@@ -25,3 +25,6 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          # This placeholder URL exists only so the CI build exercises the same sitemap generation path as production.
+          PUBLIC_SITE_URL: https://example.com
