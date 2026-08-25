@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export function getStaticPaths() {
+  return [
+    { params: { slug: 'stub' } },
+  ];
+}
+
+const { slug } = Astro.params;
+---
+
+<BaseLayout title={`/quests/${slug}`} description="Quest item placeholder page">
+  <h1>/quests/[slug]</h1>
+</BaseLayout>

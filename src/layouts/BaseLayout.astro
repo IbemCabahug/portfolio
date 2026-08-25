@@ -1,0 +1,51 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+
+const siteUrl = import.meta.env.PUBLIC_SITE_URL || Astro.site?.toString() || '';
+const canonicalUrl = siteUrl ? new URL(Astro.url.pathname, siteUrl).href : Astro.url.href;
+const sitemapUrl = siteUrl ? new URL('/sitemap-index.xml', siteUrl).href : '/sitemap-index.xml';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="sitemap" href={sitemapUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:type" content="website" />
+  </head>
+  <body>
+    <a href="#main-content">Skip to content</a>
+    <nav>
+      <ul>
+        <li><a href="/">/</a></li>
+        <li><a href="/about">/about</a></li>
+        <li><a href="/resume">/resume</a></li>
+        <li><a href="/quests">/quests</a></li>
+        <li><a href="/quests/stub">/quests/[slug]</a></li>
+        <li><a href="/messenger">/messenger</a></li>
+        <li><a href="/simple">/simple</a></li>
+        <li><a href="/tavern">/tavern</a></li>
+        <li><a href="/tavern/skills">/tavern/skills</a></li>
+        <li><a href="/tavern/npc">/tavern/npc</a></li>
+        <li><a href="/404">/404</a></li>
+      </ul>
+    </nav>
+    <main id="main-content" tabindex="-1">
+      <slot />
+    </main>
+  </body>
+</html>

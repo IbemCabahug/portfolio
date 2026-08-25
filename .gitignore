@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+.astro/
+.vercel/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Documentation and design assets
+docs/
+art/source/
+*.psd
+*.xcf
+
+# OS metadata
+.DS_Store
+Thumbs.db

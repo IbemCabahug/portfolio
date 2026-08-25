@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+:root {
+  --wood-deep: #1e1208;
+  --stone: #2c2d30;
+  --parchment: #f4ebd9;
+  --ink: #1a1818;
+  --candle: #ffe4a0;
+  --brass: #c8963e;
+  --ember: #d94e28;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
