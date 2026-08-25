@@ -1,0 +1,25 @@
+{
+  "category": "Frameworks",
+  "items": [
+    {
+      "name": "React",
+      "level": "working"
+    },
+    {
+      "name": "Next.js",
+      "level": "working"
+    },
+    {
+      "name": "Astro",
+      "level": "learning"
+    },
+    {
+      "name": "Express.js",
+      "level": "working"
+    },
+    {
+      "name": "Tailwind CSS",
+      "level": "working"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "category": "Languages",
+  "items": [
+    {
+      "name": "TypeScript",
+      "level": "working"
+    },
+    {
+      "name": "JavaScript",
+      "level": "working"
+    },
+    {
+      "name": "SQL",
+      "level": "working"
+    },
+    {
+      "name": "HTML",
+      "level": "confident"
+    },
+    {
+      "name": "CSS",
+      "level": "confident"
+    }
+  ]
+}
