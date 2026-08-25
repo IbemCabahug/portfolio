@@ -1,0 +1,42 @@
+---
+title: "Arcane Typer — a fantasy typing game"
+slug: arcanetyper
+role: "Sole developer"
+status: "Shipped"
+stack: ["JavaScript", "HTML5 Canvas", "Web Audio API", "Vite", "Supabase"]
+liveUrl: "https://arcane-typer.vercel.app/"
+sourceUrl: "https://github.com/IbemCabahug/ArcaneTyper"
+featured: true
+order: 1
+summary: "A browser typing game where words fall and you type them to hold a magical barrier. Four difficulty tiers, alternate modes including scrambled and hidden text, a practice trial that measures words per minute, accuracy and consistency, real-time one-versus-one duels over room codes, and a progression system with levels, upgrades and a leaderboard. Built alone, shipped at version 2.2.6."
+---
+
+## The project
+
+Arcane Typer is a typing game set in an enchanted library. Words fall toward a
+barrier and you type them to destroy them before they land. Correct words build
+a combo and fill a mana meter that can be spent on a screen-clearing spell.
+There are four difficulty tiers, a choice between an English wordlist and a
+programming-keyword wordlist, and alternate modes that scramble the letters or
+hide the text you are typing.
+
+Beyond the arena there is a practice trial that reports words per minute, raw
+speed, accuracy and consistency over fifteen, thirty or sixty seconds, real-time
+duels where two players share a room code and race with a live view of the
+opponent's score, and a progression layer with levels, titles, purchasable
+upgrades and a leaderboard.
+
+## What I built
+
+- A game loop on HTML5 Canvas handling falling-word spawning, difficulty
+  scaling, collision with the barrier, combo state and a mana economy, at a
+  steady frame rate on both desktop and mobile browsers.
+- Real-time multiplayer duels on Supabase: room creation and joining by code,
+  live score and progress synchronisation between two clients, and end states
+  for victory, defeat and rematch.
+- Typing measurement that separates raw speed from accuracy-adjusted speed and
+  reports consistency, which required tracking per-keystroke timing rather than
+  simply counting finished words.
+- Persistent player progression — experience, levels, titles and unlockable
+  upgrades — stored against an account so it survives between sessions.
+- Audio through the Web Audio API for typing, casting and impact feedback.

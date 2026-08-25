@@ -1,0 +1,57 @@
+{
+  "experience": [
+    {
+      "role": "IT and Administrative Support Intern",
+      "org": "Avega Bros. Integrated Shipping Corp.",
+      "period": "July 2025 – July 2026",
+      "hours": "1,800 hours",
+      "bullets": [
+        "Provided technical and administrative support: troubleshooting, hardware and software installation, data entry, inventory records and document organisation.",
+        "Contributed to BITS, the company's biometric attendance system, in production use."
+      ]
+    },
+    {
+      "role": "Contributor",
+      "org": "BITS — Biometric Integrated Timekeeping System",
+      "period": "2026",
+      "bullets": [
+        "Built biometric overtime check-in handling so additional daily scans route to approved overtime requests instead of overwriting a shift checkout.",
+        "Fixed multi-shift and split-shift edge cases producing phantom no-shift records.",
+        "Normalised punch times and emitted real-time dashboard events.",
+        "Added batch overtime assignment and split-shift report aggregation."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "credential": "Bachelor of Science in Industrial Technology, major in Computer Technology",
+      "school": "Cebu Technological University – Danao Campus",
+      "period": "August 2022 – May 2026",
+      "honors": [
+        "Academic Achiever",
+        "Dean's List"
+      ]
+    }
+  ],
+  "training": [
+    {
+      "name": "Creative Web Design",
+      "provider": "TESDA",
+      "hours": "102 hours"
+    }
+  ],
+  "languages": [
+    {
+      "name": "Cebuano",
+      "level": "Native"
+    },
+    {
+      "name": "Filipino",
+      "level": "Fluent"
+    },
+    {
+      "name": "English",
+      "level": "Professional working proficiency"
+    }
+  ]
+}

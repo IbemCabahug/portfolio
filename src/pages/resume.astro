@@ -1,7 +1,136 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const profileEntries = await getCollection('profile');
+const profile = profileEntries[0].data;
+
+const resumeEntries = await getCollection('resume');
+const resume = resumeEntries[0].data;
+
+const skillsEntries = await getCollection('skills');
 ---
 
-<BaseLayout title="/resume" description="Resume placeholder page">
-  <h1>/resume</h1>
+<BaseLayout title="Résumé | Nhovem Cabahug" description="Nhovem Cabahug's Résumé">
+  <style is:global>
+    @media print {
+      *, *::before, *::after {
+        background: transparent !important;
+        color: black !important;
+        text-shadow: none !important;
+        box-shadow: none !important;
+      }
+      body, main, html {
+        background: white !important;
+      }
+      nav, .no-print, .location-indicator {
+        display: none !important;
+      }
+      a[href]::after {
+        content: " (" attr(href) ")";
+        font-size: 0.9em;
+        word-break: break-all;
+      }
+      .entry, li {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      h1, h2 {
+        page-break-after: avoid;
+        break-after: avoid;
+      }
+    }
+  </style>
+
+  <div class="max-w-4xl mx-auto p-8">
+    <div class="no-print mb-8 flex gap-4 items-center">
+      <button onclick="window.print()" class="px-4 py-2 border-2 border-[var(--brass)] bg-[var(--wood-deep)] text-[var(--parchment)] font-semibold hover:bg-[var(--parchment)] hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--brass)]">
+        Print or save as PDF
+      </button>
+      <noscript>
+        <a href="/resume" class="underline hover:text-[var(--candle)] font-semibold">Fallback link to /resume</a>
+      </noscript>
+    </div>
+
+    <header class="mb-12 border-b-2 border-gray-800 pb-6">
+      <h1 class="text-4xl font-bold mb-2">{profile.name}</h1>
+      <p class="text-xl mb-4">{profile.title}</p>
+      
+      <div class="flex flex-col gap-1 text-sm">
+        <p class="location-indicator">Location: {profile.location}</p>
+        <p>Email: <a href={`mailto:${profile.email}`} class="underline">{profile.email}</a></p>
+        <p>GitHub: <a href={profile.github} class="underline">{profile.github}</a></p>
+      </div>
+    </header>
+
+    <section class="mb-10">
+      <h2 class="text-2xl font-bold mb-6 border-b border-gray-300 pb-2">Experience</h2>
+      <div class="flex flex-col gap-6">
+        {resume.experience.map(exp => (
+          <article class="entry">
+            <h3 class="text-xl font-bold">{exp.role}</h3>
+            <div class="font-semibold mb-2">{exp.org}</div>
+            <div class="text-sm text-gray-600 mb-3">{exp.period}{exp.hours ? ` (${exp.hours})` : ''}</div>
+            <ul class="list-disc pl-5 space-y-1">
+              {exp.bullets.map(bullet => <li>{bullet}</li>)}
+            </ul>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="mb-10">
+      <h2 class="text-2xl font-bold mb-6 border-b border-gray-300 pb-2">Education</h2>
+      <div class="flex flex-col gap-6">
+        {resume.education.map(edu => (
+          <article class="entry">
+            <h3 class="text-xl font-bold">{edu.credential}</h3>
+            <div class="font-semibold mb-2">{edu.school}</div>
+            <div class="text-sm text-gray-600 mb-3">{edu.period}</div>
+            <ul class="list-disc pl-5 space-y-1">
+              {edu.honors.map(honor => <li>{honor}</li>)}
+            </ul>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="mb-10">
+      <h2 class="text-2xl font-bold mb-6 border-b border-gray-300 pb-2">Training</h2>
+      <div class="flex flex-col gap-4">
+        {resume.training.map(train => (
+          <article class="entry">
+            <h3 class="text-lg font-bold">{train.name}</h3>
+            <div>{train.provider} — {train.hours}</div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="mb-10">
+      <h2 class="text-2xl font-bold mb-6 border-b border-gray-300 pb-2">Skills</h2>
+      <div class="flex flex-col gap-4">
+        {skillsEntries.map(skillCat => (
+          <article class="entry">
+            <h3 class="text-lg font-bold mb-2">{skillCat.data.category}</h3>
+            <ul class="list-disc pl-5">
+              {skillCat.data.items.map(item => (
+                <li>{item.name} <span class="text-sm uppercase tracking-wider text-gray-600 ml-2">({item.level})</span></li>
+              ))}
+            </ul>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="mb-10">
+      <h2 class="text-2xl font-bold mb-6 border-b border-gray-300 pb-2">Languages</h2>
+      <ul class="list-disc pl-5 space-y-2 entry">
+        {resume.languages.map(lang => (
+          <li><strong>{lang.name}</strong> — {lang.level}</li>
+        ))}
+      </ul>
+    </section>
+
+  </div>
 </BaseLayout>

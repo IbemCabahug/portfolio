@@ -73,6 +73,34 @@ const links = defineCollection({
   }),
 });
 
+const resume = defineCollection({
+  loader: glob({ pattern: "**/*.json", base: "./src/content/resume" }),
+  schema: z.object({
+    experience: z.array(z.object({
+      role: z.string(),
+      org: z.string(),
+      period: z.string(),
+      hours: z.string().optional(),
+      bullets: z.array(z.string()),
+    })),
+    education: z.array(z.object({
+      credential: z.string(),
+      school: z.string(),
+      period: z.string(),
+      honors: z.array(z.string()),
+    })),
+    training: z.array(z.object({
+      name: z.string(),
+      provider: z.string(),
+      hours: z.string(),
+    })),
+    languages: z.array(z.object({
+      name: z.string(),
+      level: z.string(),
+    })),
+  }),
+});
+
 export const collections = {
   profile,
   skills,
@@ -80,4 +108,5 @@ export const collections = {
   npc,
   innkeeper,
   links,
+  resume,
 };
