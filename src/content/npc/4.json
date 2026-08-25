@@ -1,4 +1,5 @@
 {
   "question": "Which project should I view first?",
+  "answer": "BITS — a Biometric Integrated Tracking System, built by a team of eight over six months. Nhovem worked on the overtime and attendance-processing layer: he built the biometric overtime check-in flow, fixed multi-shift and split-shift edge cases, and tracked down a time-normalisation bug that made overtime totals disagree with the dashboard. The source is public at github.com/avegabros/bits.",
   "order": 4
 }

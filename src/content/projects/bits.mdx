@@ -6,4 +6,29 @@ status: "Shipped"
 stack: ["Next.js", "TypeScript", "Express.js", "PostgreSQL"]
 featured: true
 order: 1
+summary: "A full-stack attendance system where employees clock in on ZKTeco biometric hardware and the system derives late, undertime and overtime automatically. Four role-scoped portals and 25 linked database models, built by a team of eight over six months."
+sourceUrl: "https://github.com/avegabros/bits"
 ---
+
+## The project
+
+Employees clock in on biometric hardware and the system works out late,
+undertime and overtime automatically, replacing manual attendance entry with
+audit-logged records where every adjustment or overtime request must be approved.
+
+## My contribution
+
+I worked on the overtime and attendance-processing layer.
+
+- Built the biometric overtime check-in flow, routing a third or fourth daily
+  scan to an approved overtime request instead of overwriting the shift
+  checkout, including the schema change to track actual OT start and end times.
+- Fixed multi-shift and split-shift edge cases: ghost "no shift" records created
+  by post-shift scans, and correctly prioritising closure of open records.
+- Fixed punch-time normalisation causing overtime minute mismatches on the
+  dashboard, and added real-time dashboard events for OT scans.
+- Built batch overtime assignment, and split-shift daily check-in/out report
+  aggregation.
+
+Development was AI-assisted; I reviewed, tested and debugged against real device
+behaviour.
