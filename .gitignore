@@ -20,3 +20,6 @@ art/source/
 # OS metadata
 .DS_Store
 Thumbs.db
+
+# Temp
+scratch/

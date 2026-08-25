@@ -1,13 +1,23 @@
 @import "tailwindcss";
 
+@theme {
+  --color-wood-deep: var(--wood-deep);
+  --color-stone: var(--stone);
+  --color-parchment: var(--parchment);
+  --color-ink: var(--ink);
+  --color-candle: var(--candle);
+  --color-brass: var(--brass);
+  --color-ember: var(--ember);
+}
+
 :root {
   --wood-deep: #1e1208;
   --stone: #2c2d30;
   --parchment: #f4ebd9;
   --ink: #1a1818;
   --candle: #ffe4a0;
-  --brass: #c8963e;
-  --ember: #d94e28;
+  --brass: #a87a27;
+  --ember: #b52c0b;
 }
 
 :focus-visible {

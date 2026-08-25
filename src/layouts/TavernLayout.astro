@@ -1,0 +1,103 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import ThemeInit from '../components/ThemeInit.astro';
+import PreferenceControls from '../components/PreferenceControls.astro';
+import LocationIndicator from '../components/LocationIndicator.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  location: 'messenger' | 'tavern' | 'quests' | 'skills' | 'npc';
+}
+
+const { title, description, location } = Astro.props;
+
+type Scene = {
+  left?: { label: string; link: string; };
+  current: string;
+  right?: { label: string; link: string; };
+};
+
+const scenes: Record<string, Scene> = {
+  'messenger': {
+    current: "Messenger's Corner",
+    right: { label: 'Main Tavern', link: '/tavern' },
+  },
+  'tavern': {
+    left: { label: "Messenger's Corner", link: '/messenger' },
+    current: "Main Tavern",
+    right: { label: 'Quest Board', link: '/quests' },
+  },
+  'quests': {
+    left: { label: 'Main Tavern', link: '/tavern' },
+    current: "Quest Board",
+  },
+  'skills': {
+    left: { label: 'Main Tavern', link: '/tavern' },
+    current: "Adventurer's Badge",
+  },
+  'npc': {
+    left: { label: 'Main Tavern', link: '/tavern' },
+    current: "Tavern Regular",
+  }
+};
+
+const currentScene = scenes[location];
+---
+<BaseLayout title={title} description={description} hideDefaultNav={true}>
+  <ThemeInit slot="head" />
+  
+  <header class="p-4 bg-[var(--wood-deep)] text-[var(--parchment)] flex flex-wrap justify-between items-center border-b border-[var(--brass)] gap-4">
+    <nav aria-label="Main Navigation">
+      <ul class="flex flex-wrap gap-4 text-sm font-semibold">
+        <li><a href="/" class="hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2 py-1">Home</a></li>
+        <li><a href="/about" class="hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2 py-1">About</a></li>
+        <li><a href="/resume" class="hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2 py-1">Résumé</a></li>
+        <li><a href="/tavern/skills" class="hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2 py-1">Skills</a></li>
+        <li><a href="/quests" class="hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2 py-1">Projects</a></li>
+        <li><a href="/messenger" class="hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2 py-1">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="flex flex-wrap gap-4 items-center">
+      <PreferenceControls />
+      <a href="/simple" class="underline hover:text-[var(--candle)] font-semibold px-2 py-1 focus-visible:outline-2 focus-visible:outline-[var(--brass)]">Simple portfolio mode</a>
+    </div>
+  </header>
+
+  <LocationIndicator
+    currentLabel={currentScene.current}
+    leftLabel={currentScene.left?.label}
+    leftLink={currentScene.left?.link}
+    rightLabel={currentScene.right?.label}
+    rightLink={currentScene.right?.link}
+  />
+
+  <div class="p-8">
+    <slot />
+  </div>
+
+  <script>
+    document.addEventListener('keydown', (e) => {
+      const active = document.activeElement;
+      if (active) {
+        const tag = active.tagName.toLowerCase();
+        const role = active.getAttribute('role');
+        const isEditable = active.hasAttribute('contenteditable');
+        
+        const isScrollable = active.scrollHeight > active.clientHeight || active.scrollWidth > active.clientWidth;
+        
+        if (tag === 'input' || tag === 'textarea' || tag === 'select' || role === 'textbox' || isEditable || isScrollable) {
+          return;
+        }
+      }
+
+      if (e.key === 'ArrowLeft') {
+        const leftLink = document.getElementById('nav-left');
+        if (leftLink) leftLink.click();
+      } else if (e.key === 'ArrowRight') {
+        const rightLink = document.getElementById('nav-right');
+        if (rightLink) rightLink.click();
+      }
+    });
+  </script>
+</BaseLayout>

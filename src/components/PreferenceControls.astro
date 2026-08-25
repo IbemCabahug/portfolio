@@ -1,0 +1,53 @@
+---
+---
+<div class="flex flex-wrap gap-4 items-center">
+  <button
+    id="toggle-motion"
+    type="button"
+    class="px-4 py-2 border-2 border-[var(--brass)] bg-[var(--wood-deep)] text-[var(--parchment)] font-semibold hover:bg-[var(--parchment)] hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 min-h-[44px]"
+    aria-pressed="false"
+  >
+    Motion: Full
+  </button>
+  <button
+    id="toggle-sound"
+    type="button"
+    class="px-4 py-2 border-2 border-[var(--brass)] bg-[var(--wood-deep)] text-[var(--parchment)] font-semibold hover:bg-[var(--parchment)] hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 min-h-[44px]"
+    aria-pressed="false"
+  >
+    Sound: Off
+  </button>
+</div>
+
+<script>
+  import { getMotion, getSound, setMotion, setSound, subscribePreferences } from '../store/preferences';
+
+  const btnMotion = document.getElementById('toggle-motion');
+  const btnSound = document.getElementById('toggle-sound');
+
+  function updateDOM() {
+    const motion = getMotion();
+    const sound = getSound();
+    
+    if (btnMotion) {
+      btnMotion.textContent = motion === 'full' ? 'Motion: Full' : 'Motion: Reduced';
+      btnMotion.setAttribute('aria-pressed', motion === 'reduced' ? 'true' : 'false');
+    }
+    
+    if (btnSound) {
+      btnSound.textContent = sound === 'on' ? 'Sound: On' : 'Sound: Off';
+      btnSound.setAttribute('aria-pressed', sound === 'on' ? 'true' : 'false');
+    }
+  }
+
+  updateDOM();
+  subscribePreferences(updateDOM);
+
+  btnMotion?.addEventListener('click', () => {
+    setMotion(getMotion() === 'full' ? 'reduced' : 'full');
+  });
+
+  btnSound?.addEventListener('click', () => {
+    setSound(getSound() === 'on' ? 'off' : 'on');
+  });
+</script>

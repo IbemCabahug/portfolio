@@ -1,0 +1,115 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const profileEntry = await getEntry('profile', 'main');
+const profile = profileEntry?.data;
+
+const skillsList = await getCollection('skills');
+const projectsList = await getCollection('projects');
+projectsList.sort((a, b) => a.data.order - b.data.order);
+const linksList = await getCollection('links');
+
+const title = profile ? `${profile.name} — ${profile.title}` : "Developer Portfolio";
+const description = profile?.tagline || "Developer Portfolio";
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="min-h-screen bg-[var(--wood-deep)] p-4 sm:p-8 flex justify-center">
+    <div class="w-full max-w-3xl bg-parchment text-ink p-6 sm:p-12 shadow-lg">
+      
+      {profile && (
+        <header id="about-heading" class="mb-12">
+          <h1 class="text-4xl font-bold mb-2 text-[var(--ink)]">{profile.name}</h1>
+          <p class="text-xl mb-4 font-semibold text-[var(--ink)]">{profile.title}</p>
+          <p class="text-base max-w-[70ch] leading-relaxed mb-4">{profile.tagline}</p>
+          <ul class="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+            <li><strong>Location:</strong> {profile.location}</li>
+            <li><strong>Availability:</strong> {profile.availability}</li>
+          </ul>
+        </header>
+      )}
+
+      <main class="space-y-12">
+        <section aria-labelledby="skills-heading">
+          <h2 id="skills-heading" class="text-2xl font-bold mb-6 border-b-2 border-[var(--brass)] pb-2 text-[var(--ink)]">Skills & Expertise</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+            {skillsList.map((skillGroup) => (
+              <div>
+                <h3 class="text-lg font-bold mb-3">{skillGroup.data.category}</h3>
+                <ul class="space-y-2">
+                  {skillGroup.data.items.map((item) => (
+                    <li class="flex justify-between border-b border-[var(--brass)]/30 pb-1">
+                      <span>{item.name}</span>
+                      <span class="text-sm uppercase tracking-wider">{item.level}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section aria-labelledby="projects-heading">
+          <h2 id="projects-heading" class="text-2xl font-bold mb-6 border-b-2 border-[var(--brass)] pb-2 text-[var(--ink)]">Selected Projects</h2>
+          <div class="space-y-8">
+            {projectsList.map((project) => (
+              <article>
+                <header class="mb-2">
+                  <h3 class="text-xl font-bold inline-block mr-3">{project.data.title}</h3>
+                  <span class="text-sm px-2 py-1 bg-[var(--wood-deep)] text-[var(--parchment)] align-text-bottom">{project.data.status}</span>
+                </header>
+                <p class="text-sm font-semibold mb-2">Role: {project.data.role}</p>
+                {project.data.summary && <p class="mb-3 max-w-[70ch] leading-relaxed">{project.data.summary}</p>}
+                
+                <div class="mb-4">
+                  <strong class="text-sm block mb-1">Stack:</strong>
+                  <ul class="flex flex-wrap gap-2 text-sm">
+                    {project.data.stack.map(tech => (
+                      <li class="px-2 py-1 border border-[var(--brass)]">{tech}</li>
+                    ))}
+                  </ul>
+                </div>
+                
+                <div class="flex flex-wrap gap-4">
+                  {project.data.liveUrl && (
+                    <a href={project.data.liveUrl} class="inline-flex items-center justify-center px-4 py-2 bg-[var(--wood-deep)] text-[var(--parchment)] font-semibold hover:opacity-90 focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 min-h-[44px] min-w-[44px]">View Live</a>
+                  )}
+                  {project.data.sourceUrl && (
+                    <a href={project.data.sourceUrl} class="inline-flex items-center justify-center px-4 py-2 border-2 border-[var(--wood-deep)] text-[var(--wood-deep)] font-semibold hover:bg-[var(--wood-deep)] hover:text-[var(--parchment)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 min-h-[44px] min-w-[44px]">View Source</a>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section aria-labelledby="contact-heading">
+          <h2 id="contact-heading" class="text-2xl font-bold mb-6 border-b-2 border-[var(--brass)] pb-2 text-[var(--ink)]">Contact</h2>
+          <nav aria-label="Contact links">
+            <ul class="flex flex-col gap-4">
+              {linksList.map((link) => (
+                <li>
+                  <a href={link.data.url} class="inline-flex flex-col border border-[var(--brass)] p-3 hover:bg-[var(--brass)] hover:bg-opacity-10 focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 min-h-[44px] w-full max-w-sm">
+                    <span class="text-lg font-bold underline mb-1">{link.data.plainLabel}</span>
+                    <span class="text-sm italic">{link.data.label}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </section>
+
+        {profile && profile.resumeFile && profile.resumeFile.trim() !== '' && (
+          <section aria-labelledby="resume-heading">
+            <h2 id="resume-heading" class="text-2xl font-bold mb-6 border-b-2 border-[var(--brass)] pb-2 text-[var(--ink)]">Résumé</h2>
+            <a href={profile.resumeFile} download class="inline-flex items-center justify-center px-6 py-3 bg-[var(--candle)] text-[var(--wood-deep)] font-bold hover:opacity-90 focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 min-h-[44px] min-w-[44px] max-w-xs text-center border-2 border-[var(--wood-deep)]">
+              Download Résumé (PDF)
+            </a>
+          </section>
+        )}
+      </main>
+
+    </div>
+  </div>
+</BaseLayout>

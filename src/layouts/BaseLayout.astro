@@ -4,9 +4,10 @@ import '../styles/global.css';
 interface Props {
   title: string;
   description: string;
+  hideDefaultNav?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, hideDefaultNav } = Astro.props;
 
 const siteUrl = import.meta.env.PUBLIC_SITE_URL || Astro.site?.toString() || '';
 const canonicalUrl = siteUrl ? new URL(Astro.url.pathname, siteUrl).href : Astro.url.href;
@@ -26,24 +27,36 @@ const sitemapUrl = siteUrl ? new URL('/sitemap-index.xml', siteUrl).href : '/sit
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:type" content="website" />
+    <slot name="head" />
   </head>
   <body>
     <a href="#main-content">Skip to content</a>
-    <nav>
-      <ul>
-        <li><a href="/">/</a></li>
-        <li><a href="/about">/about</a></li>
-        <li><a href="/resume">/resume</a></li>
-        <li><a href="/quests">/quests</a></li>
-        <li><a href="/quests/stub">/quests/[slug]</a></li>
-        <li><a href="/messenger">/messenger</a></li>
-        <li><a href="/simple">/simple</a></li>
-        <li><a href="/tavern">/tavern</a></li>
-        <li><a href="/tavern/skills">/tavern/skills</a></li>
-        <li><a href="/tavern/npc">/tavern/npc</a></li>
-        <li><a href="/404">/404</a></li>
-      </ul>
-    </nav>
+    {!hideDefaultNav && (
+      <nav>
+        <ul>
+          {Astro.url.pathname.startsWith('/simple') ? (
+            <>
+              <li><a href="#about-heading">About</a></li>
+              <li><a href="#skills-heading">Skills</a></li>
+              <li><a href="#projects-heading">Projects</a></li>
+              <li><a href="#contact-heading">Contact</a></li>
+            </>
+          ) : (
+            <>
+              <li><a href="/">Home</a></li>
+              <li><a href="/about">About</a></li>
+              <li><a href="/resume">Résumé</a></li>
+              <li><a href="/quests">Quest Board</a></li>
+              <li><a href="/tavern">Main Tavern</a></li>
+              <li><a href="/tavern/skills">Adventurer's Badge</a></li>
+              <li><a href="/tavern/npc">Tavern Regular</a></li>
+              <li><a href="/messenger">Messenger's Corner</a></li>
+              <li><a href="/simple">Simple portfolio mode</a></li>
+            </>
+          )}
+        </ul>
+      </nav>
+    )}
     <main id="main-content" tabindex="-1">
       <slot />
     </main>
