@@ -12,7 +12,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "check": "astro check"
+    "check": "astro check",
+    "art": "node scripts/optimise-art.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^7.0.8",

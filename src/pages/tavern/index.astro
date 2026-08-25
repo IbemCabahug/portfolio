@@ -3,5 +3,11 @@ import TavernLayout from '../../layouts/TavernLayout.astro';
 ---
 
 <TavernLayout title="/tavern" description="Tavern placeholder page" location="tavern">
-  <h1>/tavern</h1>
+  <div class="fixed inset-0 -z-10 pointer-events-none" aria-hidden="true">
+  </div>
+  <div class="relative z-10 p-4">
+    <div class="bg-[var(--wood-deep)]/90 inline-block p-4 rounded backdrop-blur-sm">
+      <h1>/tavern</h1>
+    </div>
+  </div>
 </TavernLayout>
