@@ -20,23 +20,29 @@ import TavernLayout from '../../layouts/TavernLayout.astro';
     <!-- Characters & Objects -->
     <a href="/tavern/npc" class="interactive-object sprite tavern-regular" aria-label="Talk to the Tavern Regular">
       <div class="ground-shadow"></div>
-      <img src="/art/tavern-regular-neutral-940.webp" width="470" height="703" alt="" />
-      <span class="hotspot-label">Talk to the Tavern Regular</span>
+      <img src="/art/tavern-regular-neutral-940.webp" 
+           srcset="/art/tavern-regular-neutral-470.webp 470w, /art/tavern-regular-neutral-940.webp 940w" 
+           sizes="(max-width: 1280px) 470px, 940px" 
+           width="470" height="703" alt="" />
+      <span class="hotspot-label regular-label">Talk to the Tavern Regular</span>
     </a>
 
     <button type="button" class="interactive-object sprite innkeeper" aria-label="Talk to the Innkeeper">
       <div class="ground-shadow"></div>
-      <img src="/art/innkeeper-neutral-516.webp" width="258" height="683" alt="" />
-      <span class="hotspot-label">Talk to the Innkeeper</span>
+      <img src="/art/innkeeper-neutral-516.webp" 
+           srcset="/art/innkeeper-neutral-258.webp 258w, /art/innkeeper-neutral-516.webp 516w" 
+           sizes="(max-width: 1280px) 258px, 516px" 
+           width="258" height="683" alt="" />
+      <span class="hotspot-label innkeeper-label">Talk to the Innkeeper</span>
     </button>
 
     <!-- Painted Object Hotspots -->
     <a href="/tavern/skills" class="interactive-object hotspot shield-wall" aria-label="View Skills">
-      <span class="hotspot-label">View Skills</span>
+      <span class="hotspot-label skills-label">View Skills</span>
     </a>
 
     <a href="/quests" class="interactive-object hotspot right-passage" aria-label="Go to the Quest Board">
-      <span class="hotspot-label">Go to the Quest Board</span>
+      <span class="hotspot-label quests-label">Go to the Quest Board</span>
     </a>
 
     <!-- Reserved Space: Dark centre floor -->
@@ -203,8 +209,20 @@ import TavernLayout from '../../layouts/TavernLayout.astro';
   }
 
   /* Adjust labels for invisible hotspots so they sit in the middle */
-  .hotspot .hotspot-label {
+  .hotspot .quests-label {
     bottom: 50%;
+  }
+
+  /* Task 2: Specific Label Placements */
+  .innkeeper-label {
+    bottom: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .skills-label {
+    top: 100%;
+    bottom: auto;
+    margin-top: 1rem;
   }
 
   /* Reserved dialogue area */
