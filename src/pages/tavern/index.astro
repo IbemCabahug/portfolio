@@ -2,12 +2,249 @@
 import TavernLayout from '../../layouts/TavernLayout.astro';
 ---
 
-<TavernLayout title="/tavern" description="Tavern placeholder page" location="tavern">
-  <div class="fixed inset-0 -z-10 pointer-events-none" aria-hidden="true">
+<TavernLayout title="/tavern" description="Main Tavern Scene" location="tavern">
+  <div class="scene-container">
+    <img 
+      src="/art/tavern-room-2560.webp"
+      srcset="/art/tavern-room-1280.webp 1280w, /art/tavern-room-2560.webp 2560w"
+      sizes="100vw"
+      width="2560"
+      height="1430"
+      alt=""
+      aria-hidden="true"
+      loading="eager"
+      fetchpriority="high"
+      class="scene-background"
+    />
+
+    <!-- Characters & Objects -->
+    <a href="/tavern/npc" class="interactive-object sprite tavern-regular" aria-label="Talk to the Tavern Regular">
+      <div class="ground-shadow"></div>
+      <img src="/art/tavern-regular-neutral-940.webp" width="470" height="703" alt="" />
+      <span class="hotspot-label">Talk to the Tavern Regular</span>
+    </a>
+
+    <button type="button" class="interactive-object sprite innkeeper" aria-label="Talk to the Innkeeper">
+      <div class="ground-shadow"></div>
+      <img src="/art/innkeeper-neutral-516.webp" width="258" height="683" alt="" />
+      <span class="hotspot-label">Talk to the Innkeeper</span>
+    </button>
+
+    <!-- Painted Object Hotspots -->
+    <a href="/tavern/skills" class="interactive-object hotspot shield-wall" aria-label="View Skills">
+      <span class="hotspot-label">View Skills</span>
+    </a>
+
+    <a href="/quests" class="interactive-object hotspot right-passage" aria-label="Go to the Quest Board">
+      <span class="hotspot-label">Go to the Quest Board</span>
+    </a>
+
+    <!-- Reserved Space: Dark centre floor -->
+    <div class="reserved-dialogue-area" aria-hidden="true"></div>
   </div>
-  <div class="relative z-10 p-4">
-    <div class="bg-[var(--wood-deep)]/90 inline-block p-4 rounded backdrop-blur-sm">
-      <h1>/tavern</h1>
-    </div>
+
+  <div class="narrow-links">
+    <a href="/tavern/npc" class="narrow-link">Talk to the Tavern Regular</a>
+    <button type="button" class="narrow-link">Talk to the Innkeeper</button>
+    <a href="/tavern/skills" class="narrow-link">View Skills</a>
+    <a href="/quests" class="narrow-link">Go to the Quest Board</a>
   </div>
 </TavernLayout>
+
+<style>
+  :root {
+    /* Innkeeper: Feet behind central bar, height increased by ~10% from previous 130x350 approx */
+    --innkeeper-left: 48%;
+    --innkeeper-bottom: 25%;
+    --innkeeper-width: 6.6%;
+    --innkeeper-height: 27%; /* Before: ~24.4% */
+
+    /* Tavern Regular: Seated at the right-hand table */
+    --regular-left: 50.8%;
+    --regular-bottom: 18.0%;
+    --regular-width: 10.6%;
+    --regular-height: 28.5%;
+
+    /* Shield Wall Hotspot */
+    --shield-left: 33.0%;
+    --shield-bottom: 50.0%;
+    --shield-width: 10.5%;
+    --shield-height: 20.0%;
+
+    /* Right Passage Hotspot */
+    --passage-left: 82%;
+    --passage-bottom: 26%;
+    --passage-width: 8%;
+    --passage-height: 38%;
+  }
+
+  body, html {
+    background-color: var(--wood-deep, #1a1005);
+  }
+
+  .scene-container {
+    position: relative;
+    width: 100%;
+    max-width: 2560px;
+    margin: 0 auto;
+    aspect-ratio: 2560 / 1430;
+    overflow: hidden;
+    background-color: var(--wood-deep, #1a1005);
+  }
+
+  .scene-background {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .interactive-object {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    min-width: 44px;
+    min-height: 44px;
+    transition: transform 180ms ease, filter 180ms ease;
+  }
+
+  .interactive-object img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Hotspot Label Styling */
+  .hotspot-label {
+    position: absolute;
+    bottom: -2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: url('/art/ui-parchment-slice.webp') #e6d3a8; /* Aged-parchment */
+    border: 1px solid #8b6b4a;
+    color: #1a1005; /* Dark ink text for high contrast */
+    padding: 6px 14px;
+    font-size: 0.875rem; /* min 14px */
+    font-weight: 700;
+    border-radius: 4px;
+    white-space: nowrap;
+    opacity: 1;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.8);
+    z-index: 10;
+  }
+
+  /* Interaction Feedback */
+  .interactive-object:is(:hover, :focus-visible) {
+    transform: scale(1.02);
+    filter: brightness(1.08) drop-shadow(0 0 10px rgba(213, 128, 59, 0.55));
+    outline: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .interactive-object {
+      transition: none;
+    }
+    .interactive-object:is(:hover, :focus-visible) {
+      transform: none;
+      /* filter keeps the glow/brightness as requested */
+    }
+  }
+
+  /* Ground Shadow for Characters */
+  .ground-shadow {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, 50%);
+    width: 80%;
+    height: 20px;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 70%);
+    z-index: -1;
+  }
+
+  /* Specific Positions (Percentages) via CSS Variables */
+  .tavern-regular {
+    left: var(--regular-left);
+    bottom: var(--regular-bottom);
+    width: var(--regular-width);
+    height: var(--regular-height);
+    z-index: 2;
+  }
+
+  .innkeeper {
+    left: var(--innkeeper-left);
+    bottom: var(--innkeeper-bottom);
+    width: var(--innkeeper-width);
+    height: var(--innkeeper-height);
+    z-index: 1;
+  }
+
+  .shield-wall {
+    left: var(--shield-left);
+    bottom: var(--shield-bottom);
+    width: var(--shield-width);
+    height: var(--shield-height);
+    z-index: 3;
+  }
+
+  .hotspot.right-passage {
+    left: var(--passage-left);
+    bottom: var(--passage-bottom);
+    width: var(--passage-width);
+    height: var(--passage-height);
+    z-index: 1;
+  }
+
+  /* Adjust labels for invisible hotspots so they sit in the middle */
+  .hotspot .hotspot-label {
+    bottom: 50%;
+  }
+
+  /* Reserved dialogue area */
+  .reserved-dialogue-area {
+    position: absolute;
+    left: 30%;
+    top: 75%;
+    width: 40%;
+    height: 20%;
+    z-index: 5;
+  }
+
+  /* Narrow Screens (< 640px) */
+  .narrow-links {
+    display: none;
+  }
+
+  @media (max-width: 639px) {
+    .interactive-object {
+      display: none; /* Hide interactive targets within scene */
+    }
+    .narrow-links {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 24px;
+      background-color: var(--wood-deep, #1a1005);
+    }
+    .narrow-link {
+      display: block;
+      background: url('/art/ui-parchment-slice.webp') #e6d3a8;
+      color: #1a1005;
+      padding: 12px 16px;
+      text-align: center;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 700;
+      border: 1px solid #8b6b4a;
+      border-radius: 4px;
+      min-height: 44px; /* Maintain 44px min touch target */
+    }
+  }
+</style>
