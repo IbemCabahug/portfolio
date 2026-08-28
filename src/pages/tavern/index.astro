@@ -85,18 +85,23 @@ const sceneObjects = [
 
 <TavernLayout title="Ibem's Tavern - Nhovem Cabahug" description="Main Tavern Scene" location="tavern">
   <div class="scene-container">
-    <img 
-      src="/art/tavern-room-2560.webp"
-      srcset="/art/tavern-room-1280.webp 1280w, /art/tavern-room-2560.webp 2560w"
-      sizes="100vw"
-      width="2560"
-      height="1431"
-      alt=""
-      aria-hidden="true"
-      loading="eager"
-      fetchpriority="high"
-      class="scene-background"
-    />
+    <picture>
+      <source
+        media="(min-width: 640px)"
+        srcset="/art/tavern-room-1280.webp 1280w, /art/tavern-room-2560.webp 2560w"
+        sizes="100vw"
+      />
+      <img 
+        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+        width="2560"
+        height="1431"
+        alt=""
+        aria-hidden="true"
+        loading="eager"
+        fetchpriority="high"
+        class="scene-background"
+      />
+    </picture>
 
     <div class="scene-overlay" aria-hidden="false">
       <!-- Characters & Objects -->
