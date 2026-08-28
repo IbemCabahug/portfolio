@@ -1,7 +1,17 @@
 ---
 import TavernLayout from '../../layouts/TavernLayout.astro';
+import { getCollection } from 'astro:content';
+
+const projects = await getCollection('projects');
 ---
 
-<TavernLayout title="/quests" description="Quests placeholder page" location="quests">
-  <h1>/quests</h1>
+<TavernLayout title="Quest Board - Nhovem Cabahug" description="Projects Nhovem Cabahug has built, with links to the live site and the source code." location="quests">
+  <h1>Quest Board</h1>
+  <ul>
+    {projects.map(project => (
+      <li>
+        <a href={`/quests/${project.data.slug}`}>{project.data.title}</a>
+      </li>
+    ))}
+  </ul>
 </TavernLayout>

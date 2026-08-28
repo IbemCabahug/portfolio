@@ -1,15 +1,56 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
+import TavernLayout from '../../layouts/TavernLayout.astro';
+import { getCollection, render } from 'astro:content';
 
-export function getStaticPaths() {
-  return [
-    { params: { slug: 'stub' } },
-  ];
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map(entry => ({
+    params: { slug: entry.data.slug },
+    props: { entry },
+  }));
 }
 
-const { slug } = Astro.params;
+const { entry } = Astro.props;
+const { Content } = await render(entry);
 ---
 
-<BaseLayout title={`/quests/${slug}`} description="Quest item placeholder page">
-  <h1>/quests/[slug]</h1>
-</BaseLayout>
+<TavernLayout title={entry.data.title} description={entry.data.summary || ''} location="quests">
+  <h1>{entry.data.title}</h1>
+
+  <dl>
+    {entry.data.summary && (
+      <>
+        <dt>Summary</dt>
+        <dd>{entry.data.summary}</dd>
+      </>
+    )}
+
+    <dt>Role</dt>
+    <dd>{entry.data.role}</dd>
+
+    <dt>Status</dt>
+    <dd>{entry.data.status}</dd>
+
+    <dt>Stack</dt>
+    <dd>{entry.data.stack.join(', ')}</dd>
+
+    {entry.data.liveUrl && (
+      <>
+        <dt>Live URL</dt>
+        <dd><a href={entry.data.liveUrl}>{entry.data.liveUrl}</a></dd>
+      </>
+    )}
+
+    {entry.data.sourceUrl && (
+      <>
+        <dt>Source URL</dt>
+        <dd><a href={entry.data.sourceUrl}>{entry.data.sourceUrl}</a></dd>
+      </>
+    )}
+
+  </dl>
+
+  <Content />
+
+  <a href="/quests">Back to all quests</a>
+</TavernLayout>
