@@ -64,7 +64,35 @@ The `public/art/` directory contains exactly the following 26 files. These are t
 | tavern-entrance-open-2560.webp | 2560x1429 | 70622 | background |
 | tavern-regular-neutral-470.webp | 470x703 | 46712 | sprite |
 | tavern-regular-neutral-940.webp | 940x1406 | 82016 | sprite |
-| tavern-room-1280.webp | 1280x715 | 57898 | background |
-| tavern-room-2560.webp | 2560x1430 | 130582 | background |
+| tavern-room-1280.webp | 1280×715  |  48,956 B |background |
+| tavern-room-2560.webp | 2560×1431 | 107,660 B |background |
 | tavern-sign-1694.webp | 1694x1267 | 77312 | sprite |
 | tavern-sign-847.webp | 847x634 | 48372 | sprite |
+| shield-languages-256.webp      | 256×325  | 14,394 B |
+| shield-languages-128.webp      | 128×163  |  5,552 B |
+| shield-frameworks-256.webp     | 256×354  | 16,962 B |
+| shield-frameworks-128.webp     | 128×177  |  6,200 B |
+| shield-tools-256.webp          | 256×370  | 13,018 B |
+| shield-tools-128.webp          | 128×185  |  5,792 B |
+| shield-data-256.webp           | 256×321  | 12,580 B |
+| shield-data-128.webp           | 128×161  |  5,236 B |
+| shield-other-256.webp          | 256×319  | 13,970 B |
+| shield-other-128.webp          | 128×159  |  5,446 B |
+| shield-coming-soon-256.webp    | 256×316  | 12,234 B |
+| shield-coming-soon-128.webp    | 128×158  |  5,076 B |
+| quest-board-prop-512.webp      | 512×885  | 37,472 B |
+| quest-board-prop-256.webp      | 256×443  | 16,730 B |
+| tavern-regular-seated-528.webp | 528×741  | 28,992 B |
+| tavern-regular-seated-264.webp | 264×371  | 21,050 B |
+
+The width in a filename is a measurement, not an intention. npm run art
+re-reads every file it writes and refuses, deletes and exits non-zero if
+the real width disagrees with the name, so no file in this directory can
+carry a width it does not have.
+
+tavern-regular-neutral-940.webp and -470.webp are retained deliberately,
+even though tavern-regular-seated-* supersedes them, so the swap stays
+auditable.
+
+The room pair is verified by modification time, never by dimensions,
+because a repaint at the same size is invisible to every other check.
