@@ -1,7 +1,325 @@
 ---
 import TavernLayout from '../../layouts/TavernLayout.astro';
+import { getCollection } from 'astro:content';
+
+const npcEntries = await getCollection('npc');
+const questions = npcEntries
+  .map(entry => entry.data)
+  .sort((a, b) => a.order - b.order);
 ---
 
-<TavernLayout title="/tavern/npc" description="Tavern NPC placeholder page" location="npc">
-  <h1>/tavern/npc</h1>
+<TavernLayout title="Tavern Regular" description="Ask the Tavern Regular about Nhovem Cabahug — six prepared answers about the developer, their work, and how to get in touch." location="npc">
+  <div class="npc-page">
+    <!-- Character portrait -->
+    <div class="npc-portrait" aria-hidden="true">
+      <img
+        src="/art/tavern-regular-neutral-940.webp"
+        srcset="/art/tavern-regular-neutral-470.webp 470w, /art/tavern-regular-neutral-940.webp 940w"
+        sizes="(max-width: 639px) 200px, 300px"
+        width="470"
+        height="703"
+        alt=""
+        loading="eager"
+      />
+    </div>
+
+    <div class="npc-dialogue-area">
+      <h1 class="npc-heading">The Tavern Regular</h1>
+      <p class="npc-disclosure">These are prepared responses drawn from the portfolio, not AI-generated.</p>
+
+      <!-- No-JS fallback: all QA pairs visible as a flat list -->
+      <div class="npc-fallback" id="npc-fallback">
+        {questions.map((q) => (
+          <div class="qa-pair">
+            <h3>{q.question}</h3>
+            {q.answer && <p>{q.answer}</p>}
+          </div>
+        ))}
+        <div class="npc-actions">
+          <a href="/tavern" class="npc-btn npc-btn-primary">Back to the Tavern</a>
+        </div>
+      </div>
+
+      <!-- JS-enhanced dialogue (hidden by default, shown by script) -->
+      <div class="npc-interactive" id="npc-interactive" hidden>
+        <!-- Question list view -->
+        <div id="npc-questions" class="npc-view">
+          <p class="npc-greeting">What would you like to know?</p>
+          <div class="npc-choices" role="group" aria-label="Questions for the Tavern Regular">
+            {questions.map((q, i) => (
+              <button
+                type="button"
+                class="npc-choice-btn"
+                data-question-index={i}
+              >
+                {q.question}
+              </button>
+            ))}
+          </div>
+          <div class="npc-actions">
+            <a href="/tavern" class="npc-btn npc-btn-secondary">End conversation</a>
+          </div>
+        </div>
+
+        <!-- Answer view -->
+        <div id="npc-answer" class="npc-view" hidden>
+          <h3 id="npc-answer-question" class="npc-answer-heading"></h3>
+          <div id="npc-answer-text" class="npc-answer-body" aria-live="polite" aria-atomic="true"></div>
+          <div class="npc-actions">
+            <button type="button" class="npc-btn npc-btn-primary" id="npc-back-btn">Ask another question</button>
+            <a href="/tavern" class="npc-btn npc-btn-secondary">End conversation</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </TavernLayout>
+
+<style>
+  .npc-page {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .npc-portrait {
+    flex-shrink: 0;
+    width: 200px;
+  }
+
+  .npc-portrait img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    border: 2px solid var(--brass);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  }
+
+  .npc-dialogue-area {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .npc-heading {
+    font-size: 1.75rem;
+    color: var(--candle);
+    margin: 0 0 0.25rem 0;
+  }
+
+  .npc-disclosure {
+    font-size: 0.875rem;
+    color: var(--parchment);
+    opacity: 0.7;
+    margin: 0 0 1.5rem 0;
+    font-style: italic;
+  }
+
+  /* Fallback flat list */
+  .qa-pair {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(168, 122, 39, 0.3);
+  }
+
+  .qa-pair:last-child {
+    border-bottom: none;
+  }
+
+  .qa-pair h3 {
+    font-size: 1.1rem;
+    color: var(--candle);
+    margin: 0 0 0.5rem 0;
+  }
+
+  .qa-pair p {
+    font-size: 1rem;
+    color: var(--parchment);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* Interactive dialogue */
+  .npc-greeting {
+    font-size: 1.1rem;
+    color: var(--parchment);
+    margin: 0 0 1rem 0;
+  }
+
+  .npc-choices {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .npc-choice-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: rgba(30, 18, 8, 0.8);
+    color: var(--parchment);
+    border: 1px solid var(--brass);
+    padding: 12px 16px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    min-height: 44px;
+    transition: background-color 180ms ease, border-color 180ms ease;
+  }
+
+  .npc-choice-btn:is(:hover, :focus-visible) {
+    background: rgba(168, 122, 39, 0.2);
+    border-color: var(--candle);
+  }
+
+  /* Answer view */
+  .npc-answer-heading {
+    font-size: 1.1rem;
+    color: var(--candle);
+    margin: 0 0 0.75rem 0;
+  }
+
+  .npc-answer-body {
+    font-size: 1rem;
+    color: var(--parchment);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Buttons */
+  .npc-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(168, 122, 39, 0.3);
+  }
+
+  .npc-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 4px;
+    cursor: pointer;
+    min-height: 44px;
+    text-decoration: none;
+    border: none;
+  }
+
+  .npc-btn-primary {
+    background: var(--parchment);
+    color: var(--ink);
+  }
+
+  .npc-btn-primary:is(:hover, :focus-visible) {
+    background: var(--candle);
+  }
+
+  .npc-btn-secondary {
+    background: transparent;
+    color: var(--parchment);
+    border: 1px solid var(--parchment);
+  }
+
+  .npc-btn-secondary:is(:hover, :focus-visible) {
+    background: rgba(244, 235, 217, 0.1);
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .npc-choice-btn {
+      transition: none;
+    }
+  }
+
+  /* Mobile: stack portrait above dialogue */
+  @media (max-width: 639px) {
+    .npc-page {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .npc-portrait {
+      width: 140px;
+    }
+
+    .npc-dialogue-area {
+      width: 100%;
+    }
+
+    .npc-choice-btn {
+      font-size: 1rem;
+      padding: 14px 16px;
+    }
+  }
+</style>
+
+<script>
+  const fallback = document.getElementById('npc-fallback');
+  const interactive = document.getElementById('npc-interactive');
+  const questionsView = document.getElementById('npc-questions');
+  const answerView = document.getElementById('npc-answer');
+  const answerQuestion = document.getElementById('npc-answer-question');
+  const answerText = document.getElementById('npc-answer-text');
+  const backBtn = document.getElementById('npc-back-btn');
+
+  if (fallback && interactive && questionsView && answerView && answerQuestion && answerText && backBtn) {
+    // Collect answers from the fallback before hiding it
+    const qaPairs: { question: string; answer: string }[] = [];
+    fallback.querySelectorAll('.qa-pair').forEach((pair) => {
+      const h3 = pair.querySelector('h3');
+      const p = pair.querySelector('p');
+      qaPairs.push({
+        question: h3?.textContent?.trim() || '',
+        answer: p?.textContent?.trim() || '',
+      });
+    });
+
+    // Progressive enhancement: swap fallback for interactive
+    fallback.hidden = true;
+    interactive.hidden = false;
+
+    function showQuestions() {
+      if (!questionsView || !answerView) return;
+      questionsView.hidden = false;
+      answerView.hidden = true;
+
+      // Focus the first question button
+      const firstBtn = questionsView.querySelector<HTMLButtonElement>('.npc-choice-btn');
+      if (firstBtn) firstBtn.focus();
+    }
+
+    function showAnswer(index: number) {
+      if (!questionsView || !answerView || !answerQuestion || !answerText) return;
+      const pair = qaPairs[index];
+      if (!pair) return;
+
+      questionsView.hidden = true;
+      answerView.hidden = false;
+      answerQuestion.textContent = pair.question;
+      answerText.textContent = pair.answer;
+
+      // Focus the answer heading for screen readers, then the live region announces
+      answerQuestion.setAttribute('tabindex', '-1');
+      answerQuestion.focus();
+    }
+
+    // Question button clicks
+    questionsView.querySelectorAll<HTMLButtonElement>('.npc-choice-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const index = parseInt(btn.getAttribute('data-question-index') || '0', 10);
+        showAnswer(index);
+      });
+    });
+
+    // Back button
+    backBtn.addEventListener('click', showQuestions);
+  }
+</script>

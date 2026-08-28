@@ -47,22 +47,37 @@ const currentScene = scenes[location];
 <BaseLayout title={title} description={description} hideDefaultNav={true}>
   <ThemeInit slot="head" />
   
-  <header class="p-4 bg-[var(--wood-deep)] text-[var(--parchment)] flex flex-wrap justify-between items-center border-b border-[var(--brass)] gap-4">
-    <nav aria-label="Main Navigation">
-      <ul class="flex flex-wrap gap-4 text-sm font-semibold">
-        <li><a href="/" class="hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2 py-1">Home</a></li>
-        <li><a href="/about" class="hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2 py-1">About</a></li>
-        <li><a href="/resume" class="hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2 py-1">Résumé</a></li>
-        <li><a href="/tavern" class="hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2 py-1">Main Tavern</a></li>
-        <li><a href="/tavern/skills" class="hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2 py-1">Adventurer's Badge</a></li>
-        <li><a href="/tavern/npc" class="hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2 py-1">Tavern Regular</a></li>
-        <li><a href="/quests" class="hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2 py-1">Quest Board</a></li>
-        <li><a href="/messenger" class="hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2 py-1">Messenger's Corner</a></li>
+  <header class="p-2 sm:p-4 bg-[var(--wood-deep)] text-[var(--parchment)] flex flex-col sm:flex-row flex-wrap justify-between items-center border-b border-[var(--brass)] gap-2 sm:gap-4">
+    <nav aria-label="Main Navigation" class="w-full sm:w-auto">
+      <details class="sm:hidden group">
+        <summary class="flex items-center justify-center min-h-[44px] px-4 font-semibold cursor-pointer hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)]">
+          Menu
+        </summary>
+        <ul class="flex flex-col gap-2 p-2 mt-2 border-t border-[var(--brass)] text-sm font-semibold">
+          <li><a href="/" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Home</a></li>
+          <li><a href="/about" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">About</a></li>
+          <li><a href="/resume" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Résumé</a></li>
+          <li><a href="/tavern" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Main Tavern</a></li>
+          <li><a href="/tavern/skills" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Adventurer's Badge</a></li>
+          <li><a href="/tavern/npc" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Tavern Regular</a></li>
+          <li><a href="/quests" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Quest Board</a></li>
+          <li><a href="/messenger" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Messenger's Corner</a></li>
+        </ul>
+      </details>
+      <ul class="hidden sm:flex flex-wrap justify-center sm:justify-start gap-2 sm:gap-4 text-xs sm:text-sm font-semibold">
+        <li><a href="/" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Home</a></li>
+        <li><a href="/about" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">About</a></li>
+        <li><a href="/resume" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Résumé</a></li>
+        <li><a href="/tavern" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Main Tavern</a></li>
+        <li><a href="/tavern/skills" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Adventurer's Badge</a></li>
+        <li><a href="/tavern/npc" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Tavern Regular</a></li>
+        <li><a href="/quests" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Quest Board</a></li>
+        <li><a href="/messenger" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Messenger's Corner</a></li>
       </ul>
     </nav>
-    <div class="flex flex-wrap gap-4 items-center">
+    <div class="flex flex-wrap justify-center sm:justify-end gap-2 sm:gap-4 items-center w-full sm:w-auto">
       <PreferenceControls />
-      <a href="/simple" class="underline hover:text-[var(--candle)] font-semibold px-2 py-1 focus-visible:outline-2 focus-visible:outline-[var(--brass)]">Simple portfolio mode</a>
+      <a href="/simple" class="flex items-center min-h-[44px] underline hover:text-[var(--candle)] font-semibold px-2 focus-visible:outline-2 focus-visible:outline-[var(--brass)]">Simple portfolio mode</a>
     </div>
   </header>
 
@@ -74,7 +89,7 @@ const currentScene = scenes[location];
     rightLink={currentScene.right?.link}
   />
 
-  <div class="p-8">
+  <div class="p-4 sm:p-8">
     <slot />
   </div>
 

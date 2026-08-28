@@ -1,15 +1,96 @@
 ---
 import TavernLayout from '../../layouts/TavernLayout.astro';
+
+import { getCollection } from 'astro:content';
+
+const skillsEntries = await getCollection('skills');
+const skills = skillsEntries.map(entry => entry.data);
+
+const innkeeperEntries = await getCollection('innkeeper');
+const innkeeperLines = innkeeperEntries
+  .map(entry => entry.data)
+  .sort((a: any, b: any) => a.order - b.order)
+  .map(d => d.line);
+
+// Data structure for the interactive scene objects
+const sceneObjects = [
+  {
+    id: 'shield-languages',
+    type: 'shield',
+    label: 'Languages',
+    ariaLabel: 'View Languages skills',
+    position: { left: '31.5%', bottom: '58.5%', width: '3.5%' },
+    pixelHeight: 325,
+    tooltipPlacement: 'left',
+    zIndex: 3,
+    action: { type: 'dialog', target: 'dialog-skills', filter: 'Languages' },
+  },
+  {
+    id: 'shield-frameworks',
+    type: 'shield',
+    label: 'Frameworks',
+    ariaLabel: 'View Frameworks skills',
+    position: { left: '35.5%', bottom: '61%', width: '4%' },
+    pixelHeight: 354,
+    tooltipPlacement: 'top',
+    zIndex: 3,
+    action: { type: 'dialog', target: 'dialog-skills', filter: 'Frameworks' },
+  },
+  {
+    id: 'shield-tools',
+    type: 'shield',
+    label: 'Tools',
+    ariaLabel: 'View Tools skills',
+    position: { left: '40%', bottom: '58%', width: '3.5%' },
+    pixelHeight: 370,
+    tooltipPlacement: 'right',
+    zIndex: 3,
+    action: { type: 'dialog', target: 'dialog-skills', filter: 'Tools' },
+  },
+  {
+    id: 'shield-data',
+    type: 'shield',
+    label: 'Data',
+    ariaLabel: 'View Data skills',
+    position: { left: '31.5%', bottom: '46%', width: '3.5%' },
+    pixelHeight: 321,
+    tooltipPlacement: 'left',
+    zIndex: 3,
+    action: { type: 'dialog', target: 'dialog-skills', filter: 'Data' },
+  },
+  {
+    id: 'shield-other',
+    type: 'shield',
+    label: 'Other',
+    ariaLabel: 'View Other skills',
+    position: { left: '35.5%', bottom: '45.5%', width: '3.5%' },
+    pixelHeight: 319,
+    tooltipPlacement: 'bottom',
+    zIndex: 3,
+    action: { type: 'dialog', target: 'dialog-skills', filter: 'Other' },
+  },
+  {
+    id: 'shield-coming-soon',
+    type: 'shield',
+    label: 'Coming Soon',
+    ariaLabel: 'Unmapped shield',
+    position: { left: '40%', bottom: '46%', width: '3.5%' },
+    pixelHeight: 316,
+    tooltipPlacement: 'right',
+    zIndex: 3,
+    action: { type: 'none' },
+  }
+];
 ---
 
-<TavernLayout title="/tavern" description="Main Tavern Scene" location="tavern">
+<TavernLayout title="Ibem's Tavern - Nhovem Cabahug" description="Main Tavern Scene" location="tavern">
   <div class="scene-container">
     <img 
       src="/art/tavern-room-2560.webp"
       srcset="/art/tavern-room-1280.webp 1280w, /art/tavern-room-2560.webp 2560w"
       sizes="100vw"
       width="2560"
-      height="1430"
+      height="1431"
       alt=""
       aria-hidden="true"
       loading="eager"
@@ -17,73 +98,123 @@ import TavernLayout from '../../layouts/TavernLayout.astro';
       class="scene-background"
     />
 
-    <!-- Characters & Objects -->
-    <a href="/tavern/npc" class="interactive-object sprite tavern-regular" aria-label="Talk to the Tavern Regular">
-      <div class="ground-shadow"></div>
-      <img src="/art/tavern-regular-neutral-940.webp" 
-           srcset="/art/tavern-regular-neutral-470.webp 470w, /art/tavern-regular-neutral-940.webp 940w" 
-           sizes="(max-width: 1280px) 470px, 940px" 
-           width="470" height="703" alt="" />
-      <span class="hotspot-label regular-label">Talk to the Tavern Regular</span>
-    </a>
+    <div class="scene-overlay" aria-hidden="false">
+      <!-- Characters & Objects -->
+      <a href="/tavern/npc" id="trigger-regular" class="scene-object" aria-label="Talk to the Tavern Regular"
+         style="left: 50.8%; bottom: 18.0%; width: 10.6%; z-index: 2;">
+        <div class="ground-shadow"></div>
+        <img src="/art/tavern-regular-seated-528.webp" 
+             srcset="/art/tavern-regular-seated-264.webp 264w, /art/tavern-regular-seated-528.webp 528w" 
+             sizes="(max-width: 1280px) 264px, 528px" 
+             width="528" height="741" alt="" />
+        <span class="scene-tooltip" data-placement="bottom">Tavern Regular</span>
+      </a>
 
-    <button type="button" class="interactive-object sprite innkeeper" aria-label="Talk to the Innkeeper">
-      <div class="ground-shadow"></div>
-      <img src="/art/innkeeper-neutral-516.webp" 
-           srcset="/art/innkeeper-neutral-258.webp 258w, /art/innkeeper-neutral-516.webp 516w" 
-           sizes="(max-width: 1280px) 258px, 516px" 
-           width="258" height="683" alt="" />
-      <span class="hotspot-label innkeeper-label">Talk to the Innkeeper</span>
-    </button>
+      <!-- OPEN DEFECT (M9): No non-JS fallback route exists for the Innkeeper dialogue. -->
+      <button type="button" id="trigger-innkeeper" class="scene-object" aria-label="Talk to the Innkeeper"
+              style="left: 48%; bottom: 25%; width: 6.6%; z-index: 1;">
+        <div class="ground-shadow"></div>
+        <img src="/art/innkeeper-neutral-516.webp" 
+             srcset="/art/innkeeper-neutral-258.webp 258w, /art/innkeeper-neutral-516.webp 516w" 
+             sizes="(max-width: 1280px) 258px, 516px" 
+             width="516" height="1365" alt="" />
+        <span class="scene-tooltip" data-placement="top">Talk to the Innkeeper</span>
+      </button>
 
-    <!-- Painted Object Hotspots -->
-    <a href="/tavern/skills" class="interactive-object hotspot shield-wall" aria-label="View Skills">
-      <span class="hotspot-label skills-label">View Skills</span>
-    </a>
+      <!-- Painted Object Hotspots -->
+      {sceneObjects.map(obj => {
+        if (obj.action.type === 'dialog') {
+          return (
+            <button type="button" class="scene-object scene-hotspot shield" id={`trigger-${obj.id}`}
+                    aria-label={obj.ariaLabel} data-filter={obj.action.filter}
+                    style={`left: ${obj.position.left}; bottom: ${obj.position.bottom}; width: ${obj.position.width}; z-index: ${obj.zIndex};`}>
+              <img src={`/art/${obj.id}-256.webp`}
+                   srcset={`/art/${obj.id}-128.webp 128w, /art/${obj.id}-256.webp 256w`}
+                   sizes="(max-width: 1280px) 128px, 256px"
+                   width="256" height={obj.pixelHeight} alt="" />
+              <span class="scene-tooltip" data-placement={obj.tooltipPlacement}>{obj.label}</span>
+            </button>
+          );
+        }
+        return (
+            <button type="button" class="scene-object scene-hotspot shield" id={`trigger-${obj.id}`}
+                    aria-label={obj.ariaLabel} disabled
+                    style={`left: ${obj.position.left}; bottom: ${obj.position.bottom}; width: ${obj.position.width}; z-index: ${obj.zIndex}; cursor: default;`}>
+              <img src={`/art/${obj.id}-256.webp`}
+                   srcset={`/art/${obj.id}-128.webp 128w, /art/${obj.id}-256.webp 256w`}
+                   sizes="(max-width: 1280px) 128px, 256px"
+                   width="256" height={obj.pixelHeight} alt="" />
+              <span class="scene-tooltip" data-placement={obj.tooltipPlacement}>{obj.label}</span>
+            </button>
+        );
+      })}
 
-    <a href="/quests" class="interactive-object hotspot right-passage" aria-label="Go to the Quest Board">
-      <span class="hotspot-label quests-label">Go to the Quest Board</span>
-    </a>
+      <a href="/quests" id="trigger-quest-board" class="scene-object scene-hotspot" aria-label="Go to the Quest Board"
+         style="left: 89.2%; bottom: 44.5%; width: 6.5%; z-index: 2;">
+        <img src="/art/quest-board-prop-512.webp"
+             srcset="/art/quest-board-prop-256.webp 256w, /art/quest-board-prop-512.webp 512w"
+             sizes="(max-width: 1280px) 256px, 512px"
+             width="512" height="885" alt="" />
+        <span class="scene-tooltip" data-placement="left">Quest Board</span>
+      </a>
 
-    <!-- Reserved Space: Dark centre floor -->
-    <div class="reserved-dialogue-area" aria-hidden="true"></div>
+      <!-- Papers Hotspots -->
+
+      <!-- In-scene Panels -->
+      <!-- Skills Panel -->
+      <div id="dialog-skills" class="tavern-panel skills-panel" role="dialog" aria-modal="true" aria-labelledby="skills-title" hidden>
+        <div class="panel-header">
+          <img src="/art/adventurers-badge-384.webp" alt="" width="48" height="58" class="panel-icon" />
+          <h2 id="skills-title">Skills & Arsenal</h2>
+        </div>
+        <div class="panel-body skills-grid">
+          {skills.map((group) => (
+            <div class="skill-category" data-category={group.category}>
+              <h3>{group.category}</h3>
+              <ul>
+                {group.items.map((item) => (
+                  <li><strong>{item.name}</strong> <span>({item.level})</span></li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <div class="panel-actions">
+          <button type="button" class="close-panel-btn">Close Skills</button>
+          <button type="button" class="close-panel-btn back-btn">Back to Tavern</button>
+        </div>
+      </div>
+
+      <!-- Innkeeper Dialogue -->
+      <div id="dialog-innkeeper" class="tavern-panel dialogue-panel" role="dialog" aria-modal="true" aria-labelledby="innkeeper-title" hidden>
+        <div class="panel-header">
+          <h2 id="innkeeper-title">The Innkeeper Says...</h2>
+        </div>
+        <div class="panel-body">
+          {innkeeperLines.map((line) => (
+            <p>{line}</p>
+          ))}
+        </div>
+        <div class="panel-actions">
+          <button type="button" class="close-panel-btn">Close Dialogue</button>
+          <button type="button" class="close-panel-btn back-btn">Back to Work</button>
+        </div>
+      </div>
+      
+      <!-- Reserved Space: Dark centre floor -->
+      <div class="reserved-dialogue-area" aria-hidden="true"></div>
+    </div>
   </div>
 
   <div class="narrow-links">
     <a href="/tavern/npc" class="narrow-link">Talk to the Tavern Regular</a>
-    <button type="button" class="narrow-link">Talk to the Innkeeper</button>
+    <button type="button" class="narrow-link" id="narrow-innkeeper">Talk to the Innkeeper</button>
     <a href="/tavern/skills" class="narrow-link">View Skills</a>
     <a href="/quests" class="narrow-link">Go to the Quest Board</a>
   </div>
 </TavernLayout>
 
 <style>
-  :root {
-    /* Innkeeper: Feet behind central bar, height increased by ~10% from previous 130x350 approx */
-    --innkeeper-left: 48%;
-    --innkeeper-bottom: 25%;
-    --innkeeper-width: 6.6%;
-    --innkeeper-height: 27%; /* Before: ~24.4% */
-
-    /* Tavern Regular: Seated at the right-hand table */
-    --regular-left: 50.8%;
-    --regular-bottom: 18.0%;
-    --regular-width: 10.6%;
-    --regular-height: 28.5%;
-
-    /* Shield Wall Hotspot */
-    --shield-left: 33.0%;
-    --shield-bottom: 50.0%;
-    --shield-width: 10.5%;
-    --shield-height: 20.0%;
-
-    /* Right Passage Hotspot */
-    --passage-left: 82%;
-    --passage-bottom: 26%;
-    --passage-width: 8%;
-    --passage-height: 38%;
-  }
-
   body, html {
     background-color: var(--wood-deep, #1a1005);
   }
@@ -93,7 +224,6 @@ import TavernLayout from '../../layouts/TavernLayout.astro';
     width: 100%;
     max-width: 2560px;
     margin: 0 auto;
-    aspect-ratio: 2560 / 1430;
     overflow: hidden;
     background-color: var(--wood-deep, #1a1005);
   }
@@ -101,14 +231,17 @@ import TavernLayout from '../../layouts/TavernLayout.astro';
   .scene-background {
     display: block;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto; /* Uses intrinsic aspect ratio */
   }
 
-  .interactive-object {
+  .scene-overlay {
+    position: absolute;
+    inset: 0;
+  }
+
+  .scene-object {
     position: absolute;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
     text-decoration: none;
@@ -116,50 +249,95 @@ import TavernLayout from '../../layouts/TavernLayout.astro';
     border: none;
     padding: 0;
     cursor: pointer;
-    min-width: 44px;
-    min-height: 44px;
-    transition: transform 180ms ease, filter 180ms ease;
   }
 
-  .interactive-object img {
+  .scene-object::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    transform: translate(-50%, -50%);
+  }
+
+  .scene-object img {
     display: block;
     width: 100%;
     height: auto;
+    pointer-events: none;
   }
 
-  /* Hotspot Label Styling */
-  .hotspot-label {
+  /* Tooltip: visible by default */
+  .scene-tooltip {
     position: absolute;
-    bottom: -2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    background: url('/art/ui-parchment-slice.webp') #e6d3a8; /* Aged-parchment */
-    border: 1px solid #8b6b4a;
-    color: #1a1005; /* Dark ink text for high contrast */
-    padding: 6px 14px;
-    font-size: 0.875rem; /* min 14px */
-    font-weight: 700;
+    pointer-events: none;
+    background: var(--wood-deep, #1a1005);
+    border: 1px solid #d5803b;
+    color: #e6d3a8;
+    padding: 4px 10px;
+    font-size: 0.8125rem;
+    font-weight: 600;
     border-radius: 4px;
     white-space: nowrap;
     opacity: 1;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.8);
-    z-index: 10;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.6);
   }
 
-  /* Interaction Feedback */
-  .interactive-object:is(:hover, :focus-visible) {
-    transform: scale(1.02);
-    filter: brightness(1.08) drop-shadow(0 0 10px rgba(213, 128, 59, 0.55));
-    outline: none;
+  /* Placement variants */
+  .scene-tooltip[data-placement="top"] {
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .scene-tooltip[data-placement="bottom"] {
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .scene-tooltip[data-placement="left"] {
+    right: calc(100% + 8px);
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .scene-tooltip[data-placement="right"] {
+    left: calc(100% + 8px);
+    top: 50%;
+    transform: translateY(-50%);
   }
 
+
+
+  /* Highlight feedback */
+  .scene-object:is(:hover, :focus-visible) {
+    filter: brightness(1.12) drop-shadow(0 0 8px rgba(213, 128, 59, 0.6));
+    outline: 2px solid rgba(213, 128, 59, 0.6);
+    outline-offset: 2px;
+  }
+
+  /* Hotspot-only objects: subtle highlight area */
+  .scene-hotspot:is(:hover, :focus-visible) {
+    background: rgba(213, 128, 59, 0.12);
+    border-radius: 4px;
+  }
+
+  /* Active state: brief press feedback */
+  .scene-object:active {
+    filter: brightness(1.2);
+    transform: scale(0.98);
+  }
+
+  /* Reduced motion */
   @media (prefers-reduced-motion: reduce) {
-    .interactive-object {
-      transition: none;
-    }
-    .interactive-object:is(:hover, :focus-visible) {
+    .scene-tooltip { transition: none; }
+    .scene-object { transition: none; }
+    .scene-object:is(:hover, :focus-visible) {
       transform: none;
-      /* filter keeps the glow/brightness as requested */
+      /* Keep outline and brightness, remove drop-shadow animation */
+    }
+    .scene-object:active {
+      transform: none;
     }
   }
 
@@ -175,56 +353,6 @@ import TavernLayout from '../../layouts/TavernLayout.astro';
     z-index: -1;
   }
 
-  /* Specific Positions (Percentages) via CSS Variables */
-  .tavern-regular {
-    left: var(--regular-left);
-    bottom: var(--regular-bottom);
-    width: var(--regular-width);
-    height: var(--regular-height);
-    z-index: 2;
-  }
-
-  .innkeeper {
-    left: var(--innkeeper-left);
-    bottom: var(--innkeeper-bottom);
-    width: var(--innkeeper-width);
-    height: var(--innkeeper-height);
-    z-index: 1;
-  }
-
-  .shield-wall {
-    left: var(--shield-left);
-    bottom: var(--shield-bottom);
-    width: var(--shield-width);
-    height: var(--shield-height);
-    z-index: 3;
-  }
-
-  .hotspot.right-passage {
-    left: var(--passage-left);
-    bottom: var(--passage-bottom);
-    width: var(--passage-width);
-    height: var(--passage-height);
-    z-index: 1;
-  }
-
-  /* Adjust labels for invisible hotspots so they sit in the middle */
-  .hotspot .quests-label {
-    bottom: 50%;
-  }
-
-  /* Task 2: Specific Label Placements */
-  .innkeeper-label {
-    bottom: 100%;
-    margin-bottom: 1rem;
-  }
-
-  .skills-label {
-    top: 100%;
-    bottom: auto;
-    margin-top: 1rem;
-  }
-
   /* Reserved dialogue area */
   .reserved-dialogue-area {
     position: absolute;
@@ -237,11 +365,204 @@ import TavernLayout from '../../layouts/TavernLayout.astro';
 
   /* Narrow Screens (< 640px) */
   .narrow-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+  
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Panels styling */
+  .tavern-panel {
+    position: absolute;
+    background: rgba(15, 10, 5, 0.95);
+    border: 2px solid #8b6b4a;
+    border-radius: 8px;
+    color: #fdf6e3;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    animation: slideUp 0.3s ease-out forwards;
+  }
+
+  .tavern-panel[hidden] {
+    display: none !important;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tavern-panel {
+      animation: appear 0.1s ease-out forwards;
+    }
+    @keyframes appear {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  }
+
+  /* Positions */
+  .skills-panel {
+    left: 20%;
+    bottom: 10%;
+    width: 60%;
+    max-height: 70%;
+    overflow-y: auto;
+  }
+  
+  .paper-panel {
+    left: 25%;
+    bottom: 25%;
+    width: 50%;
+    max-height: 50%;
+    overflow-y: auto;
+  }
+
+  .disabled-by-dialog {
+    pointer-events: none;
+  }
+
+  .disabled-by-dialog .scene-tooltip {
+    opacity: 0 !important;
+  }
+
+  .dialogue-panel {
+    left: 10%;
+    bottom: 40%;
+    width: 35%;
+    max-height: 55%;
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid rgba(253, 246, 227, 0.2);
+    padding-bottom: 12px;
+  }
+
+  .panel-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #e6d3a8;
+  }
+
+  .panel-body {
+    overflow-y: auto;
+  }
+
+  .panel-body p {
+    margin: 0 0 12px 0;
+    line-height: 1.5;
+    font-size: 1.1rem;
+  }
+  
+  .panel-body ul {
+    margin-left: 20px;
+    margin-bottom: 12px;
+  }
+  
+  .panel-body li {
+    margin-bottom: 8px;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .skill-category h3 {
+    color: #d5803b;
+    margin: 0 0 8px 0;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .skill-category ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .skill-category li {
+    margin-bottom: 4px;
+    font-size: 1rem;
+  }
+
+  .skill-category li span {
+    opacity: 0.7;
+    font-size: 0.9rem;
+  }
+  
+  /* Filtering styles */
+  .skill-category.filtered-out {
     display: none;
   }
 
+  .panel-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid rgba(253, 246, 227, 0.2);
+  }
+
+  .close-panel-btn {
+    background: #e6d3a8;
+    color: #1a1005;
+    border: none;
+    padding: 8px 16px;
+    font-weight: 700;
+    border-radius: 4px;
+    cursor: pointer;
+    min-height: 44px; /* Accessible target */
+  }
+
+  .close-panel-btn:is(:hover, :focus-visible) {
+    background: #1a1005;
+    color: #e6d3a8;
+    outline: 2px solid #e6d3a8;
+    outline-offset: 2px;
+  }
+
+  .back-btn {
+    background: transparent;
+    color: #e6d3a8;
+    border: 1px solid #e6d3a8;
+  }
+
+  .back-btn:is(:hover, :focus-visible) {
+    background: rgba(230, 211, 168, 0.1);
+    color: #e6d3a8;
+  }
+
   @media (max-width: 639px) {
-    .interactive-object {
+    .scene-container {
+      display: none;
+    }
+    .scene-overlay {
       display: none; /* Hide interactive targets within scene */
     }
     .narrow-links {
@@ -253,7 +574,7 @@ import TavernLayout from '../../layouts/TavernLayout.astro';
     }
     .narrow-link {
       display: block;
-      background: url('/art/ui-parchment-slice.webp') #e6d3a8;
+      background: #e6d3a8;
       color: #1a1005;
       padding: 12px 16px;
       text-align: center;
@@ -266,3 +587,129 @@ import TavernLayout from '../../layouts/TavernLayout.astro';
     }
   }
 </style>
+
+<script>
+  const triggerInnkeeper = document.getElementById('trigger-innkeeper');
+  
+  const narrowInnkeeper = document.getElementById('narrow-innkeeper');
+  
+  const dialogSkills = document.getElementById('dialog-skills');
+  const dialogInnkeeper = document.getElementById('dialog-innkeeper');
+
+  const sceneInteractives = document.querySelectorAll('.scene-object, .narrow-link');
+  let activeDialog: HTMLElement | null = null;
+  let activeTrigger: HTMLElement | null = null;
+
+  function openDialog(dialog: HTMLElement, trigger: HTMLElement, filterCategory?: string) {
+    sceneInteractives.forEach(el => {
+      el.classList.add('disabled-by-dialog');
+      el.setAttribute('tabindex', '-1');
+    });
+    
+    // Handle filtering for skills dialog
+    if (dialog === dialogSkills) {
+      const categories = dialog.querySelectorAll('.skill-category');
+      categories.forEach(cat => {
+        if (filterCategory && cat.getAttribute('data-category') !== filterCategory) {
+          cat.classList.add('filtered-out');
+        } else {
+          cat.classList.remove('filtered-out');
+        }
+      });
+      
+      const title = dialog.querySelector('#skills-title');
+      if (title) {
+        title.textContent = filterCategory ? `Skills: ${filterCategory}` : 'Skills & Arsenal';
+      }
+    }
+    
+    dialog.hidden = false;
+    dialog.setAttribute('aria-hidden', 'false');
+    trigger.setAttribute('aria-expanded', 'true');
+    activeDialog = dialog;
+    activeTrigger = trigger;
+    
+    const focusables = getFocusableElements(dialog);
+    if (focusables.length) focusables[0].focus();
+    
+    document.addEventListener('keydown', handleKeydown);
+  }
+
+  function closeDialog() {
+    if (!activeDialog) return;
+    sceneInteractives.forEach(el => {
+      el.classList.remove('disabled-by-dialog');
+      el.removeAttribute('tabindex');
+    });
+    activeDialog.hidden = true;
+    activeDialog.setAttribute('aria-hidden', 'true');
+    if (activeTrigger) {
+      activeTrigger.setAttribute('aria-expanded', 'false');
+      activeTrigger.focus();
+    }
+    activeDialog = null;
+    activeTrigger = null;
+    document.removeEventListener('keydown', handleKeydown);
+  }
+
+  function getFocusableElements(el: HTMLElement): HTMLElement[] {
+    return Array.from(el.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'));
+  }
+
+  function handleKeydown(e: KeyboardEvent) {
+    if (e.key === 'Escape') {
+      closeDialog();
+      return;
+    }
+    if (e.key === 'Tab' && activeDialog) {
+      const focusables = getFocusableElements(activeDialog);
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+  }
+
+  // Setup shield triggers
+  document.querySelectorAll('button[id^="trigger-shield-"]').forEach(trigger => {
+    if (dialogSkills && trigger instanceof HTMLElement) {
+      trigger.setAttribute('aria-haspopup', 'dialog');
+      trigger.setAttribute('aria-expanded', 'false');
+      trigger.setAttribute('aria-controls', 'dialog-skills');
+      trigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        const filter = trigger.getAttribute('data-filter') || undefined;
+        openDialog(dialogSkills, trigger, filter);
+      });
+    }
+  });
+
+  // Setup Innkeeper triggers
+  [triggerInnkeeper, narrowInnkeeper].forEach(trigger => {
+    if (trigger && dialogInnkeeper) {
+      trigger.setAttribute('aria-haspopup', 'dialog');
+      trigger.setAttribute('aria-expanded', 'false');
+      trigger.setAttribute('aria-controls', 'dialog-innkeeper');
+      trigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        openDialog(dialogInnkeeper, trigger);
+      });
+    }
+  });
+  
+
+
+  document.querySelectorAll('.close-panel-btn').forEach(btn => {
+    btn.addEventListener('click', closeDialog);
+  });
+</script>

@@ -9,24 +9,24 @@ interface Props {
 
 const { currentLabel, leftLabel, leftLink, rightLabel, rightLink } = Astro.props;
 ---
-<nav aria-label="Scene navigation" class="flex items-center justify-center gap-4 py-4 text-[var(--parchment)] font-semibold bg-[var(--wood-deep)]">
+<nav aria-label="Scene navigation" class="flex items-center justify-center gap-2 sm:gap-4 py-2 sm:py-4 text-[var(--parchment)] font-semibold bg-[var(--wood-deep)]">
   {leftLink && leftLabel ? (
-    <a href={leftLink} class="hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2 py-1" id="nav-left">
+    <a href={leftLink} class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2" id="nav-left">
       {leftLabel} &larr;
     </a>
   ) : (
-    <span class="opacity-0 px-2 py-1 pointer-events-none" aria-hidden="true">None &larr;</span>
+    <span class="hidden sm:inline opacity-0 px-2 py-1 pointer-events-none" aria-hidden="true">None &larr;</span>
   )}
 
-  <span class="text-xl font-bold border-b-2 border-[var(--brass)] px-4 text-[var(--candle)]" aria-current="page">
+  <span class="text-base sm:text-xl font-bold border-b-2 border-[var(--brass)] px-4 text-[var(--candle)]" aria-current="page">
     {currentLabel}
   </span>
 
   {rightLink && rightLabel ? (
-    <a href={rightLink} class="hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2 py-1" id="nav-right">
+    <a href={rightLink} class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2" id="nav-right">
       &rarr; {rightLabel}
     </a>
   ) : (
-    <span class="opacity-0 px-2 py-1 pointer-events-none" aria-hidden="true">&rarr; None</span>
+    <span class="hidden sm:inline opacity-0 px-2 py-1 pointer-events-none" aria-hidden="true">&rarr; None</span>
   )}
 </nav>
