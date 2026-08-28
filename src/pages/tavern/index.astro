@@ -43,7 +43,7 @@ const sceneObjects = [
     ariaLabel: 'View Tools skills',
     position: { left: '40%', bottom: '58%', width: '3.5%' },
     pixelHeight: 370,
-    tooltipPlacement: 'right',
+    tooltipPlacement: 'top',
     zIndex: 3,
     action: { type: 'dialog', target: 'dialog-skills', filter: 'Tools' },
   },
@@ -76,7 +76,7 @@ const sceneObjects = [
     ariaLabel: 'Unmapped shield',
     position: { left: '40%', bottom: '46%', width: '3.5%' },
     pixelHeight: 316,
-    tooltipPlacement: 'right',
+    tooltipPlacement: 'top',
     zIndex: 3,
     action: { type: 'none' },
   }
@@ -106,7 +106,7 @@ const sceneObjects = [
         <img src="/art/tavern-regular-seated-528.webp" 
              srcset="/art/tavern-regular-seated-264.webp 264w, /art/tavern-regular-seated-528.webp 528w" 
              sizes="(max-width: 1280px) 264px, 528px" 
-             width="528" height="741" alt="" />
+             width="528" height="741" alt="" loading="lazy" decoding="async" />
         <span class="scene-tooltip" data-placement="bottom">Tavern Regular</span>
       </a>
 
@@ -117,7 +117,7 @@ const sceneObjects = [
         <img src="/art/innkeeper-neutral-516.webp" 
              srcset="/art/innkeeper-neutral-258.webp 258w, /art/innkeeper-neutral-516.webp 516w" 
              sizes="(max-width: 1280px) 258px, 516px" 
-             width="516" height="1365" alt="" />
+             width="516" height="1365" alt="" loading="lazy" decoding="async" />
         <span class="scene-tooltip" data-placement="top">Talk to the Innkeeper</span>
       </button>
 
@@ -131,7 +131,7 @@ const sceneObjects = [
               <img src={`/art/${obj.id}-256.webp`}
                    srcset={`/art/${obj.id}-128.webp 128w, /art/${obj.id}-256.webp 256w`}
                    sizes="(max-width: 1280px) 128px, 256px"
-                   width="256" height={obj.pixelHeight} alt="" />
+                   width="256" height={obj.pixelHeight} alt="" loading="lazy" decoding="async" />
               <span class="scene-tooltip" data-placement={obj.tooltipPlacement}>{obj.label}</span>
             </button>
           );
@@ -143,18 +143,18 @@ const sceneObjects = [
               <img src={`/art/${obj.id}-256.webp`}
                    srcset={`/art/${obj.id}-128.webp 128w, /art/${obj.id}-256.webp 256w`}
                    sizes="(max-width: 1280px) 128px, 256px"
-                   width="256" height={obj.pixelHeight} alt="" />
+                   width="256" height={obj.pixelHeight} alt="" loading="lazy" decoding="async" />
               <span class="scene-tooltip" data-placement={obj.tooltipPlacement}>{obj.label}</span>
             </button>
         );
       })}
 
       <a href="/quests" id="trigger-quest-board" class="scene-object scene-hotspot" aria-label="Go to the Quest Board"
-         style="left: 89.2%; bottom: 44.5%; width: 6.5%; z-index: 2;">
+         style="left: 90.4%; bottom: 41.5%; width: 6.5%; z-index: 2;">
         <img src="/art/quest-board-prop-512.webp"
              srcset="/art/quest-board-prop-256.webp 256w, /art/quest-board-prop-512.webp 512w"
              sizes="(max-width: 1280px) 256px, 512px"
-             width="512" height="885" alt="" />
+             width="512" height="885" alt="" loading="lazy" decoding="async" />
         <span class="scene-tooltip" data-placement="left">Quest Board</span>
       </a>
 
@@ -276,7 +276,7 @@ const sceneObjects = [
     border: 1px solid #d5803b;
     color: #e6d3a8;
     padding: 4px 10px;
-    font-size: 0.8125rem;
+    font-size: clamp(0.5rem, 0.85vw, 0.8125rem);
     font-weight: 600;
     border-radius: 4px;
     white-space: nowrap;
@@ -370,6 +370,20 @@ const sceneObjects = [
     justify-content: center;
     gap: 0.75rem;
     margin-top: 1.5rem;
+  }
+
+  .narrow-link {
+    display: block;
+    background: #e6d3a8;
+    color: #1a1005;
+    padding: 12px 16px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 700;
+    border: 1px solid #8b6b4a;
+    border-radius: 4px;
+    min-height: 44px; /* Maintain 44px min touch target */
   }
   
   .visually-hidden {
@@ -571,19 +585,6 @@ const sceneObjects = [
       gap: 16px;
       padding: 24px;
       background-color: var(--wood-deep, #1a1005);
-    }
-    .narrow-link {
-      display: block;
-      background: #e6d3a8;
-      color: #1a1005;
-      padding: 12px 16px;
-      text-align: center;
-      text-decoration: none;
-      font-size: 1rem;
-      font-weight: 700;
-      border: 1px solid #8b6b4a;
-      border-radius: 4px;
-      min-height: 44px; /* Maintain 44px min touch target */
     }
   }
 </style>
