@@ -346,6 +346,16 @@ const sceneObjects = [
     }
   }
 
+  :root[data-motion="reduced"] .scene-tooltip { transition: none; }
+  :root[data-motion="reduced"] .scene-object { transition: none; }
+  :root[data-motion="reduced"] .scene-object:is(:hover, :focus-visible) {
+    transform: none;
+    /* Keep outline and brightness, remove drop-shadow animation */
+  }
+  :root[data-motion="reduced"] .scene-object:active {
+    transform: none;
+  }
+
   /* Ground Shadow for Characters */
   .ground-shadow {
     position: absolute;
