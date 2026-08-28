@@ -1,6 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
-import ThemeInit from '../components/ThemeInit.astro';
+
 import PreferenceControls from '../components/PreferenceControls.astro';
 import LocationIndicator from '../components/LocationIndicator.astro';
 
@@ -45,7 +45,7 @@ const scenes: Record<string, Scene> = {
 const currentScene = scenes[location];
 ---
 <BaseLayout title={title} description={description} hideDefaultNav={true}>
-  <ThemeInit slot="head" />
+
   
   <header class="p-2 sm:p-4 bg-[var(--wood-deep)] text-[var(--parchment)] flex flex-col sm:flex-row flex-wrap justify-between items-center border-b border-[var(--brass)] gap-2 sm:gap-4">
     <nav aria-label="Main Navigation" class="w-full sm:w-auto">
