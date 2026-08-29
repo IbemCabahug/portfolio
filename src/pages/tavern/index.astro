@@ -582,7 +582,34 @@ const sceneObjects = [
   /* Labels off, scene on: 769px to 1000px */
   @media (max-width: 1000px) {
     .scene-tooltip {
-      display: none;
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+
+  /* Fine pointers get their labels back on hover and on focus: 769px to 1000px */
+  @media (max-width: 1000px) and (hover: hover) and (pointer: fine) {
+    .scene-object:hover .scene-tooltip,
+    .scene-object:focus-visible .scene-tooltip,
+    .scene-object:focus-within .scene-tooltip {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  /* Keyboard focus always names its target, on every device and at every width */
+  @media (max-width: 1000px) {
+    .scene-object:focus-visible .scene-tooltip,
+    .scene-object:focus-within .scene-tooltip {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  /* Touch devices have no hover, so the list names the destinations instead */
+  @media (max-width: 1000px) and (hover: none) {
+    .narrow-links {
+      display: flex;
     }
   }
 
