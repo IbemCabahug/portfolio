@@ -495,6 +495,7 @@ const sceneObjects = [
     align-items: flex-end;
     gap: 20px;
     overflow-y: auto;
+    min-height: 0;
   }
   .dialogue-panel .dialogue-prose {
     flex: 1 1 auto;
@@ -502,7 +503,7 @@ const sceneObjects = [
   }
 
   .innkeeper-portrait {
-    max-height: 34cqw;
+    max-height: 20cqw;
     max-width: 14cqw;
     width: auto;
     height: auto;
@@ -847,27 +848,12 @@ const sceneObjects = [
   const innkeeperData = innkeeperDataEl ? JSON.parse(innkeeperDataEl.textContent || '{}') : null;
   const innkeeperProse = document.getElementById('innkeeper-prose');
   const innkeeperRepliesList = document.getElementById('innkeeper-replies');
+  const innkeeperRepliesInitialHTML = innkeeperRepliesList ? innkeeperRepliesList.innerHTML : '';
 
   function resetInnkeeperDialog() {
     if (!innkeeperProse || !innkeeperRepliesList || !innkeeperData) return;
     innkeeperProse.innerHTML = innkeeperData.beats.map((line: string) => `<p>${line}</p>`).join('');
-    
-    let repliesHtml = '';
-    if (innkeeperData.replies) {
-      repliesHtml += innkeeperData.replies.map((reply: any, i: number) => `
-        <li>
-          <button type="button" class="reply-btn" data-reply-index="${i}">${reply.question}</button>
-        </li>
-      `).join('');
-    }
-    if (innkeeperData.farewell) {
-      repliesHtml += `
-        <li>
-          <button type="button" class="reply-btn farewell-btn">${innkeeperData.farewell.question}</button>
-        </li>
-      `;
-    }
-    innkeeperRepliesList.innerHTML = repliesHtml;
+    innkeeperRepliesList.innerHTML = innkeeperRepliesInitialHTML;
     innkeeperRepliesList.style.display = '';
   }
 
@@ -875,6 +861,12 @@ const sceneObjects = [
     innkeeperRepliesList.addEventListener('click', (e) => {
       const btn = (e.target as HTMLElement).closest('.reply-btn');
       if (!btn || !innkeeperProse || !innkeeperData) return;
+
+      if (btn.classList.contains('back-to-beats-btn')) {
+        resetInnkeeperDialog();
+        innkeeperProse.focus();
+        return;
+      }
 
       if (btn.classList.contains('farewell-btn')) {
         innkeeperProse.innerHTML = `<p>${innkeeperData.farewell.answer}</p>`;
@@ -896,13 +888,6 @@ const sceneObjects = [
               </li>
             `;
             innkeeperProse.focus();
-            const backBtn = innkeeperRepliesList.querySelector('.back-to-beats-btn');
-            if (backBtn) {
-              backBtn.addEventListener('click', () => {
-                resetInnkeeperDialog();
-                innkeeperProse.focus();
-              });
-            }
           }
         }
       }
