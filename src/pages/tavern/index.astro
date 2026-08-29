@@ -7,11 +7,12 @@ const skillsEntries = await getCollection('skills');
 const skills = skillsEntries.map(entry => entry.data);
 
 const innkeeperEntries = await getCollection('innkeeper');
-const innkeeperLines = innkeeperEntries
-  .map(entry => entry.data)
-  .sort((a: any, b: any) => a.order - b.order)
-  .filter((d: any) => d.line)
-  .map(d => d.line);
+  const innkeeperAll = innkeeperEntries
+    .map(entry => entry.data)
+    .sort((a: any, b: any) => a.order - b.order);
+  const innkeeperBeats = innkeeperAll.filter((d: any) => d.line);
+  const innkeeperReplies = innkeeperAll.filter((d: any) => d.question && d.offerHref);
+  const innkeeperFarewell = innkeeperAll.find((d: any) => d.question && !d.offerHref);
 
 // Data structure for the interactive scene objects
 const sceneObjects = [
@@ -116,8 +117,8 @@ const sceneObjects = [
         <span class="scene-tooltip" data-placement="bottom">Tavern Regular</span>
       </a>
 
-      <!-- OPEN DEFECT (M9): No non-JS fallback route exists for the Innkeeper dialogue. -->
-      <button type="button" id="trigger-innkeeper" class="scene-object" aria-label="Talk to the Innkeeper"
+      <!-- FIXED (M9): Non-JS fallback route exists for the Innkeeper dialogue. -->
+      <a href="/tavern/npc" id="trigger-innkeeper" class="scene-object" aria-label="Talk to the Innkeeper"
               style="left: 48%; bottom: 25%; width: 6.6%; z-index: 1;">
         <div class="ground-shadow"></div>
         <img src="/art/innkeeper-neutral-516.webp" 
@@ -125,7 +126,7 @@ const sceneObjects = [
              sizes="(max-width: 1280px) 258px, 516px" 
              width="516" height="1365" alt="" loading="lazy" decoding="async" />
         <span class="scene-tooltip" data-placement="top">Talk to the Innkeeper</span>
-      </button>
+      </a>
 
       <!-- Painted Object Hotspots -->
       {sceneObjects.map(obj => {
@@ -197,9 +198,23 @@ const sceneObjects = [
           <h2 id="innkeeper-title">The Innkeeper Says...</h2>
         </div>
         <div class="panel-body">
-          {innkeeperLines.map((line) => (
-            <p>{line}</p>
-          ))}
+          <img class="innkeeper-portrait" src="/art/innkeeper-portrait-519.webp" width="519" height="1365"
+               alt="" aria-hidden="true" loading="lazy" decoding="async" />
+          <div class="dialogue-prose" id="innkeeper-prose" tabindex="-1" aria-live="polite">
+            {innkeeperBeats.map((d: any) => (<p>{d.line}</p>))}
+          </div>
+          <ul class="dialogue-replies" id="innkeeper-replies">
+            {innkeeperReplies.map((d: any, i: number) => (
+              <li>
+                <button type="button" class="reply-btn" data-reply-index={i}>{d.question}</button>
+              </li>
+            ))}
+            {innkeeperFarewell && (
+              <li>
+                <button type="button" class="reply-btn farewell-btn">{innkeeperFarewell.question}</button>
+              </li>
+            )}
+          </ul>
         </div>
         <div class="panel-actions">
           <button type="button" class="close-panel-btn">Close Dialogue</button>
@@ -467,10 +482,49 @@ const sceneObjects = [
   }
 
   .dialogue-panel {
-    left: 10%;
-    bottom: 40%;
-    width: 35%;
-    max-height: 55%;
+    left: 8%;
+    right: 8%;
+    bottom: 4%;
+    width: auto;
+    max-height: 42%;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 20px;
+  }
+
+  .innkeeper-portrait {
+    max-height: 34cqw;
+    max-width: 14cqw;
+    width: auto;
+    height: auto;
+    align-self: flex-end;
+    flex: 0 0 auto;
+  }
+
+  .dialogue-replies {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .reply-btn {
+    background: transparent;
+    border: 1px solid #8b6b4a;
+    color: #fdf6e3;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: left;
+    min-height: 44px;
+  }
+  .reply-btn:hover {
+    background: rgba(139, 107, 74, 0.2);
+  }
+  .reply-btn:focus-visible {
+    outline: 2px solid #e6d3a8;
+    outline-offset: 2px;
   }
 
   .panel-header {
@@ -622,6 +676,17 @@ const sceneObjects = [
   }
 
   @media (max-width: 768px) {
+    .dialogue-panel {
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      max-height: 60%;
+      border-radius: 12px 12px 0 0;
+    }
+    .innkeeper-portrait {
+      display: none;
+    }
     .scene-container {
       display: none;
     }
@@ -638,6 +703,11 @@ const sceneObjects = [
   }
 </style>
 
+  <script type="application/json" id="innkeeper-data" set:html={JSON.stringify({
+    replies: innkeeperReplies,
+    farewell: innkeeperFarewell,
+    beats: innkeeperBeats.map((d: any) => d.line),
+  })} />
 <script>
   const triggerInnkeeper = document.getElementById('trigger-innkeeper');
   
@@ -752,6 +822,7 @@ const sceneObjects = [
       trigger.setAttribute('aria-controls', 'dialog-innkeeper');
       trigger.addEventListener('click', (e) => {
         e.preventDefault();
+        resetInnkeeperDialog();
         openDialog(dialogInnkeeper, trigger);
       });
     }
@@ -762,4 +833,50 @@ const sceneObjects = [
   document.querySelectorAll('.close-panel-btn').forEach(btn => {
     btn.addEventListener('click', closeDialog);
   });
+
+  const innkeeperDataEl = document.getElementById('innkeeper-data');
+  const innkeeperData = innkeeperDataEl ? JSON.parse(innkeeperDataEl.textContent || '{}') : null;
+  const innkeeperProse = document.getElementById('innkeeper-prose');
+  const innkeeperRepliesList = document.getElementById('innkeeper-replies');
+
+  function resetInnkeeperDialog() {
+    if (!innkeeperProse || !innkeeperRepliesList || !innkeeperData) return;
+    innkeeperProse.innerHTML = innkeeperData.beats.map((line: string) => `<p>${line}</p>`).join('');
+    innkeeperRepliesList.style.display = '';
+  }
+
+  if (innkeeperRepliesList) {
+    innkeeperRepliesList.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest('.reply-btn');
+      if (!btn || !innkeeperProse || !innkeeperData) return;
+
+      if (btn.classList.contains('farewell-btn')) {
+        innkeeperProse.innerHTML = `<p>${innkeeperData.farewell.answer}</p>`;
+        innkeeperRepliesList.style.display = 'none';
+        innkeeperProse.focus();
+      } else {
+        const indexStr = btn.getAttribute('data-reply-index');
+        if (indexStr !== null) {
+          const idx = parseInt(indexStr, 10);
+          const reply = innkeeperData.replies[idx];
+          if (reply) {
+            innkeeperProse.innerHTML = `
+              <p>${reply.answer}</p>
+              <p><a href="${reply.offerHref}">${reply.offerLabel}</a></p>
+              <button type="button" class="reply-btn back-to-beats-btn">Back</button>
+            `;
+            innkeeperRepliesList.style.display = 'none';
+            innkeeperProse.focus();
+            const backBtn = innkeeperProse.querySelector('.back-to-beats-btn');
+            if (backBtn) {
+              backBtn.addEventListener('click', () => {
+                resetInnkeeperDialog();
+                innkeeperProse.focus();
+              });
+            }
+          }
+        }
+      }
+    });
+  }
 </script>
