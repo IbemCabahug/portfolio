@@ -54,7 +54,7 @@ const sceneObjects = [
     ariaLabel: 'View Data skills',
     position: { left: '30.7%', bottom: '46.2%', width: '3.5%' },
     pixelHeight: 321,
-    tooltipPlacement: 'left',
+    tooltipPlacement: 'bottom',
     zIndex: 3,
     action: { type: 'dialog', target: 'dialog-skills', filter: 'Data' },
   },
@@ -72,11 +72,11 @@ const sceneObjects = [
   {
     id: 'shield-coming-soon',
     type: 'shield',
-    label: 'Coming Soon',
-    ariaLabel: 'Unmapped shield',
+    label: 'Soon',
+    ariaLabel: 'Coming soon',
     position: { left: '38.8%', bottom: '46.5%', width: '3.5%' },
     pixelHeight: 316,
-    tooltipPlacement: 'top',
+    tooltipPlacement: 'bottom',
     zIndex: 3,
     action: { type: 'none' },
   }
@@ -155,7 +155,7 @@ const sceneObjects = [
       })}
 
       <a href="/quests" id="trigger-quest-board" class="scene-object scene-hotspot" aria-label="Go to the Quest Board"
-         style="left: 88.4%; bottom: 41.5%; width: 6.5%; z-index: 2;">
+         style="left: 88.4%; bottom: 41.5%; width: 5.5%; z-index: 2;">
         <img src="/art/quest-board-prop-512.webp"
              srcset="/art/quest-board-prop-256.webp 256w, /art/quest-board-prop-512.webp 512w"
              sizes="(max-width: 1280px) 256px, 512px"
