@@ -487,9 +487,18 @@ const sceneObjects = [
     bottom: 4%;
     width: auto;
     max-height: 42%;
+  }
+
+  .dialogue-panel .panel-body {
+    display: flex;
     flex-direction: row;
     align-items: flex-end;
     gap: 20px;
+    overflow-y: auto;
+  }
+  .dialogue-panel .dialogue-prose {
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   .innkeeper-portrait {
@@ -703,7 +712,7 @@ const sceneObjects = [
   }
 </style>
 
-  <script type="application/json" id="innkeeper-data" set:html={JSON.stringify({
+  <script type="application/json" id="innkeeper-data" is:inline set:html={JSON.stringify({
     replies: innkeeperReplies,
     farewell: innkeeperFarewell,
     beats: innkeeperBeats.map((d: any) => d.line),
@@ -842,6 +851,23 @@ const sceneObjects = [
   function resetInnkeeperDialog() {
     if (!innkeeperProse || !innkeeperRepliesList || !innkeeperData) return;
     innkeeperProse.innerHTML = innkeeperData.beats.map((line: string) => `<p>${line}</p>`).join('');
+    
+    let repliesHtml = '';
+    if (innkeeperData.replies) {
+      repliesHtml += innkeeperData.replies.map((reply: any, i: number) => `
+        <li>
+          <button type="button" class="reply-btn" data-reply-index="${i}">${reply.question}</button>
+        </li>
+      `).join('');
+    }
+    if (innkeeperData.farewell) {
+      repliesHtml += `
+        <li>
+          <button type="button" class="reply-btn farewell-btn">${innkeeperData.farewell.question}</button>
+        </li>
+      `;
+    }
+    innkeeperRepliesList.innerHTML = repliesHtml;
     innkeeperRepliesList.style.display = '';
   }
 
@@ -852,7 +878,7 @@ const sceneObjects = [
 
       if (btn.classList.contains('farewell-btn')) {
         innkeeperProse.innerHTML = `<p>${innkeeperData.farewell.answer}</p>`;
-        innkeeperRepliesList.style.display = 'none';
+        innkeeperRepliesList.innerHTML = '';
         innkeeperProse.focus();
       } else {
         const indexStr = btn.getAttribute('data-reply-index');
@@ -863,11 +889,14 @@ const sceneObjects = [
             innkeeperProse.innerHTML = `
               <p>${reply.answer}</p>
               <p><a href="${reply.offerHref}">${reply.offerLabel}</a></p>
-              <button type="button" class="reply-btn back-to-beats-btn">Back</button>
             `;
-            innkeeperRepliesList.style.display = 'none';
+            innkeeperRepliesList.innerHTML = `
+              <li>
+                <button type="button" class="reply-btn back-to-beats-btn">Back</button>
+              </li>
+            `;
             innkeeperProse.focus();
-            const backBtn = innkeeperProse.querySelector('.back-to-beats-btn');
+            const backBtn = innkeeperRepliesList.querySelector('.back-to-beats-btn');
             if (backBtn) {
               backBtn.addEventListener('click', () => {
                 resetInnkeeperDialog();
