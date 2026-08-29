@@ -87,7 +87,7 @@ const sceneObjects = [
   <div class="scene-container">
     <picture>
       <source
-        media="(min-width: 640px)"
+        media="(min-width: 1024px)"
         srcset="/art/tavern-room-1280.webp 1280w, /art/tavern-room-2560.webp 2560w"
         sizes="100vw"
       />
@@ -226,6 +226,7 @@ const sceneObjects = [
 
   .scene-container {
     position: relative;
+    container-type: inline-size;
     width: 100%;
     max-width: 2560px;
     margin: 0 auto;
@@ -378,7 +379,7 @@ const sceneObjects = [
     z-index: 5;
   }
 
-  /* Narrow Screens (< 640px) */
+  /* Narrow Screens (< 1024px) */
   .narrow-links {
     display: flex;
     flex-wrap: wrap;
@@ -587,7 +588,7 @@ const sceneObjects = [
     color: #e6d3a8;
   }
 
-  @media (max-width: 639px) {
+  @media (max-width: 1023px) {
     .scene-container {
       display: none;
     }
