@@ -10,6 +10,7 @@ const innkeeperEntries = await getCollection('innkeeper');
 const innkeeperLines = innkeeperEntries
   .map(entry => entry.data)
   .sort((a: any, b: any) => a.order - b.order)
+  .filter((d: any) => d.line)
   .map(d => d.line);
 
 // Data structure for the interactive scene objects

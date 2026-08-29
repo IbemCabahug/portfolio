@@ -60,6 +60,10 @@ const innkeeper = defineCollection({
   schema: z.object({
     line: z.string().optional(),
     order: z.number(),
+    question: z.string().optional(),
+    answer: z.string().optional(),
+    offerLabel: z.string().optional(),
+    offerHref: z.string().optional(),
   }),
 });
 
