@@ -606,17 +606,17 @@ const sceneObjects = [
     }
   }
 
-  /* Touch devices have no hover, so the list names the destinations instead */
-  @media (max-width: 1000px) and (hover: none) {
-    .narrow-links {
-      display: flex;
-    }
-  }
-
   /* The parchment list belongs to narrow screens only */
   @media (min-width: 769px) {
     .narrow-links {
       display: none;
+    }
+  }
+
+  /* Touch devices have no hover, so the list names the destinations instead */
+  @media (max-width: 1000px) and (hover: none) {
+    .narrow-links {
+      display: flex;
     }
   }
 
