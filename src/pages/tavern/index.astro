@@ -282,7 +282,7 @@ const sceneObjects = [
     border: 1px solid #d5803b;
     color: #e6d3a8;
     padding: 4px 10px;
-    font-size: clamp(0.5rem, 0.85vw, 0.8125rem);
+    font-size: clamp(0.5rem, 0.9cqw, 0.8125rem);
     font-weight: 600;
     border-radius: 4px;
     white-space: normal;
@@ -314,6 +314,9 @@ const sceneObjects = [
     transform: translateY(-50%);
   }
 
+  /* Measured label offsets - two drag sessions, scene 1437px and 1358px */
+  #trigger-shield-languages .scene-tooltip { translate: 2.3cqw -4.4cqw; }
+  #trigger-shield-tools .scene-tooltip { translate: 1.8cqw 0; }
 
 
   /* Highlight feedback */
@@ -403,18 +406,6 @@ const sceneObjects = [
     min-height: 44px; /* Maintain 44px min touch target */
   }
   
-  .visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-
   /* Panels styling */
   .tavern-panel {
     position: absolute;
