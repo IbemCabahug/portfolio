@@ -544,6 +544,9 @@ const sceneObjects = [
 .dialogue-panel .dialogue-prose {
   max-width: 66ch;
 }
+.dialogue-panel .dialogue-unread {
+  visibility: hidden;
+}
 
   .dialogue-panel .innkeeper-portrait {
     position: absolute;
@@ -980,19 +983,43 @@ const sceneObjects = [
     typingDone = false;
     finishTyping = settle;
     if (innkeeperRepliesList) innkeeperRepliesList.hidden = true;
-    innkeeperProse.innerHTML = '<p class="dialogue-typing" aria-hidden="true"></p>';
-    const target = innkeeperProse.querySelector('.dialogue-typing');
-    if (!target) { settle(); return; }
+    innkeeperProse.innerHTML = html;
 
-    let i = 0;
+    const walker = document.createTreeWalker(innkeeperProse, NodeFilter.SHOW_TEXT);
+    const originals: Text[] = [];
+    let found: Node | null;
+    while ((found = walker.nextNode())) originals.push(found as Text);
+
+    const runs: Array<{ shown: HTMLElement; hidden: HTMLElement; text: string }> = [];
+    for (const original of originals) {
+      const text = original.nodeValue || '';
+      if (!text.trim()) continue;
+      const shown = document.createElement('span');
+      shown.setAttribute('aria-hidden', 'true');
+      const rest = document.createElement('span');
+      rest.setAttribute('aria-hidden', 'true');
+      rest.className = 'dialogue-unread';
+      rest.textContent = text;
+      const frag = document.createDocumentFragment();
+      frag.appendChild(shown);
+      frag.appendChild(rest);
+      original.parentNode?.replaceChild(frag, original);
+      runs.push({ shown, hidden: rest, text });
+    }
+
+    if (!runs.length) { settle(); return; }
+
+    let ri = 0;
+    let ci = 0;
     const step = () => {
-      i += 1;
-      target.textContent = plain.slice(0, i);
-      if (i < plain.length) {
-        typeTimer = window.setTimeout(step, TYPE_MS * (PAUSE_AFTER[plain[i - 1]] ?? 1));
-      } else {
-        settle();
-      }
+      const run = runs[ri];
+      ci += 1;
+      run.shown.textContent = run.text.slice(0, ci);
+      run.hidden.textContent = run.text.slice(ci);
+      const ch = run.text[ci - 1];
+      if (ci >= run.text.length) { ri += 1; ci = 0; }
+      if (ri >= runs.length) { settle(); return; }
+      typeTimer = window.setTimeout(step, TYPE_MS * (PAUSE_AFTER[ch] ?? 1));
     };
     typeTimer = window.setTimeout(step, TYPE_MS);
   }
