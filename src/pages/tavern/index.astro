@@ -193,16 +193,11 @@ const sceneObjects = [
       </div>
 
       <!-- Innkeeper Dialogue -->
-      <div id="dialog-innkeeper" class="tavern-panel dialogue-panel" role="dialog" aria-modal="true" aria-labelledby="innkeeper-title" hidden>
-        <div class="panel-header">
-          <h2 id="innkeeper-title">The Innkeeper Says...</h2>
-        </div>
-        <div class="panel-body">
-          <img class="innkeeper-portrait" src="/art/innkeeper-portrait-519.webp" width="519" height="1365"
-               alt="" aria-hidden="true" loading="lazy" decoding="async" />
-          <div class="dialogue-prose" id="innkeeper-prose" tabindex="-1" aria-live="polite">
-            {innkeeperBeats.map((d: any) => (<p>{d.line}</p>))}
-          </div>
+      <div id="dialog-innkeeper" class="tavern-panel dialogue-panel" role="dialog" aria-modal="true"
+           aria-labelledby="innkeeper-title" aria-describedby="innkeeper-prose" hidden>
+        <img class="innkeeper-portrait" src="/art/innkeeper-portrait-519.webp" width="519" height="1365"
+             alt="" aria-hidden="true" loading="lazy" decoding="async" />
+        <div class="dialogue-stack">
           <ul class="dialogue-replies" id="innkeeper-replies">
             {innkeeperReplies.map((d: any, i: number) => (
               <li>
@@ -215,10 +210,19 @@ const sceneObjects = [
               </li>
             )}
           </ul>
-        </div>
-        <div class="panel-actions">
-          <button type="button" class="close-panel-btn">Close Dialogue</button>
-          <button type="button" class="close-panel-btn back-btn">Back to Work</button>
+          <div class="dialogue-band">
+            <div class="panel-header">
+              <h2 id="innkeeper-title">The Innkeeper Says...</h2>
+            </div>
+            <div class="panel-body">
+              <div class="dialogue-prose" id="innkeeper-prose" tabindex="-1" aria-live="polite">
+                {innkeeperBeats.map((d: any) => (<p>{d.line}</p>))}
+              </div>
+            </div>
+            <div class="panel-actions">
+              <button type="button" class="close-panel-btn">Close Dialogue</button>
+            </div>
+          </div>
         </div>
       </div>
       
@@ -482,42 +486,68 @@ const sceneObjects = [
   }
 
   .dialogue-panel {
-    left: 8%;
-    right: 8%;
-    bottom: 4%;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
     width: auto;
-    max-height: 42%;
+    height: auto;
+    max-height: none;
+    background: none;
+    border: none;
+    padding: 0;
+    display: block;
+    pointer-events: none;
+  }
+  .dialogue-panel > * {
+    pointer-events: auto;
   }
 
-  .dialogue-panel .panel-body {
+  .dialogue-panel .dialogue-stack {
+    position: absolute;
+    left: 26%;
+    right: 6%;
+    bottom: 4%;
     display: flex;
-    flex-direction: row;
-    align-items: stretch;
-    gap: 20px;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+    max-height: 78%;
+  }
+  .dialogue-panel .dialogue-band {
+    align-self: stretch;
+    background: rgba(15, 10, 5, 0.95);
+    border: 2px solid #8b6b4a;
+    border-radius: 6px;
+    padding: 14px 18px;
+    max-height: 34%;
     overflow-y: auto;
     min-height: 0;
   }
-  .dialogue-panel .dialogue-prose {
-    flex: 1 1 auto;
-    min-width: 0;
-  }
 
-  .innkeeper-portrait {
-    max-height: 20cqw;
-    max-width: 14cqw;
+  .dialogue-panel .innkeeper-portrait {
+    position: absolute;
+    left: 3%;
+    bottom: 2%;
+    height: 62%;
     width: auto;
-    height: auto;
-    align-self: flex-end;
-    flex: 0 0 auto;
+    max-width: 20%;
+    object-fit: contain;
+    object-position: bottom center;
   }
 
-  .dialogue-replies {
+  .dialogue-panel .dialogue-replies {
     list-style: none;
-    padding: 0;
     margin: 0;
+    padding: 0;
     display: flex;
     flex-direction: column;
+    align-items: stretch;
     gap: 8px;
+    width: max-content;
+    max-width: 44%;
+    min-height: 0;
+    overflow-y: auto;
   }
   .reply-btn {
     background: transparent;
@@ -686,17 +716,9 @@ const sceneObjects = [
   }
 
   @media (max-width: 768px) {
-    .dialogue-panel {
-      left: 0;
-      right: 0;
-      bottom: 0;
-      width: 100%;
-      max-height: 60%;
-      border-radius: 12px 12px 0 0;
-    }
-    .innkeeper-portrait {
-      display: none;
-    }
+    .dialogue-panel .innkeeper-portrait { display: none; }
+    .dialogue-panel .dialogue-stack { left: 4%; right: 4%; bottom: 2%; max-height: 88%; }
+    .dialogue-panel .dialogue-replies { max-width: 100%; width: 100%; }
     .scene-container {
       display: none;
     }
