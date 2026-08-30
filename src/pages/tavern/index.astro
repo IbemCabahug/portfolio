@@ -265,10 +265,11 @@ const sceneObjects = [
     inset: 0;
   }
 
+  #trigger-innkeeper img { transition: opacity 0.25s ease-out; }
+
   .scene-container.innkeeper-away #trigger-innkeeper img {
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.25s ease-out;
   }
 
   .scene-object {
@@ -535,7 +536,7 @@ const sceneObjects = [
 
   .dialogue-panel .innkeeper-portrait {
     position: absolute;
-    left: 3%;
+    left: 9%;
     bottom: 2%;
     height: 62%;
     width: auto;
@@ -547,16 +548,44 @@ const sceneObjects = [
   .dialogue-panel .dialogue-replies {
     list-style: none;
     margin: 0;
-    padding: 0;
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 8px;
     width: max-content;
     max-width: 44%;
     min-height: 0;
     overflow-y: auto;
+    background: rgba(15, 10, 5, 0.95);
+    border: 2px solid #8b6b4a;
+    border-radius: 6px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    padding: 6px;
+    gap: 0;
   }
+
+  .dialogue-panel .dialogue-replies .reply-btn {
+    border: none;
+    border-radius: 4px;
+    width: 100%;
+    position: relative;
+    padding: 10px 12px 10px 28px;
+  }
+
+  .dialogue-panel .dialogue-replies li + li .reply-btn { border-top: 1px solid rgba(139,107,74,0.35); }
+
+  .dialogue-panel .dialogue-replies .reply-btn::before {
+    content: "\25B8";
+    position: absolute;
+    left: 10px;
+    opacity: 0;
+    transition: opacity 0.15s ease-out;
+  }
+  .dialogue-panel .dialogue-replies .reply-btn:hover::before,
+  .dialogue-panel .dialogue-replies .reply-btn:focus-visible::before { opacity: 1; }
+
+  .dialogue-panel .reply-btn.reply-visited { color: #a89880; }
+  .dialogue-panel .reply-btn.reply-visited:hover { color: #fdf6e3; }
+  .dialogue-panel .dialogue-followup { color: #e6d3a8; font-style: italic; margin-bottom: 0; }
   .reply-btn {
     background: transparent;
     border: 1px solid #8b6b4a;
