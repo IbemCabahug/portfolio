@@ -528,12 +528,22 @@ const sceneObjects = [
     background: rgba(15, 10, 5, 0.95);
     border: 2px solid #8b6b4a;
     border-radius: 6px;
-    padding: 14px 18px;
+    padding: 20px 26px;
     max-height: 34%;
     overflow-y: auto;
     min-height: 0;
     box-shadow: 0 10px 30px rgba(0,0,0,0.8);
   }
+.dialogue-panel .dialogue-prose p {
+  margin: 0 0 0.85em;
+  line-height: 1.6;
+}
+.dialogue-panel .dialogue-prose p:last-child {
+  margin-bottom: 0;
+}
+.dialogue-panel .dialogue-prose {
+  max-width: 66ch;
+}
 
   .dialogue-panel .innkeeper-portrait {
     position: absolute;
@@ -934,7 +944,8 @@ const sceneObjects = [
   const innkeeperRepliesInitialHTML = innkeeperRepliesList ? innkeeperRepliesList.innerHTML : '';
 
   const innkeeperAnnounce = document.getElementById('innkeeper-announce');
-  const TYPE_MS = 50;
+  const TYPE_MS = 25;
+  const PAUSE_AFTER: Record<string, number> = { '.': 8, '!': 8, '?': 8, ',': 4, ';': 4, ':': 4 };
   let typeTimer: number | null = null;
   let typingDone = true;
   let finishTyping: (() => void) | null = null;
@@ -978,7 +989,7 @@ const sceneObjects = [
       i += 1;
       target.textContent = plain.slice(0, i);
       if (i < plain.length) {
-        typeTimer = window.setTimeout(step, TYPE_MS);
+        typeTimer = window.setTimeout(step, TYPE_MS * (PAUSE_AFTER[plain[i - 1]] ?? 1));
       } else {
         settle();
       }
