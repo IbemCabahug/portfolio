@@ -513,7 +513,7 @@ const sceneObjects = [
 
   .dialogue-panel .dialogue-stack {
     position: absolute;
-    left: 26%;
+    left: 20%;
     right: 6%;
     bottom: 4%;
     display: flex;
@@ -537,8 +537,8 @@ const sceneObjects = [
   .dialogue-panel .innkeeper-portrait {
     position: absolute;
     left: 9%;
-    bottom: 2%;
-    height: 62%;
+    bottom: -8%;
+    height: 72%;
     width: auto;
     max-width: 20%;
     object-fit: contain;
@@ -560,7 +560,7 @@ const sceneObjects = [
     border-radius: 6px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.8);
     padding: 6px;
-    gap: 0;
+    gap: 4px;
   }
 
   .dialogue-panel .dialogue-replies .reply-btn {
@@ -570,8 +570,6 @@ const sceneObjects = [
     position: relative;
     padding: 10px 12px 10px 28px;
   }
-
-  .dialogue-panel .dialogue-replies li + li .reply-btn { border-top: 1px solid rgba(139,107,74,0.35); }
 
   .dialogue-panel .dialogue-replies .reply-btn::before {
     content: "\25B8";
