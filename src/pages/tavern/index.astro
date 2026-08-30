@@ -265,6 +265,12 @@ const sceneObjects = [
     inset: 0;
   }
 
+  .scene-container.innkeeper-away #trigger-innkeeper img {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease-out;
+  }
+
   .scene-object {
     position: absolute;
     display: flex;
@@ -498,6 +504,7 @@ const sceneObjects = [
     padding: 0;
     display: block;
     pointer-events: none;
+    box-shadow: none;
   }
   .dialogue-panel > * {
     pointer-events: auto;
@@ -523,6 +530,7 @@ const sceneObjects = [
     max-height: 34%;
     overflow-y: auto;
     min-height: 0;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
   }
 
   .dialogue-panel .innkeeper-portrait {
@@ -855,6 +863,7 @@ const sceneObjects = [
       trigger.addEventListener('click', (e) => {
         e.preventDefault();
         resetInnkeeperDialog();
+        document.querySelector('.scene-container')?.classList.add('innkeeper-away');
         openDialog(dialogInnkeeper, trigger);
       });
     }
@@ -864,6 +873,15 @@ const sceneObjects = [
 
   document.querySelectorAll('.close-panel-btn').forEach(btn => {
     btn.addEventListener('click', closeDialog);
+    btn.addEventListener('click', () => {
+      document.querySelector('.scene-container')?.classList.remove('innkeeper-away');
+    });
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      document.querySelector('.scene-container')?.classList.remove('innkeeper-away');
+    }
   });
 
   const innkeeperDataEl = document.getElementById('innkeeper-data');
