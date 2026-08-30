@@ -215,7 +215,7 @@ const sceneObjects = [
               <h2 id="innkeeper-title">The Innkeeper Says...</h2>
             </div>
             <div class="panel-body">
-              <div class="dialogue-prose" id="innkeeper-prose" tabindex="-1" aria-live="polite">
+              <div class="dialogue-prose" id="innkeeper-prose" tabindex="-1">
                 {innkeeperBeats.map((d: any) => (<p>{d.line}</p>))}
               </div>
             </div>
@@ -224,6 +224,7 @@ const sceneObjects = [
             </div>
           </div>
         </div>
+        <div id="innkeeper-announce" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
       </div>
       
       <!-- Reserved Space: Dark centre floor -->
@@ -562,6 +563,9 @@ const sceneObjects = [
     padding: 6px;
     gap: 4px;
   }
+.dialogue-panel .dialogue-replies[hidden] {
+  display: none;
+}
 
   .dialogue-panel .dialogue-replies .reply-btn {
     border: none;
@@ -584,6 +588,18 @@ const sceneObjects = [
   .dialogue-panel .reply-btn.reply-visited { color: #a89880; }
   .dialogue-panel .reply-btn.reply-visited:hover { color: #fdf6e3; }
   .dialogue-panel .dialogue-followup { color: #e6d3a8; font-style: italic; margin-bottom: 0; }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
   .reply-btn {
     background: transparent;
     border: 1px solid #8b6b4a;
@@ -917,11 +933,82 @@ const sceneObjects = [
   const innkeeperRepliesList = document.getElementById('innkeeper-replies');
   const innkeeperRepliesInitialHTML = innkeeperRepliesList ? innkeeperRepliesList.innerHTML : '';
 
+  const innkeeperAnnounce = document.getElementById('innkeeper-announce');
+  const TYPE_MS = 50;
+  let typeTimer: number | null = null;
+  let typingDone = true;
+  let finishTyping: (() => void) | null = null;
+
+  function stopTyping() {
+    if (typeTimer !== null) { clearTimeout(typeTimer); typeTimer = null; }
+  }
+
+  function renderProse(html: string) {
+    if (!innkeeperProse) return;
+    stopTyping();
+    finishTyping = null;
+
+    const probe = document.createElement('div');
+    probe.innerHTML = html;
+    const plain = (probe.textContent || '').replace(/\s+/g, ' ').trim();
+
+    const settle = () => {
+      stopTyping();
+      finishTyping = null;
+      innkeeperProse.innerHTML = html;
+      typingDone = true;
+      if (innkeeperAnnounce) innkeeperAnnounce.textContent = plain;
+      if (innkeeperRepliesList) innkeeperRepliesList.hidden = false;
+    };
+
+    if (document.documentElement.dataset.motion !== 'full') {
+      settle();
+      return;
+    }
+
+    typingDone = false;
+    finishTyping = settle;
+    if (innkeeperRepliesList) innkeeperRepliesList.hidden = true;
+    innkeeperProse.innerHTML = '<p class="dialogue-typing" aria-hidden="true"></p>';
+    const target = innkeeperProse.querySelector('.dialogue-typing');
+    if (!target) { settle(); return; }
+
+    let i = 0;
+    const step = () => {
+      i += 1;
+      target.textContent = plain.slice(0, i);
+      if (i < plain.length) {
+        typeTimer = window.setTimeout(step, TYPE_MS);
+      } else {
+        settle();
+      }
+    };
+    typeTimer = window.setTimeout(step, TYPE_MS);
+  }
+
+  const innkeeperBand = document.querySelector('#dialog-innkeeper .dialogue-band');
+  if (innkeeperBand) {
+    innkeeperBand.addEventListener('click', () => {
+      if (!typingDone && finishTyping) finishTyping();
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    const panel = document.getElementById('dialog-innkeeper');
+    if (!panel || panel.hidden) return;
+    if (typingDone || !finishTyping) return;
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+      e.preventDefault();
+      finishTyping();
+    }
+  });
+
   function resetInnkeeperDialog() {
+    stopTyping();
+    typingDone = true;
     if (!innkeeperProse || !innkeeperRepliesList || !innkeeperData) return;
-    innkeeperProse.innerHTML = innkeeperData.beats.map((line: string) => `<p>${line}</p>`).join('');
+    renderProse(innkeeperData.beats.map((line: string) => `<p>${line}</p>`).join(''));
     innkeeperRepliesList.innerHTML = innkeeperRepliesInitialHTML;
-    innkeeperRepliesList.style.display = '';
   }
 
   if (innkeeperRepliesList) {
@@ -930,7 +1017,7 @@ const sceneObjects = [
       if (!btn || !innkeeperProse || !innkeeperData) return;
 
       if (btn.classList.contains('farewell-btn')) {
-        innkeeperProse.innerHTML = `<p>${innkeeperData.farewell.answer}</p>`;
+        renderProse(`<p>${innkeeperData.farewell.answer}</p>`);
         innkeeperRepliesList.innerHTML = '';
         innkeeperProse.focus();
       } else {
@@ -939,11 +1026,11 @@ const sceneObjects = [
           const idx = parseInt(indexStr, 10);
           const reply = innkeeperData.replies[idx];
           if (reply) {
-            innkeeperProse.innerHTML = `
+            renderProse(`
               <p>${reply.answer}</p>
-              <p><a href="${reply.offerHref}">${reply.offerLabel}</a></p>
+              ${reply.offerHref ? `<p><a href="${reply.offerHref}">${reply.offerLabel}</a></p>` : ''}
               ${reply.followUp ? `<p class="dialogue-followup">${reply.followUp}</p>` : ''}
-            `;
+            `);
             btn.classList.add('reply-visited');
           }
         }
