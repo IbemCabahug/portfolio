@@ -548,7 +548,7 @@ const sceneObjects = [
 .dialogue-panel .dialogue-prose {
   max-width: 66ch;
 }
-.dialogue-panel .dialogue-unread {
+.dialogue-panel :global(.dialogue-unread) {
   visibility: hidden;
 }
 
@@ -580,7 +580,7 @@ const sceneObjects = [
     gap: 4px;
   }
 .dialogue-panel .dialogue-replies[hidden] {
-  display: flex;
+  display: flex !important;
   visibility: hidden;
 }
 
