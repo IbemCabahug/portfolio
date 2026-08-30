@@ -64,6 +64,7 @@ const innkeeper = defineCollection({
     answer: z.string().optional(),
     offerLabel: z.string().optional(),
     offerHref: z.string().optional(),
+    followUp: z.string().optional(),
   }),
 });
 

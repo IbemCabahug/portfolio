@@ -3,5 +3,6 @@
   "answer": "Messenger's Corner, by the door. Leave your mark there and it reaches him direct - he answers his own letters, and he answers them himself.",
   "offerLabel": "Messenger's Corner",
   "offerHref": "/messenger",
-  "order": 7
+  "order": 7,
+  "followUp": "Anything else, traveller?"
 }

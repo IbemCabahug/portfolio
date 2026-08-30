@@ -902,12 +902,6 @@ const sceneObjects = [
       const btn = (e.target as HTMLElement).closest('.reply-btn');
       if (!btn || !innkeeperProse || !innkeeperData) return;
 
-      if (btn.classList.contains('back-to-beats-btn')) {
-        resetInnkeeperDialog();
-        innkeeperProse.focus();
-        return;
-      }
-
       if (btn.classList.contains('farewell-btn')) {
         innkeeperProse.innerHTML = `<p>${innkeeperData.farewell.answer}</p>`;
         innkeeperRepliesList.innerHTML = '';
@@ -921,13 +915,9 @@ const sceneObjects = [
             innkeeperProse.innerHTML = `
               <p>${reply.answer}</p>
               <p><a href="${reply.offerHref}">${reply.offerLabel}</a></p>
+              ${reply.followUp ? `<p class="dialogue-followup">${reply.followUp}</p>` : ''}
             `;
-            innkeeperRepliesList.innerHTML = `
-              <li>
-                <button type="button" class="reply-btn back-to-beats-btn">Back</button>
-              </li>
-            `;
-            innkeeperProse.focus();
+            btn.classList.add('reply-visited');
           }
         }
       }

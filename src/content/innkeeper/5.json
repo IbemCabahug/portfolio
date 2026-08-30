@@ -3,5 +3,6 @@
   "answer": "Look to the shields over the hearth. Each names a set of tools - the tongues he writes in, the frames he builds on, the instruments at his belt. Two of them are still blank. He would rather leave a shield empty than paint a trade he has not earned.",
   "offerLabel": "See the Adventurer's Badge",
   "offerHref": "/tavern/skills",
-  "order": 5
+  "order": 5,
+  "followUp": "Anything else, traveller?"
 }
