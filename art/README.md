@@ -59,6 +59,8 @@ Rows are in byte-order by filename so this table can be diffed directly against 
 | messengers-corner-2560.webp | 2560×1429 | 88,452 B | background |
 | npc-table-1280.webp | 1280×714 | 37,846 B | background |
 | npc-table-2560.webp | 2560×1429 | 85,856 B | background |
+| npc-table-front-1280.webp | 1280×714 | 13,488 B | foreground plate, alpha |
+| npc-table-front-2560.webp | 2560×1429 | 31,684 B | foreground plate, alpha |
 | quest-board-1192.webp | 1192×662 | 36,972 B | sprite |
 | quest-board-2384.webp | 2384×1323 | 89,746 B | sprite |
 | quest-board-prop-256.webp | 256×443 | 16,730 B | sprite |
@@ -101,7 +103,7 @@ Rows are in byte-order by filename so this table can be diffed directly against 
 | `/tavern` | 1 of 5 (D106) | 364,162 B (larger twin of each pair, plus untwinned files; desktop transfer) | 60.7% |
 | `/tavern/npc` | 2 of 5 | 183,060 B | 30.5% |
 
-`npc-table-*` is the `/tavern/npc` close-up background; `tavern-regular-bust-*` is the
+`npc-table-*` is the `/tavern/npc` close-up background and `npc-table-front-*` is the foreground table plate drawn above the sprite; `tavern-regular-bust-*` is the
 seated Tavern Regular composited over it. The camera sits beside the Regular's table rather
 than directly opposite it, and the painting reserves no dark region, so the dialogue panel
 on that route must be fully opaque rather than translucent.
@@ -113,4 +115,5 @@ from its own image; do not assume one ratio across routes.
 Produced by:
 
     npm run art art/source/tavern-npc-table.jpg npc-table
+    npm run art art/cutout/npc-table-front.png npc-table-front 2560,1280
     npm run art art/cutout/tavern-regular-bust.png tavern-regular-bust 1024,512
