@@ -52,6 +52,7 @@ Rows are in byte-order by filename so this table can be diffed directly against 
 | enchanted-case-study-device-576.webp | 576×289 | 21,266 B | sprite |
 | innkeeper-neutral-258.webp | 258×683 | 34,060 B | sprite |
 | innkeeper-neutral-516.webp | 516×1365 | 51,640 B | sprite |
+| innkeeper-portrait-519.webp | 519×1365 | 37,626 B | sprite |
 | innkeeper-presenting-device-259.webp | 259×681 | 31,058 B | sprite |
 | innkeeper-presenting-device-519.webp | 519×1365 | 46,056 B | sprite |
 | messengers-corner-1280.webp | 1280×714 | 33,810 B | background |
