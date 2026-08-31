@@ -75,11 +75,11 @@ const questions = npcEntries
   }
   .npc-page {
     position: relative;
-    width: 100%;
-    max-width: 1600px;
-    margin: 0 auto;
+    height: min(calc(100dvh - 7rem), calc((100vw - 4rem) / 1.79));
     aspect-ratio: 2560 / 1429;
-    max-height: calc(100dvh - 7rem);
+    width: auto;
+    max-width: 100%;
+    margin: 0 auto;
     overflow: hidden;
     background-color: var(--wood-deep);
   }
@@ -260,8 +260,10 @@ const questions = npcEntries
   /* Mobile: stack portrait above dialogue */
   @media (max-width: 639px) {
     .npc-page {
+      height: auto;
       aspect-ratio: auto;
       min-height: 100vh;
+      max-width: 100%;
     }
 
     .npc-dialogue-area {
