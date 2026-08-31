@@ -79,8 +79,13 @@ const questions = npcEntries
     max-width: 1600px;
     margin: 0 auto;
     aspect-ratio: 2560 / 1429;
+    max-height: calc(100dvh - 7rem);
     overflow: hidden;
     background-color: var(--wood-deep);
+  }
+
+  .npc-page > picture {
+    display: contents;
   }
 
   .npc-scene-art {
