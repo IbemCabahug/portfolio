@@ -1,5 +1,5 @@
 {
-  "question": "What technologies do they use?",
+  "question": "What technologies does he use?",
   "answer": "Day to day: TypeScript, React, Next.js, Astro, Express.js and PostgreSQL, with Git and Tailwind CSS. This tavern itself is built with Astro and hand-tuned for accessibility.",
   "order": 3
 }
