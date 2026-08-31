@@ -98,7 +98,7 @@ Rows are in byte-order by filename so this table can be diffed directly against 
 
 | Route | Layers | Bytes at largest variant | Share of 600 KB per-scene budget |
 |-------|--------|--------------------------|----------------------------------|
-| `/tavern` | 2 of 5 | 147,756 B | 24.6% |
+| `/tavern` | 1 of 5 (D106) | 364,162 B (larger twin of each pair, plus untwinned files; desktop transfer) | 60.7% |
 | `/tavern/npc` | 2 of 5 | 183,060 B | 30.5% |
 
 `npc-table-*` is the `/tavern/npc` close-up background; `tavern-regular-closeup-*` is the
