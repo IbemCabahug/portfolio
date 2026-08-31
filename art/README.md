@@ -38,7 +38,7 @@ node scripts/measure-contrast.mjs <path-to-image> <x> <y> <width> <height> <text
 Do not assume colours; sample them directly from the artwork using this utility.
 ## Final Asset List
 
-The `public/art/` directory contains exactly the following 46 files. These are the only
+The `public/art/` directory contains exactly the following 47 files. These are the only
 files permitted in that folder. Sprites are derived from hand-cut PNGs in `art/cutout/`.
 Both `art/source/` and `art/cutout/` are gitignored source folders.
 
