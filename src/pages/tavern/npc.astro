@@ -11,17 +11,11 @@ const questions = npcEntries
 <TavernLayout title="Tavern Regular" description={`Ask the Tavern Regular about Nhovem Cabahug — ${questions.length} prepared answers about the developer, their work, and how to get in touch.`} location="npc">
   <div class="npc-page">
     <!-- Character portrait -->
-    <div class="npc-portrait" aria-hidden="true">
-      <img
-        src="/art/tavern-regular-neutral-940.webp"
-        srcset="/art/tavern-regular-neutral-470.webp 470w, /art/tavern-regular-neutral-940.webp 940w"
-        sizes="(max-width: 639px) 200px, 300px"
-        width="470"
-        height="703"
-        alt=""
-        loading="eager"
-      />
-    </div>
+    <picture>
+      <source media="(min-width: 1024px)" srcset="/art/npc-table-2560.webp" />
+      <img class="npc-scene-art" src="/art/npc-table-1280.webp" width="2560" height="1429" alt="" loading="eager" decoding="async" />
+    </picture>
+    <img class="npc-sprite" src="/art/tavern-regular-closeup-1024.webp" srcset="/art/tavern-regular-closeup-512.webp 512w, /art/tavern-regular-closeup-1024.webp 1024w" sizes="(max-width: 1023px) 40vw, 30vw" width="1024" height="1471" alt="" loading="eager" decoding="async" />
 
     <div class="npc-dialogue-area">
       <h1 class="npc-heading">The Tavern Regular</h1>
@@ -76,31 +70,48 @@ const questions = npcEntries
 </TavernLayout>
 
 <style>
+  html, body {
+    background-color: var(--wood-deep);
+  }
   .npc-page {
-    display: flex;
-    gap: 2rem;
-    align-items: flex-start;
-    max-width: 960px;
-    margin: 0 auto;
-  }
-
-  .npc-portrait {
-    flex-shrink: 0;
-    width: 200px;
-  }
-
-  .npc-portrait img {
-    display: block;
+    position: relative;
     width: 100%;
-    height: auto;
-    border-radius: 8px;
-    border: 2px solid var(--brass);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    max-width: 1600px;
+    margin: 0 auto;
+    aspect-ratio: 2560 / 1429;
+    overflow: hidden;
+    background-color: var(--wood-deep);
   }
+
+  .npc-scene-art {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .npc-sprite {
+    position: absolute;
+    left: 6%;
+    bottom: 0;
+    height: 78%;
+    width: auto;
+    z-index: 1;
+  }
+
 
   .npc-dialogue-area {
-    flex: 1;
-    min-width: 0;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    max-height: 45%;
+    overflow-y: auto;
+    padding: 20px 26px;
+    background-color: var(--wood-deep);
+    border-top: 2px solid var(--brass);
   }
 
   .npc-heading {
@@ -244,16 +255,13 @@ const questions = npcEntries
   /* Mobile: stack portrait above dialogue */
   @media (max-width: 639px) {
     .npc-page {
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .npc-portrait {
-      width: 140px;
+      aspect-ratio: auto;
+      min-height: 100vh;
     }
 
     .npc-dialogue-area {
-      width: 100%;
+      max-height: 60%;
+      padding: 16px 18px;
     }
 
     .npc-choice-btn {
