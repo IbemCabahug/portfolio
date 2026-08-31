@@ -83,8 +83,8 @@ Rows are in byte-order by filename so this table can be diffed directly against 
 | tavern-entrance-closed-2560.webp | 2560×1429 | 66,868 B | background |
 | tavern-entrance-open-1280.webp | 1280×714 | 28,868 B | background |
 | tavern-entrance-open-2560.webp | 2560×1429 | 70,622 B | background |
-| tavern-regular-closeup-1024.webp | 1024×1471 | 97,204 B | sprite, alpha |
-| tavern-regular-closeup-512.webp | 512×736 | 42,882 B | sprite, alpha |
+| tavern-regular-bust-1024.webp | 1024×1205 | 73,784 B | sprite, alpha, npc bust crop |
+| tavern-regular-bust-512.webp | 512×603 | 36,188 B | sprite, alpha, npc bust crop |
 | tavern-regular-neutral-470.webp | 470×703 | 46,712 B | sprite |
 | tavern-regular-neutral-940.webp | 940×1406 | 82,016 B | sprite |
 | tavern-regular-seated-264.webp | 264×371 | 21,050 B | sprite |
@@ -101,7 +101,7 @@ Rows are in byte-order by filename so this table can be diffed directly against 
 | `/tavern` | 1 of 5 (D106) | 364,162 B (larger twin of each pair, plus untwinned files; desktop transfer) | 60.7% |
 | `/tavern/npc` | 2 of 5 | 183,060 B | 30.5% |
 
-`npc-table-*` is the `/tavern/npc` close-up background; `tavern-regular-closeup-*` is the
+`npc-table-*` is the `/tavern/npc` close-up background; `tavern-regular-bust-*` is the
 seated Tavern Regular composited over it. The camera sits beside the Regular's table rather
 than directly opposite it, and the painting reserves no dark region, so the dialogue panel
 on that route must be fully opaque rather than translucent.
@@ -113,4 +113,4 @@ from its own image; do not assume one ratio across routes.
 Produced by:
 
     npm run art art/source/tavern-npc-table.jpg npc-table
-    npm run art art/cutout/tavern-regular-closeup.png tavern-regular-closeup 1024,512
+    npm run art art/cutout/tavern-regular-bust.png tavern-regular-bust 1024,512
