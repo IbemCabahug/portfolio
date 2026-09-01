@@ -70,3 +70,9 @@ a[href="#main-content"]:focus {
   color: var(--parchment);
   border: 2px solid var(--brass);
 }
+
+/* DEF-80: Ensure 44px min touch target for close buttons */
+.close-panel-btn {
+  min-height: 44px;
+  display: inline-block;
+}

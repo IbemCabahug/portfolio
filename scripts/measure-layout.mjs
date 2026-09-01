@@ -1,6 +1,6 @@
 // Layout measurement harness. Committed deliberately: this file is a GATE,
 // and a gate that lives outside version control is not a gate.
-// Usage: node scripts/measure-layout.mjs [viewportHeight] [path]
+// Usage: node scripts/measure-layout.mjs [viewportHeight] [path] [modes...]
 // Requires the dev server running on http://localhost:4321
 //
 // NOTE on units: naturalWidth and naturalHeight on an element using a
@@ -13,8 +13,22 @@
 import puppeteer from 'puppeteer-core';
 
 const EDGE = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
-const height = Number(process.argv[2] || 768);
-const path = (process.argv[3] && process.argv[3] !== 'answer') ? process.argv[3] : '/tavern/npc';
+const args = process.argv.slice(2);
+const heightStr = args.find(a => /^\d+$/.test(a));
+const height = Number(heightStr || 768);
+const pathArg = args.find(a => a.startsWith('/'));
+const path = pathArg || '/tavern/npc';
+const answerMode = args.includes('answer');
+const reducedMode = args.includes('reduced');
+const openMode = args.includes('open');
+const triggerArg = args.find(a => a.startsWith('trigger-') || a === 'narrow-innkeeper');
+
+if (openMode && !triggerArg) {
+  console.log('OPEN_NEEDS_TRIGGER');
+  process.exit(1);
+}
+
+const resolvedUrl = 'http://localhost:4321' + path;
 
 const browser = await puppeteer.launch({
   executablePath: EDGE,
@@ -23,12 +37,41 @@ const browser = await puppeteer.launch({
 });
 
 const page = await browser.newPage();
-await page.goto('http://localhost:4321' + path, { waitUntil: 'networkidle0' });
+await page.goto(resolvedUrl, { waitUntil: 'load' });
+await page.evaluate(() => {
+  document.querySelectorAll('img').forEach(img => {
+    img.loading = 'eager';
+    img.decoding = 'sync';
+  });
+});
+await page.waitForFunction(() => {
+  const imgs = Array.from(document.querySelectorAll('img'));
+  return imgs.every(img => img.complete && img.naturalWidth > 0);
+}, { timeout: 15000 }).catch(() => {});
 
-const answerMode = process.argv.includes('answer');
-if (answerMode) {
-  const isReduced = process.argv.includes('reduced');
-  if (isReduced) {
+
+const readyStateCheck = await page.evaluate(() => {
+  if (document.readyState !== 'complete') return 'readyState is ' + document.readyState;
+  const imgs = Array.from(document.querySelectorAll('img'));
+  for (let i = 0; i < imgs.length; i++) {
+    const img = imgs[i];
+    if (!img.complete) return 'img ' + (img.src || img.id || i) + ' not complete';
+    if (img.naturalWidth <= 0) return 'img ' + (img.src || img.id || i) + ' naturalWidth ' + img.naturalWidth;
+  }
+  const main = document.querySelector('main#main-content') || document.querySelector('.tavern-shell');
+  if (!main) return 'main#main-content not found';
+  if (main.getBoundingClientRect().height <= 0) return 'main#main-content height ' + main.getBoundingClientRect().height;
+  return 'OK';
+});
+
+if (readyStateCheck !== 'OK') {
+  console.log('PAGE_NOT_READY: ' + readyStateCheck);
+  await browser.close();
+  process.exit(1);
+}
+
+if (answerMode || reducedMode) {
+  if (reducedMode) {
     await page.evaluate(() => { document.documentElement.dataset.motion = 'reduced'; });
     console.log('MOTION reduced');
   } else {
@@ -58,7 +101,7 @@ if (answerMode) {
   }
   console.log('ANSWER_MODE ' + JSON.stringify(clicked));
 
-  if (!isReduced) {
+  if (!reducedMode) {
     const started = await page.waitForFunction(
       () => {
         const p = document.querySelector('.npc-dialogue-panel .dialogue-prose');
@@ -87,20 +130,83 @@ if (answerMode) {
     await browser.close();
     process.exit(1);
   }
-  if (!isReduced) console.log('TYPING_SETTLED');
+  if (!reducedMode) console.log('TYPING_SETTLED');
+} else if (openMode) {
+  try {
+    const triggerSel = '#' + triggerArg;
+    await page.waitForSelector(triggerSel, { timeout: 2000 });
+    
+    // Wait for JS to attach event listeners (it adds aria-haspopup or data-filter)
+    await page.waitForFunction((sel) => {
+      const el = document.querySelector(sel);
+      return el && (el.hasAttribute('aria-haspopup') || el.hasAttribute('data-filter'));
+    }, { timeout: 5000 }, triggerSel).catch(() => {});
+
+    await page.evaluate((sel) => document.querySelector(sel).click(), triggerSel);
+    
+    await page.waitForFunction(() => {
+      const els = document.querySelectorAll('.tavern-panel, .npc-dialogue-panel');
+      for (let i = 0; i < els.length; i++) {
+        const r = els[i].getBoundingClientRect();
+        if (r.width > 0 && r.height > 0 && !els[i].hidden) return true;
+      }
+      return false;
+    }, { timeout: 5000 });
+
+    // Wait for CSS open animation to settle (slideUp is 0.3s with scale)
+    await page.waitForFunction(() => {
+      const panels = document.querySelectorAll('.tavern-panel:not([hidden])');
+      for (const p of panels) {
+        const anims = p.getAnimations();
+        if (anims.length > 0 && anims.some(a => a.playState === 'running')) return false;
+      }
+      return true;
+    }, { timeout: 2000 }).catch(() => {});
+    
+    console.log('OPEN_MODE');
+    console.log('OPEN_TRIGGER ' + triggerArg);
+    console.log('OPEN_PANEL_VISIBLE');
+  } catch (err) {
+    console.log('OPEN_FAILED');
+    await browser.close();
+    process.exit(1);
+  }
 }
 
 const data = await page.evaluate(() => {
+  const probeAll = (selector) => {
+    const elements = document.querySelectorAll(selector);
+    const matches = [];
+    for (let i = 0; i < elements.length && i < 5; i++) {
+      const el = elements[i];
+      const r = el.getBoundingClientRect();
+      const w = Math.round(r.width);
+      const h = Math.round(r.height);
+      matches.push({
+        i,
+        w,
+        h,
+        top: Math.round(r.top + window.scrollY),
+        left: Math.round(r.left + window.scrollX),
+        measurable: w > 0 && h > 0
+      });
+    }
+    return { selector, count: elements.length, matches };
+  };
+
   const rect = (el) => {
-    if (!el) return { present: false };
+    if (!el) return { present: false, measurable: false };
     const r = el.getBoundingClientRect();
+    const w = Math.round(r.width);
+    const h = Math.round(r.height);
     return {
       present: true,
       top: Math.round(r.top + window.scrollY),
       left: Math.round(r.left + window.scrollX),
-      w: Math.round(r.width),
-      h: Math.round(r.height),
+      w,
+      h,
       bottom: Math.round(r.bottom + window.scrollY),
+      measurable: w > 0 && h > 0
     };
   };
 
@@ -117,9 +223,9 @@ const data = await page.evaluate(() => {
     spriteProbe.currentSrc = sprite.currentSrc;
   }
 
-  const bandProbe = rect(document.querySelector('.npc-dialogue-panel .dialogue-band'));
-  const stackProbe = rect(document.querySelector('.npc-dialogue-panel .dialogue-stack'));
-  const repliesEl = document.querySelector('.npc-dialogue-panel .dialogue-replies');
+  const bandProbe = rect(document.querySelector('.npc-dialogue-panel .dialogue-band') || document.querySelector('.dialogue-panel .dialogue-band'));
+  const stackProbe = rect(document.querySelector('.npc-dialogue-panel .dialogue-stack') || document.querySelector('.dialogue-panel .dialogue-stack'));
+  const repliesEl = document.querySelector('.npc-dialogue-panel .dialogue-replies') || document.querySelector('.dialogue-panel .dialogue-replies');
   const repliesProbe = rect(repliesEl);
   const plateProbe = rect(document.querySelector('.npc-table-front'));
   bandProbe.overlapsSprite = overlaps(bandProbe, spriteProbe);
@@ -133,44 +239,58 @@ const data = await page.evaluate(() => {
 
   const art = document.querySelector('.npc-scene-art');
   const artProbe = art
-    ? {
-        present: true,
-        naturalW: art.naturalWidth,
-        naturalH: art.naturalHeight,
-        currentSrc: art.currentSrc,
-        boxW: Math.round(art.getBoundingClientRect().width),
-        boxH: Math.round(art.getBoundingClientRect().height),
-      }
-    : { present: false };
+    ? (() => {
+        const r = art.getBoundingClientRect();
+        const w = Math.round(r.width);
+        const h = Math.round(r.height);
+        return {
+          present: true,
+          naturalW: art.naturalWidth,
+          naturalH: art.naturalHeight,
+          currentSrc: art.currentSrc,
+          boxW: w,
+          boxH: h,
+          measurable: w > 0 && h > 0
+        }
+      })()
+    : { present: false, measurable: false };
 
   const skip = document.querySelector('a[href="#main-content"]');
   const skipLinkProbe = skip
     ? (() => {
         const r = skip.getBoundingClientRect();
         const cs = getComputedStyle(skip);
+        const w = Math.round(r.width);
+        const h = Math.round(r.height);
         return {
+          present: true,
+          measurable: w > 0 && h > 0,
           x: Math.round(r.left),
           y: Math.round(r.top),
-          w: Math.round(r.width),
-          h: Math.round(r.height),
+          w,
+          h,
           position: cs.position,
           offsetParentTag: skip.offsetParent ? skip.offsetParent.tagName : null,
         };
       })()
-    : { present: false };
+    : { present: false, measurable: false };
 
   const frame = document.querySelector('.npc-page');
   const content = document.querySelector('.tavern-content');
   const wrapper = content
     ? (() => {
         const cs = getComputedStyle(content);
+        const w = Math.round(content.getBoundingClientRect().width);
+        const h = Math.round(content.getBoundingClientRect().height);
         return {
-          h: Math.round(content.getBoundingClientRect().height),
+          present: true,
+          measurable: w > 0 && h > 0,
+          h,
           minHeight: cs.minHeight,
           display: cs.display,
         };
       })()
-    : { present: false };
+    : { present: false, measurable: false };
 
   const frameRect = rect(frame);
   const siblingsOfFrame = frame && frame.parentElement
@@ -179,14 +299,14 @@ const data = await page.evaluate(() => {
 
   const docScrollHeight = document.documentElement.scrollHeight;
 
-  const proseEl = document.querySelector('.npc-dialogue-panel .dialogue-prose');
+  const proseEl = document.querySelector('.npc-dialogue-panel .dialogue-prose') || document.querySelector('.dialogue-panel .dialogue-prose');
   const proseProbe = rect(proseEl);
   if (proseEl) {
     proseProbe.scrollHeight = proseEl.scrollHeight;
     proseProbe.clientHeight = proseEl.clientHeight;
     proseProbe.clipped = proseEl.scrollHeight > proseEl.clientHeight + 1;
   }
-  const bodyEl = document.querySelector('.npc-dialogue-panel .panel-body');
+  const bodyEl = document.querySelector('.npc-dialogue-panel .panel-body') || document.querySelector('.dialogue-panel .panel-body');
   const bodyProbe = rect(bodyEl);
   if (bodyEl) {
     bodyProbe.scrollHeight = bodyEl.scrollHeight;
@@ -194,11 +314,10 @@ const data = await page.evaluate(() => {
     bodyProbe.overflowY = getComputedStyle(bodyEl).overflowY;
     bodyProbe.scrollable = bodyEl.scrollHeight > bodyEl.clientHeight + 1;
   }
-  const closeProbe = rect(document.querySelector('.npc-dialogue-panel .panel-actions .close-panel-btn'));
-
-  const proseEl2 = document.querySelector('.npc-dialogue-panel .dialogue-prose');
+  
+  const proseEl2 = document.querySelector('.npc-dialogue-panel .dialogue-prose') || document.querySelector('.dialogue-panel .dialogue-prose');
   const announceEl = document.getElementById('npc-announce');
-  const repliesEl2 = document.querySelector('.npc-dialogue-panel .dialogue-replies');
+  const repliesEl2 = document.querySelector('.npc-dialogue-panel .dialogue-replies') || document.querySelector('.dialogue-panel .dialogue-replies');
   const typingProbe = {
     unreadCount: proseEl2 ? proseEl2.querySelectorAll('.dialogue-unread').length : null,
     proseTextLength: proseEl2 ? (proseEl2.textContent || '').length : null,
@@ -206,6 +325,10 @@ const data = await page.evaluate(() => {
     repliesHidden: repliesEl2 ? repliesEl2.hidden : null,
     motion: document.documentElement.dataset.motion || null,
   };
+
+  const closeProbe = probeAll('.close-panel-btn');
+  const controlProbe = probeAll('.close-panel-btn-does-not-exist');
+  const replyBtnProbe = probeAll('.reply-btn');
 
   return {
     innerHeight: window.innerHeight,
@@ -230,9 +353,17 @@ const data = await page.evaluate(() => {
     bodyProbe,
     typingProbe,
     closeProbe,
+    controlProbe,
+    replyBtnProbe
   };
 });
 
+if (data.controlProbe.count !== 0 || data.controlProbe.matches.length !== 0) {
+  console.log('PROBE MACHINERY UNTRUSTWORTHY');
+  process.exit(1);
+}
+
+console.log('RESOLVED_URL ' + resolvedUrl);
 console.log('JSON_START_' + height);
 console.log(JSON.stringify(data, null, 2));
 console.log('JSON_END_' + height);
