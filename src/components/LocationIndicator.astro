@@ -9,7 +9,7 @@ interface Props {
 
 const { currentLabel, leftLabel, leftLink, rightLabel, rightLink } = Astro.props;
 ---
-<nav aria-label="Scene navigation" class="flex items-center justify-center gap-2 sm:gap-4 py-2 sm:py-1 text-[var(--parchment)] font-semibold bg-[var(--wood-deep)]">
+<nav aria-label="Scene navigation" class="flex items-center justify-center gap-2 sm:gap-4 py-2 sm:py-1.5 text-[var(--parchment)] font-semibold bg-[var(--wood-deep)]">
   {leftLink && leftLabel ? (
     <a href={leftLink} class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2" id="nav-left">
       {leftLabel} &larr;
