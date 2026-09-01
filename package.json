@@ -15,7 +15,9 @@
     "check": "astro check",
     "art": "node scripts/optimise-art.mjs",
     "measure": "node scripts/measure-layout.mjs",
-    "nojs": "node scripts/nojs-check.mjs"
+    "measure:answer": "node scripts/measure-layout.mjs",
+    "nojs": "node scripts/nojs-check.mjs",
+    "shot": "node scripts/screenshot-npc.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^7.0.8",

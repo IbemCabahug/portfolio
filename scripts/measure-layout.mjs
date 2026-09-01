@@ -14,7 +14,7 @@ import puppeteer from 'puppeteer-core';
 
 const EDGE = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
 const height = Number(process.argv[2] || 768);
-const path = process.argv[3] || '/tavern/npc';
+const path = (process.argv[3] && process.argv[3] !== 'answer') ? process.argv[3] : '/tavern/npc';
 
 const browser = await puppeteer.launch({
   executablePath: EDGE,
@@ -24,6 +24,32 @@ const browser = await puppeteer.launch({
 
 const page = await browser.newPage();
 await page.goto('http://localhost:4321' + path, { waitUntil: 'networkidle0' });
+
+const answerMode = process.argv.includes('answer');
+if (answerMode) {
+  const clicked = await page.evaluate(() => {
+    const pairs = Array.from(document.querySelectorAll('#npc-fallback .qa-pair'));
+    let best = -1;
+    let bestLen = -1;
+    pairs.forEach((pair, i) => {
+      const p = pair.querySelector('p');
+      const len = p ? (p.textContent || '').trim().length : 0;
+      if (len > bestLen) { bestLen = len; best = i; }
+    });
+    if (best < 0) return { clicked: false, reason: 'no qa-pair found' };
+    const btn = document.querySelector('#npc-replies [data-question-index="' + best + '"]');
+    if (!btn) return { clicked: false, reason: 'no reply button for index ' + best };
+    btn.click();
+    return { clicked: true, index: best, answerLength: bestLen };
+  });
+  if (!clicked.clicked) {
+    console.error('ANSWER MODE FAILED: ' + clicked.reason);
+    await browser.close();
+    process.exit(1);
+  }
+  console.log('ANSWER_MODE ' + JSON.stringify(clicked));
+  await new Promise((r) => setTimeout(r, 400));
+}
 
 const data = await page.evaluate(() => {
   const rect = (el) => {
@@ -54,11 +80,17 @@ const data = await page.evaluate(() => {
 
   const bandProbe = rect(document.querySelector('.npc-dialogue-panel .dialogue-band'));
   const stackProbe = rect(document.querySelector('.npc-dialogue-panel .dialogue-stack'));
-  const repliesProbe = rect(document.querySelector('.npc-dialogue-panel .dialogue-replies'));
+  const repliesEl = document.querySelector('.npc-dialogue-panel .dialogue-replies');
+  const repliesProbe = rect(repliesEl);
   const plateProbe = rect(document.querySelector('.npc-table-front'));
   bandProbe.overlapsSprite = overlaps(bandProbe, spriteProbe);
   stackProbe.overlapsSprite = overlaps(stackProbe, spriteProbe);
   repliesProbe.overlapsSprite = overlaps(repliesProbe, spriteProbe);
+  if (repliesEl) {
+    repliesProbe.scrollHeight = repliesEl.scrollHeight;
+    repliesProbe.clientHeight = repliesEl.clientHeight;
+    repliesProbe.scrollable = repliesEl.scrollHeight > repliesEl.clientHeight + 1;
+  }
 
   const art = document.querySelector('.npc-scene-art');
   const artProbe = art
@@ -108,6 +140,23 @@ const data = await page.evaluate(() => {
 
   const docScrollHeight = document.documentElement.scrollHeight;
 
+  const proseEl = document.querySelector('.npc-dialogue-panel .dialogue-prose');
+  const proseProbe = rect(proseEl);
+  if (proseEl) {
+    proseProbe.scrollHeight = proseEl.scrollHeight;
+    proseProbe.clientHeight = proseEl.clientHeight;
+    proseProbe.clipped = proseEl.scrollHeight > proseEl.clientHeight + 1;
+  }
+  const bodyEl = document.querySelector('.npc-dialogue-panel .panel-body');
+  const bodyProbe = rect(bodyEl);
+  if (bodyEl) {
+    bodyProbe.scrollHeight = bodyEl.scrollHeight;
+    bodyProbe.clientHeight = bodyEl.clientHeight;
+    bodyProbe.overflowY = getComputedStyle(bodyEl).overflowY;
+    bodyProbe.scrollable = bodyEl.scrollHeight > bodyEl.clientHeight + 1;
+  }
+  const closeProbe = rect(document.querySelector('.npc-dialogue-panel .panel-actions .close-panel-btn'));
+
   return {
     innerHeight: window.innerHeight,
     docScrollHeight,
@@ -127,6 +176,9 @@ const data = await page.evaluate(() => {
     plateProbe,
     artProbe,
     skipLinkProbe,
+    proseProbe,
+    bodyProbe,
+    closeProbe,
   };
 });
 
