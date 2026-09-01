@@ -412,6 +412,17 @@ const data = await page.evaluate(() => {
     prose: getStyleInfo('.dialogue-prose')
   };
 
+  const getChromeRect = (el) => {
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    return { top: r.top, height: r.height, bottom: r.bottom };
+  };
+  const chromeProbe = {
+    header: getChromeRect(document.querySelector('header')),
+    locationBar: getChromeRect(document.querySelector('header + nav')),
+    content: getChromeRect(document.querySelector('.tavern-content'))
+  };
+
   return {
     innerHeight: window.innerHeight,
     docScrollHeight,
@@ -437,6 +448,7 @@ const data = await page.evaluate(() => {
     closeProbe,
     controlProbe,
     replyBtnProbe,
+    chromeProbe,
     styleProbe
   };
 });
