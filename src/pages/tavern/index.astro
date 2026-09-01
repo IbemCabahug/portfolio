@@ -6,6 +6,12 @@ import { getCollection } from 'astro:content';
 const skillsEntries = await getCollection('skills');
 const skills = skillsEntries.map(entry => entry.data);
 
+const levelMap: Record<string, number> = {
+  learning: 1,
+  working: 2,
+  confident: 3
+};
+
 const innkeeperEntries = await getCollection('innkeeper');
   const innkeeperAll = innkeeperEntries
     .map(entry => entry.data)
@@ -179,7 +185,14 @@ const sceneObjects = [
             <div class="skill-category" data-category={group.category}>
               <ul>
                 {group.items.map((item) => (
-                  <li><strong>{item.name}</strong> <span>({item.level})</span></li>
+                  <li>
+                    <strong>{item.name}</strong>
+                    <span class="level-meter" role="img" aria-label={`${item.name}, ${item.level}, ${levelMap[item.level]} of 3`}>
+                      <span class={`notch ${levelMap[item.level] >= 1 ? 'is-filled' : ''}`}></span>
+                      <span class={`notch ${levelMap[item.level] >= 2 ? 'is-filled' : ''}`}></span>
+                      <span class={`notch ${levelMap[item.level] >= 3 ? 'is-filled' : ''}`}></span>
+                    </span>
+                  </li>
                 ))}
               </ul>
             </div>
@@ -695,6 +708,25 @@ const sceneObjects = [
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 16px;
+  }
+
+  .level-meter {
+    display: inline-flex;
+    gap: 3px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .level-meter .notch {
+    box-sizing: border-box;
+    width: 5px;
+    height: 14px;
+    border-radius: 1px;
+    border: 1px solid rgba(230, 211, 168, 0.5);
+    background: transparent;
+  }
+  .level-meter .notch.is-filled {
+    background: #e6d3a8;
+    border-color: #e6d3a8;
   }
 
   .skill-category h3 {
