@@ -85,7 +85,7 @@ const sceneObjects = [
 ];
 ---
 
-<TavernLayout title="Ibem's Tavern - Nhovem Cabahug" description="Main Tavern Scene" location="tavern">
+<TavernLayout title="Ibem's Tavern - Nhovem Cabahug" description="Main Tavern Scene" location="tavern" fitViewport>
   <div class="scene-container">
     <picture>
       <source
@@ -259,6 +259,20 @@ const sceneObjects = [
     display: block;
     width: 100%;
     height: auto; /* Uses intrinsic aspect ratio */
+  }
+
+  @media (min-width: 769px) {
+    .scene-container {
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+    .scene-background {
+      position: absolute;
+      inset: 0;
+      height: 100%;
+      object-fit: cover;
+      object-position: 50% 100%;
+    }
   }
 
   .scene-overlay {
