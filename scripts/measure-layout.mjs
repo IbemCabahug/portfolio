@@ -33,6 +33,11 @@ let path;
 let routeSource;
 
 if (routeArg !== undefined) {
+  if (/^\d+$/.test(routeArg)) {
+    console.error('ERROR: Route argument cannot be purely numeric');
+    process.exit(1);
+  }
+  
   routeSource = 'argument';
   let cleaned = routeArg;
   
@@ -76,7 +81,13 @@ const browser = await puppeteer.launch({
 });
 
 const page = await browser.newPage();
-await page.goto(resolvedUrl, { waitUntil: 'load' });
+const response = await page.goto(resolvedUrl, { waitUntil: 'load' });
+const status = response.status();
+if (status !== 200) {
+  console.log(`ROUTE_STATUS_FAILED ${status} ${resolvedUrl}`);
+  process.exit(1);
+}
+let routeStatus = status;
 await page.evaluate(() => {
   document.querySelectorAll('img').forEach(img => {
     img.loading = 'eager';
@@ -404,6 +415,7 @@ if (data.controlProbe.count !== 0 || data.controlProbe.matches.length !== 0) {
 }
 
 console.log('ROUTE_SOURCE=' + routeSource);
+console.log('ROUTE_STATUS=' + routeStatus);
 console.log('RESOLVED_URL ' + resolvedUrl);
 console.log('JSON_START_' + height);
 console.log(JSON.stringify(data, null, 2));
