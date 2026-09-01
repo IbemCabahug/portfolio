@@ -16,12 +16,51 @@ const EDGE = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
 const args = process.argv.slice(2);
 const heightStr = args.find(a => /^\d+$/.test(a));
 const height = Number(heightStr || 768);
-const pathArg = args.find(a => a.startsWith('/'));
-const path = pathArg || '/tavern/npc';
 const answerMode = args.includes('answer');
 const reducedMode = args.includes('reduced');
 const openMode = args.includes('open');
 const triggerArg = args.find(a => a.startsWith('trigger-') || a === 'narrow-innkeeper');
+
+const routeArg = args.find(a => 
+  a !== heightStr && 
+  a !== 'answer' && 
+  a !== 'reduced' && 
+  a !== 'open' && 
+  a !== triggerArg
+);
+
+let path;
+let routeSource;
+
+if (routeArg !== undefined) {
+  routeSource = 'argument';
+  let cleaned = routeArg;
+  
+  const mangleToken = 'Program Files/Git';
+  const idx = cleaned.indexOf(mangleToken);
+  if (idx !== -1) {
+    cleaned = cleaned.substring(idx + mangleToken.length);
+  }
+  
+  if (!cleaned || cleaned.trim() === '') {
+    console.error('ERROR: Route argument resolved to an empty path');
+    process.exit(1);
+  }
+  
+  if (!cleaned.startsWith('/')) {
+    cleaned = '/' + cleaned;
+  }
+  
+  if (cleaned === '/') {
+    console.error('ERROR: Route argument resolved to an empty path');
+    process.exit(1);
+  }
+  
+  path = cleaned;
+} else {
+  routeSource = 'default';
+  path = '/tavern/npc';
+}
 
 if (openMode && !triggerArg) {
   console.log('OPEN_NEEDS_TRIGGER');
@@ -177,7 +216,8 @@ const data = await page.evaluate(() => {
   const probeAll = (selector) => {
     const elements = document.querySelectorAll(selector);
     const matches = [];
-    for (let i = 0; i < elements.length && i < 5; i++) {
+    const cap = 20;
+    for (let i = 0; i < elements.length && i < cap; i++) {
       const el = elements[i];
       const r = el.getBoundingClientRect();
       const w = Math.round(r.width);
@@ -191,7 +231,7 @@ const data = await page.evaluate(() => {
         measurable: w > 0 && h > 0
       });
     }
-    return { selector, count: elements.length, matches };
+    return { selector, count: elements.length, matches, capped: elements.length > cap };
   };
 
   const rect = (el) => {
@@ -363,6 +403,7 @@ if (data.controlProbe.count !== 0 || data.controlProbe.matches.length !== 0) {
   process.exit(1);
 }
 
+console.log('ROUTE_SOURCE=' + routeSource);
 console.log('RESOLVED_URL ' + resolvedUrl);
 console.log('JSON_START_' + height);
 console.log(JSON.stringify(data, null, 2));
