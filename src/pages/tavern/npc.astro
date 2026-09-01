@@ -148,7 +148,7 @@ const questions = npcEntries
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
-    min-height: 160px;
+    min-height: 200px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.8);
   }
   .npc-dialogue-panel .panel-body {
@@ -186,6 +186,9 @@ const questions = npcEntries
   }
   .npc-dialogue-panel .dialogue-replies[hidden] {
     display: flex !important;
+    visibility: hidden;
+  }
+  .npc-dialogue-panel :global(.dialogue-unread) {
     visibility: hidden;
   }
   .npc-dialogue-panel .panel-header {
@@ -379,14 +382,77 @@ const questions = npcEntries
     fallback.hidden = true;
     stack.hidden = false;
 
+    const TYPE_MS = 25;
+    const PAUSE_AFTER: Record<string, number> = { '.': 8, '!': 8, '?': 8, ',': 4, ';': 4, ':': 4 };
+    let typeTimer: number | null = null;
+    let typingDone = true;
+    let finishTyping: (() => void) | null = null;
+
+    function stopTyping() {
+      if (typeTimer !== null) { clearTimeout(typeTimer); typeTimer = null; }
+    }
+
+    function renderProse(text: string) {
+      if (!prose) return;
+      stopTyping();
+      finishTyping = null;
+
+      const plain = text.replace(/\s+/g, ' ').trim();
+
+      const settle = () => {
+        stopTyping();
+        finishTyping = null;
+        prose.textContent = plain;
+        typingDone = true;
+        if (announce) announce.textContent = plain;
+        if (replies) replies.hidden = false;
+      };
+
+      if (document.documentElement.dataset.motion !== 'full') {
+        settle();
+        return;
+      }
+
+      typingDone = false;
+      finishTyping = settle;
+      if (replies) replies.hidden = true;
+
+      const shown = document.createElement('span');
+      shown.setAttribute('aria-hidden', 'true');
+      const rest = document.createElement('span');
+      rest.setAttribute('aria-hidden', 'true');
+      rest.className = 'dialogue-unread';
+      rest.textContent = plain;
+      prose.textContent = '';
+      prose.appendChild(shown);
+      prose.appendChild(rest);
+
+      let ci = 0;
+      const step = () => {
+        ci += 1;
+        shown.textContent = plain.slice(0, ci);
+        rest.textContent = plain.slice(ci);
+        const ch = plain[ci - 1];
+        if (ci >= plain.length) { settle(); return; }
+        typeTimer = window.setTimeout(step, TYPE_MS * (PAUSE_AFTER[ch] ?? 1));
+      };
+      typeTimer = window.setTimeout(step, TYPE_MS);
+    }
+
+    const band = document.querySelector('.npc-dialogue-panel .dialogue-band');
+    if (band) {
+      band.addEventListener('click', () => {
+        if (!typingDone && finishTyping) finishTyping();
+      });
+    }
+
     replies.querySelectorAll<HTMLButtonElement>('.reply-btn[data-question-index]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const index = parseInt(btn.getAttribute('data-question-index') || '0', 10);
         const pair = qaPairs[index];
         if (!pair) return;
-        prose.textContent = pair.answer;
+        renderProse(pair.answer);
         btn.classList.add('reply-visited');
-        announce.textContent = pair.answer;
         prose.focus();
       });
     });

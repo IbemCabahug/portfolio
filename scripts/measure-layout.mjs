@@ -27,6 +27,15 @@ await page.goto('http://localhost:4321' + path, { waitUntil: 'networkidle0' });
 
 const answerMode = process.argv.includes('answer');
 if (answerMode) {
+  const isReduced = process.argv.includes('reduced');
+  if (isReduced) {
+    await page.evaluate(() => { document.documentElement.dataset.motion = 'reduced'; });
+    console.log('MOTION reduced');
+  } else {
+    const currentMotion = await page.evaluate(() => document.documentElement.dataset.motion || '');
+    console.log('MOTION ' + currentMotion);
+  }
+
   const clicked = await page.evaluate(() => {
     const pairs = Array.from(document.querySelectorAll('#npc-fallback .qa-pair'));
     let best = -1;
@@ -48,7 +57,37 @@ if (answerMode) {
     process.exit(1);
   }
   console.log('ANSWER_MODE ' + JSON.stringify(clicked));
-  await new Promise((r) => setTimeout(r, 400));
+
+  if (!isReduced) {
+    const started = await page.waitForFunction(
+      () => {
+        const p = document.querySelector('.npc-dialogue-panel .dialogue-prose');
+        return !!p && p.querySelectorAll('.dialogue-unread').length > 0;
+      },
+      { timeout: 2000 },
+    ).then(() => true).catch(() => false);
+    if (!started) {
+      console.error('TYPE OUT NEVER STARTED: no dialogue-unread span appeared within 2 seconds');
+      await browser.close();
+      process.exit(1);
+    }
+    console.log('TYPING_STARTED');
+  }
+
+  const settled = await page.waitForFunction(
+    () => {
+      const p = document.querySelector('.npc-dialogue-panel .dialogue-prose');
+      if (!p) return false;
+      return p.querySelectorAll('.dialogue-unread').length === 0;
+    },
+    { timeout: 20000 },
+  ).then(() => true).catch(() => false);
+  if (!settled) {
+    console.error('TYPE OUT DID NOT SETTLE WITHIN 20 SECONDS');
+    await browser.close();
+    process.exit(1);
+  }
+  if (!isReduced) console.log('TYPING_SETTLED');
 }
 
 const data = await page.evaluate(() => {
@@ -157,6 +196,17 @@ const data = await page.evaluate(() => {
   }
   const closeProbe = rect(document.querySelector('.npc-dialogue-panel .panel-actions .close-panel-btn'));
 
+  const proseEl2 = document.querySelector('.npc-dialogue-panel .dialogue-prose');
+  const announceEl = document.getElementById('npc-announce');
+  const repliesEl2 = document.querySelector('.npc-dialogue-panel .dialogue-replies');
+  const typingProbe = {
+    unreadCount: proseEl2 ? proseEl2.querySelectorAll('.dialogue-unread').length : null,
+    proseTextLength: proseEl2 ? (proseEl2.textContent || '').length : null,
+    announceTextLength: announceEl ? (announceEl.textContent || '').length : null,
+    repliesHidden: repliesEl2 ? repliesEl2.hidden : null,
+    motion: document.documentElement.dataset.motion || null,
+  };
+
   return {
     innerHeight: window.innerHeight,
     docScrollHeight,
@@ -178,6 +228,7 @@ const data = await page.evaluate(() => {
     skipLinkProbe,
     proseProbe,
     bodyProbe,
+    typingProbe,
     closeProbe,
   };
 });

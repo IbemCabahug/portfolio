@@ -16,6 +16,7 @@
     "art": "node scripts/optimise-art.mjs",
     "measure": "node scripts/measure-layout.mjs",
     "measure:answer": "node scripts/measure-layout.mjs",
+    "measure:reduced": "node scripts/measure-layout.mjs",
     "nojs": "node scripts/nojs-check.mjs",
     "shot": "node scripts/screenshot-npc.mjs"
   },
