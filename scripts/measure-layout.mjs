@@ -422,6 +422,15 @@ const data = await page.evaluate(() => {
     locationBar: getChromeRect(document.querySelector('header + nav')),
     content: getChromeRect(document.querySelector('.tavern-content'))
   };
+  const navLinkProbe = (() => {
+    const kept = [];
+    document.querySelectorAll('header nav a').forEach(a => {
+      const r = a.getBoundingClientRect();
+      if (r.height > 0) kept.push({ width: r.width, height: r.height });
+    });
+    if (kept.length === 0) return null;
+    return { visibleCount: kept.length, first: kept[0] };
+  })();
 
   return {
     innerHeight: window.innerHeight,
@@ -449,6 +458,7 @@ const data = await page.evaluate(() => {
     controlProbe,
     replyBtnProbe,
     chromeProbe,
+    navLinkProbe,
     styleProbe
   };
 });
