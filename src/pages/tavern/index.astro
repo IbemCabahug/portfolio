@@ -177,7 +177,6 @@ const sceneObjects = [
         <div class="panel-body skills-grid">
           {skills.map((group) => (
             <div class="skill-category" data-category={group.category}>
-              <h3>{group.category}</h3>
               <ul>
                 {group.items.map((item) => (
                   <li><strong>{item.name}</strong> <span>({item.level})</span></li>
