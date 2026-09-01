@@ -57,8 +57,8 @@ Rows are in byte-order by filename so this table can be diffed directly against 
 | innkeeper-presenting-device-519.webp | 519×1365 | 46,056 B | sprite |
 | messengers-corner-1280.webp | 1280×714 | 33,810 B | background |
 | messengers-corner-2560.webp | 2560×1429 | 88,452 B | background |
-| npc-table-1280.webp | 1280×714 | 37,846 B | background |
-| npc-table-2560.webp | 2560×1429 | 85,856 B | background |
+| npc-table-1280.webp | 1280×714 | 41,634 B | background |
+| npc-table-2560.webp | 2560×1429 | 93,946 B | background |
 | npc-table-front-1280.webp | 1280×714 | 13,488 B | foreground plate, alpha |
 | npc-table-front-2560.webp | 2560×1429 | 31,684 B | foreground plate, alpha |
 | quest-board-1192.webp | 1192×662 | 36,972 B | sprite |
@@ -101,7 +101,7 @@ Rows are in byte-order by filename so this table can be diffed directly against 
 | Route | Layers | Bytes at largest variant | Share of 600 KB per-scene budget |
 |-------|--------|--------------------------|----------------------------------|
 | `/tavern` | 1 of 5 (D106) | 364,162 B (larger twin of each pair, plus untwinned files; desktop transfer) | 60.7% |
-| `/tavern/npc` | 2 of 5 | 183,060 B | 30.5% |
+| `/tavern/npc` | 2 of 5 | 199,414 B | 32.5% |
 
 `npc-table-*` is the `/tavern/npc` close-up background and `npc-table-front-*` is the foreground table plate drawn above the sprite; `tavern-regular-bust-*` is the
 seated Tavern Regular composited over it. The camera sits beside the Regular's table rather
@@ -114,6 +114,7 @@ from its own image; do not assume one ratio across routes.
 
 Produced by:
 
-    npm run art art/source/tavern-npc-table.jpg npc-table
+    npm run art art/source/tavern-npc-table-v2.jpg npc-table
+    (Source is now tavern-npc-table-v2.jpg, regenerated 2026-09-01 with corrected shield artwork.)
     npm run art art/cutout/npc-table-front.png npc-table-front 2560,1280
     npm run art art/cutout/tavern-regular-bust.png tavern-regular-bust 1024,512
