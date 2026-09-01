@@ -216,6 +216,22 @@ if (answerMode || reducedMode) {
     console.log('OPEN_MODE');
     console.log('OPEN_TRIGGER ' + triggerArg);
     console.log('OPEN_PANEL_VISIBLE');
+
+    const settleTimeout = 20000;
+    const settled = await page.waitForFunction(
+      () => {
+        const p = document.querySelector('.npc-dialogue-panel .dialogue-prose') || document.querySelector('.dialogue-panel .dialogue-prose');
+        if (!p) return false;
+        return p.querySelectorAll('.dialogue-unread').length === 0;
+      },
+      { timeout: settleTimeout },
+    ).then(() => true).catch(() => false);
+    
+    if (!settled) {
+      console.log(`SETTLE_TIMEOUT ${settleTimeout}`);
+      await browser.close();
+      process.exit(1);
+    }
   } catch (err) {
     console.log('OPEN_FAILED');
     await browser.close();
@@ -414,6 +430,9 @@ if (data.controlProbe.count !== 0 || data.controlProbe.matches.length !== 0) {
   process.exit(1);
 }
 
+if (openMode) {
+  console.log('SETTLED=true');
+}
 console.log('ROUTE_SOURCE=' + routeSource);
 console.log('ROUTE_STATUS=' + routeStatus);
 console.log('RESOLVED_URL ' + resolvedUrl);
