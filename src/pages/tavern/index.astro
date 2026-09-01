@@ -646,6 +646,11 @@ const sceneObjects = [
     outline-offset: 2px;
   }
 
+  .panel-icon {
+    height: 58px;
+    width: auto;
+  }
+
   .panel-header {
     display: flex;
     align-items: center;
@@ -658,6 +663,12 @@ const sceneObjects = [
     margin: 0;
     font-size: 1.5rem;
     color: #e6d3a8;
+  }
+
+  #skills-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
   }
 
   .panel-body {
@@ -860,13 +871,17 @@ const sceneObjects = [
     if (dialog === dialogSkills) {
       const icon = dialog.querySelector('.panel-icon');
       if (icon) {
-        const shieldId = trigger.id.replace('trigger-', '');
-        icon.setAttribute('src', `/art/${shieldId}-256.webp`);
-        icon.removeAttribute('srcset');
+        if (filterCategory) {
+          const shieldId = trigger.id.replace('trigger-', '');
+          icon.setAttribute('src', `/art/${shieldId}-256.webp`);
+          icon.removeAttribute('srcset');
+        } else {
+          icon.setAttribute('src', '/art/adventurers-badge-384.webp');
+        }
       }
       const title = dialog.querySelector('#skills-title');
-      if (title && filterCategory) {
-        title.textContent = filterCategory;
+      if (title) {
+        title.textContent = filterCategory ? filterCategory : 'Skills & Arsenal';
       }
     }
     

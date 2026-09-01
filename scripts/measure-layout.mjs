@@ -397,6 +397,21 @@ const data = await page.evaluate(() => {
   const controlProbe = probeAll('.close-panel-btn-does-not-exist');
   const replyBtnProbe = probeAll('.reply-btn');
 
+  const getStyleInfo = (selector) => {
+    const el = document.querySelector(selector);
+    if (!el) return null;
+    const s = getComputedStyle(el);
+    return {
+      fontSize: s.fontSize,
+      fontWeight: s.fontWeight,
+      lineHeight: s.lineHeight
+    };
+  };
+  const styleProbe = {
+    skillsTitle: getStyleInfo('#skills-title'),
+    prose: getStyleInfo('.dialogue-prose')
+  };
+
   return {
     innerHeight: window.innerHeight,
     docScrollHeight,
@@ -421,7 +436,8 @@ const data = await page.evaluate(() => {
     typingProbe,
     closeProbe,
     controlProbe,
-    replyBtnProbe
+    replyBtnProbe,
+    styleProbe
   };
 });
 
