@@ -12,6 +12,10 @@
     {
       "name": "VS Code",
       "level": "confident"
+    },
+    {
+      "name": "Antigravity IDE",
+      "level": "confident"
     }
   ]
 }
