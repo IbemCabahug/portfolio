@@ -180,6 +180,11 @@ const sceneObjects = [
           <img src="/art/adventurers-badge-384.webp" alt="" width="48" height="58" class="panel-icon" />
           <h2 id="skills-title">Skills & Arsenal</h2>
         </div>
+        <p class="level-legend" aria-hidden="true">
+          <span class="legend-item"><span class="level-meter"><span class="notch is-filled"></span><span class="notch"></span><span class="notch"></span></span> learning</span>
+          <span class="legend-item"><span class="level-meter"><span class="notch is-filled"></span><span class="notch is-filled"></span><span class="notch"></span></span> working</span>
+          <span class="legend-item"><span class="level-meter"><span class="notch is-filled"></span><span class="notch is-filled"></span><span class="notch is-filled"></span></span> confident</span>
+        </p>
         <div class="panel-body skills-grid">
           {skills.map((group) => (
             <div class="skill-category" data-category={group.category}>
@@ -728,14 +733,21 @@ const sceneObjects = [
     background: #e6d3a8;
     border-color: #e6d3a8;
   }
-
-  .skill-category h3 {
-    color: #d5803b;
-    margin: 0 0 8px 0;
-    font-size: 1.1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+  .level-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 0 0 12px 0;
+    font-size: 0.85rem;
+    color: var(--parchment);
   }
+  .level-legend .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+
 
   .skill-category ul {
     list-style: none;
@@ -748,10 +760,7 @@ const sceneObjects = [
     font-size: 1rem;
   }
 
-  .skill-category li span {
-    opacity: 0.7;
-    font-size: 0.9rem;
-  }
+
   
   /* Filtering styles */
   .skill-category.filtered-out {
