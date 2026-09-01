@@ -8,10 +8,9 @@ interface Props {
   title: string;
   description: string;
   location: 'messenger' | 'tavern' | 'quests' | 'skills' | 'npc';
-  fitViewport?: boolean;
 }
 
-const { title, description, location, fitViewport = false } = Astro.props;
+const { title, description, location } = Astro.props;
 
 type Scene = {
   left?: { label: string; link: string; };
@@ -48,7 +47,7 @@ const currentScene = scenes[location];
 <BaseLayout title={title} description={description} hideDefaultNav={true}>
 
   
-  <div class={fitViewport ? "tavern-shell fit-viewport" : "tavern-shell"}>
+  <div class="tavern-shell">
   <header class="p-2 sm:p-4 bg-[var(--wood-deep)] text-[var(--parchment)] flex flex-col sm:flex-row flex-wrap justify-between items-center border-b border-[var(--brass)] gap-2 sm:gap-4">
     <nav aria-label="Main Navigation" class="w-full sm:w-auto">
       <details class="sm:hidden group">
@@ -91,7 +90,7 @@ const currentScene = scenes[location];
     rightLink={currentScene.right?.link}
   />
 
-  <div class={fitViewport ? "p-4 sm:p-8 bg-[var(--wood-deep)] text-[var(--parchment)] tavern-content" : "p-4 sm:p-8 bg-[var(--wood-deep)] text-[var(--parchment)] min-h-screen tavern-content"}>
+  <div class="p-4 sm:p-8 bg-[var(--wood-deep)] text-[var(--parchment)] min-h-screen tavern-content">
     <slot />
   </div>
   </div>
@@ -120,19 +119,4 @@ const currentScene = scenes[location];
       }
     });
   </script>
-  <style>
-    @media (min-width: 769px) {
-      .tavern-shell.fit-viewport {
-        min-height: 100dvh;
-        display: flex;
-        flex-direction: column;
-      }
-      .tavern-shell.fit-viewport > .tavern-content {
-        flex: 1 1 auto;
-        min-height: 0;
-        display: flex;
-        flex-direction: column;
-      }
-    }
-  </style>
 </BaseLayout>
