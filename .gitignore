@@ -22,6 +22,8 @@ art/source/
 Thumbs.db
 
 # Temp
+*.log
+/*.cjs
 scratch/
 art/source/
 art/cutout/

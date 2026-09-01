@@ -849,11 +849,6 @@ const sceneObjects = [
           cat.classList.remove('filtered-out');
         }
       });
-      
-      const title = dialog.querySelector('#skills-title');
-      if (title) {
-        title.textContent = filterCategory ? `Skills: ${filterCategory}` : 'Skills & Arsenal';
-      }
     }
     
     dialog.hidden = false;
@@ -861,6 +856,19 @@ const sceneObjects = [
     trigger.setAttribute('aria-expanded', 'true');
     activeDialog = dialog;
     activeTrigger = trigger;
+    
+    if (dialog === dialogSkills) {
+      const icon = dialog.querySelector('.panel-icon');
+      if (icon) {
+        const shieldId = trigger.id.replace('trigger-', '');
+        icon.setAttribute('src', `/art/${shieldId}-256.webp`);
+        icon.removeAttribute('srcset');
+      }
+      const title = dialog.querySelector('#skills-title');
+      if (title && filterCategory) {
+        title.textContent = filterCategory;
+      }
+    }
     
     const focusables = getFocusableElements(dialog);
     if (focusables.length) focusables[0].focus();
