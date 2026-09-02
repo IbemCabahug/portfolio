@@ -1,7 +1,8 @@
 // Layout measurement harness. Committed deliberately: this file is a GATE,
 // and a gate that lives outside version control is not a gate.
 // Usage: node scripts/measure-layout.mjs [viewportHeight] [path] [modes...]
-// Requires the dev server running on http://localhost:4321
+// Starts its own static server over dist on an ephemeral port, per D187, and
+// closes it before exit. Nothing needs to be running first. Build dist first.
 //
 // NOTE on units: naturalWidth and naturalHeight on an element using a
 // w-descriptor srcset are DENSITY CORRECTED by the browser. They are NOT the
@@ -11,6 +12,7 @@
 // All rectangle values are DOCUMENT relative, not frame relative.
 
 import puppeteer from 'puppeteer-core';
+import { createDistServer } from './serve-dist.mjs';
 
 const EDGE = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
 const args = process.argv.slice(2);
@@ -72,7 +74,11 @@ if (openMode && !triggerArg) {
   process.exit(1);
 }
 
-const resolvedUrl = 'http://localhost:4321' + path;
+const srv = await createDistServer({ root: 'dist', port: 0, quiet: true });
+console.log('SERVE_ROOT ' + srv.root);
+console.log('SERVE_PORT ' + srv.port);
+console.log('SERVE_MTIME ' + srv.indexMtime);
+const resolvedUrl = srv.origin + path;
 
 const browser = await puppeteer.launch({
   executablePath: EDGE,
@@ -551,3 +557,4 @@ console.log(JSON.stringify(data, null, 2));
 console.log('JSON_END_' + height);
 
 await browser.close();
+await srv.close();

@@ -30,3 +30,4 @@ art/cutout/
 lastprompt-output.txt
 npc-*.png
 *.stackdump
+.serve-dist.pid
