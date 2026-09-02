@@ -432,6 +432,33 @@ const data = await page.evaluate(() => {
     return { visibleCount: kept.length, first: kept[0] };
   })();
 
+  const getScrollInfo = (selector) => {
+    const el = document.querySelector(selector);
+    if (!el) return 'NOT_FOUND';
+    const cs = getComputedStyle(el);
+    const scrollHeight = el.scrollHeight;
+    const clientHeight = el.clientHeight;
+    const clientWidth = el.clientWidth;
+    const offsetWidth = el.offsetWidth;
+    const gap = cs.rowGap;
+    const overflowing = scrollHeight > clientHeight;
+    const barPx = offsetWidth - clientWidth;
+    return {
+      scrollHeight,
+      clientHeight,
+      clientWidth,
+      offsetWidth,
+      gap,
+      overflowing,
+      barPx
+    };
+  };
+
+  const scrollProbe = {
+    REPLIES: getScrollInfo('.npc-dialogue-panel .dialogue-replies'),
+    BODY: getScrollInfo('.npc-dialogue-panel .panel-body')
+  };
+
   return {
     innerHeight: window.innerHeight,
     docScrollHeight,
@@ -459,7 +486,8 @@ const data = await page.evaluate(() => {
     replyBtnProbe,
     chromeProbe,
     navLinkProbe,
-    styleProbe
+    styleProbe,
+    scrollProbe
   };
 });
 
