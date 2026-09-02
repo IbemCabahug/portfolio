@@ -20,7 +20,8 @@
     "nojs": "node scripts/nojs-check.mjs",
     "shot": "node scripts/screenshot-npc.mjs",
     "measure:open": "node scripts/measure-layout.mjs open",
-    "serve:dist": "node scripts/serve-dist.mjs"
+    "serve:dist": "node scripts/serve-dist.mjs",
+    "measure:fields": "node scripts/report-layout.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^7.0.8",
