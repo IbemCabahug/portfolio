@@ -365,20 +365,23 @@ const sceneObjects = [
 
   /* Highlight feedback */
   .scene-object:is(:hover, :focus-visible) {
-    filter: brightness(1.12) drop-shadow(0 0 8px rgba(213, 128, 59, 0.6));
+    filter: brightness(1.12)
+        drop-shadow(0 0 2px rgba(255, 228, 160, 0.95))
+        drop-shadow(0 0 8px rgba(255, 228, 160, 0.7))
+        drop-shadow(0 0 22px rgba(213, 128, 59, 0.55));
+  }
+
+  .scene-object:focus-visible {
     outline: 2px solid rgba(213, 128, 59, 0.6);
     outline-offset: 2px;
   }
 
-  /* Hotspot-only objects: subtle highlight area */
-  .scene-hotspot:is(:hover, :focus-visible) {
-    background: rgba(213, 128, 59, 0.12);
-    border-radius: 4px;
-  }
-
   /* Active state: brief press feedback */
   .scene-object:active {
-    filter: brightness(1.2);
+    filter: brightness(1.2)
+        drop-shadow(0 0 2px rgba(255, 228, 160, 0.95))
+        drop-shadow(0 0 8px rgba(255, 228, 160, 0.7))
+        drop-shadow(0 0 22px rgba(213, 128, 59, 0.55));
     transform: scale(0.98);
   }
 
@@ -388,7 +391,7 @@ const sceneObjects = [
     .scene-object { transition: none; }
     .scene-object:is(:hover, :focus-visible) {
       transform: none;
-      /* Keep outline and brightness, remove drop-shadow animation */
+      /* Keep the glow and brightness, remove only the animation */
     }
     .scene-object:active {
       transform: none;
@@ -399,7 +402,7 @@ const sceneObjects = [
   :root[data-motion="reduced"] .scene-object { transition: none; }
   :root[data-motion="reduced"] .scene-object:is(:hover, :focus-visible) {
     transform: none;
-    /* Keep outline and brightness, remove drop-shadow animation */
+    /* Keep the glow and brightness, remove only the animation */
   }
   :root[data-motion="reduced"] .scene-object:active {
     transform: none;
