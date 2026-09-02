@@ -459,6 +459,49 @@ const data = await page.evaluate(() => {
     BODY: getScrollInfo('.npc-dialogue-panel .panel-body')
   };
 
+  const tooltipElements = document.querySelectorAll('.scene-tooltip');
+  const sceneContainer = document.querySelector('.scene-container');
+  const sceneContainerRect = sceneContainer ? sceneContainer.getBoundingClientRect() : null;
+  const tooltipProbe = tooltipElements.length === 0
+    ? 'NOT_FOUND'
+    : (() => {
+        const res = {};
+        tooltipElements.forEach((el, idx) => {
+          const parent = el.closest('.scene-object');
+          const key = parent && parent.id ? parent.id : `tooltip_${idx}`;
+          const cs = getComputedStyle(el);
+          const r = el.getBoundingClientRect();
+          const lh = cs.lineHeight;
+          const pt = parseFloat(cs.paddingTop) || 0;
+          const pb = parseFloat(cs.paddingBottom) || 0;
+          const bt = parseFloat(cs.borderTopWidth) || 0;
+          const bb = parseFloat(cs.borderBottomWidth) || 0;
+          let wraps;
+          if (lh === 'normal') {
+            wraps = 'UNKNOWN';
+          } else {
+            const lhNum = parseFloat(lh) || 0;
+            const singleLineHeight = lhNum + pt + pb + bt + bb;
+            wraps = el.offsetHeight > singleLineHeight + 2;
+          }
+          const escapesLeft = sceneContainerRect ? r.left < sceneContainerRect.left : false;
+          const escapesRight = sceneContainerRect ? r.right > sceneContainerRect.right : false;
+          res[key] = {
+            text: (el.textContent || '').trim(),
+            w: el.offsetWidth,
+            h: el.offsetHeight,
+            fontSize: cs.fontSize,
+            lineHeight: lh,
+            whiteSpace: cs.whiteSpace,
+            opacity: cs.opacity,
+            wraps,
+            escapesLeft,
+            escapesRight
+          };
+        });
+        return res;
+      })();
+
   return {
     innerHeight: window.innerHeight,
     docScrollHeight,
@@ -487,7 +530,8 @@ const data = await page.evaluate(() => {
     chromeProbe,
     navLinkProbe,
     styleProbe,
-    scrollProbe
+    scrollProbe,
+    tooltipProbe
   };
 });
 
