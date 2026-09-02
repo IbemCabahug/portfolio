@@ -180,11 +180,6 @@ const sceneObjects = [
           <img src="/art/adventurers-badge-384.webp" alt="" width="48" height="58" class="panel-icon" />
           <h2 id="skills-title">Skills & Arsenal</h2>
         </div>
-        <p class="level-legend" aria-hidden="true">
-          <span class="legend-item"><span class="level-meter"><span class="notch is-filled"></span><span class="notch"></span><span class="notch"></span></span> learning</span>
-          <span class="legend-item"><span class="level-meter"><span class="notch is-filled"></span><span class="notch is-filled"></span><span class="notch"></span></span> working</span>
-          <span class="legend-item"><span class="level-meter"><span class="notch is-filled"></span><span class="notch is-filled"></span><span class="notch is-filled"></span></span> confident</span>
-        </p>
         <div class="panel-body skills-grid">
           {skills.map((group) => (
             <div class="skill-category" data-category={group.category}>
@@ -197,6 +192,7 @@ const sceneObjects = [
                       <span class={`notch ${levelMap[item.level] >= 2 ? 'is-filled' : ''}`}></span>
                       <span class={`notch ${levelMap[item.level] >= 3 ? 'is-filled' : ''}`}></span>
                     </span>
+                    <span class="level-word" aria-hidden="true">{item.level}</span>
                   </li>
                 ))}
               </ul>
@@ -736,18 +732,14 @@ const sceneObjects = [
     background: #e6d3a8;
     border-color: #e6d3a8;
   }
-  .level-legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    margin: 0 0 12px 0;
+  .level-word {
+    margin-left: 8px;
     font-size: 0.85rem;
     color: var(--parchment);
+    visibility: hidden;
   }
-  .level-legend .legend-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+  .skill-category li:hover .level-word {
+    visibility: visible;
   }
 
 
