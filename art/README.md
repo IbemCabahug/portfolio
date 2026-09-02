@@ -57,8 +57,8 @@ Rows are in byte-order by filename so this table can be diffed directly against 
 | innkeeper-presenting-device-519.webp | 519×1365 | 46,056 B | sprite |
 | messengers-corner-1280.webp | 1280×714 | 33,810 B | background |
 | messengers-corner-2560.webp | 2560×1429 | 88,452 B | background |
-| npc-table-1280.webp | 1280×714 | 41,634 B | background |
-| npc-table-2560.webp | 2560×1429 | 93,946 B | background |
+| npc-table-1280.webp | 1280×714 | 35,504 B | background |
+| npc-table-2560.webp | 2560×1429 | 81,964 B | background |
 | npc-table-front-1280.webp | 1280×714 | 13,488 B | foreground plate, alpha |
 | npc-table-front-2560.webp | 2560×1429 | 31,684 B | foreground plate, alpha |
 | quest-board-1192.webp | 1192×662 | 36,972 B | sprite |
@@ -114,7 +114,7 @@ from its own image; do not assume one ratio across routes.
 
 Produced by:
 
-    npm run art art/source/tavern-npc-table-v2.jpg npc-table
-    (Source is now tavern-npc-table-v2.jpg, regenerated 2026-09-01 with corrected shield artwork.)
+    npm run art art/source/tavern-npc-table-v5-2752.png npc-table
+    (Source is tavern-npc-table-v5-2752.png, cropped 2026-09-02 from tavern-npc-table-v5.jpg which was delivered at 2754x1536; one pixel was removed from each side to reach the house 2752x1536. v5 repairs the shelf gap present in v3.)
     npm run art art/cutout/npc-table-front.png npc-table-front 2560,1280
     npm run art art/cutout/tavern-regular-bust.png tavern-regular-bust 1024,512
