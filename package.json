@@ -19,7 +19,8 @@
     "measure:reduced": "node scripts/measure-layout.mjs reduced",
     "nojs": "node scripts/nojs-check.mjs",
     "shot": "node scripts/screenshot-npc.mjs",
-    "measure:open": "node scripts/measure-layout.mjs open"
+    "measure:open": "node scripts/measure-layout.mjs open",
+    "serve:dist": "node scripts/serve-dist.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^7.0.8",
