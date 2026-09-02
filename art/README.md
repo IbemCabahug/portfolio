@@ -91,8 +91,8 @@ Rows are in byte-order by filename so this table can be diffed directly against 
 | tavern-regular-neutral-940.webp | 940×1406 | 82,016 B | sprite |
 | tavern-regular-seated-264.webp | 264×371 | 21,050 B | sprite |
 | tavern-regular-seated-528.webp | 528×741 | 28,992 B | sprite |
-| tavern-room-1280.webp | 1280×715 | 48,956 B | background |
-| tavern-room-2560.webp | 2560×1431 | 107,660 B | background |
+| tavern-room-1280.webp | 1280×715 | 41,034 B | background |
+| tavern-room-2560.webp | 2560×1431 | 97,706 B | background |
 | tavern-sign-1694.webp | 1694×1267 | 77,312 B | sprite |
 | tavern-sign-847.webp | 847×634 | 48,372 B | sprite |
 
