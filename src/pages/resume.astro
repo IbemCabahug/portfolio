@@ -46,13 +46,6 @@ const skillsEntries = await getCollection('skills');
   </style>
 
   <div class="max-w-4xl mx-auto p-8">
-    <div class="no-print mb-8 flex gap-4 items-center">
-      <div class="print:hidden mt-8 text-center text-gray-600">
-        <a href="/resume.pdf" download class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 border border-gray-500 hover:border-gray-800 rounded transition-colors duration-200 uppercase tracking-widest text-sm no-print">
-          Download PDF
-        </a>
-      </div>
-    </div>
 
     <header class="mb-12 border-b-2 border-gray-800 pb-6">
       <h1 class="text-4xl font-bold mb-2">{profile.name}</h1>
