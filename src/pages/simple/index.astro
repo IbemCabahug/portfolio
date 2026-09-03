@@ -22,6 +22,7 @@ const resume = resumeEntries[0]?.data;
 
 const title = profile ? `${profile.name} — ${profile.title}` : "Developer Portfolio";
 const description = profile?.tagline || "Developer Portfolio";
+// px-3
 ---
 
 <BaseLayout title={title} description={description}>
@@ -46,17 +47,6 @@ const description = profile?.tagline || "Developer Portfolio";
       <main class="space-y-12">
         <section aria-labelledby="skills-heading">
           <h2 id="skills-heading" class="text-2xl font-bold mb-6 border-b-2 border-[var(--brass)] pb-2 text-[var(--ink)]">Skills & Expertise</h2>
-          <nav aria-label="Skill categories" class="flex flex-wrap gap-2 mb-4">
-            {sortedSkills.map((skillGroup) => (
-              <a
-                href={`#skills-${skillGroup.data.category.toLowerCase()}`}
-                class="inline-flex items-center px-3 py-1 border border-[var(--brass)] font-semibold hover:bg-[var(--wood-deep)] hover:text-[var(--parchment)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 min-h-[44px]"
-              >
-                {skillGroup.data.category}
-              </a>
-            ))}
-          </nav>
-          <p class="text-sm italic mb-6">Proficiency: Confident (production-ready), Working (practical experience), Learning (actively building competency).</p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
             {sortedSkills.map((skillGroup) => (
               <div id={`skills-${skillGroup.data.category.toLowerCase()}`}>
