@@ -1,3 +1,29 @@
+// B11 gate: the no-JS fallback must be readable with JavaScript genuinely
+// disabled. Reading the markup is not evidence. Committed for the same reason
+// as measure-layout.mjs.
+// Usage: node scripts/nojs-check.mjs [route]
+//
+// Output contract:
+// Prefix lines:
+//   ROUTE_SOURCE
+//   NOJS_SERVE_ROOT
+//   NOJS_SERVE_PORT
+//   NOJS_ROUTE
+//   NOJS_ROUTE_STATUS
+//   NOJS_ROUTE_BYTES
+//   NOJS_ROUTE_SHA256
+//   NOJS_START
+//   NOJS_END
+//
+// JSON fields:
+//   h1
+//   headingCount
+//   bodyTextLength
+//   hiddenTextBearingElements (total, items [tag, id, classes])
+//   fallback (found, fallbackPresent, fallbackVisible, fallbackDisplay, clientHeight, clientHeightOfFallback, scrollHeight, scrollHeightOfFallback, overflowing, overflowYOfFallback, qaPairCount)
+//   stack (present, stackPresent, hidden, stackHidden)
+//   reachability (reachable, overflowing, overflowY)
+
 import crypto from 'node:crypto';
 import puppeteer from 'puppeteer-core';
 import { createDistServer } from './serve-dist.mjs';
@@ -48,39 +74,77 @@ const data = await page.evaluate(() => {
   const headingCount = document.querySelectorAll('h1, h2, h3, h4, h5, h6').length;
   const bodyTextLength = document.body ? (document.body.innerText || '').length : 0;
 
-  let hiddenTextBearingElements = 0;
+  const hiddenElements = [];
   for (const el of (document.body ? document.body.querySelectorAll('*') : [])) {
     if (el.tagName === 'SCRIPT' || el.tagName === 'STYLE' || el.tagName === 'NOSCRIPT') continue;
     const text = (el.textContent || '').trim();
     if (text.length > 200) {
       const cs = window.getComputedStyle(el);
       if (cs.display === 'none' || cs.visibility === 'hidden') {
-        hiddenTextBearingElements++;
+        hiddenElements.push({ tag: el.tagName.toLowerCase(), id: el.id || null, classes: Array.from(el.classList) });
       }
     }
   }
 
   const fb = document.getElementById('npc-fallback');
+  const fbCs = fb ? window.getComputedStyle(fb) : null;
   const fallback = fb ? {
     found: true,
+    fallbackPresent: true,
+    fallbackVisible: fbCs.display !== 'none' && fbCs.visibility !== 'hidden' && !fb.hidden,
+    fallbackDisplay: fbCs.display,
     clientHeight: fb.clientHeight,
+    clientHeightOfFallback: fb.clientHeight,
     scrollHeight: fb.scrollHeight,
+    scrollHeightOfFallback: fb.scrollHeight,
     overflowing: fb.scrollHeight > fb.clientHeight,
+    overflowYOfFallback: fbCs.overflowY,
     qaPairCount: fb.querySelectorAll('.qa-pair').length,
   } : {
     found: 'ABSENT',
+    fallbackPresent: 'ABSENT',
+    fallbackVisible: 'ABSENT',
+    fallbackDisplay: 'ABSENT',
     clientHeight: 'ABSENT',
+    clientHeightOfFallback: 'ABSENT',
     scrollHeight: 'ABSENT',
+    scrollHeightOfFallback: 'ABSENT',
     overflowing: 'ABSENT',
+    overflowYOfFallback: 'ABSENT',
     qaPairCount: 'ABSENT',
   };
+
+  const stack = document.getElementById('npc-stack');
+  const stackCs = stack ? window.getComputedStyle(stack) : null;
+  const stackProbe = stack ? {
+    present: true,
+    stackPresent: true,
+    hidden: !!(stack.hidden || (stackCs && (stackCs.display === 'none' || stackCs.visibility === 'hidden'))),
+    stackHidden: !!(stack.hidden || (stackCs && (stackCs.display === 'none' || stackCs.visibility === 'hidden'))),
+  } : {
+    present: 'ABSENT',
+    stackPresent: 'ABSENT',
+    hidden: 'ABSENT',
+    stackHidden: 'ABSENT',
+  };
+
+  const reachability = fb ? {
+    reachable: !(fb.scrollHeight > fb.clientHeight) || (fbCs.overflowY === 'auto' || fbCs.overflowY === 'scroll'),
+    overflowing: fb.scrollHeight > fb.clientHeight,
+    overflowY: fbCs.overflowY,
+  } : 'ABSENT';
 
   return {
     h1,
     headingCount,
     bodyTextLength,
-    hiddenTextBearingElements,
+    hiddenTextBearingElements: {
+      total: hiddenElements.length,
+      items: hiddenElements.slice(0, 10),
+    },
     fallback,
+    stack: stackProbe,
+    reachability,
   };
 });
 
