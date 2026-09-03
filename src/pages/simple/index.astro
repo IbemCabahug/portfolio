@@ -9,6 +9,8 @@ const skillsList = await getCollection('skills');
 const projectsList = await getCollection('projects');
 projectsList.sort((a, b) => a.data.order - b.data.order);
 const linksList = await getCollection('links');
+const resumeEntries = await getCollection('resume');
+const resume = resumeEntries[0]?.data;
 
 const title = profile ? `${profile.name} — ${profile.title}` : "Developer Portfolio";
 const description = profile?.tagline || "Developer Portfolio";
@@ -27,6 +29,9 @@ const description = profile?.tagline || "Developer Portfolio";
             <li><strong>Location:</strong> {profile.location}</li>
             <li><strong>Availability:</strong> {profile.availability}</li>
           </ul>
+          <div class="mt-4">
+            <a href="/tavern" class="inline-flex items-center min-h-[44px] underline font-semibold focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2">Enter the Tavern (illustrated version)</a>
+          </div>
         </header>
       )}
 
@@ -83,6 +88,50 @@ const description = profile?.tagline || "Developer Portfolio";
             ))}
           </div>
         </section>
+
+        {resume?.experience && (
+          <section aria-labelledby="experience-heading">
+            <h2 id="experience-heading" class="text-2xl font-bold mb-6 border-b-2 border-[var(--brass)] pb-2 text-[var(--ink)]">Experience</h2>
+            <div class="space-y-8">
+              {resume.experience.map((exp) => (
+                <article>
+                  <header class="mb-2">
+                    <h3 class="text-xl font-bold">{exp.role} — {exp.org} ({exp.period}{exp.hours ? ` (${exp.hours})` : ''})</h3>
+                  </header>
+                  <ul class="space-y-1 list-disc pl-5">
+                    {exp.bullets.map((bullet) => (
+                      <li>{bullet}</li>
+                    ))}
+                  </ul>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {resume?.education && (
+          <section aria-labelledby="education-heading">
+            <h2 id="education-heading" class="text-2xl font-bold mb-6 border-b-2 border-[var(--brass)] pb-2 text-[var(--ink)]">Education</h2>
+            <div class="space-y-8">
+              {resume.education.map((edu) => (
+                <article>
+                  <header class="mb-2">
+                    <h3 class="text-xl font-bold">{edu.credential}</h3>
+                  </header>
+                  <p class="text-sm font-semibold mb-1">{edu.school}</p>
+                  <p class="text-sm mb-2">{edu.period}</p>
+                  {edu.honors && edu.honors.length > 0 && (
+                    <ul class="space-y-1 list-disc pl-5 text-sm">
+                      {edu.honors.map((honor) => (
+                        <li>{honor}</li>
+                      ))}
+                    </ul>
+                  )}
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
 
         <section aria-labelledby="contact-heading">
           <h2 id="contact-heading" class="text-2xl font-bold mb-6 border-b-2 border-[var(--brass)] pb-2 text-[var(--ink)]">Contact</h2>
