@@ -44,14 +44,14 @@ const skillsEntries = await getCollection('skills');
 
   <div class="max-w-4xl mx-auto p-8">
     <div class="no-print mb-8 flex gap-4 items-center">
-      <div class="print:hidden mt-8 text-center text-[var(--parchment)]/80">
-        <button onclick="window.print()" class="px-6 py-2 border border-[var(--parchment)]/20 hover:border-[var(--parchment)]/50 rounded transition-colors duration-200 uppercase tracking-widest text-sm">
+      <div class="print:hidden mt-8 text-center text-gray-600">
+        <button onclick="window.print()" class="px-6 py-2 border border-gray-500 hover:border-gray-800 rounded transition-colors duration-200 uppercase tracking-widest text-sm">
           Print or save as PDF
         </button>
         <p class="mt-4 text-sm opacity-60">If the button does not work, use your browser's Print command.</p>
       </div>
       <noscript>
-        <a href="/resume" class="underline hover:text-[var(--candle)] font-semibold">Fallback link to /resume</a>
+        <a href="/resume" class="underline hover:text-[var(--ember)] font-semibold">Fallback link to /resume</a>
       </noscript>
     </div>
 
