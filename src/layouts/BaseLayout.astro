@@ -36,25 +36,25 @@ const sitemapUrl = siteUrl ? new URL('/sitemap-index.xml', siteUrl).href : '/sit
     <a href="#main-content">Skip to content</a>
     {!hideDefaultNav && (
       <nav>
-        <ul>
+        <ul class="flex flex-col gap-2">
           {Astro.url.pathname.startsWith('/simple') ? (
             <>
-              <li><a href="#about-heading">About</a></li>
-              <li><a href="#skills-heading">Skills</a></li>
-              <li><a href="#projects-heading">Projects</a></li>
-              <li><a href="#contact-heading">Contact</a></li>
+              <li><a href="#about-heading" class="inline-flex items-center min-h-[44px] px-2">About</a></li>
+              <li><a href="#skills-heading" class="inline-flex items-center min-h-[44px] px-2">Skills</a></li>
+              <li><a href="#projects-heading" class="inline-flex items-center min-h-[44px] px-2">Projects</a></li>
+              <li><a href="#contact-heading" class="inline-flex items-center min-h-[44px] px-2">Contact</a></li>
             </>
           ) : (
             <>
-              <li><a href="/">Home</a></li>
-              <li><a href="/about">About</a></li>
-              <li><a href="/resume">Résumé</a></li>
-              <li><a href="/quests">Quest Board</a></li>
-              <li><a href="/tavern">Main Tavern</a></li>
-              <li><a href="/tavern/skills">Adventurer's Badge</a></li>
-              <li><a href="/tavern/npc">Tavern Regular</a></li>
-              <li><a href="/messenger">Messenger's Corner</a></li>
-              <li><a href="/simple">Simple portfolio mode</a></li>
+              <li><a href="/" class="inline-flex items-center min-h-[44px] px-2">Home</a></li>
+              <li><a href="/about" class="inline-flex items-center min-h-[44px] px-2">About</a></li>
+              <li><a href="/resume" class="inline-flex items-center min-h-[44px] px-2">Résumé</a></li>
+              <li><a href="/quests" class="inline-flex items-center min-h-[44px] px-2">Quest Board</a></li>
+              <li><a href="/tavern" class="inline-flex items-center min-h-[44px] px-2">Main Tavern</a></li>
+              <li><a href="/tavern/skills" class="inline-flex items-center min-h-[44px] px-2">Adventurer's Badge</a></li>
+              <li><a href="/tavern/npc" class="inline-flex items-center min-h-[44px] px-2">Tavern Regular</a></li>
+              <li><a href="/messenger" class="inline-flex items-center min-h-[44px] px-2">Messenger's Corner</a></li>
+              <li><a href="/simple" class="inline-flex items-center min-h-[44px] px-2">Simple portfolio mode</a></li>
             </>
           )}
         </ul>
