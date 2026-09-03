@@ -29,6 +29,7 @@
 // Fields in text probe JSON:
 //   total
 //   cap
+//   skipped
 //   items (tag, id, classes, documentRect [top, left, width, height], scrollOffset [x, y], color, fontSize, fontWeight, text)
 
 import fs from 'node:fs';
@@ -595,7 +596,7 @@ console.log('SHOT_SCROLL ' + scrollX + ' ' + scrollY);
 console.log('SHOT_DOCH ' + docH);
 
 const textProbe = await page.evaluate(() => {
-  const CAP = 2;
+  const CAP = 250;
   const elements = Array.from(document.querySelectorAll('*'));
   const probed = [];
 
@@ -624,32 +625,23 @@ const textProbe = await page.evaluate(() => {
     }
   }
 
-  const total = probed.length;
+  const scrollX = Math.round(window.scrollX || window.pageXOffset || 0);
+  const scrollY = Math.round(window.scrollY || window.pageYOffset || 0);
 
-  const selected = [];
-  if (total <= CAP) {
-    for (const item of probed) selected.push(item);
-  } else {
-    const step = (total - 1) / (CAP - 1);
-    for (let i = 0; i < CAP; i++) {
-      selected.push(probed[Math.round(i * step)]);
-    }
-  }
+  const valid = [];
+  let skipped = 0;
 
-  const items = [];
-  for (const { el, cs } of selected) {
-    const rCheck = el.getBoundingClientRect();
-    if (rCheck.top < 0 || rCheck.bottom > window.innerHeight) {
-      el.scrollIntoView({ block: 'center', inline: 'nearest' });
-    }
-
+  for (const { el, cs } of probed) {
     const r = el.getBoundingClientRect();
-    const scrollX = Math.round(window.scrollX || window.pageXOffset || 0);
-    const scrollY = Math.round(window.scrollY || window.pageYOffset || 0);
     const width = Math.round(r.width);
     const height = Math.round(r.height);
     const docTop = Math.round(r.top + scrollY);
     const docLeft = Math.round(r.left + scrollX);
+
+    if (width < 2 || height < 2 || docTop < 0 || docLeft < 0 || (docTop + height <= 0) || (docLeft + width <= 0)) {
+      skipped++;
+      continue;
+    }
 
     let numericWeight = Number(cs.fontWeight);
     if (isNaN(numericWeight)) {
@@ -658,7 +650,7 @@ const textProbe = await page.evaluate(() => {
       else numericWeight = 400;
     }
 
-    items.push({
+    valid.push({
       tag: el.tagName.toLowerCase(),
       id: el.id || null,
       classes: Array.from(el.classList),
@@ -671,13 +663,36 @@ const textProbe = await page.evaluate(() => {
     });
   }
 
-  window.scrollTo(0, 0);
+  const total = valid.length;
+  const items = [];
+  const dropped = [];
 
-  return {
+  for (let i = 0; i < total; i++) {
+    if (i < CAP) {
+      items.push(valid[i]);
+    } else {
+      dropped.push({
+        tag: valid[i].tag,
+        id: valid[i].id,
+        classes: valid[i].classes,
+        text: valid[i].text,
+      });
+    }
+  }
+
+  const result = {
     total,
     cap: CAP,
+    skipped,
     items,
   };
+
+  if (total > CAP) {
+    result.droppedCount = dropped.length;
+    result.dropped = dropped;
+  }
+
+  return result;
 });
 
 console.log('TEXT_PROBE_START');
