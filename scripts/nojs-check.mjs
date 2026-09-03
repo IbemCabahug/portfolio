@@ -20,8 +20,8 @@
 //   headingCount
 //   bodyTextLength
 //   hiddenTextBearingElements (total, items [tag, id, classes])
-//   fallback (found, fallbackPresent, fallbackVisible, fallbackDisplay, clientHeight, clientHeightOfFallback, scrollHeight, scrollHeightOfFallback, overflowing, overflowYOfFallback, qaPairCount)
-//   stack (present, stackPresent, hidden, stackHidden)
+//   fallback (found, fallbackVisible, fallbackDisplay, clientHeight, scrollHeight, overflowing, overflowYOfFallback, qaPairCount)
+//   stack (present, hidden, computedHidden)
 //   reachability (reachable, overflowing, overflowY)
 
 import crypto from 'node:crypto';
@@ -90,25 +90,19 @@ const data = await page.evaluate(() => {
   const fbCs = fb ? window.getComputedStyle(fb) : null;
   const fallback = fb ? {
     found: true,
-    fallbackPresent: true,
     fallbackVisible: fbCs.display !== 'none' && fbCs.visibility !== 'hidden' && !fb.hidden,
     fallbackDisplay: fbCs.display,
     clientHeight: fb.clientHeight,
-    clientHeightOfFallback: fb.clientHeight,
     scrollHeight: fb.scrollHeight,
-    scrollHeightOfFallback: fb.scrollHeight,
     overflowing: fb.scrollHeight > fb.clientHeight,
     overflowYOfFallback: fbCs.overflowY,
     qaPairCount: fb.querySelectorAll('.qa-pair').length,
   } : {
     found: 'ABSENT',
-    fallbackPresent: 'ABSENT',
     fallbackVisible: 'ABSENT',
     fallbackDisplay: 'ABSENT',
     clientHeight: 'ABSENT',
-    clientHeightOfFallback: 'ABSENT',
     scrollHeight: 'ABSENT',
-    scrollHeightOfFallback: 'ABSENT',
     overflowing: 'ABSENT',
     overflowYOfFallback: 'ABSENT',
     qaPairCount: 'ABSENT',
@@ -118,14 +112,12 @@ const data = await page.evaluate(() => {
   const stackCs = stack ? window.getComputedStyle(stack) : null;
   const stackProbe = stack ? {
     present: true,
-    stackPresent: true,
-    hidden: !!(stack.hidden || (stackCs && (stackCs.display === 'none' || stackCs.visibility === 'hidden'))),
-    stackHidden: !!(stack.hidden || (stackCs && (stackCs.display === 'none' || stackCs.visibility === 'hidden'))),
+    hidden: !!stack.hidden,
+    computedHidden: !!(stack.hidden || (stackCs && (stackCs.display === 'none' || stackCs.visibility === 'hidden'))),
   } : {
     present: 'ABSENT',
-    stackPresent: 'ABSENT',
     hidden: 'ABSENT',
-    stackHidden: 'ABSENT',
+    computedHidden: 'ABSENT',
   };
 
   const reachability = fb ? {
