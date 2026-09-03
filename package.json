@@ -21,7 +21,8 @@
     "shot": "node scripts/screenshot-npc.mjs",
     "measure:open": "node scripts/measure-layout.mjs open",
     "serve:dist": "node scripts/serve-dist.mjs",
-    "measure:fields": "node scripts/report-layout.mjs"
+    "measure:fields": "node scripts/report-layout.mjs",
+    "resume:pdf": "node scripts/render-resume-pdf.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^7.0.8",
