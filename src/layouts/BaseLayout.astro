@@ -40,8 +40,10 @@ const sitemapUrl = siteUrl ? new URL('/sitemap-index.xml', siteUrl).href : '/sit
           {Astro.url.pathname.startsWith('/simple') ? (
             <>
               <li><a href="#about-heading" class="inline-flex items-center min-h-[44px] px-2">About</a></li>
-              <li><a href="#skills-heading" class="inline-flex items-center min-h-[44px] px-2">Skills</a></li>
               <li><a href="#projects-heading" class="inline-flex items-center min-h-[44px] px-2">Projects</a></li>
+              <li><a href="#experience-heading" class="inline-flex items-center min-h-[44px] px-2">Experience</a></li>
+              <li><a href="#skills-heading" class="inline-flex items-center min-h-[44px] px-2">Skills</a></li>
+              <li><a href="#education-heading" class="inline-flex items-center min-h-[44px] px-2">Education</a></li>
               <li><a href="#contact-heading" class="inline-flex items-center min-h-[44px] px-2">Contact</a></li>
             </>
           ) : (
