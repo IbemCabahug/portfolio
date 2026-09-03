@@ -48,14 +48,10 @@ const skillsEntries = await getCollection('skills');
   <div class="max-w-4xl mx-auto p-8">
     <div class="no-print mb-8 flex gap-4 items-center">
       <div class="print:hidden mt-8 text-center text-gray-600">
-        <button onclick="window.print()" class="px-6 py-2 border border-gray-500 hover:border-gray-800 rounded transition-colors duration-200 uppercase tracking-widest text-sm">
-          Print or save as PDF
-        </button>
-        <p class="mt-4 text-sm opacity-60">If the button does not work, use your browser's Print command.</p>
+        <a href="/resume.pdf" download class="px-6 py-2 border border-gray-500 hover:border-gray-800 rounded transition-colors duration-200 uppercase tracking-widest text-sm">
+          Download PDF
+        </a>
       </div>
-      <noscript>
-        <a href="/resume" class="underline hover:text-[var(--ember)] font-semibold">Fallback link to /resume</a>
-      </noscript>
     </div>
 
     <header class="mb-12 border-b-2 border-gray-800 pb-6">
@@ -65,7 +61,7 @@ const skillsEntries = await getCollection('skills');
       <div class="flex flex-col gap-1 text-sm">
         <p class="location-indicator">Location: {profile.location}</p>
         <p>Email: <a href={`mailto:${profile.email}`} class="underline">{profile.email}</a></p>
-        <p>GitHub: <a href={profile.github} class="underline">{profile.github}</a></p>
+        <p>GitHub: <a href={profile.github} class="underline">GitHub</a></p>
       </div>
     </header>
 
