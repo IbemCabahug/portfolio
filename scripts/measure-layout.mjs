@@ -21,6 +21,7 @@
 //   JSON_END_<height>
 //   SHOT_PATH
 //   SHOT_BYTES
+//   SHOT_SHA256
 //   SHOT_SCROLL
 //   SHOT_DOCH
 //   TEXT_PROBE_START
@@ -30,10 +31,12 @@
 //   total
 //   cap
 //   skipped
-//   duplicatesDropped
+//   dupByTextAndRect
+//   dupByTextOnly
 //   items (tag, id, classes, documentRect [top, left, width, height], scrollOffset [x, y], color, fontSize, fontWeight, text)
 
 import fs from 'node:fs';
+import crypto from 'node:crypto';
 import puppeteer from 'puppeteer-core';
 import { createDistServer } from './serve-dist.mjs';
 import { EDGE } from './browser-path.mjs';
@@ -590,9 +593,12 @@ const { scrollX, scrollY, docH } = await page.evaluate(() => ({
 
 await page.screenshot({ path: shotPath, fullPage: true });
 
-const shotBytes = fs.statSync(shotPath).size;
+const shotBuffer = fs.readFileSync(shotPath);
+const shotSha256 = crypto.createHash('sha256').update(shotBuffer).digest('hex');
+const shotBytes = shotBuffer.length;
 console.log('SHOT_PATH ' + shotPath);
 console.log('SHOT_BYTES ' + shotBytes);
+console.log('SHOT_SHA256 ' + shotSha256);
 console.log('SHOT_SCROLL ' + scrollX + ' ' + scrollY);
 console.log('SHOT_DOCH ' + docH);
 
@@ -639,7 +645,7 @@ const textProbe = await page.evaluate(() => {
     const docTop = Math.round(r.top + scrollY);
     const docLeft = Math.round(r.left + scrollX);
 
-    if (width < 2 || height < 2 || docTop < 0 || docLeft < 0 || (docTop + height <= 0) || (docLeft + width <= 0)) {
+    if (width < 2 || height < 2 || (docTop + height <= 0) || (docLeft + width <= 0)) {
       skipped++;
       continue;
     }
@@ -665,23 +671,29 @@ const textProbe = await page.evaluate(() => {
   }
 
   const valid = [];
-  let duplicatesDropped = 0;
+  let dupByTextAndRect = 0;
+  let dupByTextOnly = 0;
 
   for (let i = 0; i < candidates.length; i++) {
     const cand = candidates[i];
-    let isAncestorDuplicate = false;
+    let isTextDup = false;
+    let isTextAndRectDup = false;
     for (let j = 0; j < candidates.length; j++) {
       if (i === j) continue;
       const o = candidates[j];
-      if (cand.el.contains(o.el) && cand.rawText === o.rawText &&
-          cand.documentRect.top === o.documentRect.top && cand.documentRect.left === o.documentRect.left &&
-          cand.documentRect.width === o.documentRect.width && cand.documentRect.height === o.documentRect.height) {
-        isAncestorDuplicate = true;
-        break;
+      if (cand.el.contains(o.el) && cand.rawText === o.rawText) {
+        isTextDup = true;
+        if (cand.documentRect.top === o.documentRect.top &&
+            cand.documentRect.left === o.documentRect.left &&
+            cand.documentRect.width === o.documentRect.width &&
+            cand.documentRect.height === o.documentRect.height) {
+          isTextAndRectDup = true;
+        }
       }
     }
-    if (isAncestorDuplicate) {
-      duplicatesDropped++;
+    if (isTextAndRectDup) dupByTextAndRect++;
+    if (isTextDup) {
+      dupByTextOnly++;
     } else {
       const { el, rawText, ...item } = cand;
       valid.push(item);
@@ -709,7 +721,8 @@ const textProbe = await page.evaluate(() => {
     total,
     cap: CAP,
     skipped,
-    duplicatesDropped,
+    dupByTextAndRect,
+    dupByTextOnly,
     items,
   };
 
