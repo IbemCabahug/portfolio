@@ -10,6 +10,26 @@
 // without decoding the file independently.
 //
 // All rectangle values are DOCUMENT relative, not frame relative.
+//
+// Output contract:
+// Prefix lines:
+//   SETTLED=true
+//   ROUTE_SOURCE=
+//   ROUTE_STATUS=
+//   RESOLVED_URL
+//   JSON_START_<height>
+//   JSON_END_<height>
+//   SHOT_PATH
+//   SHOT_BYTES
+//   SHOT_SCROLL
+//   SHOT_DOCH
+//   TEXT_PROBE_START
+//   TEXT_PROBE_END
+//
+// Fields in text probe JSON:
+//   total
+//   cap
+//   items (tag, id, classes, documentRect [top, left, width, height], scrollOffset [x, y], color, fontSize, fontWeight, text)
 
 import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
@@ -573,6 +593,96 @@ console.log('SHOT_PATH ' + shotPath);
 console.log('SHOT_BYTES ' + shotBytes);
 console.log('SHOT_SCROLL ' + scrollX + ' ' + scrollY);
 console.log('SHOT_DOCH ' + docH);
+
+const textProbe = await page.evaluate(() => {
+  const CAP = 2;
+  const elements = Array.from(document.querySelectorAll('*'));
+  const probed = [];
+
+  for (const el of elements) {
+    if (['SCRIPT', 'STYLE', 'NOSCRIPT', 'SVG'].includes(el.tagName)) continue;
+    const cs = window.getComputedStyle(el);
+    if (cs.display === 'none' || cs.visibility === 'hidden' || cs.opacity === '0') continue;
+    const r = el.getBoundingClientRect();
+    if (r.width === 0 && r.height === 0) continue;
+
+    // Check if element directly contains visible text (has non-empty direct text node)
+    let hasDirectText = false;
+    for (const child of el.childNodes) {
+      if (child.nodeType === Node.TEXT_NODE && child.textContent.trim().length > 0) {
+        hasDirectText = true;
+        break;
+      }
+    }
+
+    // Also leaf elements with text or inline-only children
+    const isLeaf = el.children.length === 0 && (el.textContent || '').trim().length > 0;
+    const isTextContainer = ['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'BUTTON', 'A', 'LI', 'SPAN', 'LABEL', 'EM', 'STRONG', 'SMALL', 'B', 'I'].includes(el.tagName) && (el.textContent || '').trim().length > 0;
+
+    if (hasDirectText || isLeaf || isTextContainer) {
+      probed.push({ el, cs });
+    }
+  }
+
+  const total = probed.length;
+
+  const selected = [];
+  if (total <= CAP) {
+    for (const item of probed) selected.push(item);
+  } else {
+    const step = (total - 1) / (CAP - 1);
+    for (let i = 0; i < CAP; i++) {
+      selected.push(probed[Math.round(i * step)]);
+    }
+  }
+
+  const items = [];
+  for (const { el, cs } of selected) {
+    const rCheck = el.getBoundingClientRect();
+    if (rCheck.top < 0 || rCheck.bottom > window.innerHeight) {
+      el.scrollIntoView({ block: 'center', inline: 'nearest' });
+    }
+
+    const r = el.getBoundingClientRect();
+    const scrollX = Math.round(window.scrollX || window.pageXOffset || 0);
+    const scrollY = Math.round(window.scrollY || window.pageYOffset || 0);
+    const width = Math.round(r.width);
+    const height = Math.round(r.height);
+    const docTop = Math.round(r.top + scrollY);
+    const docLeft = Math.round(r.left + scrollX);
+
+    let numericWeight = Number(cs.fontWeight);
+    if (isNaN(numericWeight)) {
+      if (cs.fontWeight === 'bold') numericWeight = 700;
+      else if (cs.fontWeight === 'normal') numericWeight = 400;
+      else numericWeight = 400;
+    }
+
+    items.push({
+      tag: el.tagName.toLowerCase(),
+      id: el.id || null,
+      classes: Array.from(el.classList),
+      documentRect: { top: docTop, left: docLeft, width, height },
+      scrollOffset: { x: scrollX, y: scrollY },
+      color: cs.color,
+      fontSize: parseFloat(cs.fontSize),
+      fontWeight: numericWeight,
+      text: (el.textContent || '').trim().slice(0, 40),
+    });
+  }
+
+  window.scrollTo(0, 0);
+
+  return {
+    total,
+    cap: CAP,
+    items,
+  };
+});
+
+console.log('TEXT_PROBE_START');
+console.log(JSON.stringify(textProbe, null, 2));
+console.log('TEXT_PROBE_END');
 
 await browser.close();
 await srv.close();
