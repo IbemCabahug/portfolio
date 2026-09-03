@@ -45,7 +45,8 @@ for (const line of out.split(/\r?\n/)) {
     line.startsWith('OPEN_') ||
     line.startsWith('SETTLED') ||
     line.startsWith('PAGE_NOT_READY') ||
-    line.startsWith('PROBE MACHINERY')
+    line.startsWith('PROBE MACHINERY') ||
+    line.startsWith('SHOT_')
   ) {
     console.log(line)
   }
