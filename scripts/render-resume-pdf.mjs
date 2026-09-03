@@ -1,8 +1,7 @@
 import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
 import { createDistServer } from './serve-dist.mjs';
-
-const EDGE = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
+import { EDGE } from './browser-path.mjs';
 const height = 768;
 
 const srv = await createDistServer({ root: 'dist', port: 0, quiet: true });

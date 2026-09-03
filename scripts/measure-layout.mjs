@@ -11,10 +11,10 @@
 //
 // All rectangle values are DOCUMENT relative, not frame relative.
 
+import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
 import { createDistServer } from './serve-dist.mjs';
-
-const EDGE = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
+import { EDGE } from './browser-path.mjs';
 const args = process.argv.slice(2);
 const heightStr = args.find(a => /^\d+$/.test(a));
 const height = Number(heightStr || 768);
@@ -554,6 +554,25 @@ console.log('RESOLVED_URL ' + resolvedUrl);
 console.log('JSON_START_' + height);
 console.log(JSON.stringify(data, null, 2));
 console.log('JSON_END_' + height);
+
+fs.mkdirSync('.shots', { recursive: true });
+const routePart = (routeArg === 'root' ? '' : (routeArg || path || '')).replace(/^\/+/, '').replace(/\/+/g, '-');
+const routeToken = routePart || 'root';
+const shotPath = `.shots/${height}-${routeToken}.png`;
+
+const { scrollX, scrollY, docH } = await page.evaluate(() => ({
+  scrollX: window.scrollX,
+  scrollY: window.scrollY,
+  docH: document.documentElement.scrollHeight,
+}));
+
+await page.screenshot({ path: shotPath, fullPage: true });
+
+const shotBytes = fs.statSync(shotPath).size;
+console.log('SHOT_PATH ' + shotPath);
+console.log('SHOT_BYTES ' + shotBytes);
+console.log('SHOT_SCROLL ' + scrollX + ' ' + scrollY);
+console.log('SHOT_DOCH ' + docH);
 
 await browser.close();
 await srv.close();
