@@ -46,32 +46,45 @@ async function run() {
     .raw()
     .toBuffer({ resolveWithObject: true });
 
+  const counts = new Map();
   let minL = 1;
   let maxL = 0;
   let minColor = null;
   let maxColor = null;
+  let pixels = 0;
 
   for (let i = 0; i < data.length; i += info.channels) {
     const r = data[i];
     const g = data[i + 1];
     const b = data[i + 2];
+    pixels++;
+    const key = (r << 16) | (g << 8) | b;
+    counts.set(key, (counts.get(key) || 0) + 1);
     const lum = getLuminance(r, g, b);
-    if (lum < minL) {
-      minL = lum;
-      minColor = {r, g, b};
-    }
-    if (lum > maxL) {
-      maxL = lum;
-      maxColor = {r, g, b};
-    }
+    if (lum < minL) { minL = lum; minColor = { r, g, b }; }
+    if (lum > maxL) { maxL = lum; maxColor = { r, g, b }; }
   }
 
-  const c1 = getContrastRatio(textLuminance, minL);
-  const c2 = getContrastRatio(textLuminance, maxL);
+  let modalKey = -1;
+  let modalCount = 0;
+  for (const [key, count] of counts) {
+    if (count > modalCount) { modalCount = count; modalKey = key; }
+  }
 
-  console.log(`Text color: ${textHex}`);
-  console.log(`Darkest pixel in region: rgb(${minColor.r}, ${minColor.g}, ${minColor.b}) -> Contrast: ${c1.toFixed(2)}:1`);
-  console.log(`Lightest pixel in region: rgb(${maxColor.r}, ${maxColor.g}, ${maxColor.b}) -> Contrast: ${c2.toFixed(2)}:1`);
+  const bg = { r: (modalKey >> 16) & 255, g: (modalKey >> 8) & 255, b: modalKey & 255 };
+  const bgLuminance = getLuminance(bg.r, bg.g, bg.b);
+  const share = modalCount / pixels;
+
+  console.log('TEXT_HEX ' + textHex);
+  console.log('REGION ' + x + ' ' + y + ' ' + w + ' ' + h);
+  console.log('PIXELS ' + pixels);
+  console.log('DISTINCT ' + counts.size);
+  console.log('BG_MODAL rgb(' + bg.r + ', ' + bg.g + ', ' + bg.b + ')');
+  console.log('BG_SHARE ' + share.toFixed(4));
+  console.log('BG_CONFIDENCE ' + (share >= 0.5 ? 'HIGH' : 'LOW'));
+  console.log('CONTRAST_MODAL ' + getContrastRatio(textLuminance, bgLuminance).toFixed(2));
+  console.log('DIAG_DARKEST rgb(' + minColor.r + ', ' + minColor.g + ', ' + minColor.b + ') RATIO ' + getContrastRatio(textLuminance, minL).toFixed(2));
+  console.log('DIAG_LIGHTEST rgb(' + maxColor.r + ', ' + maxColor.g + ', ' + maxColor.b + ') RATIO ' + getContrastRatio(textLuminance, maxL).toFixed(2));
 }
 
 run().catch(console.error);
