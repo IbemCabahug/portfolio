@@ -35,35 +35,34 @@ let path;
 let routeSource;
 
 if (routeArg !== undefined) {
-  if (/^\d+$/.test(routeArg)) {
-    console.error('ERROR: Route argument cannot be purely numeric');
-    process.exit(1);
-  }
-  
   routeSource = 'argument';
-  let cleaned = routeArg;
   
-  const mangleToken = 'Program Files/Git';
-  const idx = cleaned.indexOf(mangleToken);
-  if (idx !== -1) {
-    cleaned = cleaned.substring(idx + mangleToken.length);
+  if (routeArg === 'root') {
+    path = '/';
+  } else {
+    let cleaned = routeArg;
+    
+    const mangleToken = 'Program Files/Git';
+    const idx = cleaned.indexOf(mangleToken);
+    if (idx !== -1) {
+      cleaned = cleaned.substring(idx + mangleToken.length);
+    }
+    
+    if (!cleaned || cleaned.trim() === '') {
+      console.error('ERROR: Route argument resolved to an empty path');
+      process.exit(1);
+    }
+    
+    if (cleaned.startsWith('/')) {
+      path = cleaned;
+    } else {
+      if (/^\d+$/.test(cleaned)) {
+        console.error('ERROR: Route argument cannot be purely numeric');
+        process.exit(1);
+      }
+      path = '/' + cleaned;
+    }
   }
-  
-  if (!cleaned || cleaned.trim() === '') {
-    console.error('ERROR: Route argument resolved to an empty path');
-    process.exit(1);
-  }
-  
-  if (!cleaned.startsWith('/')) {
-    cleaned = '/' + cleaned;
-  }
-  
-  if (cleaned === '/') {
-    console.error('ERROR: Route argument resolved to an empty path');
-    process.exit(1);
-  }
-  
-  path = cleaned;
 } else {
   routeSource = 'default';
   path = '/tavern/npc';
