@@ -31,6 +31,9 @@ const skillsEntries = await getCollection('skills');
         font-size: 0.9em;
         word-break: break-all;
       }
+      a[href^='mailto:']::after {
+        content: none;
+      }
       .entry, li {
         page-break-inside: avoid;
         break-inside: avoid;
