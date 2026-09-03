@@ -30,6 +30,7 @@
 //   total
 //   cap
 //   skipped
+//   duplicatesDropped
 //   items (tag, id, classes, documentRect [top, left, width, height], scrollOffset [x, y], color, fontSize, fontWeight, text)
 
 import fs from 'node:fs';
@@ -628,7 +629,7 @@ const textProbe = await page.evaluate(() => {
   const scrollX = Math.round(window.scrollX || window.pageXOffset || 0);
   const scrollY = Math.round(window.scrollY || window.pageYOffset || 0);
 
-  const valid = [];
+  const candidates = [];
   let skipped = 0;
 
   for (const { el, cs } of probed) {
@@ -645,12 +646,11 @@ const textProbe = await page.evaluate(() => {
 
     let numericWeight = Number(cs.fontWeight);
     if (isNaN(numericWeight)) {
-      if (cs.fontWeight === 'bold') numericWeight = 700;
-      else if (cs.fontWeight === 'normal') numericWeight = 400;
-      else numericWeight = 400;
+      numericWeight = (cs.fontWeight === 'bold') ? 700 : 400;
     }
 
-    valid.push({
+    candidates.push({
+      el,
       tag: el.tagName.toLowerCase(),
       id: el.id || null,
       classes: Array.from(el.classList),
@@ -660,7 +660,32 @@ const textProbe = await page.evaluate(() => {
       fontSize: parseFloat(cs.fontSize),
       fontWeight: numericWeight,
       text: (el.textContent || '').trim().slice(0, 40),
+      rawText: (el.textContent || '').trim(),
     });
+  }
+
+  const valid = [];
+  let duplicatesDropped = 0;
+
+  for (let i = 0; i < candidates.length; i++) {
+    const cand = candidates[i];
+    let isAncestorDuplicate = false;
+    for (let j = 0; j < candidates.length; j++) {
+      if (i === j) continue;
+      const o = candidates[j];
+      if (cand.el.contains(o.el) && cand.rawText === o.rawText &&
+          cand.documentRect.top === o.documentRect.top && cand.documentRect.left === o.documentRect.left &&
+          cand.documentRect.width === o.documentRect.width && cand.documentRect.height === o.documentRect.height) {
+        isAncestorDuplicate = true;
+        break;
+      }
+    }
+    if (isAncestorDuplicate) {
+      duplicatesDropped++;
+    } else {
+      const { el, rawText, ...item } = cand;
+      valid.push(item);
+    }
   }
 
   const total = valid.length;
@@ -684,6 +709,7 @@ const textProbe = await page.evaluate(() => {
     total,
     cap: CAP,
     skipped,
+    duplicatesDropped,
     items,
   };
 
