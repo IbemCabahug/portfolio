@@ -26,8 +26,51 @@ export function parseHex(hex) {
   };
 }
 
+export function parseOklch(value) {
+  const raw = String(value).trim().toLowerCase();
+  if (raw.indexOf('oklch(') !== 0) return null;
+  const close = raw.indexOf(')');
+  if (close < 0) return null;
+  const inner = raw.slice(6, close).split('/')[0].trim();
+  const parts = inner.split(/[\s,]+/).filter(Boolean);
+  if (parts.length < 3) return null;
+  const num = (t, scale) => {
+    const v = parseFloat(t);
+    if (!Number.isFinite(v)) return NaN;
+    return t.endsWith('%') ? v * scale : v;
+  };
+  const L = num(parts[0], 0.01);
+  const C = num(parts[1], 0.004);
+  const H = num(parts[2], 3.6);
+  if (!Number.isFinite(L) || !Number.isFinite(C) || !Number.isFinite(H)) return null;
+  const hr = H * Math.PI / 180;
+  const a = C * Math.cos(hr);
+  const bb = C * Math.sin(hr);
+  const lp = L + 0.3963377774 * a + 0.2158037573 * bb;
+  const mp = L - 0.1055613458 * a - 0.0638541728 * bb;
+  const sp = L - 0.0894841775 * a - 1.2914855480 * bb;
+  const l3 = lp * lp * lp;
+  const m3 = mp * mp * mp;
+  const s3 = sp * sp * sp;
+  const linear = [
+    4.0767416621 * l3 - 3.3077115913 * m3 + 0.2309699292 * s3,
+    -1.2684380046 * l3 + 2.6097574011 * m3 - 0.3413193965 * s3,
+    -0.0041960863 * l3 - 0.7034186147 * m3 + 1.7076147010 * s3,
+  ];
+  const out = linear.map((c) => {
+    const k = Math.max(0, Math.min(1, c));
+    const v = k <= 0.0031308 ? 12.92 * k : 1.055 * Math.pow(k, 1 / 2.4) - 0.055;
+    return Math.max(0, Math.min(255, Math.round(v * 255)));
+  });
+  if (!out.every((v) => Number.isFinite(v))) return null;
+  return { r: out[0], g: out[1], b: out[2] };
+}
+
 export function parseColor(value) {
   const s = String(value).trim();
+  const low = s.toLowerCase();
+  if (low.indexOf('oklch(') === 0) return parseOklch(s);
+  if (low.indexOf('#') !== 0 && low.indexOf('rgb') !== 0) return null;
   if (s.toLowerCase().startsWith('rgb')) {
     const open = s.indexOf('(');
     const close = s.indexOf(')');
