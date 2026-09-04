@@ -144,6 +144,7 @@ console.log(`TAB_NO_OUTLINE ${noOutlineCount}`);
 
 fs.mkdirSync('.shots', { recursive: true });
 const shotPath = path.join('.shots', `${outName}.png`);
+await new Promise(function settle(r) { return setTimeout(r, 250); });
 await page.screenshot({ path: shotPath, fullPage: true });
 const shotBytes = fs.statSync(shotPath).size;
 console.log(`SHOT_PATH ${shotPath}`);
