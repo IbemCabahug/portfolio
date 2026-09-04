@@ -58,7 +58,6 @@ await page.evaluate(() => {
 });
 
 let noOutlineCount = 0;
-let offscreenCount = 0;
 let bodyStepCount = 0;
 let totalSteps = 0;
 
@@ -126,9 +125,6 @@ for (let step = 1; step <= maxSteps; step++) {
     if (stepInfo.outlineWidth === '0px' || stepInfo.outlineStyle === 'none') {
       noOutlineCount++;
     }
-    if (!stepInfo.visible) {
-      offscreenCount++;
-    }
   }
 
   console.log(`TAB ${step} tag=${stepInfo.tag} id=${stepInfo.id} rect=${stepInfo.x}:${stepInfo.y}:${stepInfo.w}:${stepInfo.h} outline=${stepInfo.outlineColor} style=${stepInfo.outlineStyle} width=${stepInfo.outlineWidth} offset=${stepInfo.outlineOffset} vtop=${stepInfo.vtop} scrollY=${stepInfo.scrollY} visible=${stepInfo.visible} text=${stepInfo.text}`);
@@ -145,7 +141,6 @@ console.log(`TAB_TOTAL ${totalSteps}`);
 console.log(`TAB_DISTINCT ${distinctTotal}`);
 console.log(`TAB_BODY_STEPS ${bodyStepCount}`);
 console.log(`TAB_NO_OUTLINE ${noOutlineCount}`);
-console.log(`TAB_OFFSCREEN ${offscreenCount}`);
 
 fs.mkdirSync('.shots', { recursive: true });
 const shotPath = path.join('.shots', `${outName}.png`);
