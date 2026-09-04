@@ -168,8 +168,8 @@ async function run() {
   console.log('BG_SHARE ' + a.bgShare.toFixed(4));
   console.log('BG_CONFIDENCE ' + a.bgConfidence);
   console.log('CONTRAST_MODAL ' + a.contrastModal.toFixed(2));
-  console.log('DIAG_DARKEST rgb(' + a.darkest.color.r + ', ' + a.darkest.color.g + ', ' + a.darkest.color.b + ') RATIO ' + a.darkest.ratio.toFixed(2));
-  console.log('DIAG_LIGHTEST rgb(' + a.lightest.color.r + ', ' + a.lightest.color.g + ', ' + a.lightest.color.b + ') RATIO ' + a.lightest.ratio.toFixed(2));
+  console.log(a.darkest && a.darkest.color ? 'DIAG_DARKEST rgb(' + a.darkest.color.r + ', ' + a.darkest.color.g + ', ' + a.darkest.color.b + ') RATIO ' + a.darkest.ratio.toFixed(2) : 'DIAG_DARKEST NONE');
+  console.log(a.lightest && a.lightest.color ? 'DIAG_LIGHTEST rgb(' + a.lightest.color.r + ', ' + a.lightest.color.g + ', ' + a.lightest.color.b + ') RATIO ' + a.lightest.ratio.toFixed(2) : 'DIAG_LIGHTEST NONE');
 }
 
 if (process.argv[1] && process.argv[1].endsWith('measure-contrast.mjs')) {
