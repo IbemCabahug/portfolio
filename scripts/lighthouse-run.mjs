@@ -72,6 +72,7 @@ async function main() {
         `--output-path=${tempReportPath}`,
         '--chrome-flags=--headless=new',
         '--quiet',
+        '--throttling-method=simulate',
       ],
       {
         env: {
@@ -170,6 +171,38 @@ async function main() {
     console.log(`LH_CLS ${cls}`);
     console.log(`LH_TBT_MS ${tbt}`);
     console.log('LH_INP UNMEASURED_LAB');
+
+    const throttleMethod = report.configSettings?.throttlingMethod != null && report.configSettings.throttlingMethod !== '' ? report.configSettings.throttlingMethod : 'ABSENT';
+    const throttleCpu = report.configSettings?.throttling?.cpuSlowdownMultiplier != null ? report.configSettings.throttling.cpuSlowdownMultiplier : 'ABSENT';
+    const throttleRtt = report.configSettings?.throttling?.rttMs != null ? report.configSettings.throttling.rttMs : 'ABSENT';
+    const throttleDown = report.configSettings?.throttling?.throughputKbps != null ? report.configSettings.throttling.throughputKbps : 'ABSENT';
+    const emulatedFormFactor = report.configSettings?.emulatedFormFactor != null && report.configSettings.emulatedFormFactor !== '' ? report.configSettings.emulatedFormFactor : 'ABSENT';
+
+    console.log(`LH_THROTTLE_METHOD ${throttleMethod}`);
+    console.log(`LH_THROTTLE_CPU ${throttleCpu}`);
+    console.log(`LH_THROTTLE_RTT ${throttleRtt}`);
+    console.log(`LH_THROTTLE_DOWN ${throttleDown}`);
+    console.log(`LH_EMULATED_FORM_FACTOR ${emulatedFormFactor}`);
+
+    const diagIds = [
+      'server-response-time',
+      'first-contentful-paint',
+      'speed-index',
+      'interactive',
+      'max-potential-fid',
+      'bootup-time',
+      'mainthread-work-breakdown',
+      'render-blocking-resources',
+      'unused-javascript',
+      'total-byte-weight',
+    ];
+
+    for (const diagId of diagIds) {
+      const diagAudit = report.audits?.[diagId];
+      const diagVal = (diagAudit && diagAudit.numericValue != null) ? diagAudit.numericValue : 'ABSENT';
+      console.log(`LH_DIAG ${diagId} ${diagVal}`);
+    }
+
     console.log(`LH_URL_REQUESTED ${urlRequested}`);
     console.log(`LH_URL_FINAL ${urlFinal}`);
     console.log('LH_END');
