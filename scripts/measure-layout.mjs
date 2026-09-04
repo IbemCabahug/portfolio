@@ -670,6 +670,7 @@ const textProbe = await page.evaluate(() => {
     });
   }
 
+  const textDups = [];
   const valid = [];
   let dupByTextAndRect = 0;
   let dupByTextOnly = 0;
@@ -694,6 +695,8 @@ const textProbe = await page.evaluate(() => {
     if (isTextAndRectDup) dupByTextAndRect++;
     if (isTextDup) {
       dupByTextOnly++;
+      const { el, rawText, ...dupItem } = cand;
+      textDups.push(dupItem);
     } else {
       const { el, rawText, ...item } = cand;
       valid.push(item);
@@ -723,6 +726,7 @@ const textProbe = await page.evaluate(() => {
     skipped,
     dupByTextAndRect,
     dupByTextOnly,
+    textDups,
     items,
   };
 
