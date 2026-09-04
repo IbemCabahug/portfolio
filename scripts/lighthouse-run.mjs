@@ -73,6 +73,8 @@ async function main() {
         '--chrome-flags=--headless=new',
         '--quiet',
         '--throttling-method=simulate',
+        '--form-factor=mobile',
+        '--screen-emulation.mobile',
       ],
       {
         env: {
@@ -184,6 +186,18 @@ async function main() {
     console.log(`LH_THROTTLE_DOWN ${throttleDown}`);
     console.log(`LH_EMULATED_FORM_FACTOR ${emulatedFormFactor}`);
 
+    const formFactor = report.configSettings?.formFactor != null ? report.configSettings.formFactor : 'ABSENT';
+    const screenMobile = report.configSettings?.screenEmulation?.mobile != null ? report.configSettings.screenEmulation.mobile : 'ABSENT';
+    const screenWidth = report.configSettings?.screenEmulation?.width != null ? report.configSettings.screenEmulation.width : 'ABSENT';
+    const screenDsf = report.configSettings?.screenEmulation?.deviceScaleFactor != null ? report.configSettings.screenEmulation.deviceScaleFactor : 'ABSENT';
+    const benchmarkIndex = report.environment?.benchmarkIndex != null ? report.environment.benchmarkIndex : 'ABSENT';
+
+    console.log(`LH_FORM_FACTOR ${formFactor}`);
+    console.log(`LH_SCREEN_MOBILE ${screenMobile}`);
+    console.log(`LH_SCREEN_WIDTH ${screenWidth}`);
+    console.log(`LH_SCREEN_DSF ${screenDsf}`);
+    console.log(`LH_BENCHMARK_INDEX ${benchmarkIndex}`);
+
     const diagIds = [
       'server-response-time',
       'first-contentful-paint',
@@ -199,7 +213,14 @@ async function main() {
 
     for (const diagId of diagIds) {
       const diagAudit = report.audits?.[diagId];
-      const diagVal = (diagAudit && diagAudit.numericValue != null) ? diagAudit.numericValue : 'ABSENT';
+      let diagVal;
+      if (!diagAudit) {
+        diagVal = 'NO_AUDIT';
+      } else if (diagAudit.numericValue == null) {
+        diagVal = 'NO_VALUE';
+      } else {
+        diagVal = diagAudit.numericValue;
+      }
       console.log(`LH_DIAG ${diagId} ${diagVal}`);
     }
 
