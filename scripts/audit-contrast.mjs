@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import { loadRaster, analyseSubRegion } from './measure-contrast.mjs';
+import { loadRaster, analyseSubRegion, parseColor } from './measure-contrast.mjs';
 
 const LARGE_PX = 24;
 const LARGE_BOLD_PX = 18.66;
@@ -75,6 +75,8 @@ async function run() {
   let unmeasured = 0;
   let dupRect = 0;
   let clampedCount = 0;
+  let badColor = 0;
+  let badRatio = 0;
   const seen = new Set();
 
   for (let n = 0; n < items.length; n++) {
@@ -97,6 +99,19 @@ async function run() {
       + ' size=' + sizePx + ' weight=' + weight
       + ' rect=' + key + (isDup ? ' DUP_RECT' : '');
 
+    const parsed = parseColor(it.color);
+    const colorReadable = parsed !== null
+      && Number.isFinite(Number(parsed.r))
+      && Number.isFinite(Number(parsed.g))
+      && Number.isFinite(Number(parsed.b));
+    if (!colorReadable) {
+      unmeasured++;
+      badColor++;
+      console.log(head + ' STATUS UNMEASURED_BAD_COLOR need=' + threshold
+        + ' color=' + it.color + ' text=' + flatten(it.text));
+      continue;
+    }
+
     const a = analyseSubRegion(raster, left, top, w, h, it.color);
 
     if (a === null) {
@@ -107,6 +122,13 @@ async function run() {
     if (a.clamped) { clampedCount++; }
 
     const ratio = a.contrastModal;
+    if (!Number.isFinite(ratio)) {
+      unmeasured++;
+      badRatio++;
+      console.log(head + ' STATUS UNMEASURED_BAD_RATIO need=' + threshold
+        + ' color=' + it.color + ' text=' + flatten(it.text));
+      continue;
+    }
     const bgStr = 'bg=rgb(' + a.bg.r + ', ' + a.bg.g + ', ' + a.bg.b + ')';
     const tail = ' ratio=' + ratio.toFixed(2) + ' need=' + threshold + ' ' + bgStr
       + ' share=' + a.bgShare.toFixed(4) + (a.clamped ? ' CLAMPED' : '');
@@ -133,8 +155,10 @@ async function run() {
   console.log('AUDIT_UNMEASURED ' + unmeasured);
   console.log('AUDIT_DUP_RECT ' + dupRect);
   console.log('AUDIT_CLAMPED ' + clampedCount);
+  console.log('AUDIT_BAD_COLOR ' + badColor);
+  console.log('AUDIT_BAD_RATIO ' + badRatio);
   console.log('AUDIT_STATUS ' + (fail > 0 ? 'FAIL' : (unmeasured > 0 ? 'INCOMPLETE' : 'PASS')));
-  process.exit(fail > 0 ? 1 : 0);
+  process.exit(fail > 0 || unmeasured > 0 ? 1 : 0);
 }
 
 run().catch((err) => { console.error(err); process.exit(1); });
