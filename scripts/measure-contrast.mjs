@@ -160,7 +160,7 @@ async function run() {
     console.error('EMPTY_REGION');
     process.exit(1);
   }
-  console.log('TEXT_HEX ' + textColor);
+  console.log('TEXT_COLOR ' + textColor);
   console.log('REGION ' + x + ' ' + y + ' ' + w + ' ' + h);
   console.log('PIXELS ' + a.pixels);
   console.log('DISTINCT ' + a.distinct);

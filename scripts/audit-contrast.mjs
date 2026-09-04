@@ -141,7 +141,8 @@ async function run() {
     }
     if (ratio >= threshold) {
       pass++;
-      console.log(head + ' STATUS PASS' + tail);
+      console.log(head + ' STATUS PASS' + tail + ' color=' + it.color
+        + ' text=' + flatten(it.text));
     } else {
       fail++;
       console.log(head + ' STATUS FAIL' + tail + ' color=' + it.color
