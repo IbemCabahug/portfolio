@@ -50,6 +50,7 @@ if (!targetExists) {
 }
 
 await page.focus(selector);
+await new Promise(function settle(r) { return setTimeout(r, 250); });
 await page.evaluate((sel) => {
   const el = document.querySelector(sel);
   if (el) {
