@@ -1,42 +1,63 @@
 import { spawn } from 'node:child_process';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
-import { randomUUID } from 'node:crypto';
-import { readFile, writeFile, unlink } from 'node:fs/promises';
+import { join, resolve, sep } from 'node:path';
+import { randomUUID, createHash } from 'node:crypto';
+import { readFile, unlink } from 'node:fs/promises';
+import { existsSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { EDGE } from './browser-path.mjs';
 import { createDistServer } from './serve-dist.mjs';
 
 async function main() {
-  const route = process.argv[2] || 'simple';
-  const cleanRoute = route.startsWith('/') ? route.slice(1) : route;
+  let rawRoute = process.argv[2] || 'simple';
+
+  // Handle Git Bash / MSYS POSIX path conversion on Windows where '/' is mangled to 'C:/Program Files/Git/'
+  const mangleToken = 'Program Files/Git';
+  const mIdx = rawRoute.indexOf(mangleToken);
+  if (mIdx !== -1) {
+    rawRoute = rawRoute.substring(mIdx + mangleToken.length);
+    if (!rawRoute || rawRoute === '') rawRoute = '/';
+  }
+
+  const clean = rawRoute.replace(/^\/+/, '').replace(/\/+$/, '');
+
+  let routeFilePath = null;
+  if (clean === '') {
+    const p = join('dist', 'index.html');
+    if (existsSync(p)) routeFilePath = p;
+  } else {
+    const p1 = join('dist', clean, 'index.html');
+    const p2 = join('dist', clean + '.html');
+    const p3 = join('dist', clean);
+    if (existsSync(p1) && statSync(p1).isFile()) routeFilePath = p1;
+    else if (existsSync(p2) && statSync(p2).isFile()) routeFilePath = p2;
+    else if (existsSync(p3) && statSync(p3).isFile()) routeFilePath = p3;
+  }
+
+  if (!routeFilePath) {
+    console.log('LH_STATUS = UNKNOWN_ROUTE');
+    process.exit(1);
+  }
+
+  const routeBytesBuffer = await readFile(routeFilePath);
+  const routeBytes = routeBytesBuffer.length;
+  const routeSha256 = createHash('sha256').update(routeBytesBuffer).digest('hex');
+  const routeFile = routeFilePath.split(sep).join('/');
 
   let srv = null;
   const tempReportPath = join(tmpdir(), `lh-report-${randomUUID()}.json`);
 
   try {
-    // Ensure chrome-launcher does not crash on Windows due to asynchronous Edge termination
-    try {
-      const launcherPath = resolve(fileURLToPath(new URL('../node_modules/chrome-launcher/dist/chrome-launcher.js', import.meta.url)));
-      const launcherContent = await readFile(launcherPath, 'utf8');
-      if (launcherContent.includes('rmSync(this.userDataDir, { recursive: true, force: true, maxRetries: 10 });')) {
-        const patched = launcherContent.replace(
-          'rmSync(this.userDataDir, { recursive: true, force: true, maxRetries: 10 });',
-          'try { rmSync(this.userDataDir, { recursive: true, force: true, maxRetries: 10 }); } catch {}'
-        );
-        await writeFile(launcherPath, patched, 'utf8');
-      }
-    } catch {
-      // Ignore if not present or cannot patch
-    }
-
     srv = await createDistServer({ root: 'dist', port: 0, quiet: true });
-    const url = `${srv.origin}/${cleanRoute}`;
+    const url = clean === '' ? `${srv.origin}/` : `${srv.origin}/${clean}`;
 
     console.log(`LH_ROOT ${srv.root}`);
     console.log(`LH_PORT ${srv.port}`);
     console.log(`LH_INDEX_MTIME ${srv.indexMtime}`);
-    console.log(`LH_ROUTE ${route}`);
+    console.log(`LH_ROUTE ${rawRoute}`);
+    console.log(`LH_ROUTE_FILE ${routeFile}`);
+    console.log(`LH_ROUTE_BYTES ${routeBytes}`);
+    console.log(`LH_ROUTE_SHA256 ${routeSha256}`);
     console.log(`LH_URL ${url}`);
 
     const lhCliPath = resolve(fileURLToPath(new URL('../node_modules/lighthouse/cli/index.js', import.meta.url)));
@@ -46,7 +67,7 @@ async function main() {
       [
         lhCliPath,
         url,
-        '--only-categories=accessibility',
+        '--only-categories=accessibility,performance',
         '--output=json',
         `--output-path=${tempReportPath}`,
         '--chrome-flags=--headless=new',
@@ -68,48 +89,94 @@ async function main() {
 
     console.log(`LH_EXIT ${exitCode}`);
 
-    if (exitCode !== 0) {
-      console.log('LH_STATUS = NO_REPORT');
-      process.exitCode = exitCode;
-      return;
-    }
-
-    let report;
+    let report = null;
     try {
       const content = await readFile(tempReportPath, 'utf8');
       report = JSON.parse(content);
     } catch {
+      // unreadable or missing
+    }
+
+    const isMeasurement =
+      report &&
+      !report.runtimeError &&
+      report.categories &&
+      report.categories.accessibility;
+
+    if (!isMeasurement) {
       console.log('LH_STATUS = NO_REPORT');
-      process.exitCode = 1;
+      process.exitCode = exitCode !== 0 ? exitCode : 1;
       return;
     }
 
-    if (!report || report.runtimeError || !report.categories?.accessibility) {
-      console.log('LH_STATUS = NO_REPORT');
-      process.exitCode = 1;
-      return;
-    }
-
-    const a11yScore = report.categories?.accessibility?.score != null
+    const a11yScore = report.categories.accessibility.score != null
       ? Math.round(report.categories.accessibility.score * 100)
-      : null;
+      : 0;
 
-    const audits = Object.values(report.audits || {});
-    const failedAudits = audits.filter(
-      (a) => a && a.score !== null && a.score < 1 && a.scoreDisplayMode === 'binary'
-    );
-    const naCount = audits.filter(
-      (a) => a && a.scoreDisplayMode === 'notApplicable'
-    ).length;
+    const a11yRefs = report.categories.accessibility.auditRefs || [];
+    let applicableCount = 0;
+    let passedCount = 0;
+    let failedCount = 0;
+    let naCount = 0;
+    let manualCount = 0;
+    const failedAudits = [];
+
+    for (const ref of a11yRefs) {
+      const audit = report.audits?.[ref.id];
+      if (!audit) continue;
+
+      const mode = audit.scoreDisplayMode;
+      if (mode === 'binary' || mode === 'numeric') {
+        applicableCount++;
+        if (audit.score === 1) {
+          passedCount++;
+        } else if (audit.score !== null && audit.score < 1) {
+          failedCount++;
+          failedAudits.push({ id: audit.id, title: audit.title });
+        }
+      } else if (mode === 'notApplicable') {
+        naCount++;
+      } else if (mode === 'manual') {
+        manualCount++;
+      }
+    }
+
+    const arithmeticStatus = (applicableCount === passedCount + failedCount) ? 'OK' : 'MISMATCH';
+
+    const perfScore = report.categories.performance?.score != null
+      ? Math.round(report.categories.performance.score * 100)
+      : 0;
+
+    const lcp = report.audits?.['largest-contentful-paint']?.numericValue ?? null;
+    const cls = report.audits?.['cumulative-layout-shift']?.numericValue ?? null;
+    const tbt = report.audits?.['total-blocking-time']?.numericValue ?? null;
+
+    const urlRequested = report.requestedUrl;
+    const urlFinal = report.finalDisplayedUrl || report.requestedUrl;
 
     console.log('LH_START');
     console.log(`LH_A11Y_SCORE ${a11yScore}`);
+    console.log(`LH_A11Y_APPLICABLE ${applicableCount}`);
+    console.log(`LH_A11Y_PASSED ${passedCount}`);
+    console.log(`LH_A11Y_FAILED_COUNT ${failedCount}`);
+    console.log(`LH_A11Y_NA ${naCount}`);
+    console.log(`LH_A11Y_MANUAL ${manualCount}`);
+    console.log(`LH_A11Y_ARITHMETIC ${arithmeticStatus}`);
     for (const audit of failedAudits) {
       console.log(`LH_AUDIT_FAILED ${audit.id} ${audit.title}`);
     }
-    console.log(`LH_AUDIT_NA ${naCount}`);
-    console.log(`LH_URL_FINAL ${report.requestedUrl}`);
+    console.log(`LH_PERF_SCORE ${perfScore}`);
+    console.log(`LH_LCP_MS ${lcp}`);
+    console.log(`LH_CLS ${cls}`);
+    console.log(`LH_TBT_MS ${tbt}`);
+    console.log('LH_INP UNMEASURED_LAB');
+    console.log(`LH_URL_REQUESTED ${urlRequested}`);
+    console.log(`LH_URL_FINAL ${urlFinal}`);
     console.log('LH_END');
+
+    if (exitCode !== 0) {
+      console.log(`LH_TEARDOWN_WARNING ${exitCode}`);
+    }
   } finally {
     if (srv) {
       await srv.close();
