@@ -90,6 +90,8 @@ for (let step = 1; step <= maxSteps; step++) {
     const y = Math.round(rect.top + window.scrollY);
     const w = Math.round(rect.width);
     const h = Math.round(rect.height);
+    const vtop = Math.round(rect.top);
+    const scrollY = Math.round(window.scrollY);
 
     const outlineColor = cs ? cs.outlineColor : 'none';
     const outlineWidth = cs ? cs.outlineWidth : '0px';
@@ -107,6 +109,8 @@ for (let step = 1; step <= maxSteps; step++) {
       id,
       text,
       x, y, w, h,
+      vtop,
+      scrollY,
       outlineColor,
       outlineWidth,
       outlineStyle,
@@ -127,7 +131,7 @@ for (let step = 1; step <= maxSteps; step++) {
     }
   }
 
-  console.log(`TAB ${step} tag=${stepInfo.tag} id=${stepInfo.id} rect=${stepInfo.x}:${stepInfo.y}:${stepInfo.w}:${stepInfo.h} outline=${stepInfo.outlineColor} style=${stepInfo.outlineStyle} width=${stepInfo.outlineWidth} offset=${stepInfo.outlineOffset} visible=${stepInfo.visible} text=${stepInfo.text}`);
+  console.log(`TAB ${step} tag=${stepInfo.tag} id=${stepInfo.id} rect=${stepInfo.x}:${stepInfo.y}:${stepInfo.w}:${stepInfo.h} outline=${stepInfo.outlineColor} style=${stepInfo.outlineStyle} width=${stepInfo.outlineWidth} offset=${stepInfo.outlineOffset} vtop=${stepInfo.vtop} scrollY=${stepInfo.scrollY} visible=${stepInfo.visible} text=${stepInfo.text}`);
 
   if (stepInfo.wrapped) {
     console.log(`TAB_WRAP_AT ${step}`);
