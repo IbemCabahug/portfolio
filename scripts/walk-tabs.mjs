@@ -44,14 +44,6 @@ if (status !== 200) {
   process.exit(1);
 }
 
-const vp = await page.evaluate(() => ({
-  innerWidth: window.innerWidth,
-  innerHeight: window.innerHeight,
-  docH: document.documentElement.scrollHeight,
-}));
-console.log(`VIEWPORT ${vp.innerWidth} ${vp.innerHeight}`);
-console.log(`DOC_HEIGHT ${vp.docH}`);
-
 await page.evaluate(() => {
   window.__tabVisited = new Set();
   window.__firstTabEl = null;
@@ -59,7 +51,6 @@ await page.evaluate(() => {
 
 let noOutlineCount = 0;
 let offscreenCount = 0;
-let bodyStepsCount = 0;
 let totalSteps = 0;
 
 for (let step = 1; step <= maxSteps; step++) {
@@ -116,18 +107,17 @@ for (let step = 1; step <= maxSteps; step++) {
   }, step);
 
   if (stepInfo.isBody) {
-    bodyStepsCount++;
     console.log(`FOCUS_LOST_AT ${step}`);
-  } else {
-    if (stepInfo.outlineWidth === '0px' || stepInfo.outlineStyle === 'none') {
-      noOutlineCount++;
-    }
-    if (!stepInfo.visible) {
-      offscreenCount++;
-    }
   }
 
-  console.log(`TAB ${step} tag=${stepInfo.tag} id=${stepInfo.id} rect=${stepInfo.x}:${stepInfo.y}:${stepInfo.w}:${stepInfo.h} outline=${stepInfo.outlineColor} style=${stepInfo.outlineStyle} width=${stepInfo.outlineWidth} offset=${stepInfo.outlineOffset} visible=${stepInfo.visible} text=${stepInfo.text}`);
+  if (stepInfo.outlineWidth === '0px' || stepInfo.outlineStyle === 'none') {
+    noOutlineCount++;
+  }
+  if (!stepInfo.visible) {
+    offscreenCount++;
+  }
+
+  console.log(`TAB ${step} tag=${stepInfo.tag} id=${stepInfo.id} rect=${stepInfo.x}:${stepInfo.y}:${stepInfo.w}:${stepInfo.h} outline=${stepInfo.outlineColor} width=${stepInfo.outlineWidth} offset=${stepInfo.outlineOffset} visible=${stepInfo.visible} text=${stepInfo.text}`);
 
   if (stepInfo.wrapped) {
     console.log(`TAB_WRAP_AT ${step}`);
@@ -139,7 +129,6 @@ const distinctTotal = await page.evaluate(() => window.__tabVisited ? window.__t
 
 console.log(`TAB_TOTAL ${totalSteps}`);
 console.log(`TAB_DISTINCT ${distinctTotal}`);
-console.log(`TAB_BODY_STEPS ${bodyStepsCount}`);
 console.log(`TAB_NO_OUTLINE ${noOutlineCount}`);
 console.log(`TAB_OFFSCREEN ${offscreenCount}`);
 
