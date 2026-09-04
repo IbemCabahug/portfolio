@@ -22,7 +22,8 @@
     "measure:open": "node scripts/measure-layout.mjs open",
     "serve:dist": "node scripts/serve-dist.mjs",
     "measure:fields": "node scripts/report-layout.mjs",
-    "resume:pdf": "node scripts/render-resume-pdf.mjs"
+    "resume:pdf": "node scripts/render-resume-pdf.mjs",
+    "a11y": "node scripts/lighthouse-run.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^7.0.8",
@@ -34,6 +35,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "lighthouse": "^13.4.1",
     "puppeteer-core": "^25.9.0",
     "sharp": "0.34.5",
     "typescript": "^5.7.3"
