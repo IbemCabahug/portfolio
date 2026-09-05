@@ -19,24 +19,6 @@ const GIT_PATHS = [
   'C:\\Program Files\\Git\\bin\\git.exe',
 ];
 
-function resolveRoute(distDir, routeArg) {
-  const cleaned = (routeArg || '').replace(/^\/+/, '').replace(/\/+$/, '');
-  const candidates = [];
-  if (!cleaned) {
-    candidates.push(path.join(distDir, 'index.html'));
-  } else {
-    candidates.push(path.join(distDir, cleaned, 'index.html'));
-    candidates.push(path.join(distDir, `${cleaned}.html`));
-    candidates.push(path.join(distDir, cleaned));
-  }
-  for (const candidate of candidates) {
-    if (fs.existsSync(candidate) && fs.statSync(candidate).isFile()) {
-      return candidate;
-    }
-  }
-  return null;
-}
-
 function getGitProvenance() {
   for (const gitPath of GIT_PATHS) {
     if (fs.existsSync(gitPath)) {
@@ -66,16 +48,37 @@ function getAxeVersion() {
   }
 }
 
-const routeArg = process.argv[2];
-if (routeArg === undefined) {
+let rawRoute = process.argv[2];
+if (rawRoute === undefined) {
   console.log('AX_STATUS = UNKNOWN_ROUTE');
   process.exit(1);
 }
 
-const distDir = path.resolve('dist');
-const resolvedFile = resolveRoute(distDir, routeArg);
+// Handle Git Bash / MSYS POSIX path conversion on Windows where '/' is mangled to 'C:/Program Files/Git/'
+const mangleToken = 'Program Files/Git';
+const mIdx = rawRoute.indexOf(mangleToken);
+if (mIdx !== -1) {
+  rawRoute = rawRoute.substring(mIdx + mangleToken.length);
+  if (!rawRoute || rawRoute === '') rawRoute = '/';
+}
 
-if (!resolvedFile) {
+const clean = rawRoute.replace(/^\/+/, '').replace(/\/+$/, '');
+
+const distDir = path.resolve('dist');
+let routeFilePath = null;
+if (clean === '') {
+  const p = path.join(distDir, 'index.html');
+  if (fs.existsSync(p) && fs.statSync(p).isFile()) routeFilePath = p;
+} else {
+  const p1 = path.join(distDir, clean, 'index.html');
+  const p2 = path.join(distDir, `${clean}.html`);
+  const p3 = path.join(distDir, clean);
+  if (fs.existsSync(p1) && fs.statSync(p1).isFile()) routeFilePath = p1;
+  else if (fs.existsSync(p2) && fs.statSync(p2).isFile()) routeFilePath = p2;
+  else if (fs.existsSync(p3) && fs.statSync(p3).isFile()) routeFilePath = p3;
+}
+
+if (!routeFilePath) {
   console.log('AX_STATUS = UNKNOWN_ROUTE');
   process.exit(1);
 }
@@ -95,13 +98,13 @@ try {
   const indexHtmlPath = path.join(distDir, 'index.html');
   const indexMtime = fs.existsSync(indexHtmlPath) ? fs.statSync(indexHtmlPath).mtime.toISOString() : 'MISSING';
 
-  const fileBytes = fs.statSync(resolvedFile).size;
-  const fileBuffer = fs.readFileSync(resolvedFile);
+  const fileBytes = fs.statSync(routeFilePath).size;
+  const fileBuffer = fs.readFileSync(routeFilePath);
   const fileSha256 = crypto.createHash('sha256').update(fileBuffer).digest('hex');
 
-  const normalizedRoute = routeArg === '' || routeArg === '/' ? '/' : `/${routeArg.replace(/^\/+/, '')}`;
-  const relativeFile = path.relative(process.cwd(), resolvedFile).replace(/\\/g, '/');
-  const pageUrl = `${server.baseUrl}${normalizedRoute}`;
+  const normalizedRoute = clean === '' ? '/' : `/${clean}`;
+  const relativeFile = path.relative(process.cwd(), routeFilePath).replace(/\\/g, '/');
+  const pageUrl = clean === '' ? `${server.baseUrl}/` : `${server.baseUrl}/${clean}`;
 
   console.log(`AX_ROOT ${distDir.replace(/\\/g, '/')}`);
   console.log(`AX_PORT ${serverPort}`);
