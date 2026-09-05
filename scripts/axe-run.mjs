@@ -48,19 +48,14 @@ function getAxeVersion() {
   }
 }
 
-let rawRoute = process.argv[2];
+const rawRoute = process.argv[2];
 if (rawRoute === undefined) {
+  console.log('AX_ROUTE_ARG_RAW undefined');
   console.log('AX_STATUS = UNKNOWN_ROUTE');
   process.exit(1);
 }
 
-// Handle Git Bash / MSYS POSIX path conversion on Windows where '/' is mangled to 'C:/Program Files/Git/'
-const mangleToken = 'Program Files/Git';
-const mIdx = rawRoute.indexOf(mangleToken);
-if (mIdx !== -1) {
-  rawRoute = rawRoute.substring(mIdx + mangleToken.length);
-  if (!rawRoute || rawRoute === '') rawRoute = '/';
-}
+console.log(`AX_ROUTE_ARG_RAW ${rawRoute}`);
 
 const clean = rawRoute.replace(/^\/+/, '').replace(/\/+$/, '');
 
@@ -145,17 +140,23 @@ try {
   await page.evaluate(axeRawSource);
 
   const evalResult = await page.evaluate(async () => {
-    const rulesTotal = window.axe.getRules().length;
+    const allAxeRules = window.axe.getRules();
+    const rulesTotal = allAxeRules.length;
+    const rulesInScope = allAxeRules.filter(
+      (r) => r.enabled !== false && !(r.tags && r.tags.includes('experimental')) && !(r.tags && r.tags.includes('deprecated'))
+    ).length;
+
     const results = await window.axe.run(document, {
       resultTypes: ['violations', 'passes', 'incomplete', 'inapplicable'],
     });
     return {
       rulesTotal,
+      rulesInScope,
       results,
     };
   });
 
-  const { rulesTotal, results } = evalResult;
+  const { rulesTotal, rulesInScope, results } = evalResult;
 
   const provenance = getGitProvenance();
   const wallMs = Date.now() - startMs;
@@ -180,11 +181,8 @@ try {
 
   const rulesConsidered = violationsCount + passesCount + incompleteCount + inapplicableCount;
   console.log(`AX_RULES_TOTAL ${rulesTotal}`);
+  console.log(`AX_RULES_IN_SCOPE ${rulesInScope}`);
   console.log(`AX_RULES_CONSIDERED ${rulesConsidered}`);
-
-  const diff = rulesConsidered - rulesTotal;
-  const arithmeticStatus = diff === 0 ? 'OK' : `MISMATCH ${diff > 0 ? '+' : ''}${diff}`;
-  console.log(`AX_ARITHMETIC ${arithmeticStatus}`);
 
   const allRules = [
     ...(results.violations || []),
@@ -195,6 +193,11 @@ try {
   const uniqueRuleIds = new Set(allRules.map((r) => r.id));
   const duplicates = allRules.length - uniqueRuleIds.size;
   console.log(`AX_DUPLICATES ${duplicates}`);
+
+  const consideredNet = rulesConsidered - duplicates;
+  const diff = consideredNet - rulesInScope;
+  const arithmeticStatus = diff === 0 ? 'OK' : `MISMATCH ${diff > 0 ? '+' : ''}${diff}`;
+  console.log(`AX_ARITHMETIC ${arithmeticStatus}`);
 
   for (const v of results.violations || []) {
     const nodeCount = v.nodes ? v.nodes.length : 0;
