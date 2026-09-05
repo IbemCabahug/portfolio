@@ -178,13 +178,11 @@ async function main() {
     const throttleCpu = report.configSettings?.throttling?.cpuSlowdownMultiplier != null ? report.configSettings.throttling.cpuSlowdownMultiplier : 'ABSENT';
     const throttleRtt = report.configSettings?.throttling?.rttMs != null ? report.configSettings.throttling.rttMs : 'ABSENT';
     const throttleDown = report.configSettings?.throttling?.throughputKbps != null ? report.configSettings.throttling.throughputKbps : 'ABSENT';
-    const emulatedFormFactor = report.configSettings?.emulatedFormFactor != null && report.configSettings.emulatedFormFactor !== '' ? report.configSettings.emulatedFormFactor : 'ABSENT';
 
     console.log(`LH_THROTTLE_METHOD ${throttleMethod}`);
     console.log(`LH_THROTTLE_CPU ${throttleCpu}`);
     console.log(`LH_THROTTLE_RTT ${throttleRtt}`);
     console.log(`LH_THROTTLE_DOWN ${throttleDown}`);
-    console.log(`LH_EMULATED_FORM_FACTOR ${emulatedFormFactor}`);
 
     const formFactor = report.configSettings?.formFactor != null ? report.configSettings.formFactor : 'ABSENT';
     const screenMobile = report.configSettings?.screenEmulation?.mobile != null ? report.configSettings.screenEmulation.mobile : 'ABSENT';
