@@ -1,5 +1,4 @@
-import { spawn } from 'node:child_process';
-import { execFileSync } from 'node:child_process';
+import { spawn, execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join, resolve, sep } from 'node:path';
 import { randomUUID, createHash } from 'node:crypto';
@@ -8,6 +7,7 @@ import { existsSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { EDGE } from './browser-path.mjs';
 import { createDistServer } from './serve-dist.mjs';
+const GIT_EXE = 'C:\\Program Files\\Git\\cmd\\git.exe';
 
 async function main() {
   let rawRoute = process.argv[2] || 'simple';
@@ -99,11 +99,15 @@ async function main() {
     let measuredCommit = 'UNKNOWN';
     let treeDirty = 'UNKNOWN';
     try {
-      measuredCommit = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
-      treeDirty = execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).trim() === '' ? 'CLEAN' : 'DIRTY';
+      measuredCommit = execFileSync(GIT_EXE, ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+      treeDirty = execFileSync(GIT_EXE, ['status', '--porcelain'], { encoding: 'utf8' }).trim() === '' ? 'CLEAN' : 'DIRTY';
     } catch {
-      measuredCommit = 'GIT_UNAVAILABLE';
-      treeDirty = 'GIT_UNAVAILABLE';
+      try {
+        measuredCommit = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+        treeDirty = execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).trim() === '' ? 'CLEAN' : 'DIRTY';
+      } catch {
+        measuredCommit = treeDirty = 'GIT_UNAVAILABLE';
+      }
     }
     console.log(`LH_COMMIT ${measuredCommit}`);
     console.log(`LH_TREE ${treeDirty}`);
