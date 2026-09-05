@@ -93,7 +93,7 @@ let server;
 let browser;
 
 try {
-  server = await createDistServer({ root: distDir, port: 0 });
+  server = await createDistServer({ root: distDir, port: 0, quiet: true });
   const serverPort = server.port;
   const indexHtmlPath = path.join(distDir, 'index.html');
   const indexMtime = fs.existsSync(indexHtmlPath) ? fs.statSync(indexHtmlPath).mtime.toISOString() : 'MISSING';
@@ -104,7 +104,7 @@ try {
 
   const normalizedRoute = clean === '' ? '/' : `/${clean}`;
   const relativeFile = path.relative(process.cwd(), routeFilePath).replace(/\\/g, '/');
-  const pageUrl = clean === '' ? `${server.baseUrl}/` : `${server.baseUrl}/${clean}`;
+  const pageUrl = clean === '' ? `${server.origin}/` : `${server.origin}/${clean}`;
 
   console.log(`AX_ROOT ${distDir.replace(/\\/g, '/')}`);
   console.log(`AX_PORT ${serverPort}`);
