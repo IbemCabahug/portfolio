@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join, resolve, sep } from 'node:path';
 import { randomUUID, createHash } from 'node:crypto';
@@ -51,6 +52,9 @@ async function main() {
     srv = await createDistServer({ root: 'dist', port: 0, quiet: true });
     const url = clean === '' ? `${srv.origin}/` : `${srv.origin}/${clean}`;
 
+    const runStartedAt = new Date().toISOString();
+    const runStartMs = Date.now();
+    console.log(`LH_STARTED_AT ${runStartedAt}`);
     console.log(`LH_ROOT ${srv.root}`);
     console.log(`LH_PORT ${srv.port}`);
     console.log(`LH_INDEX_MTIME ${srv.indexMtime}`);
@@ -91,6 +95,18 @@ async function main() {
     });
 
     console.log(`LH_EXIT ${exitCode}`);
+    console.log(`LH_WALL_MS ${Date.now() - runStartMs}`);
+    let measuredCommit = 'UNKNOWN';
+    let treeDirty = 'UNKNOWN';
+    try {
+      measuredCommit = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+      treeDirty = execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).trim() === '' ? 'CLEAN' : 'DIRTY';
+    } catch {
+      measuredCommit = 'GIT_UNAVAILABLE';
+      treeDirty = 'GIT_UNAVAILABLE';
+    }
+    console.log(`LH_COMMIT ${measuredCommit}`);
+    console.log(`LH_TREE ${treeDirty}`);
 
     let report = null;
     try {
