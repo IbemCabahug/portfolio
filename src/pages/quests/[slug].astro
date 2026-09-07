@@ -2,6 +2,7 @@
 import TavernLayout from '../../layouts/TavernLayout.astro';
 import { getCollection, render } from 'astro:content';
 import ThematicIcon from '../../components/icons/ThematicIcon.astro';
+import InteractiveEmbed from '../../components/InteractiveEmbed.astro';
 import { getProjectTelemetry } from '../../lib/github';
 
 export async function getStaticPaths() {
@@ -154,6 +155,10 @@ const telemetry = await getProjectTelemetry(entry.data.sourceUrl);
           </div>
         ) : null}
       </header>
+
+      {entry.data.allowFraming && entry.data.liveUrl && (
+        <InteractiveEmbed liveUrl={entry.data.liveUrl} title={entry.data.title} />
+      )}
 
       <div class="quest-case-study prose max-w-none text-[var(--ink)]">
         <Content />

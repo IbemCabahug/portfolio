@@ -1,0 +1,178 @@
+---
+import ThematicIcon from './icons/ThematicIcon.astro';
+
+interface Props {
+  liveUrl: string;
+  title: string;
+}
+
+const { liveUrl, title } = Astro.props;
+---
+
+<section
+  id="interactive-arena-section"
+  class="my-8 rounded-lg border-2 border-[var(--brass)] bg-[#1e1208] text-[var(--parchment)] shadow-2xl overflow-hidden transition-all duration-300"
+  aria-label="Interactive Playable Demo Arena"
+>
+  <!-- Top Chamber Bar -->
+  <div class="px-4 py-3 bg-[var(--wood-deep)] border-b border-[var(--brass)]/60 flex flex-wrap items-center justify-between gap-3">
+    <div class="flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded-md bg-black/50 border border-[var(--brass)]/60 flex items-center justify-center shrink-0">
+        <ThematicIcon name="swords" class="w-4 h-4 text-[var(--candle)]" />
+      </div>
+      <div>
+        <span class="text-[10px] uppercase font-mono tracking-widest text-[var(--ember)] block font-bold">
+          Opt-In Enchanted Trial
+        </span>
+        <h3 class="text-sm sm:text-base font-bold text-[var(--candle)] font-serif leading-none">
+          Live Interactive Arena — {title.split('—')[0].trim()}
+        </h3>
+      </div>
+    </div>
+
+    <!-- Active State Controls (hidden in resting state) -->
+    <div id="arena-active-controls" class="hidden items-center gap-2">
+      <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/60 text-emerald-400 font-mono text-[11px] font-bold">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true"></span>
+        Live Canvas Active
+      </span>
+
+      <button
+        type="button"
+        id="arena-fullscreen-btn"
+        class="inline-flex items-center gap-1 px-3 py-1.5 rounded bg-[var(--wood-deep)] border border-[var(--brass)] text-[var(--candle)] font-mono text-xs hover:bg-black transition-colors cursor-pointer min-h-[36px]"
+        title="Toggle Fullscreen"
+      >
+        <span>⛶</span>
+        <span class="hidden sm:inline">Fullscreen</span>
+      </button>
+
+      <button
+        type="button"
+        id="arena-unload-btn"
+        class="inline-flex items-center gap-1 px-3 py-1.5 rounded bg-red-950/70 border border-red-500/50 text-red-200 font-bold text-xs hover:bg-red-900 transition-colors cursor-pointer min-h-[36px]"
+        title="Unload demo and free memory"
+      >
+        <span>✕</span>
+        <span>Close Arena</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Resting State Preview Card -->
+  <div id="arena-resting-view" class="p-6 sm:p-8 text-center space-y-4 bg-gradient-to-b from-[#1e1208] to-[#120a04]">
+    <div class="max-w-xl mx-auto space-y-2">
+      <p class="text-xs sm:text-sm text-[var(--parchment)]/85 leading-relaxed">
+        Arcane Typer operates with a self-contained 60 FPS HTML5 Canvas engine and dynamic Web Audio synthesis. Launch an interactive trial directly inside this dossier, or explore it in a standalone window.
+      </p>
+      <p class="text-[11px] font-mono text-[var(--candle)]/70">
+        ⌨ Desktop physical keyboard recommended for typing trials · Zero tracking · Zero data exfiltration
+      </p>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+      <button
+        type="button"
+        id="arena-launch-btn"
+        data-url={liveUrl}
+        class="inline-flex items-center gap-2 min-h-[44px] px-6 py-2.5 rounded-md bg-[var(--brass)] text-black font-bold text-sm hover:bg-[var(--candle)] transition-all shadow-lg hover:shadow-[0_0_15px_rgba(218,165,32,0.4)] cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+      >
+        <ThematicIcon name="play" class="w-4 h-4 text-black" />
+        <span>Ignite Live Demo Arena</span>
+      </button>
+
+      <a
+        href={liveUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-2 min-h-[44px] px-5 py-2.5 rounded-md border-2 border-[var(--brass)] text-[var(--candle)] font-bold text-sm hover:bg-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+      >
+        <span>Launch in New Window</span>
+        <ThematicIcon name="external" class="w-3.5 h-3.5 text-[var(--candle)]" />
+      </a>
+    </div>
+  </div>
+
+  <!-- Active State Iframe Container -->
+  <div
+    id="arena-frame-container"
+    class="relative w-full aspect-video min-h-[480px] sm:min-h-[580px] bg-black hidden"
+  >
+    <!-- Iframe inserted dynamically on click to ensure 0 KB initial payload -->
+  </div>
+</section>
+
+<script>
+  function initInteractiveArena() {
+    const launchBtn = document.getElementById('arena-launch-btn');
+    const unloadBtn = document.getElementById('arena-unload-btn');
+    const fullscreenBtn = document.getElementById('arena-fullscreen-btn');
+    const restingView = document.getElementById('arena-resting-view');
+    const activeControls = document.getElementById('arena-active-controls');
+    const frameContainer = document.getElementById('arena-frame-container');
+    const arenaSection = document.getElementById('interactive-arena-section');
+
+    if (!launchBtn || !restingView || !activeControls || !frameContainer || !arenaSection) return;
+
+    const liveUrl = launchBtn.getAttribute('data-url');
+    if (!liveUrl) return;
+
+    const safeFrameContainer = frameContainer;
+    const safeRestingView = restingView;
+    const safeActiveControls = activeControls;
+    const safeArenaSection = arenaSection;
+
+    function launchArena() {
+      // Create sandboxed iframe dynamically
+      const iframe = document.createElement('iframe');
+      iframe.src = liveUrl!;
+      iframe.title = 'Interactive Live Demo of Arcane Typer';
+      iframe.className = 'w-full h-full border-0 absolute inset-0';
+      iframe.setAttribute('allow', 'autoplay; fullscreen');
+      iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-forms');
+      iframe.loading = 'eager';
+
+      safeFrameContainer.innerHTML = '';
+      safeFrameContainer.appendChild(iframe);
+
+      safeRestingView.classList.add('hidden');
+      safeActiveControls.classList.remove('hidden');
+      safeActiveControls.classList.add('flex');
+      safeFrameContainer.classList.remove('hidden');
+
+      // Scroll smoothly into view if needed
+      safeArenaSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function unloadArena() {
+      // Clean up iframe to free audio nodes, canvas memory, and execution loop
+      safeFrameContainer.innerHTML = '';
+      safeFrameContainer.classList.add('hidden');
+      safeActiveControls.classList.add('hidden');
+      safeActiveControls.classList.remove('flex');
+      safeRestingView.classList.remove('hidden');
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        if (safeArenaSection.requestFullscreen) {
+          safeArenaSection.requestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    launchBtn.addEventListener('click', launchArena);
+    if (unloadBtn) unloadBtn.addEventListener('click', unloadArena);
+    if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initInteractiveArena);
+  } else {
+    initInteractiveArena();
+  }
+</script>
