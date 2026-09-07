@@ -4,178 +4,99 @@ import { getCollection } from 'astro:content';
 
 const allProjects = await getCollection('projects');
 const projects = allProjects.sort((a, b) => a.data.order - b.data.order);
-
-// Visual rotations for physical pinned notice effect
-const rotations = ['-rotate-1', 'rotate-1', '-rotate-0.5'];
 ---
 
 <TavernLayout
   title="Quest Board — Nhovem Cabahug"
-  description="The Guild Quest Board of Nhovem Cabahug — completed missions, production bounties, and ongoing expeditions."
+  description="The Quest Board of Nhovem Cabahug — completed exploits, production systems, and ongoing ventures."
   location="quests"
 >
-  <div class="max-w-5xl mx-auto py-4 sm:py-6">
-    {/* Guild Notice Board Banner */}
-    <header class="mb-10 text-center relative">
-      <div class="inline-flex items-center gap-2 px-3 py-1 mb-3 rounded border border-[var(--brass)] bg-[var(--wood-deep)]/90 text-xs font-semibold tracking-wider uppercase text-[var(--candle)]">
-        <span>⚔️</span> Bounty Hunter Guild Board · Active Missions
-      </div>
-      <h1 class="text-3xl sm:text-5xl font-extrabold text-[var(--candle)] mb-3 tracking-wide font-serif drop-shadow">
+  <div class="max-w-4xl mx-auto py-6">
+    <header class="mb-10 text-center">
+      <h1 class="text-3xl sm:text-4xl font-bold text-[var(--candle)] mb-3 tracking-wide">
         The Quest Board
       </h1>
       <p class="text-base sm:text-lg text-[var(--parchment)]/90 max-w-2xl mx-auto leading-relaxed">
-        Parchment notices pinned with iron tacks upon the tavern timber. Review completed contracts, battle-tested production software, and active expeditions.
+        Parchment notices pinned by travellers, guilds, and patrons. Review completed contracts, verified production software, and active expeditions.
       </p>
     </header>
 
-    {/* The Notices Grid */}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-6 pt-4">
-      {projects.map((project, idx) => {
-        const rotationClass = rotations[idx % rotations.length];
-        const isShipped = project.data.status === 'Shipped';
-
-        return (
-          <article
-            class={`relative bg-[#f5ecdc] text-[var(--ink)] p-6 rounded-sm border-2 border-[var(--brass)] shadow-2xl flex flex-col justify-between transition-all duration-300 ${rotationClass} hover:rotate-0 hover:scale-[1.02] focus-within:ring-2 focus-within:ring-[var(--brass)] focus-within:rotate-0`}
-            style="background-image: radial-gradient(#dfcfb5 1px, transparent 1px); background-size: 16px 16px;"
-          >
-            {/* Iron Tack / Nail at Top Center */}
-            <div
-              class="absolute -top-3 left-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-stone-800 border-2 border-stone-500 shadow-md flex items-center justify-center z-30"
-              aria-hidden="true"
-            >
-              <div class="w-1.5 h-1.5 rounded-full bg-stone-400"></div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {projects.map((project) => (
+        <article class="bg-[var(--parchment)] text-[var(--ink)] p-6 rounded border-2 border-[var(--brass)] shadow-xl flex flex-col justify-between transition-transform duration-200 hover:-translate-y-1 focus-within:ring-2 focus-within:ring-[var(--brass)]">
+          <div>
+            <div class="flex justify-between items-start gap-2 mb-3">
+              <span class={`text-xs uppercase font-bold tracking-wider px-2 py-1 rounded ${project.data.status === 'Shipped' ? 'bg-[var(--wood-deep)] text-[var(--candle)]' : 'bg-[var(--stone)] text-[var(--parchment)]'}`}>
+                {project.data.status}
+              </span>
+              <span class="text-xs font-semibold text-[var(--ink)]/80 italic">
+                {project.data.role}
+              </span>
             </div>
 
-            <div>
-              {/* Notice Header */}
-              <div class="text-center pb-2 mb-3 border-b-2 border-[var(--brass)]/40">
-                <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-[#6d4c1d] block">
-                  {isShipped ? '📜 COMPLETED BOUNTY' : '⚔️ ACTIVE EXPEDITION'}
-                </span>
-                <span class="text-xs font-semibold text-[var(--ink)]/80 italic block">
-                  Patron Role: {project.data.role}
-                </span>
-              </div>
+            <h2 class="text-xl font-bold mb-2 text-[var(--ink)] leading-snug">
+              <a href={`/quests/${project.data.slug}`} class="underline hover:text-[var(--ember)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2">
+                {project.data.title}
+              </a>
+            </h2>
 
-              {/* Main Mission Icon with Diagonal Physical Stamp */}
-              <div class="relative w-28 h-28 mx-auto my-3 rounded-xl border-2 border-[var(--brass)] bg-[#1e1208] shadow-inner p-1.5 flex items-center justify-center overflow-hidden group">
-                {project.data.thumbnail ? (
-                  <img
-                    src={project.data.thumbnail}
-                    alt={`${project.data.title} mission emblem`}
-                    class="w-full h-full object-contain rounded-lg transition-transform duration-300 group-hover:scale-105"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div class="text-3xl text-[var(--candle)] font-serif">⚔️</div>
+            <p class="text-sm text-[var(--ink)]/90 mb-4 leading-relaxed">
+              {project.data.summary}
+            </p>
+          </div>
+
+          <div>
+            <div class="mb-5 pt-3 border-t border-[var(--brass)]/30">
+              <strong class="text-xs uppercase tracking-wider text-[var(--ink)]/80 block mb-2">Arsenal</strong>
+              <ul class="flex flex-wrap gap-1.5" aria-label="Technologies used">
+                {project.data.stack.map((tech: string) => (
+                  <li class="text-xs px-2 py-0.5 border border-[var(--brass)] bg-[var(--parchment)] font-medium rounded-sm">
+                    {tech}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div class="flex flex-col gap-2.5">
+              <a
+                href={`/quests/${project.data.slug}`}
+                class="inline-flex items-center justify-center min-h-[44px] px-4 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+              >
+                Inspect Case Study
+              </a>
+
+              <div class="flex gap-2">
+                {project.data.liveUrl && (
+                  <a
+                    href={project.data.liveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="flex-1 inline-flex items-center justify-center min-h-[44px] px-3 border border-[var(--wood-deep)] text-[var(--wood-deep)] font-semibold text-xs rounded hover:bg-[var(--wood-deep)] hover:text-[var(--parchment)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+                  >
+                    Play / View Live
+                  </a>
                 )}
-
-                {/* THE DIAGONAL PHYSICAL STAMP OVERLAY */}
-                {isShipped ? (
-                  <div
-                    class="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-20"
-                    aria-hidden="true"
+                {project.data.sourceUrl && (
+                  <a
+                    href={project.data.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="flex-1 inline-flex items-center justify-center min-h-[44px] px-3 border border-[var(--wood-deep)] text-[var(--wood-deep)] font-semibold text-xs rounded hover:bg-[var(--wood-deep)] hover:text-[var(--parchment)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
                   >
-                    <div
-                      class="transform -rotate-12 border-4 border-red-700 text-red-800 bg-red-100/85 backdrop-blur-[1px] font-black text-xs sm:text-sm px-2.5 py-1 uppercase tracking-widest shadow-md rounded-sm border-double border-red-800"
-                      style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; letter-spacing: 0.18em; text-shadow: 1px 1px 0 rgba(255,255,255,0.4);"
-                    >
-                      ★ SHIPPED ★
-                    </div>
-                  </div>
-                ) : (
-                  <div
-                    class="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-20"
-                    aria-hidden="true"
-                  >
-                    <div
-                      class="transform rotate-12 border-4 border-amber-900 text-amber-950 bg-amber-100/90 backdrop-blur-[1px] font-black text-[11px] sm:text-xs px-2 py-1 uppercase tracking-widest shadow-md rounded-sm border-dashed border-amber-900"
-                      style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; letter-spacing: 0.14em; text-shadow: 1px 1px 0 rgba(255,255,255,0.4);"
-                    >
-                      ⚔ IN PROGRESS ⚔
-                    </div>
-                  </div>
+                    Source Code
+                  </a>
                 )}
               </div>
-
-              {/* Accessible Status Label */}
-              <span class="sr-only">Status: {project.data.status}</span>
-
-              {/* Quest Title */}
-              <h2 class="text-lg sm:text-xl font-extrabold mb-2 text-[var(--ink)] text-center leading-snug font-serif">
-                <a
-                  href={`/quests/${project.data.slug}`}
-                  class="underline hover:text-[var(--ember)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
-                >
-                  {project.data.title}
-                </a>
-              </h2>
-
-              {/* Mission Briefing */}
-              <p class="text-sm text-[var(--ink)]/90 mb-4 leading-relaxed line-clamp-4">
-                {project.data.summary}
-              </p>
             </div>
-
-            <div>
-              {/* Required Arsenal / Stack */}
-              <div class="mb-5 pt-3 border-t-2 border-[var(--brass)]/30">
-                <strong class="text-[11px] uppercase tracking-wider text-[var(--ink)]/80 block mb-2 font-bold">
-                  Arsenal & Relics
-                </strong>
-                <ul class="flex flex-wrap gap-1.5" aria-label="Technologies used">
-                  {project.data.stack.map((tech: string) => (
-                    <li class="text-xs px-2 py-0.5 border border-[var(--brass)] bg-[#ebe1ce] text-[var(--ink)] font-semibold rounded-sm shadow-xs">
-                      {tech}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Action Buttons */}
-              <div class="flex flex-col gap-2.5">
-                <a
-                  href={`/quests/${project.data.slug}`}
-                  class="inline-flex items-center justify-center min-h-[44px] px-4 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 shadow"
-                >
-                  Inspect Case Study Dossier →
-                </a>
-
-                <div class="flex gap-2">
-                  {project.data.liveUrl && (
-                    <a
-                      href={project.data.liveUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="flex-1 inline-flex items-center justify-center min-h-[44px] px-3 border-2 border-[var(--wood-deep)] text-[var(--wood-deep)] font-bold text-xs rounded hover:bg-[var(--wood-deep)] hover:text-[var(--parchment)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
-                    >
-                      Play Live Demo ↗
-                    </a>
-                  )}
-                  {project.data.sourceUrl && (
-                    <a
-                      href={project.data.sourceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="flex-1 inline-flex items-center justify-center min-h-[44px] px-3 border-2 border-[var(--wood-deep)] text-[var(--wood-deep)] font-bold text-xs rounded hover:bg-[var(--wood-deep)] hover:text-[var(--parchment)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
-                    >
-                      View Source ↗
-                    </a>
-                  )}
-                </div>
-              </div>
-            </div>
-          </article>
-        );
-      })}
+          </div>
+        </article>
+      ))}
     </div>
 
-    {/* Navigation Link back to Tavern */}
-    <div class="mt-14 text-center">
+    <div class="mt-12 text-center">
       <a
         href="/tavern"
-        class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 border-2 border-[var(--brass)] text-[var(--parchment)] font-bold rounded hover:bg-[var(--parchment)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+        class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 border-2 border-[var(--brass)] text-[var(--parchment)] font-semibold rounded hover:bg-[var(--parchment)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
       >
         &larr; Return to Main Tavern
       </a>
