@@ -36,15 +36,27 @@ const { Content } = await render(entry);
           </span>
         </div>
 
-        <h1 class="text-2xl sm:text-3xl font-bold text-[var(--ink)] mb-4 leading-tight">
-          {entry.data.title}
-        </h1>
-
-        {entry.data.summary && (
-          <p class="text-base text-[var(--ink)]/90 leading-relaxed max-w-[70ch] mb-6">
-            {entry.data.summary}
-          </p>
-        )}
+        <div class="flex flex-col sm:flex-row gap-6 items-start mb-6">
+          {entry.data.thumbnail && (
+            <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-xl border-2 border-[var(--brass)] bg-[#1e1208] shadow-md p-2 flex-shrink-0 flex items-center justify-center overflow-hidden">
+              <img
+                src={entry.data.thumbnail}
+                alt={`${entry.data.title} emblem`}
+                class="w-full h-full object-contain rounded-lg"
+              />
+            </div>
+          )}
+          <div class="flex-1">
+            <h1 class="text-2xl sm:text-3xl font-bold text-[var(--ink)] mb-3 leading-tight font-serif">
+              {entry.data.title}
+            </h1>
+            {entry.data.summary && (
+              <p class="text-base text-[var(--ink)]/90 leading-relaxed max-w-[70ch]">
+                {entry.data.summary}
+              </p>
+            )}
+          </div>
+        </div>
 
         <div class="mb-6">
           <strong class="text-xs uppercase tracking-wider text-[var(--ink)]/80 block mb-2">Technologies</strong>

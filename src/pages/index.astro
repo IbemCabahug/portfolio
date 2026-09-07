@@ -169,7 +169,20 @@ const featuredProjects = allProjects.sort((a, b) => a.data.order - b.data.order)
                   </span>
                 </div>
 
-                <h3 class="text-lg font-bold mb-2 text-[var(--ink)] leading-snug font-serif">
+                <div class="w-20 h-20 mx-auto my-3 rounded-xl border-2 border-[var(--brass)] bg-[#1e1208] shadow-md p-1.5 flex items-center justify-center overflow-hidden">
+                  {project.data.thumbnail ? (
+                    <img
+                      src={project.data.thumbnail}
+                      alt={`${project.data.title} emblem`}
+                      class="w-full h-full object-contain rounded-lg"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div class="text-3xl text-[var(--candle)] font-serif" aria-hidden="true">⚔️</div>
+                  )}
+                </div>
+
+                <h3 class="text-lg font-bold mb-2 text-[var(--ink)] text-center leading-snug font-serif">
                   <a
                     href={`/quests/${project.data.slug}`}
                     class="underline hover:text-[var(--ember)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
