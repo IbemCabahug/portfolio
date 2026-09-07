@@ -124,7 +124,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
           aria-haspopup="dialog"
           aria-expanded="false"
           aria-controls="dialog-satchel"
-          style="left: 14.4%; top: 49.0%; width: 4.7%; height: 21.0%; z-index: 3;"
+          style="left: 16.2%; top: 34.5%; width: 4.6%; height: 25.5%; z-index: 3;"
         >
           <div class="satchel-glow-cue" aria-hidden="true"></div>
           <span class="scene-tooltip" data-placement="bottom">Field Satchel (Status)</span>
@@ -968,56 +968,53 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
     transform: translateY(-50%);
   }
 
-  /* Environmental Aura Cue for Painted Scribe Desk */
+  /* Precision Hotspot Silhouettes & Diegetic Environmental Lighting */
+  /* 1. Scribe's Rolltop Desk & Ledger: Polygon silhouette matching desk, papers, and candle */
+  .desk-hotspot {
+    clip-path: polygon(8% 12%, 42% 2%, 98% 28%, 100% 82%, 75% 95%, 45% 75%, 5% 90%, 0% 30%);
+  }
   .desk-glow-cue {
     position: absolute;
     inset: 0;
-    border-radius: 8px;
     opacity: 0;
-    transition: opacity 0.3s ease-out, box-shadow 0.3s ease-out;
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: none;
-    background: radial-gradient(ellipse at 65% 30%, rgba(255, 215, 130, 0.3) 0%, rgba(213, 128, 59, 0.16) 50%, transparent 80%);
-    border: 1.5px solid rgba(255, 215, 130, 0.4);
+    background: radial-gradient(ellipse at 55% 42%, rgba(255, 220, 140, 0.42) 0%, rgba(213, 128, 59, 0.22) 45%, transparent 72%);
   }
   .desk-hotspot:is(:hover, :focus-visible) .desk-glow-cue {
     opacity: 1;
-    box-shadow: 0 0 24px rgba(255, 215, 130, 0.4), inset 0 0 16px rgba(213, 128, 59, 0.25);
   }
 
-  /* Environmental Aura Cue for Painted Satchel */
+  /* 2. Hanging Courier Satchel: Teardrop polygon matching peg strap and leather pouch */
+  .satchel-hotspot {
+    clip-path: polygon(35% 0%, 65% 0%, 80% 35%, 100% 55%, 95% 95%, 50% 100%, 5% 95%, 0% 55%, 20% 35%);
+  }
   .satchel-glow-cue {
     position: absolute;
     inset: 0;
-    border-radius: 6px;
     opacity: 0;
-    transition: opacity 0.3s ease-out, box-shadow 0.3s ease-out;
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: none;
-    background: radial-gradient(ellipse at 50% 40%, rgba(255, 215, 130, 0.26) 0%, rgba(213, 128, 59, 0.14) 60%, transparent 85%);
-    border: 1.5px solid rgba(255, 215, 130, 0.4);
+    background: radial-gradient(ellipse at 50% 70%, rgba(255, 215, 130, 0.45) 0%, rgba(213, 128, 59, 0.2) 50%, transparent 75%);
   }
   .satchel-hotspot:is(:hover, :focus-visible) .satchel-glow-cue {
     opacity: 1;
-    box-shadow: 0 0 18px rgba(255, 215, 130, 0.4);
   }
 
-  /* Environmental Lighting Cue for Return Doorway to Tavern */
+  /* 3. Return Doorway to Tavern: Roman arch polygon matching masonry opening */
   .door-hotspot {
-    border-radius: 36px 36px 0 0;
+    clip-path: polygon(50% 0%, 75% 3%, 90% 10%, 100% 20%, 100% 100%, 0% 100%, 0% 20%, 10% 10%, 25% 3%);
   }
   .door-light-cue {
     position: absolute;
     inset: 0;
-    border-radius: 36px 36px 0 0;
     opacity: 0;
-    transition: opacity 0.3s ease-out, box-shadow 0.3s ease-out;
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: none;
-    background: radial-gradient(ellipse at 50% 30%, rgba(255, 215, 130, 0.26) 0%, rgba(213, 128, 59, 0.14) 55%, transparent 85%);
-    border: 1.5px solid rgba(255, 215, 130, 0.45);
-    border-bottom: none;
+    background: radial-gradient(ellipse at 50% 45%, rgba(255, 215, 130, 0.45) 0%, rgba(213, 128, 59, 0.2) 55%, transparent 80%);
   }
   .door-hotspot:is(:hover, :focus-visible) .door-light-cue {
     opacity: 1;
-    box-shadow: 0 0 24px rgba(255, 215, 130, 0.4), inset 0 0 16px rgba(213, 128, 59, 0.25);
   }
 
   /* Dialog Backdrop */
