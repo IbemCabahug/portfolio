@@ -180,36 +180,26 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
             <!-- Template Categories (GitHub Issue Style) -->
             <div>
               <span class="block text-xs uppercase tracking-wider text-[var(--brass)] font-semibold mb-1.5">Select Dispatch Template</span>
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5" role="radiogroup" aria-label="Missive template selection">
+              <div class="grid grid-cols-3 gap-1.5" role="radiogroup" aria-label="Missive template selection">
                 <button
                   type="button"
                   class="template-pill active"
                   data-template="quest"
                   data-prefix="[Quest Offer]"
-                  data-subject="Frontend / Full-Stack Project Inquiry"
+                  data-subject="Frontend / Web Project Inquiry"
                   data-placeholder="Describe the quest, target timeline, technology stack, and how you'd like to collaborate..."
                 >
-                  🎯 Quest Offer
+                  📜 Quest Offer
                 </button>
                 <button
                   type="button"
                   class="template-pill"
                   data-template="role"
                   data-prefix="[Guild Recruitment]"
-                  data-subject="Developer Role Opportunity"
-                  data-placeholder="Share details about the role, team structure, remote/hybrid requirements, and company mission..."
+                  data-subject="Junior Developer Role Opportunity"
+                  data-placeholder="Share details about the junior developer role, team structure, remote/hybrid requirements, and company mission..."
                 >
                   ⚔️ Recruitment
-                </button>
-                <button
-                  type="button"
-                  class="template-pill"
-                  data-template="consult"
-                  data-prefix="[Consultation]"
-                  data-subject="Technical Consultation & Architecture Review"
-                  data-placeholder="Detail the technical questions, architecture challenge, or system review you would like to discuss..."
-                >
-                  🔮 Consultation
                 </button>
                 <button
                   type="button"
@@ -219,7 +209,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
                   data-subject="Greetings from a Fellow Traveler"
                   data-placeholder="Share your thoughts on the portfolio, say hello, or connect with Nhovem..."
                 >
-                  ✉️ General
+                  🪶 Tavern Chat
                 </button>
               </div>
             </div>
@@ -258,7 +248,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
                   id="desktop-missive-subject"
                   name="subject"
                   required
-                  value="[Quest Offer] Frontend / Full-Stack Project Inquiry"
+                  value="[Quest Offer] Frontend / Web Project Inquiry"
                   class="tavern-input w-full px-3 py-1.5 text-xs sm:text-sm rounded bg-black/40 border border-[var(--brass)]/40 text-[var(--candle)] focus:border-[var(--candle)] focus:outline-none transition-colors"
                 />
               </div>
@@ -297,7 +287,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
           <!-- Dispatch Receipt / Confirmation View (Hidden by default) -->
           <div id="raven-receipt-view" class="panel-body space-y-3 hidden" aria-live="polite">
             <div class="p-4 rounded bg-emerald-950/40 border border-emerald-500/40 text-center space-y-1.5">
-              <span class="text-2xl block" aria-hidden="true">🦅</span>
+              <span class="text-2xl block" aria-hidden="true">🪶</span>
               <h3 class="text-base sm:text-lg font-bold text-emerald-400">The Raven Takes Wing!</h3>
               <p class="text-xs text-[var(--parchment)]/90 max-w-md mx-auto">
                 Your missive has been prepared and routed to your email client. A copy of your sealed message is inscribed below for your records:
@@ -664,11 +654,10 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
           <form id="mobile-raven-form" class="space-y-3 pt-2">
             <div>
               <span class="block text-xs uppercase tracking-wider text-[var(--ink)] font-bold mb-1">Dispatch Category</span>
-              <div class="grid grid-cols-2 gap-1.5">
-                <button type="button" class="mobile-template-pill active" data-template="quest" data-prefix="[Quest Offer]" data-subject="Frontend / Full-Stack Project Inquiry" data-placeholder="Describe the quest, target timeline, and technology stack...">🎯 Quest Offer</button>
-                <button type="button" class="mobile-template-pill" data-template="role" data-prefix="[Guild Recruitment]" data-subject="Developer Role Opportunity" data-placeholder="Share details about the role, team structure, and location...">⚔️ Recruitment</button>
-                <button type="button" class="mobile-template-pill" data-template="consult" data-prefix="[Consultation]" data-subject="Technical Consultation & Review" data-placeholder="Detail the technical questions or architecture review...">🔮 Consultation</button>
-                <button type="button" class="mobile-template-pill" data-template="general" data-prefix="[Tavern Greetings]" data-subject="Greetings from a Fellow Traveler" data-placeholder="Say hello or share feedback on the portfolio...">✉️ General</button>
+              <div class="grid grid-cols-3 gap-1.5">
+                <button type="button" class="mobile-template-pill active" data-template="quest" data-prefix="[Quest Offer]" data-subject="Frontend / Web Project Inquiry" data-placeholder="Describe the quest, target timeline, and technology stack...">📜 Quest Offer</button>
+                <button type="button" class="mobile-template-pill" data-template="role" data-prefix="[Guild Recruitment]" data-subject="Junior Developer Role Opportunity" data-placeholder="Share details about the junior developer role, team structure, and location...">⚔️ Recruitment</button>
+                <button type="button" class="mobile-template-pill" data-template="general" data-prefix="[Tavern Greetings]" data-subject="Greetings from a Fellow Traveler" data-placeholder="Say hello or share feedback on the portfolio...">🪶 Tavern Chat</button>
               </div>
             </div>
 
@@ -684,7 +673,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
 
             <div>
               <label for="mobile-missive-subject" class="block text-xs font-bold text-[var(--ink)] mb-1">Subject <span class="text-[var(--ember)]">*</span></label>
-              <input type="text" id="mobile-missive-subject" required value="[Quest Offer] Frontend / Full-Stack Project Inquiry" class="w-full px-3 py-2 text-sm rounded bg-[var(--wood-deep)]/10 border border-[var(--brass)]/50 text-[var(--ink)] focus:outline-2 focus:outline-[var(--brass)]" />
+              <input type="text" id="mobile-missive-subject" required value="[Quest Offer] Frontend / Web Project Inquiry" class="w-full px-3 py-2 text-sm rounded bg-[var(--wood-deep)]/10 border border-[var(--brass)]/50 text-[var(--ink)] focus:outline-2 focus:outline-[var(--brass)]" />
             </div>
 
             <div>
