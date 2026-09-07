@@ -165,8 +165,16 @@ const sceneObjects = [
       <!-- The Courier's Roost (Messenger's Corner) Arched Doorway -->
       <a href="/messenger" id="trigger-door-roost" class="scene-object scene-hotspot door-hotspot"
          aria-label="Enter The Courier's Roost (Messenger's Corner)"
-         style="left: 78.5%; bottom: 27.5%; width: 7.2%; height: 43.5%; z-index: 2;">
-        <div class="door-light-cue" aria-hidden="true"></div>
+         style="left: 82.89%; bottom: 29.09%; width: 2.66%; height: 30.91%; z-index: 2;">
+        <img
+          src="/art/door-to-roost-prop-tight.webp"
+          width="34"
+          height="221"
+          alt=""
+          loading="lazy"
+          decoding="async"
+          class="door-roost-sprite"
+        />
         <span class="scene-tooltip" data-placement="top">The Courier's Roost</span>
       </a>
 
@@ -412,20 +420,24 @@ const sceneObjects = [
     transform: none;
   }
 
-  /* Arched Doorway Hotspot & Precision Environmental Lighting */
+  /* Arched Doorway Hotspot & Cutout Sprite */
   .door-hotspot {
-    clip-path: polygon(50% 0%, 75% 3%, 90% 10%, 100% 20%, 100% 100%, 0% 100%, 0% 20%, 10% 10%, 25% 3%);
+    cursor: pointer;
+    transition: filter 0.25s ease-out, transform 0.25s ease-out;
   }
-  .door-light-cue {
+  .door-hotspot::before {
+    content: '';
     position: absolute;
-    inset: 0;
-    opacity: 0;
-    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    pointer-events: none;
-    background: radial-gradient(ellipse at 50% 45%, rgba(255, 215, 130, 0.42) 0%, rgba(213, 128, 59, 0.2) 55%, transparent 80%);
+    inset: -6px -12px;
+    cursor: pointer;
   }
-  .door-hotspot:is(:hover, :focus-visible) .door-light-cue {
-    opacity: 1;
+  .door-hotspot img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
   }
 
   /* Ground Shadow for Characters */

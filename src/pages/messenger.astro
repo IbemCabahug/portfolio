@@ -109,9 +109,17 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
           aria-haspopup="dialog"
           aria-expanded="false"
           aria-controls="dialog-desk"
-          style="left: 21.0%; top: 50.4%; width: 21.9%; height: 26.6%; z-index: 3;"
+          style="left: 21.33%; top: 46.22%; width: 21.72%; height: 31.93%; z-index: 3;"
         >
-          <div class="desk-glow-cue" aria-hidden="true"></div>
+          <img
+            src="/art/scribe-desk-prop-tight.webp"
+            width="278"
+            height="228"
+            alt=""
+            loading="eager"
+            decoding="async"
+            class="desk-sprite"
+          />
           <span class="scene-tooltip" data-placement="top">Scribe's Ledger (Resume)</span>
         </button>
 
@@ -124,9 +132,17 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
           aria-haspopup="dialog"
           aria-expanded="false"
           aria-controls="dialog-satchel"
-          style="left: 16.2%; top: 34.5%; width: 4.6%; height: 25.5%; z-index: 3;"
+          style="left: 14.69%; top: 35.71%; width: 4.53%; height: 21.71%; z-index: 3;"
         >
-          <div class="satchel-glow-cue" aria-hidden="true"></div>
+          <img
+            src="/art/courier-satchel-prop-tight.webp"
+            width="58"
+            height="155"
+            alt=""
+            loading="eager"
+            decoding="async"
+            class="satchel-sprite"
+          />
           <span class="scene-tooltip" data-placement="bottom">Field Satchel (Status)</span>
         </button>
 
@@ -136,9 +152,17 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
           id="trigger-tavern-door"
           class="scene-object scene-hotspot door-hotspot"
           aria-label="Return through the Archway to the Main Tavern"
-          style="left: 80.1%; top: 37.1%; width: 6.0%; height: 35.7%; z-index: 3;"
+          style="left: 82.73%; top: 39.08%; width: 2.50%; height: 31.79%; z-index: 3;"
         >
-          <div class="door-light-cue" aria-hidden="true"></div>
+          <img
+            src="/art/door-to-tavern-prop-tight.webp"
+            width="32"
+            height="227"
+            alt=""
+            loading="eager"
+            decoding="async"
+            class="door-sprite"
+          />
           <span class="scene-tooltip" data-placement="left">Main Tavern (Return)</span>
         </a>
 
@@ -968,53 +992,19 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
     transform: translateY(-50%);
   }
 
-  /* Precision Hotspot Silhouettes & Diegetic Environmental Lighting */
-  /* 1. Scribe's Rolltop Desk & Ledger: Polygon silhouette matching desk, papers, and candle */
-  .desk-hotspot {
-    clip-path: polygon(8% 12%, 42% 2%, 98% 28%, 100% 82%, 75% 95%, 45% 75%, 5% 90%, 0% 30%);
-  }
-  .desk-glow-cue {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    pointer-events: none;
-    background: radial-gradient(ellipse at 55% 42%, rgba(255, 220, 140, 0.42) 0%, rgba(213, 128, 59, 0.22) 45%, transparent 72%);
-  }
-  .desk-hotspot:is(:hover, :focus-visible) .desk-glow-cue {
-    opacity: 1;
-  }
-
-  /* 2. Hanging Courier Satchel: Teardrop polygon matching peg strap and leather pouch */
-  .satchel-hotspot {
-    clip-path: polygon(35% 0%, 65% 0%, 80% 35%, 100% 55%, 95% 95%, 50% 100%, 5% 95%, 0% 55%, 20% 35%);
-  }
-  .satchel-glow-cue {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    pointer-events: none;
-    background: radial-gradient(ellipse at 50% 70%, rgba(255, 215, 130, 0.45) 0%, rgba(213, 128, 59, 0.2) 50%, transparent 75%);
-  }
-  .satchel-hotspot:is(:hover, :focus-visible) .satchel-glow-cue {
-    opacity: 1;
-  }
-
-  /* 3. Return Doorway to Tavern: Roman arch polygon matching masonry opening */
+  /* Precision Cutout Sprites & Hit Targets */
+  .desk-hotspot,
+  .satchel-hotspot,
   .door-hotspot {
-    clip-path: polygon(50% 0%, 75% 3%, 90% 10%, 100% 20%, 100% 100%, 0% 100%, 0% 20%, 10% 10%, 25% 3%);
+    cursor: pointer;
   }
-  .door-light-cue {
+
+  /* Expand door entrance touch target for comfortable clicking while keeping visual cutout focused */
+  .door-hotspot::before {
+    content: '';
     position: absolute;
-    inset: 0;
-    opacity: 0;
-    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    pointer-events: none;
-    background: radial-gradient(ellipse at 50% 45%, rgba(255, 215, 130, 0.45) 0%, rgba(213, 128, 59, 0.2) 55%, transparent 80%);
-  }
-  .door-hotspot:is(:hover, :focus-visible) .door-light-cue {
-    opacity: 1;
+    inset: -6px -12px;
+    cursor: pointer;
   }
 
   /* Dialog Backdrop */
