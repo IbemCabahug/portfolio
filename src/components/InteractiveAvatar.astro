@@ -1,132 +1,284 @@
 ---
 ---
 
-<div class="interactive-avatar-root flex-shrink-0 flex flex-col items-center pt-2 lg:pt-4">
+<div class="interactive-avatar-container flex-shrink-0 flex flex-col items-center pt-2 lg:pt-4">
   <button
     type="button"
     id="avatar-toggle-btn"
-    class="relative group cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--candle)] focus-visible:outline-offset-4 rounded-full bg-transparent border-0 p-0"
-    aria-label="Adventurer guild medallion: 3D voxel avatar. Click or hover to reveal real developer photo"
+    class="avatar-medallion-btn relative group cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--candle)] focus-visible:outline-offset-8 rounded-full bg-transparent border-0 p-0 select-none"
+    aria-label="Adventurer's Medallion: Nhovem Cabahug. Click or hover to transform between 3D voxel avatar and real portrait"
     aria-expanded="false"
   >
-    {/* Circular Brass Guild Medallion Frame */}
-    <div class="w-48 h-48 sm:w-56 sm:h-56 rounded-full border-2 border-[var(--brass)] bg-[#1e1208] p-2 shadow-2xl shadow-black/80 flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:border-[var(--candle)] group-hover:shadow-[0_0_20px_rgba(255,228,160,0.25)]">
-      <div class="relative w-full h-full rounded-full overflow-hidden bg-[#120a04] flex items-center justify-center">
+    {/* Outer 3D Perspective Card Frame */}
+    <div class="avatar-card-frame w-48 h-48 sm:w-56 sm:h-56 rounded-full border-2 border-[var(--brass)] bg-[#1a0f07] p-2 shadow-2xl shadow-black/85 flex items-center justify-center relative overflow-hidden transition-all duration-300">
+      
+      {/* Dynamic Brass Rim Glint / Ambient Candlelight Ring */}
+      <div class="avatar-rim-glow absolute inset-0 rounded-full pointer-events-none transition-opacity duration-300 opacity-40 group-hover:opacity-100" aria-hidden="true"></div>
+
+      {/* The Scrying Lens Viewport */}
+      <div class="avatar-lens relative w-full h-full rounded-full overflow-hidden bg-[#100803] flex items-center justify-center">
         
-        {/* Layer 1: 3D Voxel Pixel-Art Adventurer Avatar (Default View) */}
+        {/* Layer 1: 3D Voxel Pixel-Art Adventurer Avatar (Default Form) */}
         <img
           src="/art/profile-pixel-3d.jpg"
           alt="Nhovem Cabahug — 3D Voxel Pixel-Art Adventurer portrait"
           width="224"
           height="224"
-          class="avatar-pixel-img absolute inset-0 w-full h-full object-cover rounded-full opacity-100 scale-100 transition-all duration-350 ease-out"
+          class="avatar-layer avatar-voxel absolute inset-0 w-full h-full object-cover rounded-full"
           loading="eager"
           decoding="async"
         />
 
-        {/* Layer 2: Real Profile Photo (Revealed on Hover / Click / Tap) */}
+        {/* Layer 2: Real Photographic Portrait (Transformed Form) */}
         <img
           src="/art/profile.jpg"
           alt="Nhovem Cabahug — Real photograph in formal suit and tie"
           width="224"
           height="224"
-          class="avatar-real-img absolute inset-0 w-full h-full object-cover rounded-full opacity-0 scale-95 transition-all duration-350 ease-out pointer-events-none"
+          class="avatar-layer avatar-real absolute inset-0 w-full h-full object-cover rounded-full pointer-events-none"
           loading="eager"
           decoding="async"
         />
 
+        {/* Layer 3: Pixel-Matrix Dither Overlay (Active during state transition) */}
+        <div class="avatar-pixel-dither absolute inset-0 pointer-events-none" aria-hidden="true"></div>
+
+        {/* Layer 4: Arcane Catalyst Shimmer Beam (Light wavefront that transforms pixels to reality) */}
+        <div class="avatar-catalyst-beam absolute inset-0 pointer-events-none" aria-hidden="true"></div>
+
+        {/* Layer 5: Inset Lens Bezel Vignette & Depth Shadow */}
+        <div class="avatar-lens-vignette absolute inset-0 rounded-full pointer-events-none" aria-hidden="true"></div>
+
       </div>
     </div>
-
-    {/* Guild Medallion Tag Indicator */}
-    <div class="avatar-tag absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[var(--wood-deep)] border border-[var(--brass)] text-[var(--candle)] text-[11px] font-extrabold uppercase tracking-wider px-3.5 py-0.5 rounded-full shadow-md flex items-center gap-1.5 transition-all duration-200">
-      <span class="avatar-dot w-1.5 h-1.5 rounded-full bg-amber-400" aria-hidden="true"></span>
-      <span class="avatar-label">Guild Engineer (Voxel)</span>
-    </div>
   </button>
+
+  {/* Accessible screen reader live region */}
+  <div id="avatar-sr-announcer" class="sr-only" aria-live="polite" aria-atomic="true">
+    Default: 3D Voxel Guild Avatar active.
+  </div>
 </div>
 
 <style>
-  /* Hover & Focus Interactions: Fade in the real photo over the voxel avatar */
-  .interactive-avatar-root:hover .avatar-real-img,
-  .interactive-avatar-root:focus-within .avatar-real-img,
-  .interactive-avatar-root.is-revealed .avatar-real-img {
+  /* 3D Perspective Card & Tactile Depth */
+  .avatar-medallion-btn {
+    perspective: 900px;
+    touch-action: manipulation;
+  }
+
+  .avatar-card-frame {
+    transform-style: preserve-3d;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 0.35s ease,
+                box-shadow 0.35s ease;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.9),
+                0 0 0 1px rgba(212, 160, 23, 0.3);
+  }
+
+  .avatar-rim-glow {
+    background: radial-gradient(circle at 35% 25%, rgba(255, 228, 160, 0.35) 0%, rgba(212, 160, 23, 0.15) 45%, transparent 70%);
+  }
+
+  .avatar-lens-vignette {
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.85),
+                inset 0 0 6px rgba(18, 10, 4, 0.95);
+  }
+
+  /* Layer 1: Voxel Avatar (Default) */
+  .avatar-voxel {
     opacity: 1;
     transform: scale(1);
+    filter: contrast(1.02);
+    transition: opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                filter 0.35s ease;
   }
 
-  .interactive-avatar-root:hover .avatar-pixel-img,
-  .interactive-avatar-root:focus-within .avatar-pixel-img,
-  .interactive-avatar-root.is-revealed .avatar-pixel-img {
+  /* Layer 2: Real Photographic Portrait (Revealed) */
+  .avatar-real {
     opacity: 0;
-    transform: scale(1.05);
+    transform: scale(0.96);
+    filter: brightness(0.92) contrast(0.95);
+    transition: opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                filter 0.38s ease;
   }
 
-  .interactive-avatar-root:hover .avatar-tag,
-  .interactive-avatar-root:focus-within .avatar-tag,
-  .interactive-avatar-root.is-revealed .avatar-tag {
+  /* Layer 3: Pixel-Matrix Dither Overlay */
+  .avatar-pixel-dither {
+    background-image: 
+      repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.35) 0px, rgba(0, 0, 0, 0.35) 1px, transparent 1px, transparent 4px),
+      repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.35) 0px, rgba(0, 0, 0, 0.35) 1px, transparent 1px, transparent 4px);
+    background-size: 4px 4px;
+    opacity: 0;
+    mix-blend-mode: overlay;
+    transition: opacity 0.3s ease;
+  }
+
+  /* Layer 4: Arcane Catalyst Shimmer Beam (Light Sweep) */
+  .avatar-catalyst-beam {
+    background: linear-gradient(
+      115deg,
+      transparent 15%,
+      rgba(255, 228, 160, 0.25) 35%,
+      rgba(255, 255, 255, 0.75) 50%,
+      rgba(212, 160, 23, 0.35) 65%,
+      transparent 85%
+    );
+    transform: translateX(-150%) skewX(-20deg);
+    transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Hover, Focus-Visible & Active / Revealed State Transitions */
+  .interactive-avatar-container:hover .avatar-card-frame,
+  .interactive-avatar-container:has(:focus-visible) .avatar-card-frame,
+  .interactive-avatar-container.is-revealed .avatar-card-frame {
     border-color: var(--candle);
-    box-shadow: 0 0 10px rgba(255, 228, 160, 0.3);
+    box-shadow: 0 16px 40px -6px rgba(0, 0, 0, 0.95),
+                0 0 25px rgba(255, 228, 160, 0.35);
   }
 
-  .interactive-avatar-root:hover .avatar-dot,
-  .interactive-avatar-root:focus-within .avatar-dot,
-  .interactive-avatar-root.is-revealed .avatar-dot {
-    background-color: #34d399; /* emerald-400 */
+  .interactive-avatar-container:hover .avatar-voxel,
+  .interactive-avatar-container:has(:focus-visible) .avatar-voxel,
+  .interactive-avatar-container.is-revealed .avatar-voxel {
+    opacity: 0;
+    transform: scale(1.04);
+    filter: brightness(1.15) contrast(0.9) blur(0.5px);
+  }
+
+  .interactive-avatar-container:hover .avatar-real,
+  .interactive-avatar-container:has(:focus-visible) .avatar-real,
+  .interactive-avatar-container.is-revealed .avatar-real {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1.0) contrast(1.02);
+  }
+
+  .interactive-avatar-container:hover .avatar-pixel-dither,
+  .interactive-avatar-container:has(:focus-visible) .avatar-pixel-dither,
+  .interactive-avatar-container.is-revealed .avatar-pixel-dither {
+    animation: ditherPulse 0.45s ease-out forwards;
+  }
+
+  .interactive-avatar-container:hover .avatar-catalyst-beam,
+  .interactive-avatar-container:has(:focus-visible) .avatar-catalyst-beam,
+  .interactive-avatar-container.is-revealed .avatar-catalyst-beam {
+    transform: translateX(150%) skewX(-20deg);
+  }
+
+  @keyframes ditherPulse {
+    0% {
+      opacity: 0;
+    }
+    30% {
+      opacity: 0.6;
+    }
+    70% {
+      opacity: 0.35;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  /* Accessibility: prefers-reduced-motion fallback */
+  @media (prefers-reduced-motion: reduce) {
+    .avatar-card-frame,
+    .avatar-voxel,
+    .avatar-real,
+    .avatar-catalyst-beam {
+      transition: opacity 0.2s linear !important;
+      transform: none !important;
+    }
+
+    .avatar-catalyst-beam,
+    .avatar-pixel-dither {
+      display: none !important;
+    }
   }
 </style>
 
 <script>
   function setupInteractiveAvatar() {
-    const root = document.querySelector('.interactive-avatar-root');
+    const container = document.querySelector('.interactive-avatar-container');
     const button = document.getElementById('avatar-toggle-btn');
-    const label = document.querySelector('.avatar-label');
-    if (!root || !button || !label) return;
+    const cardFrame = document.querySelector('.avatar-card-frame');
+    const announcer = document.getElementById('avatar-sr-announcer');
 
-    const rootEl = root;
+    if (!container || !button || !cardFrame) return;
+
+    const containerEl = container;
     const buttonEl = button;
-    const labelEl = label;
-    let isRevealed = false;
+    const cardFrameEl = cardFrame as HTMLElement;
+    const announcerEl = announcer;
 
-    function updateState(revealed: boolean) {
+    let isRevealed = false;
+    let isTouchActive = false;
+
+    function setTransformationState(revealed: boolean) {
       isRevealed = revealed;
       buttonEl.setAttribute('aria-expanded', String(isRevealed));
+
       if (isRevealed) {
-        rootEl.classList.add('is-revealed');
-        labelEl.textContent = 'Real Engineer (Nhovem)';
+        containerEl.classList.add('is-revealed');
+        if (announcerEl) {
+          announcerEl.textContent = 'Transformed: Real developer portrait active.';
+        }
       } else {
-        rootEl.classList.remove('is-revealed');
-        labelEl.textContent = 'Guild Engineer (Voxel)';
+        containerEl.classList.remove('is-revealed');
+        if (announcerEl) {
+          announcerEl.textContent = 'Transformed: 3D Voxel Guild Avatar active.';
+        }
       }
     }
 
-    // Toggle on click / tap for desktop locking and natural mobile interaction
+    // Toggle on click / tap (ideal for mobile and desktop click-locking)
     buttonEl.addEventListener('click', (e) => {
       e.preventDefault();
-      updateState(!isRevealed);
+      const nextState = !isRevealed;
+      setTransformationState(nextState);
+      if (!nextState) {
+        buttonEl.blur();
+      }
     });
 
-    // Keyboard support (Enter or Space)
+    // Keyboard navigation (Enter or Space)
     buttonEl.addEventListener('keydown', (e: Event) => {
       const keyEvent = e as KeyboardEvent;
       if (keyEvent.key === 'Enter' || keyEvent.key === ' ') {
         keyEvent.preventDefault();
-        updateState(!isRevealed);
+        setTransformationState(!isRevealed);
       }
     });
 
-    // Label sync on hover if not locked
-    rootEl.addEventListener('mouseenter', () => {
-      if (!isRevealed) {
-        labelEl.textContent = 'Real Engineer (Nhovem)';
-      }
-    });
+    // Interactive 3D Parallax Tilt on Desktop (Respecting prefers-reduced-motion)
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    rootEl.addEventListener('mouseleave', () => {
-      if (!isRevealed) {
-        labelEl.textContent = 'Guild Engineer (Voxel)';
-      }
-    });
+    if (!prefersReducedMotion) {
+      buttonEl.addEventListener('mousemove', (e: MouseEvent) => {
+        if (isTouchActive) return;
+        const rect = buttonEl.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        // Calculate tilt angles (max ±6 degrees)
+        const rotateX = ((y - centerY) / centerY) * -6;
+        const rotateY = ((x - centerX) / centerX) * 6;
+
+        cardFrameEl.style.transform = `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale(1.02)`;
+      });
+
+      buttonEl.addEventListener('mouseleave', () => {
+        cardFrameEl.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
+      });
+
+      // Track touch devices to avoid conflicting mouse events
+      buttonEl.addEventListener('touchstart', () => {
+        isTouchActive = true;
+      }, { passive: true });
+    }
   }
 
   if (document.readyState === 'loading') {
