@@ -7,51 +7,481 @@ const profileEntry = await getEntry('profile', 'main');
 const profile = profileEntry?.data;
 const mailLink = links.find((l) => l.data.icon === 'mail');
 const githubLink = links.find((l) => l.data.icon === 'github');
-const mailAddress = mailLink?.data.url.replace('mailto:', '') || 'ncabahug223@gmail.com';
+const mailAddress = mailLink?.data.url.replace('mailto:', '') || profile?.email || 'ncabahug223@gmail.com';
+const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com/IbemCabahug';
 ---
 
 <TavernLayout
   title="The Courier's Roost — Messenger's Corner — Nhovem Cabahug"
-  description="Send a raven or inspect guild records to get in touch with Nhovem Cabahug."
+  description="Step inside The Courier's Roost: an interactive 2.5D tavern aviary to send word, inspect GitHub telemetry, or review credentials."
   location="messenger"
 >
-  <div class="max-w-3xl mx-auto py-6 px-4">
-    <!-- Atmospheric Header -->
-    <header class="text-center mb-10">
-      <!-- Active Courier Raven taking flight -->
-      <div class="relative inline-block mb-4">
-        <div class="absolute -inset-4 bg-[radial-gradient(ellipse_at_center,rgba(213,128,59,0.2)_0%,transparent_70%)] rounded-full blur-md pointer-events-none" aria-hidden="true"></div>
-        <img
-          src="/art/raven-delivering-letter-388.webp"
-          srcset="/art/raven-delivering-letter-388.webp 388w, /art/raven-delivering-letter-776.webp 776w"
-          sizes="(max-width: 640px) 240px, 320px"
-          width="320"
-          height="119"
-          alt="A sleek black messenger raven in flight carrying a sealed parchment letter in its beak"
-          class="relative mx-auto w-60 sm:w-72 md:w-80 h-auto drop-shadow-[0_12px_24px_rgba(0,0,0,0.85)]"
-          loading="eager"
-        />
-      </div>
-
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--stone)]/60 border border-[var(--brass)]/40 text-[var(--candle)] text-xs font-semibold tracking-wider uppercase mb-3">
+  <div class="roost-page-wrapper">
+    <!-- Atmospheric Room Intro Header -->
+    <header class="roost-header text-center mb-6 px-4">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--stone)]/60 border border-[var(--brass)]/40 text-[var(--candle)] text-xs font-semibold tracking-wider uppercase mb-2">
         <span>Tavern Aviary &bull; Chamber IV</span>
       </div>
-
-      <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--candle)] mb-3 tracking-wide drop-shadow-md">
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--candle)] mb-2 tracking-wide drop-shadow-md">
         The Courier's Roost
       </h1>
-      <p class="text-base sm:text-lg text-[var(--parchment)]/90 max-w-xl mx-auto leading-relaxed">
-        Tucked beyond the taproom archway lies the tavern roost, attended day and night. Select an official dispatch channel below to send word directly, inspect public engineering records, or review guild credentials.
+      <p class="text-sm sm:text-base text-[var(--parchment)]/90 max-w-xl mx-auto leading-relaxed">
+        Tucked beyond the taproom archway lies the messenger roost, attended day and night. Inspect the interactive fixtures around the chamber to send a raven, consult the arcane transceiver, or inspect the master scribe's ledger.
       </p>
     </header>
 
-    <!-- Dispatch Slips -->
-    <div class="space-y-6">
+    <!-- 2.5D Interactive Tavern Room Scene (Desktop & Tablet) -->
+    <section class="scene-container" aria-label="Interactive Courier's Roost Chamber">
+      <picture>
+        <source
+          media="(min-width: 769px)"
+          srcset="/art/messengers-corner-1280.webp 1280w, /art/messengers-corner-2560.webp 2560w"
+          sizes="(max-width: 2560px) 100vw, 2560px"
+        />
+        <img
+          src="/art/messengers-corner-1280.webp"
+          width="2560"
+          height="1429"
+          alt="The Courier's Roost: a warm timber tavern room with a perched raven, an enchanted machine in the wall alcove, a scribe desk with candle, a hanging satchel, and a doorway returning to the tavern."
+          loading="eager"
+          fetchpriority="high"
+          class="scene-background"
+        />
+      </picture>
+
+      <div class="scene-overlay" aria-hidden="false">
+        <!-- Hotspot 1: Perched Raven (Email Dispatch) -->
+        <button
+          type="button"
+          id="trigger-perch-raven"
+          class="scene-object scene-hotspot"
+          aria-label="Send a Raven (Direct Email Dispatch)"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-controls="dialog-raven"
+          style="left: 0.9%; top: 38.5%; width: 9.3%; z-index: 3;"
+        >
+          <img
+            src="/art/raven-perched-463.webp"
+            srcset="/art/raven-perched-231.webp 231w, /art/raven-perched-463.webp 463w"
+            sizes="(max-width: 1280px) 118px, 236px"
+            width="463"
+            height="512"
+            alt=""
+            loading="eager"
+            decoding="async"
+            class="raven-sprite"
+          />
+          <span class="scene-tooltip" data-placement="right">Send Word (Email)</span>
+        </button>
+
+        <!-- Hotspot 2: Arcane Transceiver (GitHub Telemetry) -->
+        <button
+          type="button"
+          id="trigger-arcane-machine"
+          class="scene-object scene-hotspot"
+          aria-label="The Arcane Transceiver (GitHub Engineering Record)"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-controls="dialog-machine"
+          style="left: 47.6%; top: 35.5%; width: 26.6%; z-index: 3;"
+        >
+          <img
+            src="/art/enchanted-case-study-device-1152.webp"
+            srcset="/art/enchanted-case-study-device-576.webp 576w, /art/enchanted-case-study-device-1152.webp 1152w"
+            sizes="(max-width: 1280px) 340px, 680px"
+            width="1152"
+            height="577"
+            alt=""
+            loading="eager"
+            decoding="async"
+            class="machine-sprite"
+          />
+          <span class="scene-tooltip" data-placement="top">Arcane Transceiver (GitHub)</span>
+        </button>
+
+        <!-- Hotspot 3: Scribe's Rolltop Desk (Full Resume) -->
+        <button
+          type="button"
+          id="trigger-scribe-desk"
+          class="scene-object scene-hotspot desk-hotspot"
+          aria-label="The Master Scribe's Ledger (Professional Resume)"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-controls="dialog-desk"
+          style="left: 21.0%; top: 50.4%; width: 21.9%; height: 26.6%; z-index: 3;"
+        >
+          <div class="desk-glow-cue" aria-hidden="true"></div>
+          <span class="scene-tooltip" data-placement="top">Scribe's Ledger (Resume)</span>
+        </button>
+
+        <!-- Hotspot 4: Hanging Courier Satchel (Field Status & Coordinates) -->
+        <button
+          type="button"
+          id="trigger-courier-satchel"
+          class="scene-object scene-hotspot satchel-hotspot"
+          aria-label="Courier's Field Satchel (Availability & Coordinates)"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-controls="dialog-satchel"
+          style="left: 14.4%; top: 49.0%; width: 4.7%; height: 21.0%; z-index: 3;"
+        >
+          <div class="satchel-glow-cue" aria-hidden="true"></div>
+          <span class="scene-tooltip" data-placement="bottom">Field Satchel (Status)</span>
+        </button>
+
+        <!-- Hotspot 5: Arched Doorway to Main Tavern -->
+        <a
+          href="/tavern"
+          id="trigger-tavern-door"
+          class="scene-object scene-hotspot door-hotspot"
+          aria-label="Return through the Archway to the Main Tavern"
+          style="left: 80.1%; top: 37.1%; width: 6.0%; height: 35.7%; z-index: 3;"
+        >
+          <div class="door-light-cue" aria-hidden="true"></div>
+          <span class="scene-tooltip" data-placement="left">Main Tavern (Return)</span>
+        </a>
+
+        <!-- Modal Backdrop -->
+        <div id="dialog-backdrop" class="dialog-backdrop" hidden aria-hidden="true"></div>
+
+        <!-- Modal 1: Raven Email Dispatch -->
+        <div
+          id="dialog-raven"
+          class="tavern-panel"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="raven-dialog-title"
+          hidden
+        >
+          <div class="panel-header">
+            <div class="flex items-center gap-3">
+              <span class="panel-badge-icon" aria-hidden="true">
+                <svg class="w-7 h-7 text-[var(--brass)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/>
+                  <line x1="16" y1="8" x2="2" y2="22"/>
+                  <line x1="17.5" y1="15" x2="9" y2="15"/>
+                </svg>
+              </span>
+              <div>
+                <span class="text-xs uppercase font-extrabold tracking-widest text-[var(--ember)]">Priority Dispatch</span>
+                <h2 id="raven-dialog-title" class="text-xl sm:text-2xl font-bold text-[var(--candle)]">Send Word via Email</h2>
+              </div>
+            </div>
+            <button type="button" class="close-panel-btn" aria-label="Close Email Dispatch">&times;</button>
+          </div>
+
+          <div class="panel-body space-y-3.5">
+            <p class="text-sm text-[var(--parchment)]/90 leading-relaxed">
+              Whisper your message into the roost. The messenger raven carries word directly to Nhovem's personal console for project inquiries, full-time engineering roles, and technical consultations.
+            </p>
+
+            <div class="p-3.5 rounded-lg bg-[var(--wood-deep)]/80 border border-[var(--brass)]/50 space-y-2.5">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <span class="text-xs uppercase tracking-wider text-[var(--brass)] font-semibold">Direct Electronic Address</span>
+                <span class="text-xs text-emerald-400 font-mono flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  Active & Monitored
+                </span>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-2 bg-black/40 px-3 py-2 rounded border border-[var(--brass)]/30 font-mono text-sm sm:text-base text-[var(--candle)]">
+                <span class="select-all font-bold flex-1" id="modal-email-address">{mailAddress}</span>
+                <button
+                  type="button"
+                  id="modal-copy-email-btn"
+                  class="text-xs px-3 py-1 bg-[var(--brass)] text-black font-bold rounded hover:bg-[var(--candle)] transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+                  title="Copy email to clipboard"
+                  aria-label="Copy email address"
+                >
+                  Copy
+                </button>
+                <span id="modal-copy-status" class="text-xs text-emerald-400 font-bold hidden" role="status" aria-live="polite">Copied!</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-[var(--parchment)]/80">
+              <div class="p-2.5 rounded bg-black/20 border border-[var(--brass)]/20">
+                <strong class="text-[var(--candle)] block mb-0.5">Turnaround Time</strong>
+                Typically responds within 24–48 hours.
+              </div>
+              <div class="p-2.5 rounded bg-black/20 border border-[var(--brass)]/20">
+                <strong class="text-[var(--candle)] block mb-0.5">Primary Topics</strong>
+                Full-stack roles, UI architecture, contracts.
+              </div>
+            </div>
+          </div>
+
+          <div class="panel-actions">
+            <a
+              href={`mailto:${mailAddress}`}
+              class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-sm rounded hover:bg-[var(--candle)] transition-colors shadow-md"
+            >
+              Compose Missive &rarr;
+            </a>
+            <button type="button" class="close-panel-btn-secondary min-h-[44px] px-4 py-2 text-sm text-[var(--parchment)]/80 hover:text-[var(--candle)]">
+              Return to Roost
+            </button>
+          </div>
+        </div>
+
+        <!-- Modal 2: Arcane Transceiver (GitHub Engineering Record) -->
+        <div
+          id="dialog-machine"
+          class="tavern-panel"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="machine-dialog-title"
+          hidden
+        >
+          <div class="panel-header">
+            <div class="flex items-center gap-3">
+              <span class="panel-badge-icon" aria-hidden="true">
+                <svg class="w-7 h-7 text-[var(--brass)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+              </span>
+              <div>
+                <span class="text-xs uppercase font-extrabold tracking-widest text-[var(--ember)]">Guild Archives</span>
+                <h2 id="machine-dialog-title" class="text-xl sm:text-2xl font-bold text-[var(--candle)]">The Arcane Transceiver</h2>
+              </div>
+            </div>
+            <button type="button" class="close-panel-btn" aria-label="Close Arcane Transceiver">&times;</button>
+          </div>
+
+          <div class="panel-body space-y-2.5">
+            <p class="text-xs sm:text-sm text-[var(--parchment)]/90 leading-relaxed">
+              This brass-and-crystal terminal synchronizes live telemetry from Nhovem's engineering forge. Inspect verified code repositories, TypeScript architecture, and active web experiments.
+            </p>
+
+            <div class="space-y-2">
+              <div class="p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40 hover:border-[var(--brass)] transition-colors">
+                <div class="flex items-center justify-between gap-2 mb-0.5">
+                  <span class="font-bold text-[var(--candle)] font-mono text-xs sm:text-sm">ArcaneTyper</span>
+                  <span class="text-[10px] sm:text-[11px] px-2 py-0.5 rounded bg-[var(--stone)] text-[var(--parchment)] font-mono">TypeScript &bull; Canvas &bull; Audio API</span>
+                </div>
+                <p class="text-[11px] sm:text-xs text-[var(--parchment)]/80 leading-snug">
+                  Gamified typing RPG engine with real-time dynamic sound synthesis, responsive canvas rendering, and zero runtime dependencies.
+                </p>
+              </div>
+
+              <div class="p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40 hover:border-[var(--brass)] transition-colors">
+                <div class="flex items-center justify-between gap-2 mb-0.5">
+                  <span class="font-bold text-[var(--candle)] font-mono text-xs sm:text-sm">BITS — Guild Kiosk</span>
+                  <span class="text-[10px] sm:text-[11px] px-2 py-0.5 rounded bg-[var(--stone)] text-[var(--parchment)] font-mono">Next.js &bull; Tailwind &bull; Analytics</span>
+                </div>
+                <p class="text-[11px] sm:text-xs text-[var(--parchment)]/80 leading-snug">
+                  High-throughput information kiosk and student telemetry dashboard built for rapid search, offline resilience, and accessibility.
+                </p>
+              </div>
+
+              <div class="p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40 hover:border-[var(--brass)] transition-colors">
+                <div class="flex items-center justify-between gap-2 mb-0.5">
+                  <span class="font-bold text-[var(--candle)] font-mono text-xs sm:text-sm">MIMIC — Dossier Explorer</span>
+                  <span class="text-[10px] sm:text-[11px] px-2 py-0.5 rounded bg-[var(--stone)] text-[var(--parchment)] font-mono">React &bull; State Machine &bull; CSS Art</span>
+                </div>
+                <p class="text-[11px] sm:text-xs text-[var(--parchment)]/80 leading-snug">
+                  Interactive state-driven creature inspection tool featuring custom micro-animations and accessibility-first keyboard navigation.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between p-2 rounded bg-black/30 border border-[var(--brass)]/30 text-xs font-mono text-[var(--parchment)]">
+              <span>GitHub Handle: <strong class="text-[var(--candle)]">@IbemCabahug</strong></span>
+              <span class="text-emerald-400">Verified Contributor</span>
+            </div>
+          </div>
+
+          <div class="panel-actions">
+            <a
+              href={githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-sm rounded hover:bg-[var(--candle)] transition-colors shadow-md"
+            >
+              Inspect GitHub Profile &rarr;
+            </a>
+            <button type="button" class="close-panel-btn-secondary min-h-[44px] px-4 py-2 text-sm text-[var(--parchment)]/80 hover:text-[var(--candle)]">
+              Close Transceiver
+            </button>
+          </div>
+        </div>
+
+        <!-- Modal 3: Scribe's Ledger (Professional Resume) -->
+        <div
+          id="dialog-desk"
+          class="tavern-panel"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="desk-dialog-title"
+          hidden
+        >
+          <div class="panel-header">
+            <div class="flex items-center gap-3">
+              <span class="panel-badge-icon" aria-hidden="true">
+                <svg class="w-7 h-7 text-[var(--brass)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" y1="13" x2="8" y2="13"/>
+                  <line x1="16" y1="17" x2="8" y2="17"/>
+                  <polyline points="10 9 9 9 8 9"/>
+                </svg>
+              </span>
+              <div>
+                <span class="text-xs uppercase font-extrabold tracking-widest text-[var(--ember)]">Master Ledger</span>
+                <h2 id="desk-dialog-title" class="text-xl sm:text-2xl font-bold text-[var(--candle)]">The Scribe's Ledger</h2>
+              </div>
+            </div>
+            <button type="button" class="close-panel-btn" aria-label="Close Scribe's Ledger">&times;</button>
+          </div>
+
+          <div class="panel-body space-y-3">
+            <p class="text-xs sm:text-sm text-[var(--parchment)]/90 leading-relaxed">
+              Carefully inscribed under the candlelight rests Nhovem's professional credentials: chronological engineering history, core stack proficiencies, and formal education.
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+              <div class="p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/30">
+                <span class="text-[var(--brass)] uppercase tracking-wider font-extrabold block mb-1">Title & Discipline</span>
+                <strong class="text-[var(--candle)] text-sm block">Full-Stack Developer</strong>
+                <span class="text-[var(--parchment)]/80">Frontend Engineering &bull; UI/UX Systems</span>
+              </div>
+
+              <div class="p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/30">
+                <span class="text-[var(--brass)] uppercase tracking-wider font-extrabold block mb-1">Education</span>
+                <strong class="text-[var(--candle)] text-sm block">B.S. in Information Technology</strong>
+                <span class="text-[var(--parchment)]/80">University Level Degree</span>
+              </div>
+            </div>
+
+            <div class="p-2.5 rounded bg-black/30 border border-[var(--brass)]/30 space-y-1.5">
+              <span class="text-xs uppercase tracking-wider text-[var(--brass)] font-semibold block">Core Arsenal & Weaponry</span>
+              <div class="flex flex-wrap gap-1.5">
+                <span class="px-2 py-0.5 rounded bg-[var(--wood-deep)] border border-[var(--brass)]/40 text-[var(--candle)] text-xs font-mono">TypeScript</span>
+                <span class="px-2 py-0.5 rounded bg-[var(--wood-deep)] border border-[var(--brass)]/40 text-[var(--candle)] text-xs font-mono">React / Next.js</span>
+                <span class="px-2 py-0.5 rounded bg-[var(--wood-deep)] border border-[var(--brass)]/40 text-[var(--candle)] text-xs font-mono">Astro</span>
+                <span class="px-2 py-0.5 rounded bg-[var(--wood-deep)] border border-[var(--brass)]/40 text-[var(--candle)] text-xs font-mono">Node.js</span>
+                <span class="px-2 py-0.5 rounded bg-[var(--wood-deep)] border border-[var(--brass)]/40 text-[var(--candle)] text-xs font-mono">Tailwind CSS</span>
+                <span class="px-2 py-0.5 rounded bg-[var(--wood-deep)] border border-[var(--brass)]/40 text-[var(--candle)] text-xs font-mono">PostgreSQL</span>
+                <span class="px-2 py-0.5 rounded bg-[var(--wood-deep)] border border-[var(--brass)]/40 text-[var(--candle)] text-xs font-mono">REST / GraphQL</span>
+                <span class="px-2 py-0.5 rounded bg-[var(--wood-deep)] border border-[var(--brass)]/40 text-[var(--candle)] text-xs font-mono">Git & CI/CD</span>
+              </div>
+            </div>
+
+            <p class="text-xs text-[var(--parchment)]/80 italic">
+              Formatted for immediate digital review and clean paper print/PDF export with zero styling loss.
+            </p>
+          </div>
+
+          <div class="panel-actions">
+            <a
+              href="/resume"
+              class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-sm rounded hover:bg-[var(--candle)] transition-colors shadow-md"
+            >
+              View Full Web Resume &rarr;
+            </a>
+            <button type="button" class="close-panel-btn-secondary min-h-[44px] px-4 py-2 text-sm text-[var(--parchment)]/80 hover:text-[var(--candle)]">
+              Close Ledger
+            </button>
+          </div>
+        </div>
+
+        <!-- Modal 4: Satchel Status & Coordinates -->
+        <div
+          id="dialog-satchel"
+          class="tavern-panel"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="satchel-dialog-title"
+          hidden
+        >
+          <div class="panel-header">
+            <div class="flex items-center gap-3">
+              <span class="panel-badge-icon" aria-hidden="true">
+                <svg class="w-7 h-7 text-[var(--brass)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+                </svg>
+              </span>
+              <div>
+                <span class="text-xs uppercase font-extrabold tracking-widest text-[var(--ember)]">Field Satchel</span>
+                <h2 id="satchel-dialog-title" class="text-xl sm:text-2xl font-bold text-[var(--candle)]">Coordinates & Availability</h2>
+              </div>
+            </div>
+            <button type="button" class="close-panel-btn" aria-label="Close Field Satchel">&times;</button>
+          </div>
+
+          <div class="panel-body space-y-2.5">
+            <p class="text-xs sm:text-sm text-[var(--parchment)]/90 leading-relaxed">
+              Packed and prepared for long campaigns across realms. The courier's current physical station and deployment status are documented below:
+            </p>
+
+            <div class="space-y-2 text-xs sm:text-sm">
+              <div class="flex items-center justify-between p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40">
+                <span class="text-[var(--brass)] font-semibold">Current Quest Status:</span>
+                <span class="inline-flex items-center gap-1.5 text-emerald-400 font-bold">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                  {profile?.availability || 'Available for New Quests'}
+                </span>
+              </div>
+
+              <div class="flex items-center justify-between p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40">
+                <span class="text-[var(--brass)] font-semibold">Realm Station:</span>
+                <span class="text-[var(--candle)] font-bold">{profile?.location || 'Lapu-Lapu City, Philippines'}</span>
+              </div>
+
+              <div class="flex items-center justify-between p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40">
+                <span class="text-[var(--brass)] font-semibold">Deployment Radius:</span>
+                <span class="text-[var(--candle)]">Remote Worldwide &bull; Hybrid / Relocation</span>
+              </div>
+
+              <div class="flex items-center justify-between p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40">
+                <span class="text-[var(--brass)] font-semibold">Timezone Overlap:</span>
+                <span class="text-[var(--candle)]">UTC+8 (Covers APAC, EMEA, & Americas)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel-actions">
+            <a
+              href={`mailto:${mailAddress}?subject=${encodeURIComponent('Inquiry regarding availability & collaboration')}`}
+              class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-sm rounded hover:bg-[var(--candle)] transition-colors shadow-md"
+            >
+              Dispatch Inquiry to Satchel &rarr;
+            </a>
+            <button type="button" class="close-panel-btn-secondary min-h-[44px] px-4 py-2 text-sm text-[var(--parchment)]/80 hover:text-[var(--candle)]">
+              Close Satchel
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mobile Viewport & No-JS Fallback: Tactile Guild Dispatch Slips Stack -->
+    <section class="narrow-dispatch-stack px-4 max-w-3xl mx-auto space-y-6" aria-label="Dispatch Channels List">
+      <!-- Active Courier Raven flying illustration for mobile -->
+      <div class="text-center mb-6">
+        <div class="relative inline-block mb-3">
+          <div class="absolute -inset-4 bg-[radial-gradient(ellipse_at_center,rgba(213,128,59,0.2)_0%,transparent_70%)] rounded-full blur-md pointer-events-none" aria-hidden="true"></div>
+          <img
+            src="/art/raven-delivering-letter-388.webp"
+            srcset="/art/raven-delivering-letter-388.webp 388w, /art/raven-delivering-letter-776.webp 776w"
+            sizes="(max-width: 640px) 240px, 320px"
+            width="320"
+            height="119"
+            alt="A sleek black messenger raven in flight carrying a sealed parchment letter in its beak"
+            class="relative mx-auto w-56 sm:w-64 h-auto drop-shadow-[0_12px_24px_rgba(0,0,0,0.85)]"
+            loading="lazy"
+          />
+        </div>
+      </div>
+
       <!-- 1. Direct Electronic Dispatch (Email) -->
       <article class="dispatch-slip bg-[var(--parchment)] text-[var(--ink)] p-6 sm:p-7 rounded-lg border-2 border-[var(--brass)] shadow-2xl relative overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(0,0,0,0.6)]">
         <div class="corner-bracket top-left" aria-hidden="true"></div>
         <div class="corner-bracket top-right" aria-hidden="true"></div>
-        
+
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-5">
           <div class="flex-1 pr-2">
             <div class="flex flex-wrap items-center gap-2 mb-2">
@@ -62,28 +492,28 @@ const mailAddress = mailLink?.data.url.replace('mailto:', '') || 'ncabahug223@gm
                 Direct Electronic Raven
               </span>
             </div>
-            
+
             <h2 class="text-2xl font-bold text-[var(--ink)] mb-1 flex items-center gap-2">
               <span>Send Word via Email</span>
             </h2>
-            
+
             <p class="text-sm sm:text-base text-[var(--ink)]/85 mb-3 leading-relaxed">
               Fastest channel for project inquiries, technical roles, or engineering consultations. Direct to Nhovem's personal console.
             </p>
 
             <div class="inline-flex items-center gap-2 text-xs sm:text-sm bg-[var(--wood-deep)]/10 text-[var(--ink)] px-3 py-1.5 rounded border border-[var(--brass)]/40 font-mono">
               <span class="text-[var(--ember)] font-bold">Address:</span>
-              <span class="font-bold select-all" id="email-address">{mailAddress}</span>
+              <span class="font-bold select-all" id="mobile-email-address">{mailAddress}</span>
               <button
                 type="button"
-                id="copy-email-btn"
+                id="mobile-copy-email-btn"
                 class="ml-2 text-xs px-2 py-0.5 bg-[var(--wood-deep)] text-[var(--candle)] rounded hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] cursor-pointer"
                 title="Copy email to clipboard"
                 aria-label="Copy email address to clipboard"
               >
                 Copy
               </button>
-              <span id="copy-status" class="text-xs text-green-700 font-bold ml-1 hidden" role="status" aria-live="polite">Copied!</span>
+              <span id="mobile-copy-status" class="text-xs text-green-700 font-bold ml-1 hidden" role="status" aria-live="polite">Copied!</span>
             </div>
           </div>
 
@@ -130,7 +560,7 @@ const mailAddress = mailLink?.data.url.replace('mailto:', '') || 'ncabahug223@gm
 
           <div class="w-full md:w-auto shrink-0">
             <a
-              href={githubLink?.data.url || 'https://github.com/IbemCabahug'}
+              href={githubUrl}
               target="_blank"
               rel="noopener noreferrer"
               class="inline-flex items-center justify-center min-h-[44px] px-6 py-2.5 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded border border-[var(--brass)] hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 whitespace-nowrap text-center shadow-md w-full md:w-auto"
@@ -180,37 +610,358 @@ const mailAddress = mailLink?.data.url.replace('mailto:', '') || 'ncabahug223@gm
           </div>
         </div>
       </article>
-    </div>
 
-    <!-- Roost Attendant Status -->
-    {profile && (
-      <div class="mt-8 p-5 rounded-lg border border-[var(--brass)]/40 bg-[var(--wood-deep)]/60 text-[var(--parchment)] text-sm leading-relaxed text-center shadow-inner">
-        <p class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
-          <span class="inline-flex items-center gap-1.5 text-[var(--candle)] font-semibold">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-            Availability: {profile.availability}
-          </span>
-          <span class="text-[var(--parchment)]/50">&bull;</span>
-          <span>Stationed in: <strong class="text-[var(--parchment)]">{profile.location}</strong></span>
-          <span class="text-[var(--parchment)]/50">&bull;</span>
-          <span class="text-[var(--parchment)]/80">Open to Remote & Global Work</span>
-        </p>
+      <!-- 4. Roost Attendant Status -->
+      {profile && (
+        <div class="p-5 rounded-lg border border-[var(--brass)]/40 bg-[var(--wood-deep)]/60 text-[var(--parchment)] text-sm leading-relaxed text-center shadow-inner">
+          <p class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+            <span class="inline-flex items-center gap-1.5 text-[var(--candle)] font-semibold">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+              Availability: {profile.availability}
+            </span>
+            <span class="text-[var(--parchment)]/50">&bull;</span>
+            <span>Stationed in: <strong class="text-[var(--parchment)]">{profile.location}</strong></span>
+            <span class="text-[var(--parchment)]/50">&bull;</span>
+            <span class="text-[var(--parchment)]/80">Open to Remote & Global Work</span>
+          </p>
+        </div>
+      )}
+
+      <!-- 5. Physical Return to Main Tavern -->
+      <div class="pt-4 text-center">
+        <a
+          href="/tavern"
+          class="inline-flex items-center justify-center min-h-[44px] px-8 py-3 border-2 border-[var(--brass)] bg-[var(--wood-deep)]/80 text-[var(--parchment)] font-bold text-base rounded-md hover:bg-[var(--parchment)] hover:text-[var(--wood-deep)] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[var(--candle)] shadow-lg hover:shadow-[0_0_15px_rgba(213,128,59,0.4)]"
+        >
+          &larr; Step back through the Archway to Main Tavern
+        </a>
       </div>
-    )}
-
-    <!-- Physical Return to Main Tavern -->
-    <div class="mt-12 text-center">
-      <a
-        href="/tavern"
-        class="inline-flex items-center justify-center min-h-[44px] px-8 py-3 border-2 border-[var(--brass)] bg-[var(--wood-deep)]/80 text-[var(--parchment)] font-bold text-base rounded-md hover:bg-[var(--parchment)] hover:text-[var(--wood-deep)] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[var(--candle)] shadow-lg hover:shadow-[0_0_15px_rgba(213,128,59,0.4)]"
-      >
-        &larr; Step back through the Archway to Main Tavern
-      </a>
-    </div>
+    </section>
   </div>
 </TavernLayout>
 
 <style>
+  body, html {
+    background-color: var(--wood-deep, #1a1005);
+  }
+
+  .roost-page-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 2.5rem;
+  }
+
+  /* 2.5D Room Scene Container */
+  .scene-container {
+    position: relative;
+    container-type: inline-size;
+    width: 100%;
+    max-width: 2560px;
+    margin: 0 auto 2rem auto;
+    overflow: hidden;
+    background-color: var(--wood-deep, #1a1005);
+    border-radius: 8px;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 0, 0, 0.6);
+  }
+
+  .scene-background {
+    display: block;
+    width: 100%;
+    height: auto;
+    user-select: none;
+  }
+
+  .scene-overlay {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Generic scene hotspot button & anchor */
+  .scene-object {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    outline: none;
+  }
+
+  /* Minimum 44x44px touch target guarantee */
+  .scene-object::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .scene-object img {
+    display: block;
+    width: 100%;
+    height: auto;
+    pointer-events: none;
+    transition: filter 0.25s ease-out, transform 0.25s ease-out;
+  }
+
+  /* Sprite Hotspot Glow on Hover / Focus */
+  .scene-object:is(:hover, :focus-visible) img {
+    filter: brightness(1.16)
+      drop-shadow(0 0 4px rgba(255, 228, 160, 0.95))
+      drop-shadow(0 0 14px rgba(213, 128, 59, 0.75))
+      drop-shadow(0 0 24px rgba(213, 128, 59, 0.45));
+    transform: scale(1.025);
+  }
+
+  .scene-object:focus-visible {
+    outline: 2px solid rgba(255, 215, 130, 0.8);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  .scene-object:active img {
+    filter: brightness(1.22)
+      drop-shadow(0 0 6px rgba(255, 228, 160, 1))
+      drop-shadow(0 0 16px rgba(213, 128, 59, 0.85));
+    transform: scale(0.98);
+  }
+
+  /* In-world tooltips (Dual labels: Fantasy Name + Functional Action) */
+  .scene-tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: var(--wood-deep, #1a1005);
+    border: 1px solid #d5803b;
+    color: #e6d3a8;
+    padding: 5px 11px;
+    font-size: clamp(0.6rem, 0.9cqw, 0.8125rem);
+    font-weight: 600;
+    border-radius: 4px;
+    white-space: nowrap;
+    opacity: 0.95;
+    z-index: 20;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.75);
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+  }
+
+  .scene-object:is(:hover, :focus-visible) .scene-tooltip {
+    opacity: 1;
+    border-color: #ffd782;
+    color: #fff;
+    box-shadow: 0 0 12px rgba(213, 128, 59, 0.6);
+  }
+
+  .scene-tooltip[data-placement="top"] {
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .scene-tooltip[data-placement="bottom"] {
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .scene-tooltip[data-placement="left"] {
+    right: calc(100% + 8px);
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .scene-tooltip[data-placement="right"] {
+    left: calc(100% + 8px);
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  /* Environmental Aura Cue for Painted Scribe Desk */
+  .desk-glow-cue {
+    position: absolute;
+    inset: 0;
+    border-radius: 8px;
+    opacity: 0;
+    transition: opacity 0.3s ease-out, box-shadow 0.3s ease-out;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 65% 30%, rgba(255, 215, 130, 0.3) 0%, rgba(213, 128, 59, 0.16) 50%, transparent 80%);
+    border: 1.5px solid rgba(255, 215, 130, 0.4);
+  }
+  .desk-hotspot:is(:hover, :focus-visible) .desk-glow-cue {
+    opacity: 1;
+    box-shadow: 0 0 24px rgba(255, 215, 130, 0.4), inset 0 0 16px rgba(213, 128, 59, 0.25);
+  }
+
+  /* Environmental Aura Cue for Painted Satchel */
+  .satchel-glow-cue {
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+    opacity: 0;
+    transition: opacity 0.3s ease-out, box-shadow 0.3s ease-out;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 50% 40%, rgba(255, 215, 130, 0.26) 0%, rgba(213, 128, 59, 0.14) 60%, transparent 85%);
+    border: 1.5px solid rgba(255, 215, 130, 0.4);
+  }
+  .satchel-hotspot:is(:hover, :focus-visible) .satchel-glow-cue {
+    opacity: 1;
+    box-shadow: 0 0 18px rgba(255, 215, 130, 0.4);
+  }
+
+  /* Environmental Lighting Cue for Return Doorway to Tavern */
+  .door-hotspot {
+    border-radius: 36px 36px 0 0;
+  }
+  .door-light-cue {
+    position: absolute;
+    inset: 0;
+    border-radius: 36px 36px 0 0;
+    opacity: 0;
+    transition: opacity 0.3s ease-out, box-shadow 0.3s ease-out;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 50% 30%, rgba(255, 215, 130, 0.26) 0%, rgba(213, 128, 59, 0.14) 55%, transparent 85%);
+    border: 1.5px solid rgba(255, 215, 130, 0.45);
+    border-bottom: none;
+  }
+  .door-hotspot:is(:hover, :focus-visible) .door-light-cue {
+    opacity: 1;
+    box-shadow: 0 0 24px rgba(255, 215, 130, 0.4), inset 0 0 16px rgba(213, 128, 59, 0.25);
+  }
+
+  /* Dialog Backdrop */
+  .dialog-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(8, 5, 2, 0.72);
+    backdrop-filter: blur(2.5px);
+    z-index: 40;
+    cursor: pointer;
+  }
+  .dialog-backdrop[hidden] {
+    display: none !important;
+  }
+
+  /* Modals / Tavern Panels */
+  .tavern-panel {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: min(92%, 620px);
+    max-height: 88%;
+    overflow-y: auto;
+    background: rgba(22, 14, 7, 0.97);
+    border: 2px solid var(--brass, #8b6b4a);
+    border-radius: 12px;
+    color: #fdf6e3;
+    padding: 24px 28px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9), 0 0 24px rgba(213, 128, 59, 0.25);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .tavern-panel[hidden] {
+    display: none !important;
+  }
+
+  @keyframes modalPop {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -46%) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  /* Modal Custom Scrollbar */
+  .tavern-panel::-webkit-scrollbar {
+    width: 8px;
+  }
+  .tavern-panel::-webkit-scrollbar-track {
+    background: rgba(15, 10, 5, 0.8);
+    border-radius: 4px;
+  }
+  .tavern-panel::-webkit-scrollbar-thumb {
+    background: #8b6b4a;
+    border-radius: 4px;
+    border: 1px solid #d5803b;
+  }
+  .tavern-panel::-webkit-scrollbar-thumb:hover {
+    background: #d5803b;
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 1px solid rgba(213, 128, 59, 0.3);
+    padding-bottom: 12px;
+  }
+
+  .panel-badge-icon {
+    font-size: 1.75rem;
+    line-height: 1;
+  }
+
+  .close-panel-btn {
+    background: transparent;
+    border: 1px solid rgba(213, 128, 59, 0.4);
+    color: var(--candle, #fdf6e3);
+    font-size: 1.5rem;
+    line-height: 1;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .close-panel-btn:hover {
+    background: rgba(213, 128, 59, 0.2);
+    border-color: #ffd782;
+  }
+
+  .panel-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    border-top: 1px solid rgba(213, 128, 59, 0.25);
+    padding-top: 14px;
+    margin-top: 4px;
+  }
+
+  .close-panel-btn-secondary {
+    background: transparent;
+    border: 1px solid rgba(213, 128, 59, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.15s, color 0.15s;
+  }
+  .close-panel-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--brass);
+  }
+
+  /* Hotspots disabled when dialog is open */
+  .disabled-by-dialog {
+    pointer-events: none;
+  }
+  .disabled-by-dialog .scene-tooltip {
+    opacity: 0 !important;
+  }
+
   /* Corner brass brackets for authentic RPG dispatch slip aesthetics */
   .dispatch-slip {
     position: relative;
@@ -233,40 +984,212 @@ const mailAddress = mailLink?.data.url.replace('mailto:', '') || 'ncabahug223@gm
     border-top: 2px solid var(--brass);
     border-right: 2px solid var(--brass);
   }
+
+  /* Responsive Display Rules */
+  /* On desktop & tablet (>= 769px), scene is visible; stack is secondary */
+  @media (min-width: 769px) {
+    .scene-container {
+      display: block;
+    }
+    .narrow-dispatch-stack {
+      display: none;
+    }
+  }
+
+  /* On narrow screens (< 769px), show tactile cards stack, hide 2.5D canvas */
+  @media (max-width: 768px) {
+    .scene-container {
+      display: none;
+    }
+    .narrow-dispatch-stack {
+      display: block;
+    }
+  }
+
+  /* Reduced Motion */
+  @media (prefers-reduced-motion: reduce) {
+    .scene-tooltip,
+    .scene-object img,
+    .desk-glow-cue,
+    .satchel-glow-cue,
+    .door-light-cue,
+    .tavern-panel {
+      transition: none !important;
+      animation: none !important;
+    }
+    .scene-object:is(:hover, :focus-visible) img {
+      transform: none !important;
+    }
+  }
+
+  :root[data-motion="reduced"] .scene-tooltip,
+  :root[data-motion="reduced"] .scene-object img,
+  :root[data-motion="reduced"] .desk-glow-cue,
+  :root[data-motion="reduced"] .satchel-glow-cue,
+  :root[data-motion="reduced"] .door-light-cue,
+  :root[data-motion="reduced"] .tavern-panel {
+    transition: none !important;
+    animation: none !important;
+  }
+  :root[data-motion="reduced"] .scene-object:is(:hover, :focus-visible) img {
+    transform: none !important;
+  }
 </style>
 
 <script>
-  // Quick copy-to-clipboard for the email address with visual feedback
-  const copyBtn = document.getElementById('copy-email-btn');
-  const emailSpan = document.getElementById('email-address');
-  const copyStatus = document.getElementById('copy-status');
+  // Interactive Scene Hotspots and Modal Management
+  const triggers = [
+    { triggerId: 'trigger-perch-raven', dialogId: 'dialog-raven' },
+    { triggerId: 'trigger-arcane-machine', dialogId: 'dialog-machine' },
+    { triggerId: 'trigger-scribe-desk', dialogId: 'dialog-desk' },
+    { triggerId: 'trigger-courier-satchel', dialogId: 'dialog-satchel' }
+  ];
 
-  if (copyBtn && emailSpan && copyStatus) {
-    copyBtn.addEventListener('click', async () => {
-      const email = emailSpan.textContent?.trim() || 'ncabahug223@gmail.com';
+  const backdrop = document.getElementById('dialog-backdrop');
+  const sceneObjects = document.querySelectorAll('.scene-object');
+  let activeDialog: HTMLElement | null = null;
+  let activeTrigger: HTMLElement | null = null;
+
+  function getFocusableElements(el: HTMLElement): HTMLElement[] {
+    return Array.from(el.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'));
+  }
+
+  function openDialog(dialog: HTMLElement, trigger: HTMLElement) {
+    // Disable background scene objects for screen readers and tab navigation
+    sceneObjects.forEach((el) => {
+      el.classList.add('disabled-by-dialog');
+      el.setAttribute('tabindex', '-1');
+    });
+
+    if (backdrop) {
+      backdrop.hidden = false;
+      backdrop.setAttribute('aria-hidden', 'false');
+    }
+
+    dialog.hidden = false;
+    dialog.setAttribute('aria-hidden', 'false');
+    trigger.setAttribute('aria-expanded', 'true');
+    activeDialog = dialog;
+    activeTrigger = trigger;
+
+    const focusables = getFocusableElements(dialog);
+    if (focusables.length) {
+      focusables[0].focus();
+    }
+
+    document.addEventListener('keydown', handleKeydown);
+  }
+
+  function closeDialog() {
+    if (!activeDialog) return;
+
+    sceneObjects.forEach((el) => {
+      el.classList.remove('disabled-by-dialog');
+      el.removeAttribute('tabindex');
+    });
+
+    if (backdrop) {
+      backdrop.hidden = true;
+      backdrop.setAttribute('aria-hidden', 'true');
+    }
+
+    activeDialog.hidden = true;
+    activeDialog.setAttribute('aria-hidden', 'true');
+
+    if (activeTrigger) {
+      activeTrigger.setAttribute('aria-expanded', 'false');
+      activeTrigger.focus();
+    }
+
+    activeDialog = null;
+    activeTrigger = null;
+    document.removeEventListener('keydown', handleKeydown);
+  }
+
+  function handleKeydown(e: KeyboardEvent) {
+    if (e.key === 'Escape') {
+      closeDialog();
+      return;
+    }
+    if (e.key === 'Tab' && activeDialog) {
+      const focusables = getFocusableElements(activeDialog);
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+  }
+
+  // Bind trigger buttons to their respective modals
+  triggers.forEach(({ triggerId, dialogId }) => {
+    const trigger = document.getElementById(triggerId);
+    const dialog = document.getElementById(dialogId);
+    if (trigger && dialog) {
+      trigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        openDialog(dialog, trigger);
+      });
+    }
+  });
+
+  // Bind all close buttons inside panels
+  document.querySelectorAll('.close-panel-btn, .close-panel-btn-secondary').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeDialog();
+    });
+  });
+
+  // Clicking backdrop closes active dialog
+  if (backdrop) {
+    backdrop.addEventListener('click', () => {
+      closeDialog();
+    });
+  }
+
+  // Copy Email Address helper function
+  function setupCopyButton(btnId: string, textId: string, statusId: string) {
+    const btn = document.getElementById(btnId);
+    const textEl = document.getElementById(textId);
+    const statusEl = document.getElementById(statusId);
+
+    if (!btn || !textEl || !statusEl) return;
+
+    btn.addEventListener('click', async () => {
+      const text = textEl.textContent?.trim() || 'ncabahug223@gmail.com';
       try {
-        await navigator.clipboard.writeText(email);
-        copyStatus.classList.remove('hidden');
-        copyBtn.textContent = 'Copied!';
-        setTimeout(() => {
-          copyStatus.classList.add('hidden');
-          copyBtn.textContent = 'Copy';
-        }, 2500);
-      } catch (err) {
-        // Fallback for non-secure contexts
+        await navigator.clipboard.writeText(text);
+      } catch {
         const textarea = document.createElement('textarea');
-        textarea.value = email;
+        textarea.value = text;
         document.body.appendChild(textarea);
         textarea.select();
         document.execCommand('copy');
         document.body.removeChild(textarea);
-        copyStatus.classList.remove('hidden');
-        copyBtn.textContent = 'Copied!';
-        setTimeout(() => {
-          copyStatus.classList.add('hidden');
-          copyBtn.textContent = 'Copy';
-        }, 2500);
       }
+
+      statusEl.classList.remove('hidden');
+      const originalText = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => {
+        statusEl.classList.add('hidden');
+        btn.textContent = originalText;
+      }, 2500);
     });
   }
+
+  // Setup copy buttons for both modal and mobile fallback
+  setupCopyButton('modal-copy-email-btn', 'modal-email-address', 'modal-copy-status');
+  setupCopyButton('mobile-copy-email-btn', 'mobile-email-address', 'mobile-copy-status');
 </script>
