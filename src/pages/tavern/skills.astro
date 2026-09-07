@@ -1,7 +1,97 @@
 ---
 import TavernLayout from '../../layouts/TavernLayout.astro';
+import { getCollection } from 'astro:content';
+
+const skillsEntries = await getCollection('skills');
+const skills = skillsEntries.map(entry => entry.data);
+
+const levelMap: Record<string, number> = {
+  learning: 1,
+  working: 2,
+  confident: 3
+};
 ---
 
-<TavernLayout title="/tavern/skills" description="Tavern skills placeholder page" location="skills">
-  <h1>/tavern/skills</h1>
+<TavernLayout
+  title="Adventurer's Badge & Skills — Nhovem Cabahug"
+  description="Technical skills, arsenal, and proficiencies of Nhovem Cabahug."
+  location="skills"
+>
+  <div class="max-w-3xl mx-auto py-4">
+    <div class="mb-6">
+      <a
+        href="/tavern"
+        class="inline-flex items-center min-h-[44px] text-sm font-semibold text-[var(--candle)] underline hover:text-[var(--parchment)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+      >
+        &larr; Return to Main Tavern
+      </a>
+    </div>
+
+    <article class="bg-[var(--parchment)] text-[var(--ink)] p-6 sm:p-10 rounded shadow-2xl border-2 border-[var(--brass)]">
+      <header class="flex items-center gap-4 border-b-2 border-[var(--brass)] pb-6 mb-8">
+        <img
+          src="/art/adventurers-badge-384.webp"
+          alt=""
+          aria-hidden="true"
+          width="56"
+          height="68"
+          class="drop-shadow"
+        />
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-bold text-[var(--ink)]">
+            Skills & Arsenal
+          </h1>
+          <p class="text-sm text-[var(--ink)]/80 mt-1">
+            Recorded proficiencies and weapons of craft. Evaluated by working experience and production delivery.
+          </p>
+        </div>
+      </header>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-10">
+        {skills.map((group) => (
+          <section class="border border-[var(--brass)]/40 p-4 rounded bg-[var(--parchment)]">
+            <h2 class="text-lg font-bold text-[var(--ink)] border-b border-[var(--brass)]/30 pb-2 mb-4">
+              {group.category}
+            </h2>
+            <ul class="space-y-3">
+              {group.items.map((item) => (
+                <li class="flex items-center justify-between text-sm">
+                  <span class="font-semibold text-[var(--ink)]">{item.name}</span>
+                  <div class="flex items-center gap-2">
+                    <span
+                      class="inline-flex gap-1"
+                      role="img"
+                      aria-label={`${item.name}, ${item.level}, ${levelMap[item.level]} of 3`}
+                    >
+                      <span class={`w-2.5 h-2.5 rounded-sm border border-[var(--brass)] ${levelMap[item.level] >= 1 ? 'bg-[var(--brass)]' : 'bg-transparent'}`}></span>
+                      <span class={`w-2.5 h-2.5 rounded-sm border border-[var(--brass)] ${levelMap[item.level] >= 2 ? 'bg-[var(--brass)]' : 'bg-transparent'}`}></span>
+                      <span class={`w-2.5 h-2.5 rounded-sm border border-[var(--brass)] ${levelMap[item.level] >= 3 ? 'bg-[var(--brass)]' : 'bg-transparent'}`}></span>
+                    </span>
+                    <span class="text-xs uppercase tracking-wider text-[var(--ink)]/70 w-16 text-right">
+                      {item.level}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
+      </div>
+
+      <footer class="pt-6 border-t border-[var(--brass)]/30 flex justify-between items-center text-sm font-semibold">
+        <a
+          href="/quests"
+          class="inline-flex items-center min-h-[44px] text-[var(--ember)] underline hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+        >
+          View projects built with these skills &rarr;
+        </a>
+        <a
+          href="/tavern"
+          class="inline-flex items-center min-h-[44px] px-4 py-2 bg-[var(--wood-deep)] text-[var(--candle)] font-bold rounded hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+        >
+          Back to Tavern
+        </a>
+      </footer>
+    </article>
+  </div>
 </TavernLayout>

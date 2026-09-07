@@ -1,8 +1,90 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getEntry } from 'astro:content';
+
+const profileEntry = await getEntry('profile', 'main');
+const profile = profileEntry?.data;
 ---
 
-<BaseLayout title="/about" description="About placeholder page">
-  <h1>/about</h1>
-  <p>I develop with AI assistance. I review, test and make the architectural decisions myself.</p>
+<BaseLayout
+  title="About Nhovem Cabahug — Web Developer"
+  description="Background, philosophy, and engineering methods of Nhovem Cabahug."
+>
+  <div class="min-h-screen bg-[var(--wood-deep)] text-[var(--parchment)] p-4 sm:p-8 flex justify-center">
+    <article class="w-full max-w-3xl bg-[var(--parchment)] text-[var(--ink)] p-6 sm:p-12 shadow-2xl rounded border-2 border-[var(--brass)] my-4">
+      <header class="border-b-2 border-[var(--brass)] pb-6 mb-8">
+        <h1 class="text-3xl sm:text-4xl font-bold text-[var(--ink)] mb-2">
+          About Nhovem Cabahug
+        </h1>
+        <p class="text-lg font-semibold text-[var(--ember)]">
+          Web Developer &bull; Accessible Systems &bull; Rigorous Engineering
+        </p>
+      </header>
+
+      <div class="space-y-6 text-base leading-relaxed text-[var(--ink)] max-w-[70ch]">
+        <section>
+          <h2 class="text-xl font-bold text-[var(--ink)] mb-2 border-b border-[var(--brass)]/30 pb-1">
+            Engineering Philosophy
+          </h2>
+          <p>
+            I develop with AI assistance. I review, test, and make the architectural decisions myself.
+          </p>
+          <p class="mt-2">
+            AI handles high-velocity iteration and initial scaffolding, while I hold the line on correctness, accessibility contracts, and verifiable execution evidence. A claim is never accepted as fact without measurable output.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-xl font-bold text-[var(--ink)] mb-2 border-b border-[var(--brass)]/30 pb-1">
+            Background & Experience
+          </h2>
+          <p>
+            Based in {profile?.location || 'the Philippines'}, I specialize in building resilient web applications using modern TypeScript and standards-driven architectures.
+          </p>
+          <p class="mt-2">
+            Recently, I contributed to the production attendance system <strong>BITS (Biometric Integrated Tracking System)</strong>, collaborating with a team of eight to engineer the overtime check-in pipelines, split-shift attendance reconciliation, and real-time dashboard events linked to physical ZKTeco biometric hardware.
+          </p>
+          <p class="mt-2">
+            Independently, I designed and shipped <strong>Arcane Typer</strong>, a real-time multiplayer browser typing game with custom HTML5 Canvas rendering, audio synthesis, and live Supabase duels, as well as <strong>Mimic</strong>, a social deduction party game featuring an on-device AES-256 encrypted personal safe.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-xl font-bold text-[var(--ink)] mb-2 border-b border-[var(--brass)]/30 pb-1">
+            Why the Tavern?
+          </h2>
+          <p>
+            The tavern theme represents my belief that software can be deeply atmospheric, playful, and expressive without sacrificing accessibility, performance, or semantic standards.
+          </p>
+          <p class="mt-2">
+            Every page in this project is built to satisfy strict performance and WCAG contrast budgets, operates seamlessly with zero JavaScript, and respects OS-level motion and contrast preferences.
+          </p>
+        </section>
+      </div>
+
+      <footer class="mt-10 pt-6 border-t-2 border-[var(--brass)] flex flex-wrap gap-4 items-center justify-between">
+        <div class="flex flex-wrap gap-3">
+          <a
+            href="/tavern"
+            class="inline-flex items-center min-h-[44px] px-5 py-2 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+          >
+            Enter the Tavern &rarr;
+          </a>
+          <a
+            href="/quests"
+            class="inline-flex items-center min-h-[44px] px-5 py-2 border-2 border-[var(--wood-deep)] text-[var(--wood-deep)] font-bold text-sm rounded hover:bg-[var(--wood-deep)] hover:text-[var(--parchment)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+          >
+            View Projects &rarr;
+          </a>
+        </div>
+
+        <a
+          href="/resume"
+          class="inline-flex items-center min-h-[44px] text-sm font-semibold underline text-[var(--ink)] hover:text-[var(--ember)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+        >
+          View Full Résumé
+        </a>
+      </footer>
+    </article>
+  </div>
 </BaseLayout>

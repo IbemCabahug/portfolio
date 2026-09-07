@@ -1,7 +1,104 @@
 ---
 import TavernLayout from '../layouts/TavernLayout.astro';
+import { getCollection, getEntry } from 'astro:content';
+
+const links = await getCollection('links');
+const profileEntry = await getEntry('profile', 'main');
+const profile = profileEntry?.data;
 ---
 
-<TavernLayout title="/messenger" description="Messenger placeholder page" location="messenger">
-  <h1>/messenger</h1>
+<TavernLayout
+  title="Messenger's Corner — Nhovem Cabahug"
+  description="Send a raven or inspect guild records to get in touch with Nhovem Cabahug."
+  location="messenger"
+>
+  <div class="max-w-2xl mx-auto py-4">
+    <header class="text-center mb-10">
+      <div class="inline-block relative mb-4">
+        <img
+          src="/art/raven-delivering-letter-388.webp"
+          srcset="/art/raven-delivering-letter-388.webp 388w, /art/raven-delivering-letter-776.webp 776w"
+          sizes="(max-width: 640px) 160px, 200px"
+          width="200"
+          height="228"
+          alt=""
+          aria-hidden="true"
+          class="mx-auto drop-shadow-lg"
+          loading="eager"
+        />
+      </div>
+
+      <h1 class="text-3xl sm:text-4xl font-bold text-[var(--candle)] mb-3 tracking-wide">
+        Messenger's Corner
+      </h1>
+      <p class="text-base sm:text-lg text-[var(--parchment)]/90 max-w-lg mx-auto leading-relaxed">
+        The tavern roost is attended day and night. Choose a channel below to send word, inspect public records, or request an interview.
+      </p>
+    </header>
+
+    <div class="space-y-6">
+      {links.map((link) => (
+        <article class="bg-[var(--parchment)] text-[var(--ink)] p-6 rounded border-2 border-[var(--brass)] shadow-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-transform hover:-translate-y-0.5">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-xs uppercase font-bold tracking-widest text-[var(--ember)]">
+                {link.data.label}
+              </span>
+            </div>
+            <h2 class="text-xl font-bold text-[var(--ink)]">
+              {link.data.plainLabel}
+            </h2>
+            <p class="text-sm text-[var(--ink)]/80 mt-1">
+              {link.data.icon === 'mail' ? 'Direct electronic dispatch. Replies typically sent within 24 to 48 hours.' : 'Public codebase history, contributions, and verified repositories.'}
+            </p>
+          </div>
+
+          <a
+            href={link.data.url}
+            class="inline-flex items-center justify-center min-h-[44px] px-6 py-2.5 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded border border-[var(--brass)] hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 whitespace-nowrap self-stretch sm:self-auto text-center"
+          >
+            {link.data.icon === 'mail' ? 'Send Email' : 'Open GitHub'} &rarr;
+          </a>
+        </article>
+      ))}
+
+      <article class="bg-[var(--parchment)] text-[var(--ink)] p-6 rounded border-2 border-[var(--brass)] shadow-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-transform hover:-translate-y-0.5">
+        <div>
+          <span class="text-xs uppercase font-bold tracking-widest text-[var(--ember)]">
+            Formal Ledger
+          </span>
+          <h2 class="text-xl font-bold text-[var(--ink)]">
+            Full Résumé
+          </h2>
+          <p class="text-sm text-[var(--ink)]/80 mt-1">
+            Complete work experience, education, and technical background rendered for print and PDF.
+          </p>
+        </div>
+
+        <a
+          href="/resume"
+          class="inline-flex items-center justify-center min-h-[44px] px-6 py-2.5 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded border border-[var(--brass)] hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 whitespace-nowrap self-stretch sm:self-auto text-center"
+        >
+          View Résumé &rarr;
+        </a>
+      </article>
+    </div>
+
+    {profile && (
+      <div class="mt-8 p-5 rounded border border-[var(--brass)]/40 bg-[var(--stone)]/40 text-[var(--parchment)] text-sm leading-relaxed text-center">
+        <p>
+          Current status: <strong class="text-[var(--candle)]">{profile.availability}</strong>. Located in {profile.location}.
+        </p>
+      </div>
+    )}
+
+    <div class="mt-12 text-center">
+      <a
+        href="/tavern"
+        class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 border-2 border-[var(--brass)] text-[var(--parchment)] font-semibold rounded hover:bg-[var(--parchment)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+      >
+        &larr; Return to Main Tavern
+      </a>
+    </div>
+  </div>
 </TavernLayout>

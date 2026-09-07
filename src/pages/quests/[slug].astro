@@ -14,43 +14,119 @@ const { entry } = Astro.props;
 const { Content } = await render(entry);
 ---
 
-<TavernLayout title={entry.data.title} description={entry.data.summary || ''} location="quests">
-  <h1>{entry.data.title}</h1>
+<TavernLayout title={`${entry.data.title} — Nhovem Cabahug`} description={entry.data.summary || ''} location="quests">
+  <div class="max-w-3xl mx-auto py-4">
+    <nav class="mb-6">
+      <a
+        href="/quests"
+        class="inline-flex items-center min-h-[44px] text-sm font-semibold text-[var(--candle)] underline hover:text-[var(--parchment)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+      >
+        &larr; Back to Quest Board
+      </a>
+    </nav>
 
-  <dl>
-    {entry.data.summary && (
-      <>
-        <dt>Summary</dt>
-        <dd>{entry.data.summary}</dd>
-      </>
-    )}
+    <article class="bg-[var(--parchment)] text-[var(--ink)] p-6 sm:p-10 rounded shadow-2xl border-2 border-[var(--brass)]">
+      <header class="border-b-2 border-[var(--brass)] pb-6 mb-8">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+          <span class={`text-xs uppercase font-bold tracking-wider px-2.5 py-1 rounded ${entry.data.status === 'Shipped' ? 'bg-[var(--wood-deep)] text-[var(--candle)]' : 'bg-[var(--stone)] text-[var(--parchment)]'}`}>
+            {entry.data.status}
+          </span>
+          <span class="text-sm font-semibold italic text-[var(--ink)]/80">
+            Role: {entry.data.role}
+          </span>
+        </div>
 
-    <dt>Role</dt>
-    <dd>{entry.data.role}</dd>
+        <h1 class="text-2xl sm:text-3xl font-bold text-[var(--ink)] mb-4 leading-tight">
+          {entry.data.title}
+        </h1>
 
-    <dt>Status</dt>
-    <dd>{entry.data.status}</dd>
+        {entry.data.summary && (
+          <p class="text-base text-[var(--ink)]/90 leading-relaxed max-w-[70ch] mb-6">
+            {entry.data.summary}
+          </p>
+        )}
 
-    <dt>Stack</dt>
-    <dd>{entry.data.stack.join(', ')}</dd>
+        <div class="mb-6">
+          <strong class="text-xs uppercase tracking-wider text-[var(--ink)]/80 block mb-2">Technologies</strong>
+          <ul class="flex flex-wrap gap-2" aria-label="Tech stack">
+            {entry.data.stack.map((tech: string) => (
+              <li class="text-xs font-semibold px-2.5 py-1 border border-[var(--brass)] bg-[var(--parchment)] rounded">
+                {tech}
+              </li>
+            ))}
+          </ul>
+        </div>
 
-    {entry.data.liveUrl && (
-      <>
-        <dt>Live URL</dt>
-        <dd><a href={entry.data.liveUrl}>{entry.data.liveUrl}</a></dd>
-      </>
-    )}
+        <div class="flex flex-wrap gap-4">
+          {entry.data.liveUrl && (
+            <a
+              href={entry.data.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center justify-center min-h-[44px] px-5 py-2 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+            >
+              Launch Live Application &rarr;
+            </a>
+          )}
+          {entry.data.sourceUrl && (
+            <a
+              href={entry.data.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center justify-center min-h-[44px] px-5 py-2 border-2 border-[var(--wood-deep)] text-[var(--wood-deep)] font-bold text-sm rounded hover:bg-[var(--wood-deep)] hover:text-[var(--parchment)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+            >
+              View Repository &rarr;
+            </a>
+          )}
+        </div>
+      </header>
 
-    {entry.data.sourceUrl && (
-      <>
-        <dt>Source URL</dt>
-        <dd><a href={entry.data.sourceUrl}>{entry.data.sourceUrl}</a></dd>
-      </>
-    )}
+      <div class="quest-case-study prose max-w-none text-[var(--ink)]">
+        <Content />
+      </div>
 
-  </dl>
-
-  <Content />
-
-  <a href="/quests">Back to all quests</a>
+      <footer class="mt-12 pt-6 border-t border-[var(--brass)]/40 flex justify-between items-center">
+        <a
+          href="/quests"
+          class="inline-flex items-center min-h-[44px] px-4 py-2 bg-[var(--wood-deep)] text-[var(--candle)] font-semibold text-sm rounded hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+        >
+          &larr; All Quests
+        </a>
+        <a
+          href="/tavern"
+          class="inline-flex items-center min-h-[44px] px-4 py-2 border border-[var(--brass)] text-[var(--ink)] font-semibold text-sm rounded hover:bg-[var(--brass)]/10 transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+        >
+          Tavern &rarr;
+        </a>
+      </footer>
+    </article>
+  </div>
 </TavernLayout>
+
+<style is:global>
+  .quest-case-study h2 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(168, 122, 39, 0.3);
+    padding-bottom: 0.25rem;
+    color: var(--ink);
+  }
+  .quest-case-study p {
+    margin-bottom: 1rem;
+    line-height: 1.7;
+    max-width: 70ch;
+  }
+  .quest-case-study ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    margin-bottom: 1.25rem;
+    space-y: 0.5rem;
+  }
+  .quest-case-study li {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+    max-width: 68ch;
+  }
+</style>

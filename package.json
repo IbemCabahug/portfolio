@@ -23,7 +23,8 @@
     "serve:dist": "node scripts/serve-dist.mjs",
     "measure:fields": "node scripts/report-layout.mjs",
     "resume:pdf": "node scripts/render-resume-pdf.mjs",
-    "a11y": "node scripts/lighthouse-run.mjs"
+    "a11y": "node scripts/lighthouse-run.mjs",
+    "audit:b9": "node scripts/audit-border-contrast.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^7.0.8",
