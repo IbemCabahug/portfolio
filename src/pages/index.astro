@@ -24,53 +24,79 @@ const featuredProjects = allProjects.sort((a, b) => a.data.order - b.data.order)
       <div class="absolute inset-0 bg-gradient-to-b from-[#140c05]/80 via-[#1e1208]/90 to-[var(--wood-deep)] pointer-events-none" aria-hidden="true"></div>
 
       <div class="relative max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-        <header class="max-w-3xl">
-          <div class="inline-flex items-center gap-2 px-3 py-1 mb-4 rounded border border-[var(--brass)] bg-[var(--wood-deep)]/90 text-xs font-semibold tracking-wider uppercase text-[var(--candle)]">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true"></span>
-            Tavern Entrance · Available for Hire · Cebu, PH & Remote
+        <div class="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-8 lg:gap-12">
+          <header class="flex-1 max-w-2xl text-center lg:text-left">
+            <div class="inline-flex items-center gap-2 px-3 py-1 mb-4 rounded border border-[var(--brass)] bg-[var(--wood-deep)]/90 text-xs font-semibold tracking-wider uppercase text-[var(--candle)]">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true"></span>
+              Tavern Entrance · Available for Hire · Cebu, PH & Remote
+            </div>
+
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[var(--candle)] mb-4 drop-shadow-sm font-serif">
+              Nhovem Cabahug
+            </h1>
+
+            <p class="text-xl sm:text-2xl font-medium text-[var(--parchment)] mb-6 leading-snug">
+              Web Developer & Software Engineer
+            </p>
+
+            <p class="text-base sm:text-lg text-[var(--parchment)]/90 leading-relaxed mb-8 max-w-2xl">
+              I build accessible, fast web applications with TypeScript. I develop with AI assistance, and I review, test and make the architectural decisions myself. Recently shipped features and bug fixes for a biometric tracking system in production.
+            </p>
+
+            {/* Quick Direct Contacts */}
+            <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-sm font-medium">
+              <a
+                href="mailto:ncabahug223@gmail.com"
+                class="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 bg-[var(--stone)] text-[var(--candle)] border border-[var(--brass)] rounded hover:bg-[var(--brass)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+                aria-label="Send a Raven — Email ncabahug223@gmail.com"
+              >
+                <ThematicIcon name="raven" class="w-4 h-4 text-[var(--candle)]" />
+                <span>Send a Raven (Email)</span>
+              </a>
+              <a
+                href="https://github.com/IbemCabahug"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 bg-[var(--stone)] text-[var(--candle)] border border-[var(--brass)] rounded hover:bg-[var(--brass)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+                aria-label="Inspect GitHub Profile"
+              >
+                <ThematicIcon name="terminal" class="w-4 h-4 text-[var(--candle)]" />
+                <span>Inspect GitHub Profile</span>
+              </a>
+              <a
+                href="/resume"
+                class="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 bg-transparent text-[var(--parchment)] border border-[var(--brass)]/80 rounded hover:bg-[var(--parchment)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+              >
+                <ThematicIcon name="resume" class="w-4 h-4 text-[var(--candle)]" />
+                <span>View Full Résumé</span>
+              </a>
+            </div>
+          </header>
+
+          {/* Right Column: The Adventurer's Guild Portrait */}
+          <div class="flex-shrink-0 flex flex-col items-center pt-2 lg:pt-4">
+            <div class="relative group">
+              {/* Ornate Tavern Brass Outer Frame */}
+              <div class="w-48 h-48 sm:w-56 sm:h-56 rounded-2xl border-2 border-[var(--brass)] bg-[#1e1208] p-2 shadow-2xl shadow-black/80 flex items-center justify-center overflow-hidden transition-transform duration-300 group-hover:scale-[1.02]">
+                <img
+                  src="/art/profile.jpg"
+                  alt="Nhovem Cabahug — Software Engineer portrait"
+                  width="224"
+                  height="224"
+                  class="w-full h-full object-cover rounded-xl"
+                  loading="eager"
+                  decoding="async"
+                />
+              </div>
+
+              {/* Guild Medallion Tag */}
+              <div class="absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[var(--wood-deep)] border border-[var(--brass)] text-[var(--candle)] text-[11px] font-extrabold uppercase tracking-wider px-3 py-0.5 rounded-full shadow-md flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden="true"></span>
+                <span>Guild Engineer</span>
+              </div>
+            </div>
           </div>
-
-          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[var(--candle)] mb-4 drop-shadow-sm font-serif">
-            Nhovem Cabahug
-          </h1>
-
-          <p class="text-xl sm:text-2xl font-medium text-[var(--parchment)] mb-6 leading-snug">
-            Web Developer & Software Engineer
-          </p>
-
-          <p class="text-base sm:text-lg text-[var(--parchment)]/90 leading-relaxed mb-8 max-w-2xl">
-            I build accessible, fast web applications with TypeScript. I develop with AI assistance, and I review, test and make the architectural decisions myself. Recently shipped features and bug fixes for a biometric tracking system in production.
-          </p>
-
-          {/* Quick Direct Contacts */}
-          <div class="flex flex-wrap items-center gap-4 text-sm font-medium">
-            <a
-              href="mailto:ncabahug223@gmail.com"
-              class="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 bg-[var(--stone)] text-[var(--candle)] border border-[var(--brass)] rounded hover:bg-[var(--brass)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
-              aria-label="Send a Raven — Email ncabahug223@gmail.com"
-            >
-              <ThematicIcon name="raven" class="w-4 h-4 text-[var(--candle)]" />
-              <span>Send a Raven (Email)</span>
-            </a>
-            <a
-              href="https://github.com/IbemCabahug"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 bg-[var(--stone)] text-[var(--candle)] border border-[var(--brass)] rounded hover:bg-[var(--brass)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
-              aria-label="Inspect GitHub Profile"
-            >
-              <ThematicIcon name="terminal" class="w-4 h-4 text-[var(--candle)]" />
-              <span>Inspect GitHub Profile</span>
-            </a>
-            <a
-              href="/resume"
-              class="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 bg-transparent text-[var(--parchment)] border border-[var(--brass)]/80 rounded hover:bg-[var(--parchment)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
-            >
-              <ThematicIcon name="resume" class="w-4 h-4 text-[var(--candle)]" />
-              <span>View Full Résumé</span>
-            </a>
-          </div>
-        </header>
+        </div>
       </div>
     </div>
 
