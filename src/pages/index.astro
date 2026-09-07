@@ -234,20 +234,9 @@ const featuredProjects = allProjects.sort((a, b) => a.data.order - b.data.order)
                     href={`/quests/${project.data.slug}`}
                     class="inline-flex items-center justify-center gap-1.5 min-h-[44px] px-3 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-xs rounded hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
                   >
-                    <span>{project.data.allowFraming ? 'Inspect Case Study & Live Arena' : 'Inspect Case Study'}</span>
+                    <span>Inspect Case Study</span>
                     <ThematicIcon name="external" class="w-3 h-3 text-[var(--candle)]" />
                   </a>
-                  {project.data.sourceUrl && (
-                    <a
-                      href={project.data.sourceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="inline-flex items-center justify-center gap-1.5 min-h-[44px] px-3 border border-[var(--wood-deep)] text-[var(--wood-deep)] font-semibold text-xs rounded hover:bg-[var(--wood-deep)] hover:text-[var(--parchment)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
-                    >
-                      <ThematicIcon name="code" class="w-3.5 h-3.5" />
-                      <span>Source Code</span>
-                    </a>
-                  )}
                 </div>
               </div>
             </article>
