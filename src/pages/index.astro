@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
+import ThematicIcon from '../components/icons/ThematicIcon.astro';
 
 const allProjects = await getCollection('projects');
 const featuredProjects = allProjects.sort((a, b) => a.data.order - b.data.order);
@@ -48,22 +49,25 @@ const featuredProjects = allProjects.sort((a, b) => a.data.order - b.data.order)
               class="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 bg-[var(--stone)] text-[var(--candle)] border border-[var(--brass)] rounded hover:bg-[var(--brass)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
               aria-label="Send a Raven — Email ncabahug223@gmail.com"
             >
-              <span aria-hidden="true">✉</span> Send a Raven (Email)
+              <ThematicIcon name="raven" class="w-4 h-4 text-[var(--candle)]" />
+              <span>Send a Raven (Email)</span>
             </a>
             <a
               href="https://github.com/IbemCabahug"
               target="_blank"
               rel="noopener noreferrer"
               class="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 bg-[var(--stone)] text-[var(--candle)] border border-[var(--brass)] rounded hover:bg-[var(--brass)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
-              aria-label="Inspect the Spellbook — GitHub Profile"
+              aria-label="Inspect GitHub Profile"
             >
-              <span aria-hidden="true">⌨</span> Inspect GitHub Profile
+              <ThematicIcon name="terminal" class="w-4 h-4 text-[var(--candle)]" />
+              <span>Inspect GitHub Profile</span>
             </a>
             <a
               href="/resume"
               class="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 bg-transparent text-[var(--parchment)] border border-[var(--brass)]/80 rounded hover:bg-[var(--parchment)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
             >
-              <span>📄</span> View Full Résumé
+              <ThematicIcon name="resume" class="w-4 h-4 text-[var(--candle)]" />
+              <span>View Full Résumé</span>
             </a>
           </div>
         </header>
@@ -81,7 +85,9 @@ const featuredProjects = allProjects.sort((a, b) => a.data.order - b.data.order)
           {/* Path 1: Immersive Tavern */}
           <div class="bg-[#24170d] border-2 border-[var(--brass)] rounded p-6 flex flex-col justify-between shadow-lg">
             <div>
-              <div class="text-2xl mb-2" aria-hidden="true">🍺</div>
+              <div class="text-[var(--candle)] mb-3" aria-hidden="true">
+                <ThematicIcon name="tavern" class="w-8 h-8" />
+              </div>
               <h3 class="text-xl font-bold text-[var(--candle)] mb-2 font-serif">
                 Ibem's Tavern
               </h3>
@@ -100,26 +106,31 @@ const featuredProjects = allProjects.sort((a, b) => a.data.order - b.data.order)
           {/* Path 2: Simple Portfolio Mode */}
           <div class="bg-[#24170d] border-2 border-[var(--brass)] rounded p-6 flex flex-col justify-between shadow-lg">
             <div>
-              <div class="text-2xl mb-2" aria-hidden="true">⚡</div>
-              <h3 class="text-xl font-bold text-[var(--candle)] mb-2 font-serif">
-                Simple Mode
+              <div class="text-[var(--candle)] mb-3" aria-hidden="true">
+                <ThematicIcon name="ledger" class="w-8 h-8" />
+              </div>
+              <h3 class="text-xl font-bold text-[var(--candle)] mb-1 font-serif">
+                The Field Ledger
               </h3>
+              <span class="text-xs uppercase tracking-wider text-[var(--brass)] font-semibold block mb-2">Simple Portfolio Mode</span>
               <p class="text-sm text-[var(--parchment)]/90 leading-relaxed mb-4">
-                Fast-track recruiter view. Zero runtime JavaScript, clean linear typography, instant loading, and streamlined scannability.
+                Fast-track recruiter view & technical proof of work. Zero runtime JavaScript, clean linear typography, architecture trade-offs, and verified project demos.
               </p>
             </div>
             <a
               href="/simple"
               class="inline-flex items-center justify-center min-h-[44px] px-4 py-2 bg-transparent text-[var(--parchment)] border-2 border-[var(--brass)] font-bold text-sm rounded hover:bg-[var(--parchment)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
             >
-              Open Simple Mode →
+              Open Field Ledger →
             </a>
           </div>
 
           {/* Path 3: Quest Board */}
           <div class="bg-[#24170d] border-2 border-[var(--brass)] rounded p-6 flex flex-col justify-between shadow-lg">
             <div>
-              <div class="text-2xl mb-2" aria-hidden="true">📜</div>
+              <div class="text-[var(--candle)] mb-3" aria-hidden="true">
+                <ThematicIcon name="scroll" class="w-8 h-8" />
+              </div>
               <h3 class="text-xl font-bold text-[var(--candle)] mb-2 font-serif">
                 The Quest Board
               </h3>
@@ -178,7 +189,7 @@ const featuredProjects = allProjects.sort((a, b) => a.data.order - b.data.order)
                       loading="lazy"
                     />
                   ) : (
-                    <div class="text-3xl text-[var(--candle)] font-serif" aria-hidden="true">⚔️</div>
+                    <ThematicIcon name="swords" class="w-10 h-10 text-[var(--candle)]" />
                   )}
                 </div>
 
@@ -215,18 +226,20 @@ const featuredProjects = allProjects.sort((a, b) => a.data.order - b.data.order)
                 <div class="flex flex-col gap-2">
                   <a
                     href={`/quests/${project.data.slug}`}
-                    class="inline-flex items-center justify-center min-h-[44px] px-3 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-xs rounded hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+                    class="inline-flex items-center justify-center gap-1.5 min-h-[44px] px-3 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-xs rounded hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
                   >
-                    Inspect Case Study
+                    <span>Inspect Case Study</span>
+                    <ThematicIcon name="external" class="w-3 h-3 text-[var(--candle)]" />
                   </a>
                   {project.data.liveUrl && (
                     <a
                       href={project.data.liveUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="inline-flex items-center justify-center min-h-[44px] px-3 border border-[var(--wood-deep)] text-[var(--wood-deep)] font-semibold text-xs rounded hover:bg-[var(--wood-deep)] hover:text-[var(--parchment)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+                      class="inline-flex items-center justify-center gap-1.5 min-h-[44px] px-3 border border-[var(--wood-deep)] text-[var(--wood-deep)] font-semibold text-xs rounded hover:bg-[var(--wood-deep)] hover:text-[var(--parchment)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
                     >
-                      Play / View Live Demo ↗
+                      <ThematicIcon name="play" class="w-3.5 h-3.5" />
+                      <span>Play Live Demo</span>
                     </a>
                   )}
                 </div>

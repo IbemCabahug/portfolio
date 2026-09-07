@@ -1,6 +1,7 @@
 ---
 import TavernLayout from '../../layouts/TavernLayout.astro';
 import { getCollection } from 'astro:content';
+import ThematicIcon from '../../components/icons/ThematicIcon.astro';
 
 const allProjects = await getCollection('projects');
 const projects = allProjects.sort((a, b) => a.data.order - b.data.order);
@@ -15,7 +16,8 @@ const projects = allProjects.sort((a, b) => a.data.order - b.data.order);
     {/* Notice Board Header */}
     <header class="mb-10 text-center">
       <div class="inline-flex items-center gap-2 px-3 py-1 mb-3 rounded border border-[var(--brass)] bg-[var(--wood-deep)]/90 text-xs font-semibold tracking-wider uppercase text-[var(--candle)]">
-        <span>📜</span> Guild Notice Board · Active & Completed Quests
+        <ThematicIcon name="scroll" class="w-3.5 h-3.5 text-[var(--candle)]" />
+        <span>Guild Notice Board · Active & Completed Quests</span>
       </div>
       <h1 class="text-3xl sm:text-5xl font-extrabold text-[var(--candle)] mb-3 tracking-wide font-serif drop-shadow">
         The Quest Board
@@ -46,7 +48,7 @@ const projects = allProjects.sort((a, b) => a.data.order - b.data.order);
                     loading="lazy"
                   />
                 ) : (
-                  <div class="text-4xl text-[var(--candle)] font-serif" aria-hidden="true">⚔️</div>
+                  <ThematicIcon name="swords" class="w-12 h-12 text-[var(--candle)]" />
                 )}
               </div>
 
@@ -112,9 +114,10 @@ const projects = allProjects.sort((a, b) => a.data.order - b.data.order);
               <div class="flex flex-wrap items-center gap-3 pt-3 border-t border-[var(--brass)]/30">
                 <a
                   href={`/quests/${project.data.slug}`}
-                  class="inline-flex items-center justify-center min-h-[44px] px-5 py-2 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 shadow"
+                  class="inline-flex items-center gap-2 justify-center min-h-[44px] px-5 py-2 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 shadow"
                 >
-                  Inspect Case Study Dossier →
+                  <span>Inspect Case Study Dossier</span>
+                  <ThematicIcon name="external" class="w-3.5 h-3.5 text-[var(--candle)]" />
                 </a>
 
                 {project.data.liveUrl && (
@@ -122,9 +125,10 @@ const projects = allProjects.sort((a, b) => a.data.order - b.data.order);
                     href={project.data.liveUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="inline-flex items-center justify-center min-h-[44px] px-4 py-2 border-2 border-[var(--wood-deep)] text-[var(--wood-deep)] font-bold text-xs rounded hover:bg-[var(--wood-deep)] hover:text-[var(--parchment)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+                    class="inline-flex items-center gap-2 justify-center min-h-[44px] px-4 py-2 border-2 border-[var(--wood-deep)] text-[var(--wood-deep)] font-bold text-xs rounded hover:bg-[var(--wood-deep)] hover:text-[var(--parchment)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
                   >
-                    Play Live Demo ↗
+                    <ThematicIcon name="play" class="w-3.5 h-3.5" />
+                    <span>Play Live Demo</span>
                   </a>
                 )}
 
@@ -133,9 +137,10 @@ const projects = allProjects.sort((a, b) => a.data.order - b.data.order);
                     href={project.data.sourceUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="inline-flex items-center justify-center min-h-[44px] px-4 py-2 border-2 border-[var(--wood-deep)] text-[var(--wood-deep)] font-bold text-xs rounded hover:bg-[var(--wood-deep)] hover:text-[var(--parchment)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+                    class="inline-flex items-center gap-2 justify-center min-h-[44px] px-4 py-2 border-2 border-[var(--wood-deep)] text-[var(--wood-deep)] font-bold text-xs rounded hover:bg-[var(--wood-deep)] hover:text-[var(--parchment)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
                   >
-                    Source Code ↗
+                    <ThematicIcon name="code" class="w-3.5 h-3.5" />
+                    <span>Source Code</span>
                   </a>
                 )}
               </div>

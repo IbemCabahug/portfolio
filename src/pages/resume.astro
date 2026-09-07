@@ -127,10 +127,25 @@ const skillsEntries = await getCollection('skills');
       </ul>
     </section>
 
-    <div class="no-print mt-8 flex justify-center">
-      <a href="/resume.pdf" download class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 border border-gray-500 hover:border-gray-800 rounded transition-colors duration-200 uppercase tracking-widest text-sm no-print">
-        Download PDF
-      </a>
+    <div class="no-print mt-12 pt-8 border-t border-gray-300 flex flex-col items-center gap-6">
+      <div class="w-full p-5 bg-amber-50 border border-amber-300 rounded text-sm text-stone-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
+        <div>
+          <strong class="font-bold text-stone-900 block sm:inline">Seeking Technical Proof of Work?</strong>
+          <span class="text-stone-700 sm:ml-1">Explore system architecture breakdowns, live deployed applications, and source code.</span>
+        </div>
+        <a
+          href="/simple"
+          class="inline-flex items-center gap-1.5 font-bold text-amber-900 hover:text-amber-700 underline flex-shrink-0 min-h-[44px]"
+        >
+          <span>View Technical Showcase (/simple)</span> &rarr;
+        </a>
+      </div>
+
+      <div class="flex justify-center w-full">
+        <a href="/resume.pdf" download class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 border border-gray-500 hover:border-gray-800 rounded transition-colors duration-200 uppercase tracking-widest text-sm no-print">
+          Download PDF
+        </a>
+      </div>
     </div>
 
   </div>
