@@ -149,4 +149,9 @@ const skillsEntries = await getCollection('skills');
     </div>
 
   </div>
+
+  <script>
+    import { recordMilestone } from '../store/questlog';
+    recordMilestone('resume');
+  </script>
 </BaseLayout>
