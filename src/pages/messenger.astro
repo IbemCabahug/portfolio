@@ -398,7 +398,7 @@ const projectTelemetries = await Promise.all(
               This brass-and-crystal terminal synchronizes live telemetry from Nhovem's engineering forge. Inspect verified code repositories, TypeScript architecture, and active web experiments.
             </p>
 
-            <div class="space-y-2 max-h-[52vh] sm:max-h-[48vh] overflow-y-auto pr-1">
+            <div class="tavern-scrollbar space-y-2 max-h-[42vh] sm:max-h-[38vh] overflow-y-auto pr-1.5">
               {projectTelemetries.map(({ project, telemetry }) => (
                 <div class="p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40 hover:border-[var(--brass)] transition-colors space-y-1.5">
                   <div class="flex flex-wrap items-center justify-between gap-2">
@@ -1041,6 +1041,9 @@ const projectTelemetries = await Promise.all(
     left: 0;
     transform: none;
   }
+  #trigger-scribe-desk .scene-tooltip[data-placement="top"] {
+    bottom: calc(100% - 20px);
+  }
   .scene-tooltip[data-placement="bottom"] {
     top: calc(100% + 8px);
     left: 50%;
@@ -1122,21 +1125,46 @@ const projectTelemetries = await Promise.all(
     }
   }
 
-  /* Modal Custom Scrollbar */
-  .tavern-panel::-webkit-scrollbar {
-    width: 8px;
+  /* Modal & Transceiver Thematic Scrollbar */
+  @supports not selector(::-webkit-scrollbar) {
+    .tavern-panel,
+    .tavern-scrollbar,
+    .tavern-panel * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--brass, #a87a27) rgba(15, 10, 5, 0.85);
+    }
   }
-  .tavern-panel::-webkit-scrollbar-track {
-    background: rgba(15, 10, 5, 0.8);
+
+  .tavern-panel::-webkit-scrollbar,
+  .tavern-scrollbar::-webkit-scrollbar,
+  .tavern-panel *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .tavern-panel::-webkit-scrollbar-track,
+  .tavern-scrollbar::-webkit-scrollbar-track,
+  .tavern-panel *::-webkit-scrollbar-track {
+    background: rgba(15, 10, 5, 0.85);
     border-radius: 4px;
   }
-  .tavern-panel::-webkit-scrollbar-thumb {
-    background: #8b6b4a;
+  .tavern-panel::-webkit-scrollbar-thumb,
+  .tavern-scrollbar::-webkit-scrollbar-thumb,
+  .tavern-panel *::-webkit-scrollbar-thumb {
+    background: var(--brass, #a87a27);
     border-radius: 4px;
-    border: 1px solid #d5803b;
+    border: 1px solid rgba(255, 228, 160, 0.25);
   }
-  .tavern-panel::-webkit-scrollbar-thumb:hover {
-    background: #d5803b;
+  .tavern-panel::-webkit-scrollbar-thumb:hover,
+  .tavern-scrollbar::-webkit-scrollbar-thumb:hover,
+  .tavern-panel *::-webkit-scrollbar-thumb:hover {
+    background: var(--candle, #ffe4a0);
+  }
+  .tavern-panel::-webkit-scrollbar-button,
+  .tavern-scrollbar::-webkit-scrollbar-button,
+  .tavern-panel *::-webkit-scrollbar-button {
+    display: none;
+    width: 0;
+    height: 0;
   }
 
   .panel-header {
