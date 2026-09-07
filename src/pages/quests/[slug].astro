@@ -109,35 +109,40 @@ const { Content } = await render(entry);
 
       {/* Cross-Quest Navigation Footer */}
       <footer class="mt-14 pt-8 border-t-2 border-[var(--brass)]/50">
-        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-          {prevProject ? (
-            <a
-              href={`/quests/${prevProject.data.slug}`}
-              class="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 border border-[var(--brass)] bg-[#e8dbbe] text-[var(--wood-deep)] font-semibold text-sm rounded hover:bg-[var(--brass)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 w-full sm:w-auto justify-center"
-            >
-              &larr; Prev: {prevProject.data.title.split('—')[0].trim()}
-            </a>
-          ) : (
-            <div class="hidden sm:block"></div>
-          )}
+        <div class="grid grid-cols-1 sm:grid-cols-3 items-center gap-4">
+          {/* Slot 1: Previous Quest (Aligned Left) */}
+          <div class="flex justify-center sm:justify-start">
+            {prevProject ? (
+              <a
+                href={`/quests/${prevProject.data.slug}`}
+                class="inline-flex items-center gap-1.5 min-h-[44px] px-3.5 py-2 border border-[var(--brass)] bg-[#e8dbbe] text-[var(--wood-deep)] font-semibold text-xs sm:text-sm rounded hover:bg-[var(--brass)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 text-center"
+              >
+                &larr; Prev: {prevProject.data.title.split('—')[0].trim()}
+              </a>
+            ) : null}
+          </div>
 
-          <a
-            href="/quests"
-            class="inline-flex items-center min-h-[44px] px-5 py-2 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 w-full sm:w-auto justify-center"
-          >
-            Quest Board Overview
-          </a>
-
-          {nextProject ? (
+          {/* Slot 2: Quest Board Overview (Always Dead-Center) */}
+          <div class="flex justify-center">
             <a
-              href={`/quests/${nextProject.data.slug}`}
-              class="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 border border-[var(--brass)] bg-[#e8dbbe] text-[var(--wood-deep)] font-semibold text-sm rounded hover:bg-[var(--brass)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 w-full sm:w-auto justify-center"
+              href="/quests"
+              class="inline-flex items-center justify-center min-h-[44px] px-5 py-2 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 text-center shadow-md whitespace-nowrap"
             >
-              Next: {nextProject.data.title.split('—')[0].trim()} &rarr;
+              Quest Board Overview
             </a>
-          ) : (
-            <div class="hidden sm:block"></div>
-          )}
+          </div>
+
+          {/* Slot 3: Next Quest (Aligned Right) */}
+          <div class="flex justify-center sm:justify-end">
+            {nextProject ? (
+              <a
+                href={`/quests/${nextProject.data.slug}`}
+                class="inline-flex items-center gap-1.5 min-h-[44px] px-3.5 py-2 border border-[var(--brass)] bg-[#e8dbbe] text-[var(--wood-deep)] font-semibold text-xs sm:text-sm rounded hover:bg-[var(--brass)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 text-center"
+              >
+                Next: {nextProject.data.title.split('—')[0].trim()} &rarr;
+              </a>
+            ) : null}
+          </div>
         </div>
       </footer>
     </article>
