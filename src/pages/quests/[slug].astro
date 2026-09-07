@@ -4,33 +4,40 @@ import { getCollection, render } from 'astro:content';
 import ThematicIcon from '../../components/icons/ThematicIcon.astro';
 
 export async function getStaticPaths() {
-  const projects = await getCollection('projects');
-  return projects.map(entry => ({
+  const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+  return projects.map((entry, index) => ({
     params: { slug: entry.data.slug },
-    props: { entry },
+    props: {
+      entry,
+      prevProject: index > 0 ? projects[index - 1] : null,
+      nextProject: index < projects.length - 1 ? projects[index + 1] : null,
+    },
   }));
 }
 
-const { entry } = Astro.props;
+const { entry, prevProject, nextProject } = Astro.props;
 const { Content } = await render(entry);
 ---
 
 <TavernLayout title={`${entry.data.title} — Nhovem Cabahug`} description={entry.data.summary || ''} location="quests">
-  <div class="max-w-3xl mx-auto py-4">
-    <nav class="mb-6">
+  <div class="max-w-4xl mx-auto py-4">
+    <nav class="mb-6 flex justify-between items-center" aria-label="Breadcrumb">
       <a
         href="/quests"
-        class="inline-flex items-center min-h-[44px] text-sm font-semibold text-[var(--candle)] underline hover:text-[var(--parchment)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+        class="inline-flex items-center gap-1.5 min-h-[44px] text-sm font-semibold text-[var(--candle)] underline hover:text-[var(--parchment)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
       >
         &larr; Back to Quest Board
       </a>
+      <span class="text-xs text-[var(--parchment)]/70 uppercase tracking-widest font-mono">
+        Bounty Dossier #{entry.data.order}
+      </span>
     </nav>
 
     <article class="bg-[var(--parchment)] text-[var(--ink)] p-6 sm:p-10 rounded shadow-2xl border-2 border-[var(--brass)]">
       <header class="border-b-2 border-[var(--brass)] pb-6 mb-8">
         <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
           <span class={`text-xs uppercase font-bold tracking-wider px-2.5 py-1 rounded ${entry.data.status === 'Shipped' ? 'bg-[var(--wood-deep)] text-[var(--candle)]' : 'bg-[var(--stone)] text-[var(--parchment)]'}`}>
-            {entry.data.status}
+            ● {entry.data.status}
           </span>
           <span class="text-sm font-semibold italic text-[var(--ink)]/80">
             Role: {entry.data.role}
@@ -60,10 +67,10 @@ const { Content } = await render(entry);
         </div>
 
         <div class="mb-6">
-          <strong class="text-xs uppercase tracking-wider text-[var(--ink)]/80 block mb-2">Technologies</strong>
+          <strong class="text-xs uppercase tracking-wider text-[var(--ink)]/80 block mb-2 font-mono">Technologies & Stack</strong>
           <ul class="flex flex-wrap gap-2" aria-label="Tech stack">
             {entry.data.stack.map((tech: string) => (
-              <li class="text-xs font-semibold px-2.5 py-1 border border-[var(--brass)] bg-[var(--parchment)] rounded">
+              <li class="text-xs font-semibold px-2.5 py-1 border border-[var(--brass)] bg-[var(--parchment)] rounded text-[var(--ink)]">
                 {tech}
               </li>
             ))}
@@ -90,7 +97,7 @@ const { Content } = await render(entry);
               class="inline-flex items-center gap-2 justify-center min-h-[44px] px-5 py-2 border-2 border-[var(--wood-deep)] text-[var(--wood-deep)] font-bold text-sm rounded hover:bg-[var(--wood-deep)] hover:text-[var(--parchment)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
             >
               <ThematicIcon name="code" class="w-4 h-4" />
-              <span>View Repository</span>
+              <span>Inspect Source Code</span>
             </a>
           )}
         </div>
@@ -100,19 +107,38 @@ const { Content } = await render(entry);
         <Content />
       </div>
 
-      <footer class="mt-12 pt-6 border-t border-[var(--brass)]/40 flex justify-between items-center">
-        <a
-          href="/quests"
-          class="inline-flex items-center min-h-[44px] px-4 py-2 bg-[var(--wood-deep)] text-[var(--candle)] font-semibold text-sm rounded hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
-        >
-          &larr; All Quests
-        </a>
-        <a
-          href="/tavern"
-          class="inline-flex items-center min-h-[44px] px-4 py-2 border border-[var(--brass)] text-[var(--ink)] font-semibold text-sm rounded hover:bg-[var(--brass)]/10 transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
-        >
-          Tavern &rarr;
-        </a>
+      {/* Cross-Quest Navigation Footer */}
+      <footer class="mt-14 pt-8 border-t-2 border-[var(--brass)]/50">
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+          {prevProject ? (
+            <a
+              href={`/quests/${prevProject.data.slug}`}
+              class="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 border border-[var(--brass)] bg-[#e8dbbe] text-[var(--wood-deep)] font-semibold text-sm rounded hover:bg-[var(--brass)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 w-full sm:w-auto justify-center"
+            >
+              &larr; Prev: {prevProject.data.title.split('—')[0].trim()}
+            </a>
+          ) : (
+            <div class="hidden sm:block"></div>
+          )}
+
+          <a
+            href="/quests"
+            class="inline-flex items-center min-h-[44px] px-5 py-2 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 w-full sm:w-auto justify-center"
+          >
+            Quest Board Overview
+          </a>
+
+          {nextProject ? (
+            <a
+              href={`/quests/${nextProject.data.slug}`}
+              class="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 border border-[var(--brass)] bg-[#e8dbbe] text-[var(--wood-deep)] font-semibold text-sm rounded hover:bg-[var(--brass)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 w-full sm:w-auto justify-center"
+            >
+              Next: {nextProject.data.title.split('—')[0].trim()} &rarr;
+            </a>
+          ) : (
+            <div class="hidden sm:block"></div>
+          )}
+        </div>
       </footer>
     </article>
   </div>
@@ -120,28 +146,85 @@ const { Content } = await render(entry);
 
 <style is:global>
   .quest-case-study h2 {
-    font-size: 1.35rem;
+    font-size: 1.45rem;
     font-weight: 700;
-    margin-top: 2rem;
-    margin-bottom: 0.75rem;
-    border-bottom: 1px solid rgba(168, 122, 39, 0.3);
-    padding-bottom: 0.25rem;
+    margin-top: 2.25rem;
+    margin-bottom: 0.85rem;
+    border-bottom: 1px solid rgba(168, 122, 39, 0.4);
+    padding-bottom: 0.35rem;
     color: var(--ink);
+    font-family: var(--font-serif, serif);
+  }
+  .quest-case-study h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-top: 1.75rem;
+    margin-bottom: 0.5rem;
+    color: var(--wood-deep);
   }
   .quest-case-study p {
-    margin-bottom: 1rem;
-    line-height: 1.7;
-    max-width: 70ch;
+    margin-bottom: 1.15rem;
+    line-height: 1.75;
+    max-width: 72ch;
   }
   .quest-case-study ul {
     list-style-type: disc;
     padding-left: 1.5rem;
-    margin-bottom: 1.25rem;
-    space-y: 0.5rem;
+    margin-bottom: 1.5rem;
   }
   .quest-case-study li {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.65;
+    max-width: 70ch;
+  }
+  .quest-case-study blockquote {
+    border-left: 4px solid var(--brass);
+    background: rgba(168, 122, 39, 0.08);
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+    border-radius: 0 0.5rem 0.5rem 0;
+    font-style: italic;
+    color: var(--wood-deep);
+  }
+  .quest-case-study pre {
+    background: #1a0f06 !important;
+    color: var(--candle) !important;
+    padding: 1.25rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--brass);
+    overflow-x: auto;
+    margin: 1.5rem 0;
+    font-size: 0.875rem;
     line-height: 1.6;
-    max-width: 68ch;
+  }
+  .quest-case-study code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.875em;
+  }
+  .quest-case-study p code,
+  .quest-case-study li code {
+    background: rgba(43, 24, 9, 0.1);
+    color: var(--wood-deep);
+    padding: 0.15rem 0.35rem;
+    border-radius: 0.25rem;
+    border: 1px solid rgba(168, 122, 39, 0.25);
+    font-weight: 600;
+  }
+  .quest-case-study table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.9rem;
+  }
+  .quest-case-study th,
+  .quest-case-study td {
+    padding: 0.75rem;
+    border: 1px solid rgba(168, 122, 39, 0.35);
+    text-align: left;
+  }
+  .quest-case-study th {
+    background: rgba(168, 122, 39, 0.15);
+    font-weight: 700;
+    color: var(--wood-deep);
   }
 </style>
