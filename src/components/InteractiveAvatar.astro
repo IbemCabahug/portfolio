@@ -1,0 +1,149 @@
+---
+import ThematicIcon from './icons/ThematicIcon.astro';
+---
+
+<div class="interactive-avatar-root flex-shrink-0 flex flex-col items-center pt-2 lg:pt-4">
+  <button
+    type="button"
+    id="avatar-toggle-btn"
+    class="relative group cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--candle)] focus-visible:outline-offset-4 rounded-full bg-transparent border-0 p-0"
+    aria-label="Adventurer guild medallion: click or hover to reveal 3D pixel avatar"
+    aria-expanded="false"
+  >
+    {/* Circular Brass Guild Medallion Frame */}
+    <div class="w-48 h-48 sm:w-56 sm:h-56 rounded-full border-2 border-[var(--brass)] bg-[#1e1208] p-2 shadow-2xl shadow-black/80 flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:border-[var(--candle)] group-hover:shadow-[0_0_20px_rgba(255,228,160,0.25)]">
+      <div class="relative w-full h-full rounded-full overflow-hidden bg-[#120a04] flex items-center justify-center">
+        
+        {/* State A: 3D Pixel Art Adventurer Avatar (Revealed State) */}
+        <img
+          src="/art/profile-pixel-3d.jpg"
+          alt="Nhovem Cabahug — 3D Voxel Pixel-Art Adventurer portrait"
+          width="224"
+          height="224"
+          class="avatar-pixel-img absolute inset-0 w-full h-full object-cover rounded-full opacity-0 scale-95 transition-all duration-350 ease-out pointer-events-none"
+          loading="eager"
+          decoding="async"
+        />
+
+        {/* State B: The Obscured Shrouded Medallion (Default State) */}
+        <div class="avatar-shroud absolute inset-0 w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-[#1a0f06] via-[#140b04] to-[#0c0602] transition-all duration-350 ease-out p-4 text-center select-none">
+          {/* Subtle atmospheric ambient glow */}
+          <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(168,122,39,0.25)_0%,transparent_70%)] pointer-events-none" aria-hidden="true"></div>
+          
+          {/* Guild Emblem / Mystery Seal */}
+          <div class="relative z-10 w-16 h-16 rounded-full border border-[var(--brass)]/60 bg-[var(--wood-deep)]/90 flex items-center justify-center mb-2 shadow-inner group-hover:scale-105 transition-transform duration-300">
+            <ThematicIcon name="swords" class="w-8 h-8 text-[var(--candle)] opacity-80" />
+          </div>
+
+          <span class="relative z-10 text-xs font-serif font-bold text-[var(--candle)] tracking-wide">
+            Adventurer's Seal
+          </span>
+          <span class="relative z-10 text-[10px] text-[var(--parchment)]/70 mt-0.5 uppercase tracking-widest font-semibold">
+            Identity Shrouded
+          </span>
+        </div>
+
+      </div>
+    </div>
+
+    {/* Guild Medallion Tag Indicator */}
+    <div class="avatar-tag absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[var(--wood-deep)] border border-[var(--brass)] text-[var(--candle)] text-[11px] font-extrabold uppercase tracking-wider px-3.5 py-0.5 rounded-full shadow-md flex items-center gap-1.5 transition-colors duration-200">
+      <span class="avatar-dot w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" aria-hidden="true"></span>
+      <span class="avatar-label">Hover / Tap to Reveal</span>
+    </div>
+  </button>
+</div>
+
+<style>
+  /* Hover & Focus Interactions on Desktop */
+  .interactive-avatar-root:hover .avatar-shroud,
+  .interactive-avatar-root:focus-within .avatar-shroud,
+  .interactive-avatar-root.is-revealed .avatar-shroud {
+    opacity: 0;
+    transform: scale(1.05);
+    pointer-events: none;
+  }
+
+  .interactive-avatar-root:hover .avatar-pixel-img,
+  .interactive-avatar-root:focus-within .avatar-pixel-img,
+  .interactive-avatar-root.is-revealed .avatar-pixel-img {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .interactive-avatar-root:hover .avatar-tag,
+  .interactive-avatar-root:focus-within .avatar-tag,
+  .interactive-avatar-root.is-revealed .avatar-tag {
+    border-color: var(--candle);
+    box-shadow: 0 0 10px rgba(255, 228, 160, 0.3);
+  }
+
+  .interactive-avatar-root:hover .avatar-dot,
+  .interactive-avatar-root:focus-within .avatar-dot,
+  .interactive-avatar-root.is-revealed .avatar-dot {
+    background-color: #34d399; /* emerald-400 */
+    animation: none;
+  }
+</style>
+
+<script>
+  function setupInteractiveAvatar() {
+    const root = document.querySelector('.interactive-avatar-root');
+    const button = document.getElementById('avatar-toggle-btn');
+    const label = document.querySelector('.avatar-label');
+    if (!root || !button || !label) return;
+
+    const rootEl = root;
+    const buttonEl = button;
+    const labelEl = label;
+    let isRevealed = false;
+
+    function updateState(revealed: boolean) {
+      isRevealed = revealed;
+      buttonEl.setAttribute('aria-expanded', String(isRevealed));
+      if (isRevealed) {
+        rootEl.classList.add('is-revealed');
+        labelEl.textContent = 'Guild Engineer (Voxel)';
+      } else {
+        rootEl.classList.remove('is-revealed');
+        labelEl.textContent = 'Hover / Tap to Reveal';
+      }
+    }
+
+    // Toggle on click / tap for desktop locking and natural mobile interaction
+    buttonEl.addEventListener('click', (e) => {
+      e.preventDefault();
+      updateState(!isRevealed);
+    });
+
+    // Keyboard support (Enter or Space)
+    buttonEl.addEventListener('keydown', (e: Event) => {
+      const keyEvent = e as KeyboardEvent;
+      if (keyEvent.key === 'Enter' || keyEvent.key === ' ') {
+        keyEvent.preventDefault();
+        updateState(!isRevealed);
+      }
+    });
+
+    // Subtle label sync on hover if not locked
+    rootEl.addEventListener('mouseenter', () => {
+      if (!isRevealed) {
+        labelEl.textContent = 'Guild Engineer (Voxel)';
+      }
+    });
+
+    rootEl.addEventListener('mouseleave', () => {
+      if (!isRevealed) {
+        labelEl.textContent = 'Hover / Tap to Reveal';
+      }
+    });
+  }
+
+  // Support both direct initial load and Astro client routing if present
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupInteractiveAvatar);
+  } else {
+    setupInteractiveAvatar();
+  }
+  document.addEventListener('astro:page-load', setupInteractiveAvatar);
+</script>
