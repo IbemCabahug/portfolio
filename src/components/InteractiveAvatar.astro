@@ -1,5 +1,4 @@
 ---
-import ThematicIcon from './icons/ThematicIcon.astro';
 ---
 
 <div class="interactive-avatar-root flex-shrink-0 flex flex-col items-center pt-2 lg:pt-4">
@@ -7,68 +6,60 @@ import ThematicIcon from './icons/ThematicIcon.astro';
     type="button"
     id="avatar-toggle-btn"
     class="relative group cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--candle)] focus-visible:outline-offset-4 rounded-full bg-transparent border-0 p-0"
-    aria-label="Adventurer guild medallion: click or hover to reveal 3D pixel avatar"
+    aria-label="Adventurer guild medallion: 3D voxel avatar. Click or hover to reveal real developer photo"
     aria-expanded="false"
   >
     {/* Circular Brass Guild Medallion Frame */}
     <div class="w-48 h-48 sm:w-56 sm:h-56 rounded-full border-2 border-[var(--brass)] bg-[#1e1208] p-2 shadow-2xl shadow-black/80 flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:border-[var(--candle)] group-hover:shadow-[0_0_20px_rgba(255,228,160,0.25)]">
       <div class="relative w-full h-full rounded-full overflow-hidden bg-[#120a04] flex items-center justify-center">
         
-        {/* State A: 3D Pixel Art Adventurer Avatar (Revealed State) */}
+        {/* Layer 1: 3D Voxel Pixel-Art Adventurer Avatar (Default View) */}
         <img
           src="/art/profile-pixel-3d.jpg"
           alt="Nhovem Cabahug — 3D Voxel Pixel-Art Adventurer portrait"
           width="224"
           height="224"
-          class="avatar-pixel-img absolute inset-0 w-full h-full object-cover rounded-full opacity-0 scale-95 transition-all duration-350 ease-out pointer-events-none"
+          class="avatar-pixel-img absolute inset-0 w-full h-full object-cover rounded-full opacity-100 scale-100 transition-all duration-350 ease-out"
           loading="eager"
           decoding="async"
         />
 
-        {/* State B: The Obscured Shrouded Medallion (Default State) */}
-        <div class="avatar-shroud absolute inset-0 w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-[#1a0f06] via-[#140b04] to-[#0c0602] transition-all duration-350 ease-out p-4 text-center select-none">
-          {/* Subtle atmospheric ambient glow */}
-          <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(168,122,39,0.25)_0%,transparent_70%)] pointer-events-none" aria-hidden="true"></div>
-          
-          {/* Guild Emblem / Mystery Seal */}
-          <div class="relative z-10 w-16 h-16 rounded-full border border-[var(--brass)]/60 bg-[var(--wood-deep)]/90 flex items-center justify-center mb-2 shadow-inner group-hover:scale-105 transition-transform duration-300">
-            <ThematicIcon name="swords" class="w-8 h-8 text-[var(--candle)] opacity-80" />
-          </div>
-
-          <span class="relative z-10 text-xs font-serif font-bold text-[var(--candle)] tracking-wide">
-            Adventurer's Seal
-          </span>
-          <span class="relative z-10 text-[10px] text-[var(--parchment)]/70 mt-0.5 uppercase tracking-widest font-semibold">
-            Identity Shrouded
-          </span>
-        </div>
+        {/* Layer 2: Real Profile Photo (Revealed on Hover / Click / Tap) */}
+        <img
+          src="/art/profile.jpg"
+          alt="Nhovem Cabahug — Real photograph in formal suit and tie"
+          width="224"
+          height="224"
+          class="avatar-real-img absolute inset-0 w-full h-full object-cover rounded-full opacity-0 scale-95 transition-all duration-350 ease-out pointer-events-none"
+          loading="eager"
+          decoding="async"
+        />
 
       </div>
     </div>
 
     {/* Guild Medallion Tag Indicator */}
-    <div class="avatar-tag absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[var(--wood-deep)] border border-[var(--brass)] text-[var(--candle)] text-[11px] font-extrabold uppercase tracking-wider px-3.5 py-0.5 rounded-full shadow-md flex items-center gap-1.5 transition-colors duration-200">
-      <span class="avatar-dot w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" aria-hidden="true"></span>
-      <span class="avatar-label">Hover / Tap to Reveal</span>
+    <div class="avatar-tag absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[var(--wood-deep)] border border-[var(--brass)] text-[var(--candle)] text-[11px] font-extrabold uppercase tracking-wider px-3.5 py-0.5 rounded-full shadow-md flex items-center gap-1.5 transition-all duration-200">
+      <span class="avatar-dot w-1.5 h-1.5 rounded-full bg-amber-400" aria-hidden="true"></span>
+      <span class="avatar-label">Guild Engineer (Voxel)</span>
     </div>
   </button>
 </div>
 
 <style>
-  /* Hover & Focus Interactions on Desktop */
-  .interactive-avatar-root:hover .avatar-shroud,
-  .interactive-avatar-root:focus-within .avatar-shroud,
-  .interactive-avatar-root.is-revealed .avatar-shroud {
-    opacity: 0;
-    transform: scale(1.05);
-    pointer-events: none;
+  /* Hover & Focus Interactions: Fade in the real photo over the voxel avatar */
+  .interactive-avatar-root:hover .avatar-real-img,
+  .interactive-avatar-root:focus-within .avatar-real-img,
+  .interactive-avatar-root.is-revealed .avatar-real-img {
+    opacity: 1;
+    transform: scale(1);
   }
 
   .interactive-avatar-root:hover .avatar-pixel-img,
   .interactive-avatar-root:focus-within .avatar-pixel-img,
   .interactive-avatar-root.is-revealed .avatar-pixel-img {
-    opacity: 1;
-    transform: scale(1);
+    opacity: 0;
+    transform: scale(1.05);
   }
 
   .interactive-avatar-root:hover .avatar-tag,
@@ -82,7 +73,6 @@ import ThematicIcon from './icons/ThematicIcon.astro';
   .interactive-avatar-root:focus-within .avatar-dot,
   .interactive-avatar-root.is-revealed .avatar-dot {
     background-color: #34d399; /* emerald-400 */
-    animation: none;
   }
 </style>
 
@@ -103,10 +93,10 @@ import ThematicIcon from './icons/ThematicIcon.astro';
       buttonEl.setAttribute('aria-expanded', String(isRevealed));
       if (isRevealed) {
         rootEl.classList.add('is-revealed');
-        labelEl.textContent = 'Guild Engineer (Voxel)';
+        labelEl.textContent = 'Real Engineer (Nhovem)';
       } else {
         rootEl.classList.remove('is-revealed');
-        labelEl.textContent = 'Hover / Tap to Reveal';
+        labelEl.textContent = 'Guild Engineer (Voxel)';
       }
     }
 
@@ -125,21 +115,20 @@ import ThematicIcon from './icons/ThematicIcon.astro';
       }
     });
 
-    // Subtle label sync on hover if not locked
+    // Label sync on hover if not locked
     rootEl.addEventListener('mouseenter', () => {
       if (!isRevealed) {
-        labelEl.textContent = 'Guild Engineer (Voxel)';
+        labelEl.textContent = 'Real Engineer (Nhovem)';
       }
     });
 
     rootEl.addEventListener('mouseleave', () => {
       if (!isRevealed) {
-        labelEl.textContent = 'Hover / Tap to Reveal';
+        labelEl.textContent = 'Guild Engineer (Voxel)';
       }
     });
   }
 
-  // Support both direct initial load and Astro client routing if present
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', setupInteractiveAvatar);
   } else {
