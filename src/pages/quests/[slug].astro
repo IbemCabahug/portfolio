@@ -81,7 +81,7 @@ const telemetry = await getProjectTelemetry(entry.data.sourceUrl);
         </div>
 
         <div class="flex flex-wrap gap-4">
-          {entry.data.liveUrl && (
+          {entry.data.liveUrl && !entry.data.allowFraming && (
             <a
               href={entry.data.liveUrl}
               target="_blank"
