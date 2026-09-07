@@ -59,12 +59,12 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
           aria-haspopup="dialog"
           aria-expanded="false"
           aria-controls="dialog-raven"
-          style="left: 0.16%; top: 29.41%; width: 13.28%; z-index: 3;"
+          style="left: 1.64%; top: 45.80%; width: 6.02%; z-index: 3;"
         >
           <img
             src="/art/new-raven-with-perch-448.webp"
             srcset="/art/new-raven-with-perch-224.webp 224w, /art/new-raven-with-perch-448.webp 448w"
-            sizes="(max-width: 1280px) 170px, 340px"
+            sizes="(max-width: 1280px) 80px, 160px"
             width="1121"
             height="1280"
             alt=""
@@ -971,6 +971,10 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
     bottom: calc(100% + 8px);
     left: 50%;
     transform: translateX(-50%);
+  }
+  #trigger-perch-raven .scene-tooltip[data-placement="top"] {
+    left: 0;
+    transform: none;
   }
   .scene-tooltip[data-placement="bottom"] {
     top: calc(100% + 8px);
