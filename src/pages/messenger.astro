@@ -19,6 +19,8 @@ const projectTelemetries = await Promise.all(
     return { project: p, telemetry };
   })
 );
+
+const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telemetry?.latestCommit?.sha || '4904d7d';
 ---
 
 <TavernLayout
@@ -107,6 +109,33 @@ const projectTelemetries = await Promise.all(
             decoding="async"
             class="machine-sprite"
           />
+          <!-- In-World Arcane Telemetry HUD Screen -->
+          <div class="transceiver-screen" aria-hidden="true">
+            <div class="screen-scanlines"></div>
+            
+            <div class="screen-header">
+              <span class="screen-pulse-dot"></span>
+              <span class="screen-status-text">GH // LIVE</span>
+            </div>
+
+            <div class="screen-body">
+              <svg class="octocat-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+              </svg>
+              <div class="screen-handle">@IbemCabahug</div>
+            </div>
+
+            <div class="screen-footer">
+              <div class="screen-bars">
+                <span class="bar bar-1"></span>
+                <span class="bar bar-2"></span>
+                <span class="bar bar-3"></span>
+                <span class="bar bar-4"></span>
+                <span class="bar bar-5"></span>
+              </div>
+              <span class="screen-commit">{activeSha}</span>
+            </div>
+          </div>
           <span class="scene-tooltip" data-placement="top">Arcane Transceiver (GitHub)</span>
         </button>
 
@@ -1060,6 +1089,151 @@ const projectTelemetries = await Promise.all(
     transform: translateY(-50%);
   }
 
+  /* In-World Arcane Telemetry HUD Screen */
+  .transceiver-screen {
+    position: absolute;
+    left: 29.2%;
+    top: 17%;
+    width: 42.6%;
+    height: 57.9%;
+    pointer-events: none;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3% 4%;
+    background: radial-gradient(circle at 50% 45%, rgba(42, 28, 14, 0.88) 0%, rgba(16, 9, 3, 0.97) 85%);
+    border-radius: 1px;
+    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.9), 0 0 5px rgba(213, 128, 59, 0.2);
+    transition: box-shadow 0.3s ease, filter 0.3s ease;
+  }
+
+  .scene-object:is(:hover, :focus-visible) .transceiver-screen {
+    box-shadow: inset 0 0 10px rgba(255, 228, 160, 0.25), 0 0 14px rgba(213, 128, 59, 0.55);
+    filter: brightness(1.18);
+  }
+
+  /* Scanlines & Ambient Flicker */
+  .screen-scanlines {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      rgba(18, 16, 16, 0) 50%,
+      rgba(0, 0, 0, 0.35) 50%
+    );
+    background-size: 100% 3px;
+    opacity: 0.6;
+    z-index: 2;
+  }
+
+  .screen-header {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: clamp(0.35rem, 0.52cqw, 0.5rem);
+    color: rgba(255, 228, 160, 0.85);
+    letter-spacing: 0.05em;
+    line-height: 1;
+    border-bottom: 1px solid rgba(168, 122, 39, 0.3);
+    padding-bottom: 2px;
+  }
+
+  .screen-pulse-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #34d399;
+    box-shadow: 0 0 4px #34d399;
+    animation: screen-beacon 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes screen-beacon {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.35; transform: scale(0.85); }
+  }
+
+  .screen-body {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    margin: auto 0;
+  }
+
+  .octocat-icon {
+    width: clamp(14px, 2.2cqw, 20px);
+    height: clamp(14px, 2.2cqw, 20px);
+    color: var(--candle, #ffe4a0);
+    filter: drop-shadow(0 0 3px rgba(255, 228, 160, 0.6));
+    transition: transform 0.25s ease-out, filter 0.25s ease-out;
+  }
+
+  .scene-object:is(:hover, :focus-visible) .octocat-icon {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 6px rgba(255, 228, 160, 0.9)) drop-shadow(0 0 10px rgba(213, 128, 59, 0.6));
+  }
+
+  .screen-handle {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: clamp(0.38rem, 0.62cqw, 0.5625rem);
+    font-weight: 700;
+    color: #fdf6e3;
+    text-shadow: 0 0 4px rgba(213, 128, 59, 0.8);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    line-height: 1.1;
+  }
+
+  .screen-footer {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: clamp(0.32rem, 0.48cqw, 0.45rem);
+    color: rgba(255, 228, 160, 0.7);
+    line-height: 1;
+    border-top: 1px solid rgba(168, 122, 39, 0.25);
+    padding-top: 2px;
+  }
+
+  .screen-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 1.5px;
+    height: 6px;
+  }
+
+  .screen-bars .bar {
+    width: 1.5px;
+    background: var(--brass, #a87a27);
+    border-radius: 1px;
+    animation: screen-equalizer 1.4s ease-in-out infinite alternate;
+  }
+
+  .screen-bars .bar-1 { height: 30%; animation-delay: 0.1s; }
+  .screen-bars .bar-2 { height: 70%; animation-delay: 0.3s; }
+  .screen-bars .bar-3 { height: 100%; animation-delay: 0.0s; }
+  .screen-bars .bar-4 { height: 50%; animation-delay: 0.4s; }
+  .screen-bars .bar-5 { height: 80%; animation-delay: 0.2s; }
+
+  @keyframes screen-equalizer {
+    0% { height: 20%; background: var(--brass, #a87a27); }
+    50% { height: 90%; background: var(--candle, #ffe4a0); }
+    100% { height: 40%; background: var(--brass, #a87a27); }
+  }
+
   /* Precision Cutout Sprites & Hit Targets */
   .desk-hotspot,
   .satchel-hotspot,
@@ -1307,7 +1481,9 @@ const projectTelemetries = await Promise.all(
     .desk-glow-cue,
     .satchel-glow-cue,
     .door-light-cue,
-    .tavern-panel {
+    .tavern-panel,
+    .screen-pulse-dot,
+    .screen-bars .bar {
       transition: none !important;
       animation: none !important;
     }
