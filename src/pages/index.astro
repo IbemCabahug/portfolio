@@ -1,25 +1,247 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const allProjects = await getCollection('projects');
+const featuredProjects = allProjects.sort((a, b) => a.data.order - b.data.order);
 ---
 
-<BaseLayout title="Nhovem Cabahug - Web Developer" description="I build accessible, fast web applications with TypeScript. I develop with AI assistance, and I review, test and make the architectural decisions myself." hideDefaultNav={true}>
-  <div class="min-h-screen bg-[var(--wood-deep)] text-[var(--parchment)]">
-    <div class="max-w-2xl mx-auto py-16 px-4">
-      <h1 class="text-4xl font-bold mb-4 text-[var(--candle)]">Nhovem Cabahug</h1>
-      <p class="text-lg mb-6">
-        I build accessible, fast web applications with TypeScript. I develop with AI assistance, and I review, test and make the architectural decisions myself. Recently shipped features and bug fixes for a biometric tracking system in production.
-      </p>
+<BaseLayout
+  title="Nhovem Cabahug — Web Developer & Software Engineer"
+  description="I build accessible, fast web applications with TypeScript. I develop with AI assistance, and I review, test and make the architectural decisions myself."
+  hideDefaultNav={true}
+>
+  <main id="main-content" class="min-h-screen bg-[var(--wood-deep)] text-[var(--parchment)]">
+    {/* Atmospheric Tavern Threshold Hero */}
+    <div class="relative overflow-hidden border-b-2 border-[var(--brass)] bg-[#140c05]">
+      {/* Background Ambience Layer */}
+      <div
+        class="absolute inset-0 opacity-20 bg-cover bg-center pointer-events-none mix-blend-luminosity"
+        style="background-image: url('/art/tavern-entrance-closed-1280.webp');"
+        aria-hidden="true"
+      ></div>
+      <div class="absolute inset-0 bg-gradient-to-b from-[#140c05]/80 via-[#1e1208]/90 to-[var(--wood-deep)] pointer-events-none" aria-hidden="true"></div>
 
-      <div class="flex flex-wrap gap-4 mb-8 text-lg font-semibold">
-        <a href="mailto:ncabahug223@gmail.com" class="underline hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--candle)]">ncabahug223@gmail.com</a>
-        <a href="https://github.com/IbemCabahug" class="underline hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--candle)]">GitHub</a>
-      </div>
+      <div class="relative max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+        <header class="max-w-3xl">
+          <div class="inline-flex items-center gap-2 px-3 py-1 mb-4 rounded border border-[var(--brass)] bg-[var(--wood-deep)]/90 text-xs font-semibold tracking-wider uppercase text-[var(--candle)]">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true"></span>
+            Tavern Entrance · Available for Hire · Cebu, PH & Remote
+          </div>
 
-      <div class="flex flex-col gap-4">
-        <a href="/simple" class="flex items-center justify-center min-h-[44px] p-4 border-2 border-[var(--brass)] bg-[var(--wood-deep)] text-center font-semibold hover:bg-[var(--parchment)] hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--candle)]">Simple portfolio mode</a>
-        <a href="/resume" class="flex items-center justify-center min-h-[44px] p-4 border-2 border-[var(--brass)] bg-[var(--wood-deep)] text-center font-semibold hover:bg-[var(--parchment)] hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--candle)]">Résumé</a>
-        <a href="/tavern" class="flex items-center justify-center min-h-[44px] p-4 border-2 border-[var(--brass)] bg-[var(--wood-deep)] text-center font-semibold hover:bg-[var(--parchment)] hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--candle)]">Enter Ibem's Tavern</a>
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[var(--candle)] mb-4 drop-shadow-sm font-serif">
+            Nhovem Cabahug
+          </h1>
+
+          <p class="text-xl sm:text-2xl font-medium text-[var(--parchment)] mb-6 leading-snug">
+            Web Developer & Software Engineer
+          </p>
+
+          <p class="text-base sm:text-lg text-[var(--parchment)]/90 leading-relaxed mb-8 max-w-2xl">
+            I build accessible, fast web applications with TypeScript. I develop with AI assistance, and I review, test and make the architectural decisions myself. Recently shipped features and bug fixes for a biometric tracking system in production.
+          </p>
+
+          {/* Quick Direct Contacts */}
+          <div class="flex flex-wrap items-center gap-4 text-sm font-medium">
+            <a
+              href="mailto:ncabahug223@gmail.com"
+              class="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 bg-[var(--stone)] text-[var(--candle)] border border-[var(--brass)] rounded hover:bg-[var(--brass)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+              aria-label="Send a Raven — Email ncabahug223@gmail.com"
+            >
+              <span aria-hidden="true">✉</span> Send a Raven (Email)
+            </a>
+            <a
+              href="https://github.com/IbemCabahug"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 bg-[var(--stone)] text-[var(--candle)] border border-[var(--brass)] rounded hover:bg-[var(--brass)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+              aria-label="Inspect the Spellbook — GitHub Profile"
+            >
+              <span aria-hidden="true">⌨</span> Inspect GitHub Profile
+            </a>
+            <a
+              href="/resume"
+              class="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 bg-transparent text-[var(--parchment)] border border-[var(--brass)]/80 rounded hover:bg-[var(--parchment)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+            >
+              <span>📄</span> View Full Résumé
+            </a>
+          </div>
+        </header>
       </div>
     </div>
-  </div>
+
+    {/* Dual-Track Experience Navigator */}
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-12">
+      <section aria-labelledby="paths-heading" class="mb-14">
+        <h2 id="paths-heading" class="text-xs uppercase tracking-widest text-[var(--candle)] font-bold mb-4">
+          Choose Your Path · Dual Experience Architecture
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Path 1: Immersive Tavern */}
+          <div class="bg-[#24170d] border-2 border-[var(--brass)] rounded p-6 flex flex-col justify-between shadow-lg">
+            <div>
+              <div class="text-2xl mb-2" aria-hidden="true">🍺</div>
+              <h3 class="text-xl font-bold text-[var(--candle)] mb-2 font-serif">
+                Ibem's Tavern
+              </h3>
+              <p class="text-sm text-[var(--parchment)]/90 leading-relaxed mb-4">
+                The interactive, visual tavern experience. Explore the notice board, examine the shield wall of skills, and consult the Tavern Regular.
+              </p>
+            </div>
+            <a
+              href="/tavern"
+              class="inline-flex items-center justify-center min-h-[44px] px-4 py-2 bg-[var(--brass)] text-[var(--wood-deep)] font-bold text-sm rounded hover:bg-[var(--candle)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+            >
+              Enter Ibem's Tavern →
+            </a>
+          </div>
+
+          {/* Path 2: Simple Portfolio Mode */}
+          <div class="bg-[#24170d] border-2 border-[var(--brass)] rounded p-6 flex flex-col justify-between shadow-lg">
+            <div>
+              <div class="text-2xl mb-2" aria-hidden="true">⚡</div>
+              <h3 class="text-xl font-bold text-[var(--candle)] mb-2 font-serif">
+                Simple Mode
+              </h3>
+              <p class="text-sm text-[var(--parchment)]/90 leading-relaxed mb-4">
+                Fast-track recruiter view. Zero runtime JavaScript, clean linear typography, instant loading, and streamlined scannability.
+              </p>
+            </div>
+            <a
+              href="/simple"
+              class="inline-flex items-center justify-center min-h-[44px] px-4 py-2 bg-transparent text-[var(--parchment)] border-2 border-[var(--brass)] font-bold text-sm rounded hover:bg-[var(--parchment)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+            >
+              Open Simple Mode →
+            </a>
+          </div>
+
+          {/* Path 3: Quest Board */}
+          <div class="bg-[#24170d] border-2 border-[var(--brass)] rounded p-6 flex flex-col justify-between shadow-lg">
+            <div>
+              <div class="text-2xl mb-2" aria-hidden="true">📜</div>
+              <h3 class="text-xl font-bold text-[var(--candle)] mb-2 font-serif">
+                The Quest Board
+              </h3>
+              <p class="text-sm text-[var(--parchment)]/90 leading-relaxed mb-4">
+                Deep architectural case studies for Arcane Typer, BITS biometric production OJT, and Mimic API mocking tool.
+              </p>
+            </div>
+            <a
+              href="/quests"
+              class="inline-flex items-center justify-center min-h-[44px] px-4 py-2 bg-transparent text-[var(--parchment)] border-2 border-[var(--brass)] font-bold text-sm rounded hover:bg-[var(--parchment)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+            >
+              View All Quests →
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Flagship Projects Section */}
+      <section aria-labelledby="featured-quests-heading" class="mb-14">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-6 pb-2 border-b border-[var(--brass)]/30 gap-2">
+          <div>
+            <h2 id="featured-quests-heading" class="text-2xl sm:text-3xl font-bold text-[var(--candle)] font-serif">
+              Flagship Quests & Systems
+            </h2>
+            <p class="text-sm text-[var(--parchment)]/80 mt-1">
+              Curated evidence of production contributions and independently architected web applications.
+            </p>
+          </div>
+          <a
+            href="/quests"
+            class="text-sm font-semibold text-[var(--candle)] hover:underline inline-flex items-center min-h-[44px]"
+          >
+            Inspect Quest Board ({featuredProjects.length}) →
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {featuredProjects.map((project) => (
+            <article class="bg-[var(--parchment)] text-[var(--ink)] p-6 rounded border-2 border-[var(--brass)] shadow-xl flex flex-col justify-between">
+              <div>
+                <div class="flex justify-between items-start gap-2 mb-3">
+                  <span class={`text-xs uppercase font-bold tracking-wider px-2 py-0.5 rounded ${project.data.status === 'Shipped' ? 'bg-[var(--wood-deep)] text-[var(--candle)]' : 'bg-[var(--stone)] text-[var(--parchment)]'}`}>
+                    {project.data.status}
+                  </span>
+                  <span class="text-xs font-semibold text-[var(--ink)]/80 italic">
+                    {project.data.role}
+                  </span>
+                </div>
+
+                <h3 class="text-lg font-bold mb-2 text-[var(--ink)] leading-snug font-serif">
+                  <a
+                    href={`/quests/${project.data.slug}`}
+                    class="underline hover:text-[var(--ember)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+                  >
+                    {project.data.title}
+                  </a>
+                </h3>
+
+                <p class="text-sm text-[var(--ink)]/90 mb-4 leading-relaxed line-clamp-3">
+                  {project.data.summary}
+                </p>
+              </div>
+
+              <div>
+                <div class="mb-4 pt-3 border-t border-[var(--brass)]/30">
+                  <ul class="flex flex-wrap gap-1" aria-label="Key technologies">
+                    {project.data.stack.slice(0, 4).map((tech: string) => (
+                      <li class="text-xs px-2 py-0.5 border border-[var(--brass)] bg-[var(--parchment)] font-medium rounded-sm">
+                        {tech}
+                      </li>
+                    ))}
+                    {project.data.stack.length > 4 && (
+                      <li class="text-xs px-1.5 py-0.5 text-[var(--ink)]/70 font-semibold">
+                        +{project.data.stack.length - 4}
+                      </li>
+                    )}
+                  </ul>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                  <a
+                    href={`/quests/${project.data.slug}`}
+                    class="inline-flex items-center justify-center min-h-[44px] px-3 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-xs rounded hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+                  >
+                    Inspect Case Study
+                  </a>
+                  {project.data.liveUrl && (
+                    <a
+                      href={project.data.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="inline-flex items-center justify-center min-h-[44px] px-3 border border-[var(--wood-deep)] text-[var(--wood-deep)] font-semibold text-xs rounded hover:bg-[var(--wood-deep)] hover:text-[var(--parchment)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+                    >
+                      Play / View Live Demo ↗
+                    </a>
+                  )}
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* Navigation Ledger & Footer */}
+      <footer class="mt-16 pt-8 border-t-2 border-[var(--brass)] text-center text-sm text-[var(--parchment)]/70">
+        <nav aria-label="Tavern Navigation" class="mb-6">
+          <ul class="flex flex-wrap justify-center gap-x-6 gap-y-2">
+            <li><a href="/" class="hover:text-[var(--candle)] underline min-h-[44px] inline-flex items-center">Tavern Entrance</a></li>
+            <li><a href="/tavern" class="hover:text-[var(--candle)] underline min-h-[44px] inline-flex items-center">Main Tavern</a></li>
+            <li><a href="/quests" class="hover:text-[var(--candle)] underline min-h-[44px] inline-flex items-center">Quest Board</a></li>
+            <li><a href="/tavern/skills" class="hover:text-[var(--candle)] underline min-h-[44px] inline-flex items-center">Adventurer's Badge</a></li>
+            <li><a href="/tavern/npc" class="hover:text-[var(--candle)] underline min-h-[44px] inline-flex items-center">Tavern Regular</a></li>
+            <li><a href="/messenger" class="hover:text-[var(--candle)] underline min-h-[44px] inline-flex items-center">Messenger's Corner</a></li>
+            <li><a href="/resume" class="hover:text-[var(--candle)] underline min-h-[44px] inline-flex items-center">Résumé</a></li>
+            <li><a href="/about" class="hover:text-[var(--candle)] underline min-h-[44px] inline-flex items-center">About</a></li>
+            <li><a href="/simple" class="hover:text-[var(--candle)] underline min-h-[44px] inline-flex items-center">Simple Mode</a></li>
+          </ul>
+        </nav>
+        <p class="max-w-xl mx-auto leading-relaxed text-xs">
+          Environment art generated with AI and hand-edited by Nhovem Cabahug; all code, copy, tests, and architectural design by Nhovem Cabahug.
+        </p>
+      </footer>
+    </div>
+  </main>
 </BaseLayout>
