@@ -75,21 +75,21 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
           <span class="scene-tooltip" data-placement="right">Send Word (Email)</span>
         </button>
 
-        <!-- Hotspot 2: Arcane Transceiver (GitHub Telemetry) -->
+        <!-- Hotspot 2: Arcane Transceiver (GitHub Telemetry) - Resized and centered with breathing room -->
         <button
           type="button"
           id="trigger-arcane-machine"
-          class="scene-object scene-hotspot"
+          class="scene-object scene-hotspot machine-hotspot"
           aria-label="The Arcane Transceiver (GitHub Engineering Record)"
           aria-haspopup="dialog"
           aria-expanded="false"
           aria-controls="dialog-machine"
-          style="left: 47.6%; top: 35.5%; width: 26.6%; z-index: 3;"
+          style="left: 50.2%; top: 36.0%; width: 21.5%; z-index: 3;"
         >
           <img
             src="/art/enchanted-case-study-device-1152.webp"
             srcset="/art/enchanted-case-study-device-576.webp 576w, /art/enchanted-case-study-device-1152.webp 1152w"
-            sizes="(max-width: 1280px) 340px, 680px"
+            sizes="(max-width: 1280px) 275px, 550px"
             width="1152"
             height="577"
             alt=""
@@ -145,7 +145,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
         <!-- Modal Backdrop -->
         <div id="dialog-backdrop" class="dialog-backdrop" hidden aria-hidden="true"></div>
 
-        <!-- Modal 1: Raven Email Dispatch -->
+        <!-- Modal 1: Raven Interactive Missive Composer -->
         <div
           id="dialog-raven"
           class="tavern-panel"
@@ -165,63 +165,178 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
               </span>
               <div>
                 <span class="text-xs uppercase font-extrabold tracking-widest text-[var(--ember)]">Priority Dispatch</span>
-                <h2 id="raven-dialog-title" class="text-xl sm:text-2xl font-bold text-[var(--candle)]">Send Word via Email</h2>
+                <h2 id="raven-dialog-title" class="text-xl sm:text-2xl font-bold text-[var(--candle)]">Send Word with the Raven</h2>
               </div>
             </div>
             <button type="button" class="close-panel-btn" aria-label="Close Email Dispatch">&times;</button>
           </div>
 
-          <div class="panel-body space-y-3.5">
-            <p class="text-sm text-[var(--parchment)]/90 leading-relaxed">
-              Whisper your message into the roost. The messenger raven carries word directly to Nhovem's personal console for project inquiries, full-time engineering roles, and technical consultations.
+          <!-- Composer View -->
+          <div id="raven-composer-view" class="panel-body space-y-3">
+            <p class="text-xs sm:text-sm text-[var(--parchment)]/90 leading-relaxed">
+              Inscribe your dispatch below. Selecting a missive category provides a structured template, and sealing the message routes it directly to Nhovem's console.
             </p>
 
-            <div class="p-3.5 rounded-lg bg-[var(--wood-deep)]/80 border border-[var(--brass)]/50 space-y-2.5">
-              <div class="flex flex-wrap items-center justify-between gap-2">
-                <span class="text-xs uppercase tracking-wider text-[var(--brass)] font-semibold">Direct Electronic Address</span>
-                <span class="text-xs text-emerald-400 font-mono flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                  Active & Monitored
-                </span>
-              </div>
-
-              <div class="flex flex-wrap items-center gap-2 bg-black/40 px-3 py-2 rounded border border-[var(--brass)]/30 font-mono text-sm sm:text-base text-[var(--candle)]">
-                <span class="select-all font-bold flex-1" id="modal-email-address">{mailAddress}</span>
+            <!-- Template Categories (GitHub Issue Style) -->
+            <div>
+              <span class="block text-xs uppercase tracking-wider text-[var(--brass)] font-semibold mb-1.5">Select Dispatch Template</span>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5" role="radiogroup" aria-label="Missive template selection">
                 <button
                   type="button"
-                  id="modal-copy-email-btn"
-                  class="text-xs px-3 py-1 bg-[var(--brass)] text-black font-bold rounded hover:bg-[var(--candle)] transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
-                  title="Copy email to clipboard"
-                  aria-label="Copy email address"
+                  class="template-pill active"
+                  data-template="quest"
+                  data-prefix="[Quest Offer]"
+                  data-subject="Frontend / Full-Stack Project Inquiry"
+                  data-placeholder="Describe the quest, target timeline, technology stack, and how you'd like to collaborate..."
                 >
-                  Copy
+                  🎯 Quest Offer
                 </button>
-                <span id="modal-copy-status" class="text-xs text-emerald-400 font-bold hidden" role="status" aria-live="polite">Copied!</span>
+                <button
+                  type="button"
+                  class="template-pill"
+                  data-template="role"
+                  data-prefix="[Guild Recruitment]"
+                  data-subject="Developer Role Opportunity"
+                  data-placeholder="Share details about the role, team structure, remote/hybrid requirements, and company mission..."
+                >
+                  ⚔️ Recruitment
+                </button>
+                <button
+                  type="button"
+                  class="template-pill"
+                  data-template="consult"
+                  data-prefix="[Consultation]"
+                  data-subject="Technical Consultation & Architecture Review"
+                  data-placeholder="Detail the technical questions, architecture challenge, or system review you would like to discuss..."
+                >
+                  🔮 Consultation
+                </button>
+                <button
+                  type="button"
+                  class="template-pill"
+                  data-template="general"
+                  data-prefix="[Tavern Greetings]"
+                  data-subject="Greetings from a Fellow Traveler"
+                  data-placeholder="Share your thoughts on the portfolio, say hello, or connect with Nhovem..."
+                >
+                  ✉️ General
+                </button>
               </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-[var(--parchment)]/80">
-              <div class="p-2.5 rounded bg-black/20 border border-[var(--brass)]/20">
-                <strong class="text-[var(--candle)] block mb-0.5">Turnaround Time</strong>
-                Typically responds within 24–48 hours.
+            <!-- Form Fields -->
+            <form id="desktop-raven-form" class="space-y-2.5">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div>
+                  <label for="desktop-sender-name" class="block text-xs text-[var(--parchment)]/80 font-medium mb-1">Your Name / Call-Sign <span class="text-[var(--ember)]">*</span></label>
+                  <input
+                    type="text"
+                    id="desktop-sender-name"
+                    name="senderName"
+                    required
+                    placeholder="e.g. Robin of the North"
+                    class="tavern-input w-full px-3 py-1.5 text-xs sm:text-sm rounded bg-black/40 border border-[var(--brass)]/40 text-[var(--candle)] focus:border-[var(--candle)] focus:outline-none transition-colors"
+                  />
+                </div>
+                <div>
+                  <label for="desktop-sender-email" class="block text-xs text-[var(--parchment)]/80 font-medium mb-1">Your Return Address (Email) <span class="text-[var(--ember)]">*</span></label>
+                  <input
+                    type="email"
+                    id="desktop-sender-email"
+                    name="senderEmail"
+                    required
+                    placeholder="e.g. traveler@guild.com"
+                    class="tavern-input w-full px-3 py-1.5 text-xs sm:text-sm rounded bg-black/40 border border-[var(--brass)]/40 text-[var(--candle)] focus:border-[var(--candle)] focus:outline-none transition-colors"
+                  />
+                </div>
               </div>
-              <div class="p-2.5 rounded bg-black/20 border border-[var(--brass)]/20">
-                <strong class="text-[var(--candle)] block mb-0.5">Primary Topics</strong>
-                Full-stack roles, UI architecture, contracts.
+
+              <div>
+                <label for="desktop-missive-subject" class="block text-xs text-[var(--parchment)]/80 font-medium mb-1">Missive Title / Subject <span class="text-[var(--ember)]">*</span></label>
+                <input
+                  type="text"
+                  id="desktop-missive-subject"
+                  name="subject"
+                  required
+                  value="[Quest Offer] Frontend / Full-Stack Project Inquiry"
+                  class="tavern-input w-full px-3 py-1.5 text-xs sm:text-sm rounded bg-black/40 border border-[var(--brass)]/40 text-[var(--candle)] focus:border-[var(--candle)] focus:outline-none transition-colors"
+                />
               </div>
-            </div>
+
+              <div>
+                <label for="desktop-missive-body" class="block text-xs text-[var(--parchment)]/80 font-medium mb-1">Sealed Message <span class="text-[var(--ember)]">*</span></label>
+                <textarea
+                  id="desktop-missive-body"
+                  name="message"
+                  required
+                  rows="3"
+                  placeholder="Describe the quest, target timeline, technology stack, and how you'd like to collaborate..."
+                  class="tavern-input w-full px-3 py-2 text-xs sm:text-sm rounded bg-black/40 border border-[var(--brass)]/40 text-[var(--candle)] focus:border-[var(--candle)] focus:outline-none transition-colors resize-none"
+                ></textarea>
+              </div>
+
+              <div class="flex flex-wrap items-center justify-between text-[11px] text-[var(--parchment)]/70 pt-0.5">
+                <span>Destination: <strong class="text-[var(--candle)] font-mono">{mailAddress}</strong></span>
+                <span>Turnaround: 24–48 hours</span>
+              </div>
+
+              <div class="panel-actions pt-2">
+                <button
+                  type="submit"
+                  class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-sm rounded hover:bg-[var(--candle)] transition-colors shadow-md cursor-pointer"
+                >
+                  Seal & Dispatch Raven &rarr;
+                </button>
+                <button type="button" class="close-panel-btn-secondary min-h-[44px] px-4 py-2 text-sm text-[var(--parchment)]/80 hover:text-[var(--candle)]">
+                  Return to Roost
+                </button>
+              </div>
+            </form>
           </div>
 
-          <div class="panel-actions">
-            <a
-              href={`mailto:${mailAddress}`}
-              class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-sm rounded hover:bg-[var(--candle)] transition-colors shadow-md"
-            >
-              Compose Missive &rarr;
-            </a>
-            <button type="button" class="close-panel-btn-secondary min-h-[44px] px-4 py-2 text-sm text-[var(--parchment)]/80 hover:text-[var(--candle)]">
-              Return to Roost
-            </button>
+          <!-- Dispatch Receipt / Confirmation View (Hidden by default) -->
+          <div id="raven-receipt-view" class="panel-body space-y-3 hidden" aria-live="polite">
+            <div class="p-4 rounded bg-emerald-950/40 border border-emerald-500/40 text-center space-y-1.5">
+              <span class="text-2xl block" aria-hidden="true">🦅</span>
+              <h3 class="text-base sm:text-lg font-bold text-emerald-400">The Raven Takes Wing!</h3>
+              <p class="text-xs text-[var(--parchment)]/90 max-w-md mx-auto">
+                Your missive has been prepared and routed to your email client. A copy of your sealed message is inscribed below for your records:
+              </p>
+            </div>
+
+            <div class="p-3 rounded bg-black/40 border border-[var(--brass)]/30 font-mono text-xs text-[var(--parchment)]/90 space-y-1">
+              <div class="text-[var(--brass)] font-bold mb-1 border-b border-[var(--brass)]/20 pb-1">DISPATCH RECORD</div>
+              <p><strong class="text-[var(--candle)]">To:</strong> {mailAddress}</p>
+              <p><strong class="text-[var(--candle)]">Subject:</strong> <span id="receipt-subject"></span></p>
+              <p><strong class="text-[var(--candle)]">From:</strong> <span id="receipt-from"></span></p>
+              <div class="mt-2 pt-2 border-t border-[var(--brass)]/20 whitespace-pre-wrap" id="receipt-body"></div>
+            </div>
+
+            <div class="panel-actions pt-2 flex flex-wrap gap-2">
+              <button
+                type="button"
+                id="receipt-copy-btn"
+                class="inline-flex items-center justify-center min-h-[44px] px-5 py-2 bg-[var(--brass)] text-black font-bold text-xs sm:text-sm rounded hover:bg-[var(--candle)] transition-colors cursor-pointer"
+              >
+                Copy Formatted Missive
+              </button>
+              <a
+                id="receipt-gmail-link"
+                href={`https://mail.google.com/mail/?view=cm&fs=1&to=${mailAddress}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center justify-center min-h-[44px] px-5 py-2 bg-[var(--wood-deep)] text-[var(--candle)] border border-[var(--brass)] font-bold text-xs sm:text-sm rounded hover:bg-black transition-colors"
+              >
+                Open in Gmail Webmail &rarr;
+              </a>
+              <button
+                type="button"
+                id="receipt-reset-btn"
+                class="close-panel-btn-secondary min-h-[44px] px-4 py-2 text-xs sm:text-sm text-[var(--parchment)]/80 hover:text-[var(--candle)] ml-auto"
+              >
+                Write Another Missive
+              </button>
+            </div>
           </div>
         </div>
 
@@ -308,7 +423,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
           </div>
         </div>
 
-        <!-- Modal 3: Scribe's Ledger (Professional Resume) -->
+        <!-- Modal 3: Scribe's Ledger (Accurate Professional Resume & Credentials) -->
         <div
           id="dialog-desk"
           class="tavern-panel"
@@ -338,25 +453,50 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
 
           <div class="panel-body space-y-3">
             <p class="text-xs sm:text-sm text-[var(--parchment)]/90 leading-relaxed">
-              Carefully inscribed under the candlelight rests Nhovem's professional credentials: chronological engineering history, core stack proficiencies, and formal education.
+              Inscribed with meticulous care under the candlelight rests Nhovem's verified academic credentials, engineering history, and core technical proficiencies.
             </p>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-              <div class="p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/30">
-                <span class="text-[var(--brass)] uppercase tracking-wider font-extrabold block mb-1">Title & Discipline</span>
-                <strong class="text-[var(--candle)] text-sm block">Full-Stack Developer</strong>
-                <span class="text-[var(--parchment)]/80">Frontend Engineering &bull; UI/UX Systems</span>
+              <!-- Academic Credential -->
+              <div class="p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/30 space-y-1">
+                <span class="text-[var(--brass)] uppercase tracking-wider font-extrabold block">Academic Credential</span>
+                <strong class="text-[var(--candle)] text-xs sm:text-sm block">Bachelor of Industrial Technology</strong>
+                <span class="text-[var(--parchment)]/90 block font-medium">Major in Computer Technology</span>
+                <span class="text-[var(--parchment)]/70 block text-[11px]">Cebu Technological University – Danao Campus (2022–2026)</span>
+                <div class="pt-1 flex flex-wrap gap-1">
+                  <span class="px-1.5 py-0.5 rounded bg-[var(--stone)]/80 text-[var(--candle)] font-mono text-[10px] border border-[var(--brass)]/30">Academic Distinction</span>
+                  <span class="px-1.5 py-0.5 rounded bg-[var(--stone)]/80 text-[var(--candle)] font-mono text-[10px] border border-[var(--brass)]/30">Dean's Lister</span>
+                </div>
               </div>
 
-              <div class="p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/30">
-                <span class="text-[var(--brass)] uppercase tracking-wider font-extrabold block mb-1">Education</span>
-                <strong class="text-[var(--candle)] text-sm block">B.S. in Information Technology</strong>
-                <span class="text-[var(--parchment)]/80">University Level Degree</span>
+              <!-- Title, Discipline & Training -->
+              <div class="p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/30 space-y-1">
+                <span class="text-[var(--brass)] uppercase tracking-wider font-extrabold block">Discipline & Training</span>
+                <strong class="text-[var(--candle)] text-xs sm:text-sm block">Web Developer</strong>
+                <span class="text-[var(--parchment)]/90 block font-medium">Computer Technology & Web Systems</span>
+                <span class="text-[var(--parchment)]/70 block text-[11px]">Vocational: Creative Web Design (TESDA, 102 Hours)</span>
+                <div class="pt-1">
+                  <span class="text-emerald-400 font-mono text-[10px]">&bull; Focus: TypeScript, Accessible UX, Performance</span>
+                </div>
               </div>
             </div>
 
-            <div class="p-2.5 rounded bg-black/30 border border-[var(--brass)]/30 space-y-1.5">
-              <span class="text-xs uppercase tracking-wider text-[var(--brass)] font-semibold block">Core Arsenal & Weaponry</span>
+            <!-- Verified Experience -->
+            <div class="p-2.5 rounded bg-black/30 border border-[var(--brass)]/30 space-y-1.5 text-xs">
+              <span class="text-xs uppercase tracking-wider text-[var(--brass)] font-semibold block">Production Work Experience</span>
+              <div class="space-y-1 text-[11px] text-[var(--parchment)]/85">
+                <p>
+                  <strong class="text-[var(--candle)] font-mono">BITS Biometric Timekeeping:</strong> Contributed biometric overtime check-in routing, resolved multi-shift edge cases, and normalized punch times for active company operations.
+                </p>
+                <p>
+                  <strong class="text-[var(--candle)] font-mono">Avega Bros. Integrated Shipping Corp.:</strong> IT & Administrative Support Intern (1,800 hours), handling hardware/software installation, troubleshooting, and data systems.
+                </p>
+              </div>
+            </div>
+
+            <!-- Core Arsenal -->
+            <div class="p-2.5 rounded bg-black/30 border border-[var(--brass)]/30 space-y-1">
+              <span class="text-xs uppercase tracking-wider text-[var(--brass)] font-semibold block">Core Arsenal</span>
               <div class="flex flex-wrap gap-1.5">
                 <span class="px-2 py-0.5 rounded bg-[var(--wood-deep)] border border-[var(--brass)]/40 text-[var(--candle)] text-xs font-mono">TypeScript</span>
                 <span class="px-2 py-0.5 rounded bg-[var(--wood-deep)] border border-[var(--brass)]/40 text-[var(--candle)] text-xs font-mono">React / Next.js</span>
@@ -368,10 +508,6 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
                 <span class="px-2 py-0.5 rounded bg-[var(--wood-deep)] border border-[var(--brass)]/40 text-[var(--candle)] text-xs font-mono">Git & CI/CD</span>
               </div>
             </div>
-
-            <p class="text-xs text-[var(--parchment)]/80 italic">
-              Formatted for immediate digital review and clean paper print/PDF export with zero styling loss.
-            </p>
           </div>
 
           <div class="panel-actions">
@@ -381,13 +517,20 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
             >
               View Full Web Resume &rarr;
             </a>
-            <button type="button" class="close-panel-btn-secondary min-h-[44px] px-4 py-2 text-sm text-[var(--parchment)]/80 hover:text-[var(--candle)]">
+            <a
+              href="/resume.pdf"
+              download
+              class="inline-flex items-center justify-center min-h-[44px] px-4 py-2 bg-[var(--wood-deep)] text-[var(--candle)] border border-[var(--brass)] text-xs sm:text-sm font-semibold rounded hover:bg-black transition-colors"
+            >
+              Download PDF &darr;
+            </a>
+            <button type="button" class="close-panel-btn-secondary min-h-[44px] px-4 py-2 text-sm text-[var(--parchment)]/80 hover:text-[var(--candle)] ml-auto">
               Close Ledger
             </button>
           </div>
         </div>
 
-        <!-- Modal 4: Satchel Status & Coordinates -->
+        <!-- Modal 4: Satchel Status & Expedition Gear (Four Clear Compartments) -->
         <div
           id="dialog-satchel"
           class="tavern-panel"
@@ -406,7 +549,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
               </span>
               <div>
                 <span class="text-xs uppercase font-extrabold tracking-widest text-[var(--ember)]">Field Satchel</span>
-                <h2 id="satchel-dialog-title" class="text-xl sm:text-2xl font-bold text-[var(--candle)]">Coordinates & Availability</h2>
+                <h2 id="satchel-dialog-title" class="text-xl sm:text-2xl font-bold text-[var(--candle)]">Expedition Gear & Logistics</h2>
               </div>
             </div>
             <button type="button" class="close-panel-btn" aria-label="Close Field Satchel">&times;</button>
@@ -414,42 +557,59 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
 
           <div class="panel-body space-y-2.5">
             <p class="text-xs sm:text-sm text-[var(--parchment)]/90 leading-relaxed">
-              Packed and prepared for long campaigns across realms. The courier's current physical station and deployment status are documented below:
+              Packed and prepared for campaigns across realms. The courier's field gear answers all operational, geographic, and collaboration parameters for prospective employers:
             </p>
 
             <div class="space-y-2 text-xs sm:text-sm">
-              <div class="flex items-center justify-between p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40">
-                <span class="text-[var(--brass)] font-semibold">Current Quest Status:</span>
-                <span class="inline-flex items-center gap-1.5 text-emerald-400 font-bold">
-                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-                  {profile?.availability || 'Available for New Quests'}
-                </span>
+              <!-- Compartment 1: Quest Status -->
+              <div class="p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40">
+                <div class="flex items-center justify-between mb-0.5">
+                  <span class="text-[var(--brass)] font-semibold text-xs uppercase tracking-wider">1. Field Pass & Quest Readiness</span>
+                  <span class="inline-flex items-center gap-1.5 text-emerald-400 font-bold text-xs">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                    {profile?.availability || 'Open to junior developer roles'}
+                  </span>
+                </div>
+                <p class="text-[11px] text-[var(--parchment)]/80">Immediate deployment readiness for junior web developer roles, contracts, and frontend engineering positions.</p>
               </div>
 
-              <div class="flex items-center justify-between p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40">
-                <span class="text-[var(--brass)] font-semibold">Realm Station:</span>
-                <span class="text-[var(--candle)] font-bold">{profile?.location || 'Lapu-Lapu City, Philippines'}</span>
+              <!-- Compartment 2: Realm Station & Timezone -->
+              <div class="p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40">
+                <div class="flex items-center justify-between mb-0.5">
+                  <span class="text-[var(--brass)] font-semibold text-xs uppercase tracking-wider">2. Wayfarer's Compass (Coordinates)</span>
+                  <span class="text-[var(--candle)] font-bold text-xs">{profile?.location || 'Philippines'} (UTC+8)</span>
+                </div>
+                <p class="text-[11px] text-[var(--parchment)]/80">Stationed in the Philippines with flexible asynchronous and synchronous overlap for teams across APAC, EMEA, and the Americas.</p>
               </div>
 
-              <div class="flex items-center justify-between p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40">
-                <span class="text-[var(--brass)] font-semibold">Deployment Radius:</span>
-                <span class="text-[var(--candle)]">Remote Worldwide &bull; Hybrid / Relocation</span>
+              <!-- Compartment 3: Deployment Modalities -->
+              <div class="p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40">
+                <div class="flex items-center justify-between mb-0.5">
+                  <span class="text-[var(--brass)] font-semibold text-xs uppercase tracking-wider">3. Transit Waybill (Deployment Radius)</span>
+                  <span class="text-[var(--candle)] font-bold text-xs">Remote Worldwide</span>
+                </div>
+                <p class="text-[11px] text-[var(--parchment)]/80">Equipped for self-directed remote execution, distributed git workflows, and open to hybrid or relocation opportunities.</p>
               </div>
 
-              <div class="flex items-center justify-between p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40">
-                <span class="text-[var(--brass)] font-semibold">Timezone Overlap:</span>
-                <span class="text-[var(--candle)]">UTC+8 (Covers APAC, EMEA, & Americas)</span>
+              <!-- Compartment 4: Spoken Dialects -->
+              <div class="p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40">
+                <div class="flex items-center justify-between mb-0.5">
+                  <span class="text-[var(--brass)] font-semibold text-xs uppercase tracking-wider">4. Expedition Dialects (Languages)</span>
+                  <span class="text-[var(--candle)] font-bold text-xs">English &bull; Filipino &bull; Cebuano</span>
+                </div>
+                <p class="text-[11px] text-[var(--parchment)]/80">English (Professional working proficiency), Filipino (Fluent), and Cebuano (Native) for clear technical documentation and real-time team meetings.</p>
               </div>
             </div>
           </div>
 
           <div class="panel-actions">
-            <a
-              href={`mailto:${mailAddress}?subject=${encodeURIComponent('Inquiry regarding availability & collaboration')}`}
-              class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-sm rounded hover:bg-[var(--candle)] transition-colors shadow-md"
+            <button
+              type="button"
+              id="satchel-dispatch-btn"
+              class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-sm rounded hover:bg-[var(--candle)] transition-colors shadow-md cursor-pointer"
             >
-              Dispatch Inquiry to Satchel &rarr;
-            </a>
+              Send Message with the Raven &rarr;
+            </button>
             <button type="button" class="close-panel-btn-secondary min-h-[44px] px-4 py-2 text-sm text-[var(--parchment)]/80 hover:text-[var(--candle)]">
               Close Satchel
             </button>
@@ -477,54 +637,82 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
         </div>
       </div>
 
-      <!-- 1. Direct Electronic Dispatch (Email) -->
+      <!-- 1. Direct Electronic Dispatch (Interactive Form on Mobile) -->
       <article class="dispatch-slip bg-[var(--parchment)] text-[var(--ink)] p-6 sm:p-7 rounded-lg border-2 border-[var(--brass)] shadow-2xl relative overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(0,0,0,0.6)]">
         <div class="corner-bracket top-left" aria-hidden="true"></div>
         <div class="corner-bracket top-right" aria-hidden="true"></div>
 
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-5">
-          <div class="flex-1 pr-2">
-            <div class="flex flex-wrap items-center gap-2 mb-2">
-              <span class="text-xs uppercase font-extrabold tracking-widest text-[var(--ember)] bg-[var(--wood-deep)]/10 px-2 py-0.5 rounded border border-[var(--ember)]/30">
-                Priority Dispatch
-              </span>
-              <span class="text-xs text-[var(--ink)]/70 font-mono">
-                Direct Electronic Raven
-              </span>
-            </div>
-
-            <h2 class="text-2xl font-bold text-[var(--ink)] mb-1 flex items-center gap-2">
-              <span>Send Word via Email</span>
-            </h2>
-
-            <p class="text-sm sm:text-base text-[var(--ink)]/85 mb-3 leading-relaxed">
-              Fastest channel for project inquiries, technical roles, or engineering consultations. Direct to Nhovem's personal console.
-            </p>
-
-            <div class="inline-flex items-center gap-2 text-xs sm:text-sm bg-[var(--wood-deep)]/10 text-[var(--ink)] px-3 py-1.5 rounded border border-[var(--brass)]/40 font-mono">
-              <span class="text-[var(--ember)] font-bold">Address:</span>
-              <span class="font-bold select-all" id="mobile-email-address">{mailAddress}</span>
-              <button
-                type="button"
-                id="mobile-copy-email-btn"
-                class="ml-2 text-xs px-2 py-0.5 bg-[var(--wood-deep)] text-[var(--candle)] rounded hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] cursor-pointer"
-                title="Copy email to clipboard"
-                aria-label="Copy email address to clipboard"
-              >
-                Copy
-              </button>
-              <span id="mobile-copy-status" class="text-xs text-green-700 font-bold ml-1 hidden" role="status" aria-live="polite">Copied!</span>
-            </div>
+        <div class="space-y-4">
+          <div class="flex flex-wrap items-center gap-2 mb-1">
+            <span class="text-xs uppercase font-extrabold tracking-widest text-[var(--ember)] bg-[var(--wood-deep)]/10 px-2 py-0.5 rounded border border-[var(--ember)]/30">
+              Priority Dispatch
+            </span>
+            <span class="text-xs text-[var(--ink)]/70 font-mono">
+              Electronic Messenger Raven
+            </span>
           </div>
 
-          <div class="flex flex-col sm:flex-row md:flex-col gap-2.5 w-full md:w-auto shrink-0">
-            <a
-              href={`mailto:${mailAddress}`}
-              class="inline-flex items-center justify-center min-h-[44px] px-6 py-2.5 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded border border-[var(--brass)] hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 whitespace-nowrap text-center shadow-md"
+          <h2 class="text-2xl font-bold text-[var(--ink)] mb-1 flex items-center gap-2">
+            <span>Send Word via the Raven</span>
+          </h2>
+
+          <p class="text-sm text-[var(--ink)]/85 leading-relaxed">
+            Inscribe your missive below. Choosing a dispatch category will pre-fill a structured template to send directly to Nhovem's console.
+          </p>
+
+          <!-- Mobile Form -->
+          <form id="mobile-raven-form" class="space-y-3 pt-2">
+            <div>
+              <span class="block text-xs uppercase tracking-wider text-[var(--ink)] font-bold mb-1">Dispatch Category</span>
+              <div class="grid grid-cols-2 gap-1.5">
+                <button type="button" class="mobile-template-pill active" data-template="quest" data-prefix="[Quest Offer]" data-subject="Frontend / Full-Stack Project Inquiry" data-placeholder="Describe the quest, target timeline, and technology stack...">🎯 Quest Offer</button>
+                <button type="button" class="mobile-template-pill" data-template="role" data-prefix="[Guild Recruitment]" data-subject="Developer Role Opportunity" data-placeholder="Share details about the role, team structure, and location...">⚔️ Recruitment</button>
+                <button type="button" class="mobile-template-pill" data-template="consult" data-prefix="[Consultation]" data-subject="Technical Consultation & Review" data-placeholder="Detail the technical questions or architecture review...">🔮 Consultation</button>
+                <button type="button" class="mobile-template-pill" data-template="general" data-prefix="[Tavern Greetings]" data-subject="Greetings from a Fellow Traveler" data-placeholder="Say hello or share feedback on the portfolio...">✉️ General</button>
+              </div>
+            </div>
+
+            <div>
+              <label for="mobile-sender-name" class="block text-xs font-bold text-[var(--ink)] mb-1">Your Name <span class="text-[var(--ember)]">*</span></label>
+              <input type="text" id="mobile-sender-name" required placeholder="e.g. Robin of the North" class="w-full px-3 py-2 text-sm rounded bg-[var(--wood-deep)]/10 border border-[var(--brass)]/50 text-[var(--ink)] focus:outline-2 focus:outline-[var(--brass)]" />
+            </div>
+
+            <div>
+              <label for="mobile-sender-email" class="block text-xs font-bold text-[var(--ink)] mb-1">Your Email <span class="text-[var(--ember)]">*</span></label>
+              <input type="email" id="mobile-sender-email" required placeholder="e.g. traveler@guild.com" class="w-full px-3 py-2 text-sm rounded bg-[var(--wood-deep)]/10 border border-[var(--brass)]/50 text-[var(--ink)] focus:outline-2 focus:outline-[var(--brass)]" />
+            </div>
+
+            <div>
+              <label for="mobile-missive-subject" class="block text-xs font-bold text-[var(--ink)] mb-1">Subject <span class="text-[var(--ember)]">*</span></label>
+              <input type="text" id="mobile-missive-subject" required value="[Quest Offer] Frontend / Full-Stack Project Inquiry" class="w-full px-3 py-2 text-sm rounded bg-[var(--wood-deep)]/10 border border-[var(--brass)]/50 text-[var(--ink)] focus:outline-2 focus:outline-[var(--brass)]" />
+            </div>
+
+            <div>
+              <label for="mobile-missive-body" class="block text-xs font-bold text-[var(--ink)] mb-1">Message <span class="text-[var(--ember)]">*</span></label>
+              <textarea id="mobile-missive-body" required rows="3" placeholder="Describe the quest, target timeline, and technology stack..." class="w-full px-3 py-2 text-sm rounded bg-[var(--wood-deep)]/10 border border-[var(--brass)]/50 text-[var(--ink)] focus:outline-2 focus:outline-[var(--brass)] resize-none"></textarea>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-2.5 pt-1">
+              <button
+                type="submit"
+                class="inline-flex items-center justify-center min-h-[44px] px-6 py-2.5 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded border border-[var(--brass)] hover:bg-black transition-colors cursor-pointer text-center shadow-md flex-1"
+              >
+                Seal & Dispatch Raven &rarr;
+              </button>
+            </div>
+          </form>
+
+          <!-- Direct address copy fallback -->
+          <div class="pt-2 border-t border-[var(--brass)]/30 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <span>Direct address: <strong class="select-all font-mono" id="mobile-email-address">{mailAddress}</strong></span>
+            <button
+              type="button"
+              id="mobile-copy-email-btn"
+              class="px-2.5 py-1 bg-[var(--wood-deep)] text-[var(--candle)] rounded hover:bg-black transition-colors text-xs font-bold cursor-pointer"
             >
-              Compose Dispatch &rarr;
-            </a>
-            <span class="text-[11px] text-center text-[var(--ink)]/70 font-medium">Turnaround: 24–48 hours</span>
+              Copy Address
+            </button>
+            <span id="mobile-copy-status" class="text-xs text-green-700 font-bold hidden">Copied!</span>
           </div>
         </div>
       </article>
@@ -588,11 +776,11 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
             </div>
 
             <h2 class="text-2xl font-bold text-[var(--ink)] mb-1">
-              Full Professional Resume
+              Bachelor of Industrial Technology, Major in Computer Technology
             </h2>
 
             <p class="text-sm sm:text-base text-[var(--ink)]/85 mb-2 leading-relaxed">
-              Complete career timeline, technical proficiencies, education, and credentials formatted for digital review and clean print/PDF export.
+              Cebu Technological University – Danao Campus &bull; Academic Distinction &bull; Dean's Lister &bull; Contributor to production biometric timekeeping systems.
             </p>
 
             <span class="text-xs text-[var(--ink)]/70 font-mono">
@@ -600,12 +788,19 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
             </span>
           </div>
 
-          <div class="w-full md:w-auto shrink-0">
+          <div class="w-full md:w-auto shrink-0 flex flex-col sm:flex-row gap-2">
             <a
               href="/resume"
-              class="inline-flex items-center justify-center min-h-[44px] px-6 py-2.5 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded border border-[var(--brass)] hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 whitespace-nowrap text-center shadow-md w-full md:w-auto"
+              class="inline-flex items-center justify-center min-h-[44px] px-6 py-2.5 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded border border-[var(--brass)] hover:bg-black transition-colors whitespace-nowrap text-center shadow-md"
             >
               View Full Resume &rarr;
+            </a>
+            <a
+              href="/resume.pdf"
+              download
+              class="inline-flex items-center justify-center min-h-[44px] px-4 py-2.5 bg-[var(--wood-deep)]/10 text-[var(--ink)] font-bold text-sm rounded border border-[var(--brass)]/60 hover:bg-[var(--wood-deep)]/20 transition-colors whitespace-nowrap text-center"
+            >
+              PDF &darr;
             </a>
           </div>
         </div>
@@ -620,9 +815,9 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
               Availability: {profile.availability}
             </span>
             <span class="text-[var(--parchment)]/50">&bull;</span>
-            <span>Stationed in: <strong class="text-[var(--parchment)]">{profile.location}</strong></span>
+            <span>Stationed in: <strong class="text-[var(--parchment)]">{profile.location}</strong> (UTC+8)</span>
             <span class="text-[var(--parchment)]/50">&bull;</span>
-            <span class="text-[var(--parchment)]/80">Open to Remote & Global Work</span>
+            <span class="text-[var(--parchment)]/80">Open to Remote & Worldwide Roles</span>
           </p>
         </div>
       )}
@@ -850,18 +1045,18 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
     top: 50%;
     transform: translate(-50%, -50%);
     width: min(92%, 620px);
-    max-height: 88%;
+    max-height: min(92%, 620px);
     overflow-y: auto;
     background: rgba(22, 14, 7, 0.97);
     border: 2px solid var(--brass, #8b6b4a);
     border-radius: 12px;
     color: #fdf6e3;
-    padding: 24px 28px;
+    padding: 20px 24px;
     box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9), 0 0 24px rgba(213, 128, 59, 0.25);
     z-index: 50;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
@@ -903,12 +1098,13 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
     justify-content: space-between;
     gap: 1rem;
     border-bottom: 1px solid rgba(213, 128, 59, 0.3);
-    padding-bottom: 12px;
+    padding-bottom: 10px;
   }
 
   .panel-badge-icon {
-    font-size: 1.75rem;
-    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .close-panel-btn {
@@ -935,10 +1131,10 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     border-top: 1px solid rgba(213, 128, 59, 0.25);
-    padding-top: 14px;
-    margin-top: 4px;
+    padding-top: 12px;
+    margin-top: 2px;
   }
 
   .close-panel-btn-secondary {
@@ -952,6 +1148,31 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
   .close-panel-btn-secondary:hover {
     background: rgba(255, 255, 255, 0.08);
     border-color: var(--brass);
+  }
+
+  /* Template selection pill styling */
+  .template-pill, .mobile-template-pill {
+    background: rgba(26, 16, 5, 0.85);
+    border: 1px solid rgba(213, 128, 59, 0.4);
+    color: var(--parchment, #e6d3a8);
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.18s ease-out;
+  }
+  .template-pill:hover, .mobile-template-pill:hover {
+    background: rgba(213, 128, 59, 0.2);
+    border-color: var(--candle, #fdf6e3);
+  }
+  .template-pill.active, .mobile-template-pill.active {
+    background: var(--brass, #8b6b4a);
+    color: #1a1005;
+    font-weight: bold;
+    border-color: #ffd782;
+    box-shadow: 0 0 10px rgba(213, 128, 59, 0.4);
   }
 
   /* Hotspots disabled when dialog is open */
@@ -986,7 +1207,6 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
   }
 
   /* Responsive Display Rules */
-  /* On desktop & tablet (>= 769px), scene is visible; stack is secondary */
   @media (min-width: 769px) {
     .scene-container {
       display: block;
@@ -996,7 +1216,6 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
     }
   }
 
-  /* On narrow screens (< 769px), show tactile cards stack, hide 2.5D canvas */
   @media (max-width: 768px) {
     .scene-container {
       display: none;
@@ -1051,11 +1270,10 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
   let activeTrigger: HTMLElement | null = null;
 
   function getFocusableElements(el: HTMLElement): HTMLElement[] {
-    return Array.from(el.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'));
+    return Array.from(el.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'));
   }
 
   function openDialog(dialog: HTMLElement, trigger: HTMLElement) {
-    // Disable background scene objects for screen readers and tab navigation
     sceneObjects.forEach((el) => {
       el.classList.add('disabled-by-dialog');
       el.setAttribute('tabindex', '-1');
@@ -1143,6 +1361,19 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
     }
   });
 
+  // Satchel modal shortcut to Raven modal
+  const satchelDispatchBtn = document.getElementById('satchel-dispatch-btn');
+  const ravenDialog = document.getElementById('dialog-raven');
+  const ravenTrigger = document.getElementById('trigger-perch-raven');
+  if (satchelDispatchBtn && ravenDialog && ravenTrigger) {
+    satchelDispatchBtn.addEventListener('click', () => {
+      closeDialog();
+      setTimeout(() => {
+        openDialog(ravenDialog, ravenTrigger);
+      }, 50);
+    });
+  }
+
   // Bind all close buttons inside panels
   document.querySelectorAll('.close-panel-btn, .close-panel-btn-secondary').forEach((btn) => {
     btn.addEventListener('click', (e) => {
@@ -1158,38 +1389,164 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
     });
   }
 
-  // Copy Email Address helper function
-  function setupCopyButton(btnId: string, textId: string, statusId: string) {
-    const btn = document.getElementById(btnId);
-    const textEl = document.getElementById(textId);
-    const statusEl = document.getElementById(statusId);
+  // Missive Template Selector logic (GitHub Issue style)
+  function setupTemplatePills(selector: string, subjectInputId: string, bodyInputId: string) {
+    const pills = document.querySelectorAll<HTMLButtonElement>(selector);
+    const subjectInput = document.getElementById(subjectInputId) as HTMLInputElement | null;
+    const bodyInput = document.getElementById(bodyInputId) as HTMLTextAreaElement | null;
 
-    if (!btn || !textEl || !statusEl) return;
+    pills.forEach((pill) => {
+      pill.addEventListener('click', () => {
+        pills.forEach((p) => p.classList.remove('active'));
+        pill.classList.add('active');
 
-    btn.addEventListener('click', async () => {
-      const text = textEl.textContent?.trim() || 'ncabahug223@gmail.com';
+        const prefix = pill.getAttribute('data-prefix') || '';
+        const subject = pill.getAttribute('data-subject') || '';
+        const placeholder = pill.getAttribute('data-placeholder') || '';
+
+        if (subjectInput) {
+          subjectInput.value = `${prefix} ${subject}`;
+        }
+        if (bodyInput) {
+          bodyInput.placeholder = placeholder;
+          if (!bodyInput.value.trim()) {
+            bodyInput.focus();
+          }
+        }
+      });
+    });
+  }
+
+  setupTemplatePills('.template-pill', 'desktop-missive-subject', 'desktop-missive-body');
+  setupTemplatePills('.mobile-template-pill', 'mobile-missive-subject', 'mobile-missive-body');
+
+  // Form Handling and Missive Dispatching
+  const recipientEmail = 'ncabahug223@gmail.com';
+
+  function handleMissiveSubmission(
+    formId: string,
+    nameId: string,
+    emailId: string,
+    subjectId: string,
+    bodyId: string,
+    isDesktop: boolean
+  ) {
+    const form = document.getElementById(formId) as HTMLFormElement | null;
+    if (!form) return;
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const name = (document.getElementById(nameId) as HTMLInputElement)?.value.trim() || 'Traveler';
+      const email = (document.getElementById(emailId) as HTMLInputElement)?.value.trim() || '';
+      const subject = (document.getElementById(subjectId) as HTMLInputElement)?.value.trim() || 'Tavern Dispatch';
+      const body = (document.getElementById(bodyId) as HTMLTextAreaElement)?.value.trim() || '';
+
+      const fullFormattedBody = `Sender: ${name}\nReturn Address: ${email}\n\n--------------------------------------------------\n${body}\n--------------------------------------------------\n(Dispatched via Ibem's Tavern Messenger Roost)`;
+
+      // 1. Invoke mailto client
+      const mailtoUrl = `mailto:${recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(fullFormattedBody)}`;
+      window.location.href = mailtoUrl;
+
+      // 2. If on desktop modal, show the receipt view
+      if (isDesktop) {
+        const composerView = document.getElementById('raven-composer-view');
+        const receiptView = document.getElementById('raven-receipt-view');
+        const receiptSubject = document.getElementById('receipt-subject');
+        const receiptFrom = document.getElementById('receipt-from');
+        const receiptBody = document.getElementById('receipt-body');
+        const receiptGmailLink = document.getElementById('receipt-gmail-link') as HTMLAnchorElement | null;
+
+        if (composerView && receiptView) {
+          composerView.classList.add('hidden');
+          receiptView.classList.remove('hidden');
+
+          if (receiptSubject) receiptSubject.textContent = subject;
+          if (receiptFrom) receiptFrom.textContent = `${name} <${email}>`;
+          if (receiptBody) receiptBody.textContent = body;
+
+          if (receiptGmailLink) {
+            receiptGmailLink.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${recipientEmail}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(fullFormattedBody)}`;
+          }
+
+          // Setup copy formatted missive button
+          const receiptCopyBtn = document.getElementById('receipt-copy-btn');
+          if (receiptCopyBtn) {
+            receiptCopyBtn.onclick = async () => {
+              try {
+                await navigator.clipboard.writeText(fullFormattedBody);
+              } catch {
+                const textarea = document.createElement('textarea');
+                textarea.value = fullFormattedBody;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+              }
+              const oldText = receiptCopyBtn.textContent;
+              receiptCopyBtn.textContent = 'Copied to Clipboard!';
+              setTimeout(() => {
+                receiptCopyBtn.textContent = oldText;
+              }, 2500);
+            };
+          }
+
+          // Reset button
+          const resetBtn = document.getElementById('receipt-reset-btn');
+          if (resetBtn) {
+            resetBtn.onclick = () => {
+              receiptView.classList.add('hidden');
+              composerView.classList.remove('hidden');
+              form.reset();
+            };
+          }
+        }
+      }
+    });
+  }
+
+  handleMissiveSubmission(
+    'desktop-raven-form',
+    'desktop-sender-name',
+    'desktop-sender-email',
+    'desktop-missive-subject',
+    'desktop-missive-body',
+    true
+  );
+
+  handleMissiveSubmission(
+    'mobile-raven-form',
+    'mobile-sender-name',
+    'mobile-sender-email',
+    'mobile-missive-subject',
+    'mobile-missive-body',
+    false
+  );
+
+  // Mobile address copy button
+  const mobileCopyBtn = document.getElementById('mobile-copy-email-btn');
+  const mobileEmail = document.getElementById('mobile-email-address');
+  const mobileStatus = document.getElementById('mobile-copy-status');
+
+  if (mobileCopyBtn && mobileEmail && mobileStatus) {
+    mobileCopyBtn.addEventListener('click', async () => {
+      const email = mobileEmail.textContent?.trim() || recipientEmail;
       try {
-        await navigator.clipboard.writeText(text);
+        await navigator.clipboard.writeText(email);
       } catch {
         const textarea = document.createElement('textarea');
-        textarea.value = text;
+        textarea.value = email;
         document.body.appendChild(textarea);
         textarea.select();
         document.execCommand('copy');
         document.body.removeChild(textarea);
       }
-
-      statusEl.classList.remove('hidden');
-      const originalText = btn.textContent;
-      btn.textContent = 'Copied!';
+      mobileStatus.classList.remove('hidden');
+      mobileCopyBtn.textContent = 'Copied!';
       setTimeout(() => {
-        statusEl.classList.add('hidden');
-        btn.textContent = originalText;
+        mobileStatus.classList.add('hidden');
+        mobileCopyBtn.textContent = 'Copy Address';
       }, 2500);
     });
   }
-
-  // Setup copy buttons for both modal and mobile fallback
-  setupCopyButton('modal-copy-email-btn', 'modal-email-address', 'modal-copy-status');
-  setupCopyButton('mobile-copy-email-btn', 'mobile-email-address', 'mobile-copy-status');
 </script>
