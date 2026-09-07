@@ -5,100 +5,268 @@ import { getCollection, getEntry } from 'astro:content';
 const links = await getCollection('links');
 const profileEntry = await getEntry('profile', 'main');
 const profile = profileEntry?.data;
+const mailLink = links.find((l) => l.data.icon === 'mail');
+const githubLink = links.find((l) => l.data.icon === 'github');
+const mailAddress = mailLink?.data.url.replace('mailto:', '') || 'ncabahug223@gmail.com';
 ---
 
 <TavernLayout
-  title="Messenger's Corner — Nhovem Cabahug"
+  title="The Courier's Roost — Messenger's Corner — Nhovem Cabahug"
   description="Send a raven or inspect guild records to get in touch with Nhovem Cabahug."
   location="messenger"
 >
-  <div class="max-w-2xl mx-auto py-4">
+  <div class="max-w-3xl mx-auto py-6 px-4">
+    <!-- Atmospheric Header -->
     <header class="text-center mb-10">
-      <div class="inline-block relative mb-4">
+      <!-- Active Courier Raven taking flight -->
+      <div class="relative inline-block mb-4">
+        <div class="absolute -inset-4 bg-[radial-gradient(ellipse_at_center,rgba(213,128,59,0.2)_0%,transparent_70%)] rounded-full blur-md pointer-events-none" aria-hidden="true"></div>
         <img
           src="/art/raven-delivering-letter-388.webp"
           srcset="/art/raven-delivering-letter-388.webp 388w, /art/raven-delivering-letter-776.webp 776w"
-          sizes="(max-width: 640px) 200px, 260px"
-          width="260"
-          height="96"
-          alt=""
-          aria-hidden="true"
-          class="mx-auto w-56 sm:w-64 h-auto drop-shadow-2xl"
+          sizes="(max-width: 640px) 240px, 320px"
+          width="320"
+          height="119"
+          alt="A sleek black messenger raven in flight carrying a sealed parchment letter in its beak"
+          class="relative mx-auto w-60 sm:w-72 md:w-80 h-auto drop-shadow-[0_12px_24px_rgba(0,0,0,0.85)]"
           loading="eager"
         />
       </div>
 
-      <h1 class="text-3xl sm:text-4xl font-bold text-[var(--candle)] mb-3 tracking-wide">
-        Messenger's Corner
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--stone)]/60 border border-[var(--brass)]/40 text-[var(--candle)] text-xs font-semibold tracking-wider uppercase mb-3">
+        <span>Tavern Aviary &bull; Chamber IV</span>
+      </div>
+
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--candle)] mb-3 tracking-wide drop-shadow-md">
+        The Courier's Roost
       </h1>
-      <p class="text-base sm:text-lg text-[var(--parchment)]/90 max-w-lg mx-auto leading-relaxed">
-        The tavern roost is attended day and night. Choose a channel below to send word, inspect public records, or request an interview.
+      <p class="text-base sm:text-lg text-[var(--parchment)]/90 max-w-xl mx-auto leading-relaxed">
+        Tucked beyond the taproom archway lies the tavern roost, attended day and night. Select an official dispatch channel below to send word directly, inspect public engineering records, or review guild credentials.
       </p>
     </header>
 
+    <!-- Dispatch Slips -->
     <div class="space-y-6">
-      {links.map((link) => (
-        <article class="bg-[var(--parchment)] text-[var(--ink)] p-6 rounded border-2 border-[var(--brass)] shadow-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-transform hover:-translate-y-0.5">
-          <div>
-            <div class="flex items-center gap-2 mb-1">
-              <span class="text-xs uppercase font-bold tracking-widest text-[var(--ember)]">
-                {link.data.label}
+      <!-- 1. Direct Electronic Dispatch (Email) -->
+      <article class="dispatch-slip bg-[var(--parchment)] text-[var(--ink)] p-6 sm:p-7 rounded-lg border-2 border-[var(--brass)] shadow-2xl relative overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(0,0,0,0.6)]">
+        <div class="corner-bracket top-left" aria-hidden="true"></div>
+        <div class="corner-bracket top-right" aria-hidden="true"></div>
+        
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-5">
+          <div class="flex-1 pr-2">
+            <div class="flex flex-wrap items-center gap-2 mb-2">
+              <span class="text-xs uppercase font-extrabold tracking-widest text-[var(--ember)] bg-[var(--wood-deep)]/10 px-2 py-0.5 rounded border border-[var(--ember)]/30">
+                Priority Dispatch
+              </span>
+              <span class="text-xs text-[var(--ink)]/70 font-mono">
+                Direct Electronic Raven
               </span>
             </div>
-            <h2 class="text-xl font-bold text-[var(--ink)]">
-              {link.data.plainLabel}
+            
+            <h2 class="text-2xl font-bold text-[var(--ink)] mb-1 flex items-center gap-2">
+              <span>Send Word via Email</span>
             </h2>
-            <p class="text-sm text-[var(--ink)]/80 mt-1">
-              {link.data.icon === 'mail' ? 'Direct electronic dispatch. Replies typically sent within 24 to 48 hours.' : 'Public codebase history, contributions, and verified repositories.'}
+            
+            <p class="text-sm sm:text-base text-[var(--ink)]/85 mb-3 leading-relaxed">
+              Fastest channel for project inquiries, technical roles, or engineering consultations. Direct to Nhovem's personal console.
             </p>
+
+            <div class="inline-flex items-center gap-2 text-xs sm:text-sm bg-[var(--wood-deep)]/10 text-[var(--ink)] px-3 py-1.5 rounded border border-[var(--brass)]/40 font-mono">
+              <span class="text-[var(--ember)] font-bold">Address:</span>
+              <span class="font-bold select-all" id="email-address">{mailAddress}</span>
+              <button
+                type="button"
+                id="copy-email-btn"
+                class="ml-2 text-xs px-2 py-0.5 bg-[var(--wood-deep)] text-[var(--candle)] rounded hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] cursor-pointer"
+                title="Copy email to clipboard"
+                aria-label="Copy email address to clipboard"
+              >
+                Copy
+              </button>
+              <span id="copy-status" class="text-xs text-green-700 font-bold ml-1 hidden" role="status" aria-live="polite">Copied!</span>
+            </div>
           </div>
 
-          <a
-            href={link.data.url}
-            class="inline-flex items-center justify-center min-h-[44px] px-6 py-2.5 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded border border-[var(--brass)] hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 whitespace-nowrap self-stretch sm:self-auto text-center"
-          >
-            {link.data.icon === 'mail' ? 'Send Email' : 'Open GitHub'} &rarr;
-          </a>
-        </article>
-      ))}
-
-      <article class="bg-[var(--parchment)] text-[var(--ink)] p-6 rounded border-2 border-[var(--brass)] shadow-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-transform hover:-translate-y-0.5">
-        <div>
-          <span class="text-xs uppercase font-bold tracking-widest text-[var(--ember)]">
-            Formal Ledger
-          </span>
-          <h2 class="text-xl font-bold text-[var(--ink)]">
-            Full Resume
-          </h2>
-          <p class="text-sm text-[var(--ink)]/80 mt-1">
-            Complete work experience, education, and technical background rendered for print and PDF.
-          </p>
+          <div class="flex flex-col sm:flex-row md:flex-col gap-2.5 w-full md:w-auto shrink-0">
+            <a
+              href={`mailto:${mailAddress}`}
+              class="inline-flex items-center justify-center min-h-[44px] px-6 py-2.5 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded border border-[var(--brass)] hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 whitespace-nowrap text-center shadow-md"
+            >
+              Compose Dispatch &rarr;
+            </a>
+            <span class="text-[11px] text-center text-[var(--ink)]/70 font-medium">Turnaround: 24–48 hours</span>
+          </div>
         </div>
+      </article>
 
-        <a
-          href="/resume"
-          class="inline-flex items-center justify-center min-h-[44px] px-6 py-2.5 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded border border-[var(--brass)] hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 whitespace-nowrap self-stretch sm:self-auto text-center"
-        >
-          View Resume &rarr;
-        </a>
+      <!-- 2. Guild Code Archives (GitHub) -->
+      <article class="dispatch-slip bg-[var(--parchment)] text-[var(--ink)] p-6 sm:p-7 rounded-lg border-2 border-[var(--brass)] shadow-2xl relative overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(0,0,0,0.6)]">
+        <div class="corner-bracket top-left" aria-hidden="true"></div>
+        <div class="corner-bracket top-right" aria-hidden="true"></div>
+
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-5">
+          <div class="flex-1 pr-2">
+            <div class="flex flex-wrap items-center gap-2 mb-2">
+              <span class="text-xs uppercase font-extrabold tracking-widest text-[var(--ember)] bg-[var(--wood-deep)]/10 px-2 py-0.5 rounded border border-[var(--ember)]/30">
+                Guild Archives
+              </span>
+              <span class="text-xs text-[var(--ink)]/70 font-mono">
+                Verified Codebase Repositories
+              </span>
+            </div>
+
+            <h2 class="text-2xl font-bold text-[var(--ink)] mb-1">
+              GitHub Engineering Record
+            </h2>
+
+            <p class="text-sm sm:text-base text-[var(--ink)]/85 mb-2 leading-relaxed">
+              Inspect complete source repositories, production commits, TypeScript architectures, and active engineering projects.
+            </p>
+
+            <span class="text-xs text-[var(--ink)]/70 font-mono">
+              Profile: github.com/IbemCabahug
+            </span>
+          </div>
+
+          <div class="w-full md:w-auto shrink-0">
+            <a
+              href={githubLink?.data.url || 'https://github.com/IbemCabahug'}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center justify-center min-h-[44px] px-6 py-2.5 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded border border-[var(--brass)] hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 whitespace-nowrap text-center shadow-md w-full md:w-auto"
+            >
+              Inspect GitHub &rarr;
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <!-- 3. Formal Guild Dossier (Resume) -->
+      <article class="dispatch-slip bg-[var(--parchment)] text-[var(--ink)] p-6 sm:p-7 rounded-lg border-2 border-[var(--brass)] shadow-2xl relative overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(0,0,0,0.6)]">
+        <div class="corner-bracket top-left" aria-hidden="true"></div>
+        <div class="corner-bracket top-right" aria-hidden="true"></div>
+
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-5">
+          <div class="flex-1 pr-2">
+            <div class="flex flex-wrap items-center gap-2 mb-2">
+              <span class="text-xs uppercase font-extrabold tracking-widest text-[var(--ember)] bg-[var(--wood-deep)]/10 px-2 py-0.5 rounded border border-[var(--ember)]/30">
+                Master Ledger
+              </span>
+              <span class="text-xs text-[var(--ink)]/70 font-mono">
+                Curriculum Vitae
+              </span>
+            </div>
+
+            <h2 class="text-2xl font-bold text-[var(--ink)] mb-1">
+              Full Professional Resume
+            </h2>
+
+            <p class="text-sm sm:text-base text-[var(--ink)]/85 mb-2 leading-relaxed">
+              Complete career timeline, technical proficiencies, education, and credentials formatted for digital review and clean print/PDF export.
+            </p>
+
+            <span class="text-xs text-[var(--ink)]/70 font-mono">
+              Available in styled web and printable formats
+            </span>
+          </div>
+
+          <div class="w-full md:w-auto shrink-0">
+            <a
+              href="/resume"
+              class="inline-flex items-center justify-center min-h-[44px] px-6 py-2.5 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded border border-[var(--brass)] hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 whitespace-nowrap text-center shadow-md w-full md:w-auto"
+            >
+              View Full Resume &rarr;
+            </a>
+          </div>
+        </div>
       </article>
     </div>
 
+    <!-- Roost Attendant Status -->
     {profile && (
-      <div class="mt-8 p-5 rounded border border-[var(--brass)]/40 bg-[var(--stone)]/40 text-[var(--parchment)] text-sm leading-relaxed text-center">
-        <p>
-          Current status: <strong class="text-[var(--candle)]">{profile.availability}</strong>. Located in {profile.location}.
+      <div class="mt-8 p-5 rounded-lg border border-[var(--brass)]/40 bg-[var(--wood-deep)]/60 text-[var(--parchment)] text-sm leading-relaxed text-center shadow-inner">
+        <p class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+          <span class="inline-flex items-center gap-1.5 text-[var(--candle)] font-semibold">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+            Availability: {profile.availability}
+          </span>
+          <span class="text-[var(--parchment)]/50">&bull;</span>
+          <span>Stationed in: <strong class="text-[var(--parchment)]">{profile.location}</strong></span>
+          <span class="text-[var(--parchment)]/50">&bull;</span>
+          <span class="text-[var(--parchment)]/80">Open to Remote & Global Work</span>
         </p>
       </div>
     )}
 
+    <!-- Physical Return to Main Tavern -->
     <div class="mt-12 text-center">
       <a
         href="/tavern"
-        class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 border-2 border-[var(--brass)] text-[var(--parchment)] font-semibold rounded hover:bg-[var(--parchment)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+        class="inline-flex items-center justify-center min-h-[44px] px-8 py-3 border-2 border-[var(--brass)] bg-[var(--wood-deep)]/80 text-[var(--parchment)] font-bold text-base rounded-md hover:bg-[var(--parchment)] hover:text-[var(--wood-deep)] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[var(--candle)] shadow-lg hover:shadow-[0_0_15px_rgba(213,128,59,0.4)]"
       >
-        &larr; Return to Main Tavern
+        &larr; Step back through the Archway to Main Tavern
       </a>
     </div>
   </div>
 </TavernLayout>
+
+<style>
+  /* Corner brass brackets for authentic RPG dispatch slip aesthetics */
+  .dispatch-slip {
+    position: relative;
+  }
+  .corner-bracket {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    pointer-events: none;
+  }
+  .corner-bracket.top-left {
+    top: 4px;
+    left: 4px;
+    border-top: 2px solid var(--brass);
+    border-left: 2px solid var(--brass);
+  }
+  .corner-bracket.top-right {
+    top: 4px;
+    right: 4px;
+    border-top: 2px solid var(--brass);
+    border-right: 2px solid var(--brass);
+  }
+</style>
+
+<script>
+  // Quick copy-to-clipboard for the email address with visual feedback
+  const copyBtn = document.getElementById('copy-email-btn');
+  const emailSpan = document.getElementById('email-address');
+  const copyStatus = document.getElementById('copy-status');
+
+  if (copyBtn && emailSpan && copyStatus) {
+    copyBtn.addEventListener('click', async () => {
+      const email = emailSpan.textContent?.trim() || 'ncabahug223@gmail.com';
+      try {
+        await navigator.clipboard.writeText(email);
+        copyStatus.classList.remove('hidden');
+        copyBtn.textContent = 'Copied!';
+        setTimeout(() => {
+          copyStatus.classList.add('hidden');
+          copyBtn.textContent = 'Copy';
+        }, 2500);
+      } catch (err) {
+        // Fallback for non-secure contexts
+        const textarea = document.createElement('textarea');
+        textarea.value = email;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        copyStatus.classList.remove('hidden');
+        copyBtn.textContent = 'Copied!';
+        setTimeout(() => {
+          copyStatus.classList.add('hidden');
+          copyBtn.textContent = 'Copy';
+        }, 2500);
+      }
+    });
+  }
+</script>
