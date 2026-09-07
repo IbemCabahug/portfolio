@@ -61,15 +61,6 @@ const totalCount = JOURNAL_MILESTONES.length;
             </h2>
           </div>
         </div>
-
-        <button
-          type="button"
-          id="journal-close-x"
-          class="w-9 h-9 rounded-md border border-[var(--brass)]/50 bg-[#e8dbbe] text-[var(--wood-deep)] hover:bg-[var(--brass)] hover:text-black flex items-center justify-center font-bold text-lg transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--brass)]"
-          aria-label="Close Wayfarer's Journal"
-        >
-          &times;
-        </button>
       </div>
 
       <p class="text-xs sm:text-sm text-[var(--ink)]/85 mt-2.5 leading-relaxed">
@@ -215,7 +206,6 @@ const totalCount = JOURNAL_MILESTONES.length;
     const backdrop = document.getElementById('journal-dialog-backdrop');
     const dialog = document.getElementById('journal-dialog');
     const closeBtn = document.getElementById('journal-close-btn');
-    const closeX = document.getElementById('journal-close-x');
     const resetBtn = document.getElementById('journal-reset-btn');
     const counterBadge = document.getElementById('journal-counter-badge');
     const progressBar = document.getElementById('journal-progress-bar');
@@ -302,7 +292,6 @@ const totalCount = JOURNAL_MILESTONES.length;
     trigger.addEventListener('click', openDialog);
     backdrop.addEventListener('click', closeDialog);
     if (closeBtn) closeBtn.addEventListener('click', closeDialog);
-    if (closeX) closeX.addEventListener('click', closeDialog);
 
     if (resetBtn) {
       resetBtn.addEventListener('click', () => {
