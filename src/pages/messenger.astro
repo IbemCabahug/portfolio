@@ -117,18 +117,20 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
           />
           <!-- In-World Arcane Telemetry HUD Screen -->
           <div class="transceiver-screen" aria-hidden="true">
+            <img
+              src="/art/arcane-typer-splash.webp"
+              alt=""
+              width="1004"
+              height="582"
+              loading="eager"
+              decoding="async"
+              class="screen-thumb-bg absolute inset-0 w-full h-full object-cover"
+            />
             <div class="screen-scanlines"></div>
             
             <div class="screen-header">
               <span class="screen-pulse-dot"></span>
               <span class="screen-status-text">ARCANE // 60FPS</span>
-            </div>
-
-            <div class="screen-body">
-              <svg class="octocat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-              </svg>
-              <div class="screen-handle font-mono font-bold tracking-wider text-[11px]">ARCANE TYPER</div>
             </div>
 
             <div class="screen-footer">
@@ -419,7 +421,7 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
         <!-- Modal 2: Arcane Transceiver (Arcane Typer Live Simulation Arena) -->
         <div
           id="dialog-machine"
-          class="tavern-panel !w-[min(94%,680px)] !max-w-[680px] !max-h-[min(94%,640px)]"
+          class="tavern-panel"
           role="dialog"
           aria-modal="true"
           aria-labelledby="machine-dialog-title"
@@ -475,73 +477,47 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
               </div>
             </div>
 
-            <!-- Resting View: High-Impact Game Splash Thumbnail & Boot Trigger -->
-            <div
-              id="transceiver-resting-view"
-              class="relative w-full aspect-video min-h-[260px] sm:min-h-[310px] max-h-[340px] rounded border border-[var(--brass)]/60 overflow-hidden shadow-2xl group flex flex-col justify-end"
-            >
-              <!-- Arcane Typer Splash Artwork Thumbnail -->
-              <img
-                src="/art/arcane-typer-splash.webp"
-                alt="Arcane Typer Splash Screen preview"
-                width="1004"
-                height="582"
-                loading="eager"
-                decoding="async"
-                class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-              />
-
-              <!-- Atmospheric Scrim Gradient -->
-              <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 to-black/25 pointer-events-none"></div>
-
-              <!-- Top Vignette Badges -->
-              <div class="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between z-10 pointer-events-none">
-                <span class="px-2 py-0.5 rounded bg-black/75 backdrop-blur-sm border border-[var(--brass)]/50 font-mono text-[9px] sm:text-[11px] text-[var(--candle)] font-bold shadow">
-                  ⚡ ARCANE ENGINE // LIVE PREVIEW
-                </span>
-                <div class="flex items-center gap-1.5 hidden sm:flex">
-                  <span class="px-2 py-0.5 rounded bg-black/60 border border-[var(--brass)]/40 font-mono text-[9px] text-[var(--parchment)]">60 FPS Canvas</span>
-                  <span class="px-2 py-0.5 rounded bg-black/60 border border-[var(--brass)]/40 font-mono text-[9px] text-[var(--parchment)]">Web Audio</span>
+            <!-- Resting View: Thematic Brief & Boot Trigger -->
+            <div id="transceiver-resting-view" class="p-5 sm:p-7 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40 text-center space-y-4">
+              <div class="max-w-xl mx-auto space-y-2">
+                <p class="text-xs sm:text-sm text-[var(--parchment)]/90 leading-relaxed">
+                  The brass coils resonate with arcane frequency, synchronizing with Nhovem's live HTML5 Canvas engine. Engage the transceiver below to initiate real-time typing physics, spellcasting incantations, and synthesized Web Audio directly inside this chamber.
+                </p>
+                <div class="flex flex-wrap justify-center gap-1.5 pt-1">
+                  <span class="px-2 py-0.5 rounded bg-black/40 text-[var(--candle)] border border-[var(--brass)]/40 font-mono text-[10px]">60 FPS HTML5 Canvas</span>
+                  <span class="px-2 py-0.5 rounded bg-black/40 text-[var(--candle)] border border-[var(--brass)]/40 font-mono text-[10px]">Zero-Asset Web Audio</span>
+                  <span class="px-2 py-0.5 rounded bg-black/40 text-[var(--candle)] border border-[var(--brass)]/40 font-mono text-[10px]">Supabase 1v1 Duels</span>
                 </div>
               </div>
 
-              <!-- Centered / Bottom Action Card -->
-              <div class="relative z-10 p-3 sm:p-4 text-center space-y-2">
-                <div class="max-w-lg mx-auto">
-                  <p class="text-xs text-[var(--parchment)] font-serif drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
-                    Arcane Typer: Real-time spellcasting typing duel, cadence telemetry, and procedural sound synthesis.
-                  </p>
-                </div>
+              <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+                <button
+                  type="button"
+                  id="transceiver-launch-btn"
+                  data-url="https://arcane-typer.vercel.app/"
+                  class="inline-flex items-center gap-2 min-h-[44px] px-6 py-2.5 rounded-md bg-[var(--brass)] text-black font-bold text-xs sm:text-sm hover:bg-[var(--candle)] transition-all shadow-lg hover:shadow-[0_0_15px_rgba(218,165,32,0.4)] cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+                >
+                  <svg class="w-4 h-4 text-black" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                  </svg>
+                  <span>Engage Arcane Typer Trial</span>
+                </button>
 
-                <div class="flex flex-wrap items-center justify-center gap-2.5 pt-0.5">
-                  <button
-                    type="button"
-                    id="transceiver-launch-btn"
-                    data-url="https://arcane-typer.vercel.app/"
-                    class="inline-flex items-center gap-2 min-h-[40px] px-5 py-2 rounded-md bg-[var(--brass)] text-black font-bold text-xs sm:text-sm hover:bg-[var(--candle)] transition-all shadow-xl hover:shadow-[0_0_20px_rgba(218,165,32,0.6)] cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--candle)] active:scale-95"
-                  >
-                    <svg class="w-3.5 h-3.5 text-black fill-current" viewBox="0 0 24 24">
-                      <polygon points="5 3 19 12 5 21 5 3"/>
-                    </svg>
-                    <span>Engage Arcane Typer Trial</span>
-                  </button>
-
-                  <a
-                    href="https://arcane-typer.vercel.app/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="inline-flex items-center gap-1.5 min-h-[40px] px-4 py-2 rounded-md bg-black/70 backdrop-blur-sm border border-[var(--brass)] text-[var(--candle)] font-bold text-xs hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)] shadow"
-                  >
-                    <span>Launch in Standalone Window ↗</span>
-                  </a>
-                </div>
+                <a
+                  href="https://arcane-typer.vercel.app/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-2 min-h-[44px] px-5 py-2.5 rounded-md border border-[var(--brass)] text-[var(--candle)] font-bold text-xs sm:text-sm hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+                >
+                  <span>Launch in Standalone Window ↗</span>
+                </a>
               </div>
             </div>
 
             <!-- Active Iframe Container (Dynamic Loading with 0 KB initial payload) -->
             <div
               id="transceiver-frame-container"
-              class="relative w-full aspect-video min-h-[260px] sm:min-h-[310px] max-h-[340px] bg-black rounded border border-[var(--brass)]/50 hidden overflow-hidden shadow-2xl"
+              class="relative w-full aspect-video min-h-[380px] sm:min-h-[460px] bg-black rounded border border-[var(--brass)]/50 hidden overflow-hidden shadow-2xl"
             >
               <!-- Iframe inserted dynamically on click to ensure 0 KB initial payload -->
             </div>
@@ -1186,10 +1162,22 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
     justify-content: space-between;
     align-items: center;
     padding: 3% 4%;
-    background: linear-gradient(rgba(24, 14, 6, 0.82), rgba(10, 6, 2, 0.92)), url('/art/arcane-typer-splash.webp') center/cover no-repeat;
+    background: #0d0703;
     border-radius: 1px;
     box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.9), 0 0 5px rgba(213, 128, 59, 0.2);
     transition: box-shadow 0.3s ease, filter 0.3s ease;
+  }
+
+  .screen-thumb-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.88;
+    filter: brightness(0.95) contrast(1.1);
+    z-index: 1;
+    pointer-events: none;
   }
 
   .scene-object:is(:hover, :focus-visible) .transceiver-screen {
@@ -1220,11 +1208,13 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
     width: 100%;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: clamp(0.35rem, 0.52cqw, 0.5rem);
-    color: rgba(255, 228, 160, 0.85);
+    color: rgba(255, 228, 160, 0.9);
     letter-spacing: 0.05em;
     line-height: 1;
-    border-bottom: 1px solid rgba(168, 122, 39, 0.3);
-    padding-bottom: 2px;
+    background: rgba(10, 6, 2, 0.82);
+    border-bottom: 1px solid rgba(168, 122, 39, 0.35);
+    padding: 1.5px 3px;
+    border-radius: 1px;
   }
 
   .screen-pulse-dot {
@@ -1285,10 +1275,12 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
     width: 100%;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: clamp(0.32rem, 0.48cqw, 0.45rem);
-    color: rgba(255, 228, 160, 0.7);
+    color: rgba(255, 228, 160, 0.85);
     line-height: 1;
-    border-top: 1px solid rgba(168, 122, 39, 0.25);
-    padding-top: 2px;
+    background: rgba(10, 6, 2, 0.82);
+    border-top: 1px solid rgba(168, 122, 39, 0.3);
+    padding: 1.5px 3px;
+    border-radius: 1px;
   }
 
   .screen-bars {
