@@ -46,21 +46,6 @@ const skillsEntries = await getCollection('skills');
   </style>
 
   <div class="max-w-4xl mx-auto p-8">
-    <nav class="no-print mb-8 pb-4 border-b border-gray-300 flex flex-wrap items-center justify-between gap-4 text-sm font-semibold">
-      <div class="flex items-center gap-4">
-        <a href="/" class="text-blue-800 hover:underline min-h-[44px] inline-flex items-center">&larr; Return to Home / Entrance</a>
-        <a href="/tavern" class="text-gray-800 hover:underline min-h-[44px] inline-flex items-center">Illustrated Tavern</a>
-        <a href="/simple" class="text-gray-800 hover:underline min-h-[44px] inline-flex items-center">Field Ledger</a>
-      </div>
-      <a
-        href="/resume.pdf"
-        download
-        class="px-3.5 py-1.5 bg-gray-900 text-white rounded text-xs font-bold hover:bg-black transition-colors min-h-[44px] inline-flex items-center"
-      >
-        Download PDF &darr;
-      </a>
-    </nav>
-
     <header class="mb-12 border-b-2 border-gray-800 pb-6">
       <h1 class="text-4xl font-bold mb-2">{profile.name}</h1>
       <p class="text-xl mb-4">{profile.title}</p>
