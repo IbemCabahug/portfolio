@@ -10,8 +10,6 @@ const mailLink = links.find((l) => l.data.icon === 'mail');
 const githubLink = links.find((l) => l.data.icon === 'github');
 const mailAddress = mailLink?.data.url.replace('mailto:', '') || profile?.email || 'ncabahug223@gmail.com';
 const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com/IbemCabahug';
-const linkedinLink = links.find((l) => l.data.icon === 'linkedin');
-const linkedinUrl = linkedinLink?.data.url || profile?.linkedin || 'https://www.linkedin.com/in/nhovem-cabahug';
 
 const allProjects = await getCollection('projects');
 const projects = allProjects.sort((a, b) => a.data.order - b.data.order);
@@ -649,16 +647,6 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
               >
                 Download PDF &darr;
               </a>
-              {linkedinUrl && (
-                <a
-                  href={linkedinUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="inline-flex items-center justify-center min-h-[44px] px-4 py-2 bg-[var(--wood-deep)] text-[var(--candle)] border border-[var(--brass)]/70 text-xs sm:text-sm font-semibold rounded hover:bg-black hover:border-[var(--candle)] transition-colors"
-                >
-                  LinkedIn &rarr;
-                </a>
-              )}
             </div>
             <button
               type="button"
@@ -952,16 +940,6 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
             >
               PDF &darr;
             </a>
-            {linkedinUrl && (
-              <a
-                href={linkedinUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center justify-center min-h-[44px] px-4 py-2.5 bg-[var(--wood-deep)]/10 text-[var(--ink)] font-bold text-sm rounded border border-[var(--brass)]/60 hover:bg-[var(--wood-deep)]/20 transition-colors whitespace-nowrap text-center"
-              >
-                LinkedIn &rarr;
-              </a>
-            )}
           </div>
         </div>
       </article>

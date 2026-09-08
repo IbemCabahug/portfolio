@@ -54,9 +54,6 @@ const skillsEntries = await getCollection('skills');
         <p class="location-indicator">Location: {profile.location}</p>
         <p>Email: <a href={`mailto:${profile.email}`} class="underline">{profile.email}</a></p>
         <p>GitHub: <a href={profile.github} class="underline">GitHub</a></p>
-        {profile.linkedin && (
-          <p>LinkedIn: <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" class="underline">LinkedIn</a></p>
-        )}
       </div>
     </header>
 
