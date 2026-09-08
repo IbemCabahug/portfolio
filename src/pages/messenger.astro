@@ -280,6 +280,8 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
 
             <!-- Form Fields -->
             <form id="desktop-raven-form" class="space-y-2.5">
+              <input type="checkbox" name="botcheck" id="desktop-botcheck" class="hidden" style="display:none !important;position:absolute;left:-9999px;" tabindex="-1" autocomplete="off" aria-hidden="true" />
+              <div id="desktop-raven-error" class="hidden text-xs text-red-400 bg-red-900/30 border border-red-500/50 rounded px-3 py-2" role="alert"></div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <div>
                   <label for="desktop-sender-name" class="block text-xs text-[var(--parchment)]/80 font-medium mb-1">Your Name / Call-Sign <span class="text-[var(--ember)]">*</span></label>
@@ -772,6 +774,8 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
 
           <!-- Mobile Form -->
           <form id="mobile-raven-form" class="space-y-3 pt-2">
+            <input type="checkbox" name="botcheck" id="mobile-botcheck" class="hidden" style="display:none !important;position:absolute;left:-9999px;" tabindex="-1" autocomplete="off" aria-hidden="true" />
+            <div id="mobile-raven-error" class="hidden text-xs text-red-700 bg-red-100 border border-red-300 rounded px-3 py-2" role="alert"></div>
             <div>
               <span class="block text-xs uppercase tracking-wider text-[var(--ink)] font-bold mb-1">Dispatch Category</span>
               <div class="grid grid-cols-3 gap-1.5">
@@ -1598,6 +1602,59 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
   function initMessengerPage() {
     initPerformanceGovernor();
     soundEngine.init();
+
+    // ── Anti-Abuse Shield ──────────────────────────────
+    const RATE_LIMIT_KEY = 'raven_sends';
+    const COOLDOWN_MS = 60_000;  // 60 seconds between sends
+    const MAX_PER_HOUR = 3;      // max 3 sends per hour
+    let formLoadTime = Date.now();
+
+    function getRateLimitData(): { timestamps: number[] } {
+      try {
+        const raw = localStorage.getItem(RATE_LIMIT_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch {}
+      return { timestamps: [] };
+    }
+
+    function checkRateLimit(): { allowed: boolean; reason?: string } {
+      const data = getRateLimitData();
+      const now = Date.now();
+      const oneHourAgo = now - 3_600_000;
+      // Clean old entries
+      data.timestamps = data.timestamps.filter(t => t > oneHourAgo);
+      localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify(data));
+
+      if (data.timestamps.length >= MAX_PER_HOUR) {
+        return { allowed: false, reason: 'You have reached the hourly dispatch limit (3 ravens per hour). Please try again later.' };
+      }
+      if (data.timestamps.length > 0) {
+        const lastSend = Math.max(...data.timestamps);
+        const elapsed = now - lastSend;
+        if (elapsed < COOLDOWN_MS) {
+          const waitSec = Math.ceil((COOLDOWN_MS - elapsed) / 1000);
+          return { allowed: false, reason: `Please wait ${waitSec}s before dispatching another raven.` };
+        }
+      }
+      return { allowed: true };
+    }
+
+    function recordSendSuccess() {
+      const data = getRateLimitData();
+      data.timestamps.push(Date.now());
+      localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify(data));
+    }
+
+    function showFormError(errorId: string, message: string) {
+      const el = document.getElementById(errorId);
+      if (el) {
+        el.textContent = message;
+        el.classList.remove('hidden');
+        setTimeout(() => el.classList.add('hidden'), 8000);
+      }
+    }
+    // ── End Anti-Abuse Shield ──────────────────────────
+
     // Interactive Scene Hotspots and Modal Management
     const triggers = [
       { triggerId: 'trigger-perch-raven', dialogId: 'dialog-raven' },
@@ -1902,6 +1959,25 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
 
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
+        const errorContainerId = isDesktop ? 'desktop-raven-error' : 'mobile-raven-error';
+
+        // Anti-abuse: honeypot check
+        const honeypotId = isDesktop ? 'desktop-botcheck' : 'mobile-botcheck';
+        const honeypot = document.getElementById(honeypotId) as HTMLInputElement | null;
+        const botcheckValue = honeypot?.checked ? 'filled' : '';
+
+        // Anti-abuse: time-to-submit check (< 2.5s = bot)
+        if ((Date.now() - formLoadTime) < 2500) {
+          // Silently accept (fake success) so bots don't retry
+          return;
+        }
+
+        // Anti-abuse: rate limiting
+        const rateCheck = checkRateLimit();
+        if (!rateCheck.allowed) {
+          showFormError(errorContainerId, rateCheck.reason || 'Rate limit exceeded.');
+          return;
+        }
 
         const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement | null;
         const originalBtnText = submitBtn ? submitBtn.textContent : '';
@@ -1922,7 +1998,13 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
           email,
           subject,
           message: body,
+          botcheck: botcheckValue,
         });
+
+        // Record successful send for rate limiting
+        if (result.success) {
+          recordSendSuccess();
+        }
 
         // 2. If on desktop modal, show the receipt view
         if (isDesktop) {
