@@ -365,8 +365,8 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
                   <line x1="17.5" y1="15" x2="9" y2="15"/>
                 </svg>
               </span>
-              <h3 class="text-base sm:text-lg font-bold text-emerald-400">The Raven Takes Wing!</h3>
-              <p class="text-xs text-[var(--parchment)]/90 max-w-md mx-auto">
+              <h3 class="text-base sm:text-lg font-bold text-emerald-400" id="receipt-heading">The Raven Takes Wing!</h3>
+              <p class="text-xs text-[var(--parchment)]/90 max-w-md mx-auto" id="receipt-desc">
                 Your missive has been prepared and routed to your email client. A copy of your sealed message is inscribed below for your records:
               </p>
             </div>
@@ -1607,6 +1607,7 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
 
 <script>
   import { initPerformanceGovernor } from '../lib/perf-governor';
+  import { sendMissive } from '../lib/contact';
 
   function initMessengerPage() {
     initPerformanceGovernor();
@@ -1628,6 +1629,14 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
     }
 
     function openDialog(dialog: HTMLElement, trigger: HTMLElement) {
+      if (activeDialog) closeDialog();
+
+      activeDialog = dialog;
+      activeTrigger = trigger;
+      dialog.removeAttribute('hidden');
+      dialog.setAttribute('aria-hidden', 'false');
+      trigger.setAttribute('aria-expanded', 'true');
+
       sceneObjects.forEach((el) => {
         el.classList.add('disabled-by-dialog');
         el.setAttribute('tabindex', '-1');
@@ -1728,6 +1737,18 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
       });
     }
 
+    // Auto-open compose modal if arriving via ?compose=true or #compose
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('compose') === 'true' || window.location.hash === '#compose') {
+      const ravenDialog = document.getElementById('dialog-raven');
+      const ravenTrigger = document.getElementById('trigger-perch-raven');
+      if (ravenDialog && ravenTrigger) {
+        setTimeout(() => {
+          openDialog(ravenDialog, ravenTrigger);
+        }, 80);
+      }
+    }
+
     // Bind all close buttons inside panels
     document.querySelectorAll('.close-panel-btn, .close-panel-btn-secondary').forEach((btn) => {
       btn.addEventListener('click', (e) => {
@@ -1788,8 +1809,15 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
       const form = document.getElementById(formId) as HTMLFormElement | null;
       if (!form) return;
 
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
+
+        const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement | null;
+        const originalBtnText = submitBtn ? submitBtn.textContent : '';
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'The Raven Takes Wing...';
+        }
 
         const name = (document.getElementById(nameId) as HTMLInputElement)?.value.trim() || 'Traveler';
         const email = (document.getElementById(emailId) as HTMLInputElement)?.value.trim() || '';
@@ -1798,14 +1826,19 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
 
         const fullFormattedBody = `Sender: ${name}\nReturn Address: ${email}\n\n--------------------------------------------------\n${body}\n--------------------------------------------------\n(Dispatched via Ibem's Tavern Messenger Roost)`;
 
-        // 1. Invoke mailto client
-        const mailtoUrl = `mailto:${recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(fullFormattedBody)}`;
-        window.location.href = mailtoUrl;
+        const result = await sendMissive({
+          name,
+          email,
+          subject,
+          message: body,
+        });
 
         // 2. If on desktop modal, show the receipt view
         if (isDesktop) {
           const composerView = document.getElementById('raven-composer-view');
           const receiptView = document.getElementById('raven-receipt-view');
+          const receiptHeading = document.getElementById('receipt-heading');
+          const receiptDesc = document.getElementById('receipt-desc');
           const receiptSubject = document.getElementById('receipt-subject');
           const receiptFrom = document.getElementById('receipt-from');
           const receiptBody = document.getElementById('receipt-body');
@@ -1815,12 +1848,27 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
             composerView.classList.add('hidden');
             receiptView.classList.remove('hidden');
 
+            if (result.success) {
+              if (receiptHeading) receiptHeading.textContent = 'Missive Delivered to Nhovem!';
+              if (receiptDesc) {
+                receiptDesc.textContent = 'The raven has successfully delivered your words directly to Nhovem’s console at ncabahug223@gmail.com.';
+              }
+            } else {
+              if (receiptHeading) receiptHeading.textContent = 'The Raven Awaits Your Signal';
+              if (receiptDesc) {
+                receiptDesc.textContent = 'Your missive has been inscribed. Send it directly using Gmail Web or your email client:';
+              }
+              if (result.fallbackMailto) {
+                window.location.href = result.fallbackMailto;
+              }
+            }
+
             if (receiptSubject) receiptSubject.textContent = subject;
             if (receiptFrom) receiptFrom.textContent = `${name} <${email}>`;
             if (receiptBody) receiptBody.textContent = body;
 
-            if (receiptGmailLink) {
-              receiptGmailLink.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${recipientEmail}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(fullFormattedBody)}`;
+            if (receiptGmailLink && result.fallbackGmailUrl) {
+              receiptGmailLink.href = result.fallbackGmailUrl;
             }
 
             // Setup copy formatted missive button
@@ -1852,12 +1900,26 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
                 receiptView.classList.add('hidden');
                 composerView.classList.remove('hidden');
                 form.reset();
+                if (submitBtn) {
+                  submitBtn.disabled = false;
+                  submitBtn.textContent = originalBtnText;
+                }
               };
+            }
+          }
+        } else {
+          // Mobile form fallback
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = result.success ? '✓ Missive Delivered!' : originalBtnText;
+            if (!result.success && result.fallbackMailto) {
+              window.location.href = result.fallbackMailto;
             }
           }
         }
       });
     }
+
 
     handleMissiveSubmission(
       'desktop-raven-form',
