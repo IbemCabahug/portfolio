@@ -1,6 +1,6 @@
 /**
  * Client-side email dispatch utility.
- * Sends automated transactional dispatches directly to ncabahug223@gmail.com
+ * Sends automated transactional dispatches directly to cabahugnhovem@gmail.com
  * via Web3Forms API, with graceful fallbacks.
  */
 
@@ -19,7 +19,7 @@ export interface MissiveResult {
   fallbackGmailUrl?: string;
 }
 
-export const RECIPIENT_EMAIL = 'ncabahug223@gmail.com';
+export const RECIPIENT_EMAIL = 'cabahugnhovem@gmail.com';
 
 export async function sendMissive(payload: MissivePayload): Promise<MissiveResult> {
   const formattedBody = `Sender: ${payload.name}\nReturn Address: ${payload.email}\n\n--------------------------------------------------\n${payload.message}\n--------------------------------------------------\n(Dispatched via Ibem's Tavern Messenger Roost)`;

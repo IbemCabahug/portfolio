@@ -6,7 +6,7 @@ const profileEntry = await getEntry('profile', 'main');
 const profile = profileEntry?.data;
 const mailLink = links.find((l) => l.data.icon === 'mail');
 const githubLink = links.find((l) => l.data.icon === 'github');
-const mailAddress = mailLink?.data.url.replace('mailto:', '') || profile?.email || 'ncabahug223@gmail.com';
+const mailAddress = mailLink?.data.url.replace('mailto:', '') || profile?.email || 'cabahugnhovem@gmail.com';
 const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com/IbemCabahug';
 ---
 
@@ -2085,7 +2085,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
     setupTransceiverSimulation();
 
     // Form Handling and Missive Dispatching
-    const recipientEmail = 'ncabahug223@gmail.com';
+    const recipientEmail = 'cabahugnhovem@gmail.com';
 
     function handleMissiveSubmission(
       formId: string,
@@ -2165,7 +2165,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
             if (result.success) {
               if (receiptHeading) receiptHeading.textContent = 'Missive Delivered to Nhovem!';
               if (receiptDesc) {
-                receiptDesc.textContent = 'The raven has successfully delivered your words directly to Nhovem’s console at ncabahug223@gmail.com.';
+                receiptDesc.textContent = 'The raven has successfully delivered your words directly to Nhovem’s console at cabahugnhovem@gmail.com.';
               }
             } else {
               if (receiptHeading) receiptHeading.textContent = 'The Raven Awaits Your Signal';

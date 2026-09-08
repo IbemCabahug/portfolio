@@ -11,7 +11,7 @@ const pureTextContent = `# Nhovem Cabahug
 
 - **Live Portfolio & Interactive Case Studies:** [portfolio-ibem.vercel.app](https://portfolio-ibem.vercel.app)
 - **Primary Codebases:** Pinned below (\`ArcaneTyper\`, \`bits\`, \`portfolio\`)
-- **Direct Contact:** [ncabahug223@gmail.com](mailto:ncabahug223@gmail.com)
+- **Direct Contact:** [cabahugnhovem@gmail.com](mailto:cabahugnhovem@gmail.com)
 `;
 
 // Write pure markdown README
