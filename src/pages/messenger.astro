@@ -1,8 +1,6 @@
 ---
 import TavernLayout from '../layouts/TavernLayout.astro';
 import { getCollection, getEntry } from 'astro:content';
-import { getProjectTelemetry } from '../lib/github';
-
 const links = await getCollection('links');
 const profileEntry = await getEntry('profile', 'main');
 const profile = profileEntry?.data;
@@ -10,17 +8,6 @@ const mailLink = links.find((l) => l.data.icon === 'mail');
 const githubLink = links.find((l) => l.data.icon === 'github');
 const mailAddress = mailLink?.data.url.replace('mailto:', '') || profile?.email || 'ncabahug223@gmail.com';
 const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com/IbemCabahug';
-
-const allProjects = await getCollection('projects');
-const projects = allProjects.sort((a, b) => a.data.order - b.data.order);
-const projectTelemetries = await Promise.all(
-  projects.map(async (p) => {
-    const telemetry = await getProjectTelemetry(p.data.sourceUrl);
-    return { project: p, telemetry };
-  })
-);
-
-const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telemetry?.latestCommit?.sha || '4904d7d';
 ---
 
 <TavernLayout
@@ -1855,14 +1842,19 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
 
       if (!launchBtn || !restingView || !activeControls || !frameContainer) return;
 
+      const container = frameContainer;
+      const resting = restingView;
+      const controls = activeControls;
+      const dialog = machineDialog;
+
       const liveUrl = launchBtn.getAttribute('data-url') || 'https://arcane-typer.vercel.app/';
 
       function fitArena() {
-        const iframe = frameContainer.querySelector('iframe');
+        const iframe = container.querySelector('iframe');
         if (!iframe) return;
 
-        const cw = frameContainer.clientWidth;
-        const ch = frameContainer.clientHeight;
+        const cw = container.clientWidth;
+        const ch = container.clientHeight;
         if (!cw || !ch) return;
 
         // Arcane Typer base design space: 800 x 600
@@ -1890,13 +1882,13 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
         iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-forms');
         iframe.loading = 'eager';
 
-        frameContainer.innerHTML = '';
-        frameContainer.appendChild(iframe);
+        container.innerHTML = '';
+        container.appendChild(iframe);
 
-        restingView.classList.add('hidden');
-        activeControls.classList.remove('hidden');
-        activeControls.classList.add('flex');
-        frameContainer.classList.remove('hidden');
+        resting.classList.add('hidden');
+        controls.classList.remove('hidden');
+        controls.classList.add('flex');
+        container.classList.remove('hidden');
 
         fitArena();
         requestAnimationFrame(fitArena);
@@ -1905,18 +1897,18 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
 
       function unloadArena() {
         soundEngine.playWoodClink();
-        frameContainer.innerHTML = '';
-        frameContainer.classList.add('hidden');
-        activeControls.classList.add('hidden');
-        activeControls.classList.remove('flex');
-        restingView.classList.remove('hidden');
+        container.innerHTML = '';
+        container.classList.add('hidden');
+        controls.classList.add('hidden');
+        controls.classList.remove('flex');
+        resting.classList.remove('hidden');
       }
 
       function toggleFullscreen() {
         soundEngine.playWoodClink();
-        const target = machineDialog || frameContainer;
+        const target = dialog || container;
         if (!document.fullscreenElement) {
-          if (target.requestFullscreen) {
+          if (target && target.requestFullscreen) {
             target.requestFullscreen();
           }
         } else {
@@ -1927,11 +1919,11 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
       }
 
       const resizeObserver = new ResizeObserver(() => {
-        if (!frameContainer.classList.contains('hidden')) {
+        if (!container.classList.contains('hidden')) {
           fitArena();
         }
       });
-      resizeObserver.observe(frameContainer);
+      resizeObserver.observe(container);
       window.addEventListener('resize', fitArena);
 
       launchBtn.addEventListener('click', launchArena);

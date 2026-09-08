@@ -99,7 +99,7 @@ const sceneObjects = [
   <div class="scene-container">
     <picture>
       <source
-        media="(min-width: 769px)"
+        media="(min-width: 769px), (orientation: landscape)"
         srcset="/art/tavern-room-1280.webp 1280w, /art/tavern-room-2560.webp 2560w"
         sizes="100vw"
       />
@@ -367,6 +367,41 @@ const sceneObjects = [
     </div>
   </div>
 
+  <!-- Orientation Suggestion Prompt: Visible only on narrow portrait viewports -->
+  <div
+    id="tavern-orientation-prompt"
+    class="orientation-prompt"
+    role="status"
+    aria-live="polite"
+  >
+    <div class="orientation-prompt-visual" aria-hidden="true">
+      <svg class="phone-rotate-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+        <path d="M12 18h.01"/>
+      </svg>
+      <span class="rotate-glyph">↻</span>
+    </div>
+    <div class="orientation-prompt-text">
+      <p class="orientation-prompt-title">Rotate for Tavern View</p>
+      <p class="orientation-prompt-body">The interactive chamber renders best in widescreen.</p>
+    </div>
+    <button
+      type="button"
+      id="dismiss-orientation-prompt"
+      class="orientation-dismiss-btn"
+      aria-label="Dismiss orientation suggestion"
+    >
+      ✕
+    </button>
+  </div>
+  <script is:inline>
+    try {
+      if (sessionStorage.getItem('tavern_orientation_dismissed') === 'true') {
+        document.getElementById('tavern-orientation-prompt')?.setAttribute('data-dismissed', 'true');
+      }
+    } catch (e) {}
+  </script>
+
   <div class="narrow-links">
     <a href="/tavern/npc" class="narrow-link">Talk to the Tavern Regular</a>
     <button type="button" class="narrow-link" id="narrow-innkeeper">Talk to the Innkeeper</button>
@@ -596,6 +631,98 @@ const sceneObjects = [
     border: 1px solid #8b6b4a;
     border-radius: 4px;
     min-height: 44px; /* Maintain 44px min touch target */
+  }
+
+  /* F19: Orientation Prompt Base Styles */
+  .orientation-prompt {
+    display: none; /* Hidden by default; activated via portrait narrow media query */
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    margin: 16px auto 0;
+    max-width: 440px;
+    width: calc(100% - 32px);
+    background: rgba(26, 16, 5, 0.95);
+    border: 1px solid #8b6b4a;
+    border-radius: 6px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+    color: #f6efe2;
+    box-sizing: border-box;
+  }
+
+  .orientation-prompt[data-dismissed="true"] {
+    display: none !important;
+  }
+
+  .orientation-prompt-visual {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--candle, #ffcc00);
+    flex-shrink: 0;
+  }
+
+  .phone-rotate-icon {
+    display: block;
+  }
+
+  .rotate-glyph {
+    font-size: 1.1rem;
+    line-height: 1;
+    display: inline-block;
+  }
+
+  .orientation-prompt-text {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .orientation-prompt-title {
+    font-family: serif;
+    font-weight: 700;
+    font-size: 0.9375rem;
+    line-height: 1.25;
+    color: #e6d3a8;
+    margin: 0;
+  }
+
+  .orientation-prompt-body {
+    font-size: 0.8125rem;
+    line-height: 1.35;
+    color: #c4b195;
+    margin: 2px 0 0;
+  }
+
+  .orientation-dismiss-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    color: #c4b195;
+    font-size: 1.125rem;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: color 0.15s ease, background-color 0.15s ease;
+    flex-shrink: 0;
+  }
+
+  .orientation-dismiss-btn:hover,
+  .orientation-dismiss-btn:focus-visible {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.1);
+    outline: 2px solid var(--brass, #c5a059);
+  }
+
+  :root[data-motion="reduced"] .orientation-prompt-visual,
+  :root[data-motion="reduced"] .orientation-dismiss-btn {
+    transition: none;
+    animation: none;
   }
   
   /* Panels styling */
@@ -1150,6 +1277,13 @@ const sceneObjects = [
     }
   }
 
+  /* Fine pointers don't need narrow-links in landscape when the scene is visible */
+  @media (orientation: landscape) and (hover: hover) and (pointer: fine) {
+    .narrow-links {
+      display: none;
+    }
+  }
+
   /* Touch devices have no hover, so the list names the destinations instead */
   @media (max-width: 1000px) and (hover: none) {
     .narrow-links {
@@ -1157,7 +1291,15 @@ const sceneObjects = [
     }
   }
 
-  @media (max-width: 768px) {
+  /* F19: Always suppress orientation prompt in landscape viewports */
+  @media (orientation: landscape) {
+    .orientation-prompt {
+      display: none !important;
+    }
+  }
+
+  /* F19: In portrait narrow screens (<= 768px), hide scene and show narrow links + orientation prompt */
+  @media (max-width: 768px) and (orientation: portrait) {
     .dialogue-panel .innkeeper-portrait { display: none; }
     .dialogue-panel .dialogue-stack { left: 4%; right: 4%; bottom: 2%; max-height: 88%; }
     .dialogue-panel .dialogue-replies { max-width: 100%; width: 100%; }
@@ -1174,6 +1316,16 @@ const sceneObjects = [
       padding: 24px;
       background-color: var(--wood-deep, #1a1005);
     }
+    .orientation-prompt:not([data-dismissed="true"]) {
+      display: flex;
+    }
+  }
+
+  /* F19: Compact dialogue for short landscape viewports (e.g. mobile phones in landscape) */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .dialogue-panel .innkeeper-portrait { display: none; }
+    .dialogue-panel .dialogue-stack { left: 4%; right: 4%; bottom: 2%; max-height: 94%; }
+    .dialogue-panel .dialogue-replies { max-width: 60%; }
   }
 </style>
 
@@ -1478,6 +1630,28 @@ const sceneObjects = [
             }
           }
         }
+      });
+    }
+
+    // F19: Orientation Prompt Session Dismissal
+    const promptEl = document.getElementById('tavern-orientation-prompt');
+    const dismissBtn = document.getElementById('dismiss-orientation-prompt');
+    const PROMPT_STORAGE_KEY = 'tavern_orientation_dismissed';
+
+    if (promptEl && dismissBtn) {
+      try {
+        if (sessionStorage.getItem(PROMPT_STORAGE_KEY) === 'true') {
+          promptEl.setAttribute('data-dismissed', 'true');
+        }
+      } catch (e) {
+        // Gracefully ignore storage restrictions
+      }
+
+      dismissBtn.addEventListener('click', () => {
+        promptEl.setAttribute('data-dismissed', 'true');
+        try {
+          sessionStorage.setItem(PROMPT_STORAGE_KEY, 'true');
+        } catch (e) {}
       });
     }
   }
