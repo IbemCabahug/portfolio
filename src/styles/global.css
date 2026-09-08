@@ -140,3 +140,37 @@ html[data-perf="low"] .screen-pulse-dot,
   animation: none !important;
 }
 
+/* ==========================================================================
+   Thematic Fantasy Scrollbar (Consistent Tavern Aesthetic)
+   Applies warm brass thumb & dark wood track across all pages and containers
+   ========================================================================== */
+html,
+body {
+  scrollbar-width: thin;
+  scrollbar-color: var(--brass, #a87a27) rgba(15, 10, 5, 0.85);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 10, 5, 0.85);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--brass, #a87a27);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 228, 160, 0.2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--candle, #ffe4a0);
+}
+
+::-webkit-scrollbar-corner {
+  background: rgba(15, 10, 5, 0.85);
+}
+
+

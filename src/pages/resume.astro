@@ -52,22 +52,7 @@ const skillsEntries = await getCollection('skills');
       
       <div class="flex flex-col gap-1 text-sm">
         <p class="location-indicator">Location: {profile.location}</p>
-        <p class="flex items-center gap-2 flex-wrap">
-          <span>Email: <a href={`mailto:${profile.email}`} class="underline">{profile.email}</a></span>
-          <button
-            type="button"
-            id="resume-copy-email-btn"
-            class="no-print inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded border border-gray-600 bg-gray-100 hover:bg-gray-200 text-gray-800 transition-colors cursor-pointer"
-            title="Copy email address to clipboard"
-            aria-label="Copy email address"
-          >
-            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-            </svg>
-            <span id="resume-copy-status">Copy</span>
-          </button>
-        </p>
+        <p>Email: <a href={`mailto:${profile.email}`} class="underline">{profile.email}</a></p>
         <p>GitHub: <a href={profile.github} class="underline">GitHub</a></p>
       </div>
     </header>
@@ -167,34 +152,5 @@ const skillsEntries = await getCollection('skills');
   <script>
     import { recordMilestone } from '../store/questlog';
     recordMilestone('resume');
-
-    function initResumeCopy() {
-      const copyBtn = document.getElementById('resume-copy-email-btn');
-      const statusText = document.getElementById('resume-copy-status');
-      const email = 'cabahugnhovem@gmail.com';
-
-      if (copyBtn && statusText) {
-        copyBtn.addEventListener('click', async () => {
-          try {
-            await navigator.clipboard.writeText(email);
-          } catch {
-            const textarea = document.createElement('textarea');
-            textarea.value = email;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-          }
-          statusText.textContent = 'Copied!';
-          copyBtn.classList.add('text-emerald-700', 'font-bold');
-          setTimeout(() => {
-            statusText.textContent = 'Copy';
-            copyBtn.classList.remove('text-emerald-700', 'font-bold');
-          }, 2200);
-        });
-      }
-    }
-
-    document.addEventListener('astro:page-load', initResumeCopy);
   </script>
 </BaseLayout>
