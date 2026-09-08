@@ -19,8 +19,8 @@ const totalCount = JOURNAL_MILESTONES.length;
     title="Open Wayfarer's Journal (Exploration & Fast-Travel Log)"
   >
     <ThematicIcon name="ledger" class="w-4 h-4 text-[var(--candle)] shrink-0" />
-    <span class="font-serif tracking-wide hidden md:inline">Wayfarer's Journal</span>
-    <span class="font-serif tracking-wide md:hidden">Journal</span>
+    <span class="journal-full-title font-serif tracking-wide">Wayfarer's Journal</span>
+    <span class="journal-short-title font-serif tracking-wide">Journal</span>
     <span
       id="journal-counter-badge"
       class="px-2 py-0.5 rounded-full bg-[var(--brass)]/20 border border-[var(--brass)]/60 text-[var(--candle)] font-mono text-[11px] font-bold"
@@ -330,3 +330,32 @@ const totalCount = JOURNAL_MILESTONES.length;
     initJournal();
   }
 </script>
+
+<style>
+  .journal-full-title {
+    display: none;
+  }
+  .journal-short-title {
+    display: none;
+  }
+
+  @media (min-width: 1024px) and (min-height: 501px) {
+    .journal-full-title {
+      display: inline;
+    }
+  }
+
+  @media (min-width: 640px) and (max-width: 1023px) and (min-height: 501px) {
+    .journal-short-title {
+      display: inline;
+    }
+  }
+
+  @media (max-height: 500px), (max-width: 860px) {
+    #trigger-quest-log {
+      padding: 2px 8px;
+      min-height: 34px;
+      gap: 6px;
+    }
+  }
+</style>

@@ -33,7 +33,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
     <section class="scene-container" aria-label="Interactive Courier's Roost Chamber">
       <picture>
         <source
-          media="(min-width: 769px)"
+          media="(min-width: 601px), (orientation: landscape)"
           srcset="/art/messengers-corner-1280.webp 1280w, /art/messengers-corner-2560.webp 2560w"
           sizes="(max-width: 2560px) 100vw, 2560px"
         />
@@ -964,15 +964,17 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
   .scene-container {
     position: relative;
     container-type: inline-size;
-    width: 100%;
-    max-width: calc((100dvh - 48px) * (2560 / 1429));
-    max-height: calc(100dvh - 48px);
     aspect-ratio: 2560 / 1429;
+    width: min(100vw, calc((100dvh - var(--hud-height, 48px)) * (2560 / 1429)));
+    height: min(calc(100dvh - var(--hud-height, 48px)), calc(100vw * (1429 / 2560)));
+    max-width: 100vw;
+    max-height: calc(100dvh - var(--hud-height, 48px));
     margin: auto;
     overflow: hidden;
     background-color: var(--wood-deep, #1a1005);
     border-radius: 8px;
     box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 0, 0, 0.6);
+    flex-shrink: 0;
   }
 
   .scene-container picture {
@@ -985,7 +987,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: fill;
     user-select: none;
   }
 
@@ -1523,8 +1525,8 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
     border-right: 2px solid var(--brass);
   }
 
-  /* Responsive Display Rules */
-  @media (min-width: 769px) {
+  /* Responsive Display Rules: 2.5D visual chamber active in landscape & tablet portrait */
+  @media (min-width: 601px), (orientation: landscape) {
     .roost-header {
       display: none;
     }
@@ -1536,10 +1538,14 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
     }
   }
 
-  @media (max-width: 768px) {
+  /* Narrow portrait mobile phones (<= 600px): Clean atmospheric tactile dispatch stack */
+  @media (max-width: 600px) and (orientation: portrait) {
     .roost-page-wrapper {
       height: auto;
       padding-bottom: 2.5rem;
+    }
+    .roost-header {
+      display: block;
     }
     .scene-container {
       display: none;

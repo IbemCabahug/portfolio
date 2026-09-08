@@ -62,7 +62,7 @@ const isScene = location === 'tavern' || location === 'messenger';
         >
           <span class="font-serif tracking-wide">Ibem's Tavern</span>
         </a>
-        <span class="text-xs font-semibold px-2 py-0.5 rounded bg-[#1e1208] border border-[var(--brass)]/50 text-[var(--candle)]">
+        <span class="hidden sm:inline-block text-xs font-semibold px-2 py-0.5 rounded bg-[#1e1208] border border-[var(--brass)]/50 text-[var(--candle)]">
           {currentScene.current}
         </span>
       </div>
@@ -162,18 +162,47 @@ const isScene = location === 'tavern' || location === 'messenger';
   </div>
 
   <style>
+    :root {
+      --hud-height: 48px;
+    }
+
+    .tavern-hud {
+      height: var(--hud-height);
+      padding-left: max(0.5rem, env(safe-area-inset-left));
+      padding-right: max(0.5rem, env(safe-area-inset-right));
+    }
+
+    @media (max-height: 500px), (max-width: 860px) {
+      :root {
+        --hud-height: 40px;
+      }
+      .tavern-hud {
+        height: var(--hud-height) !important;
+        min-height: var(--hud-height) !important;
+      }
+      .tavern-hud a[href="/simple"] {
+        display: none !important;
+      }
+      .tavern-hud details summary {
+        min-height: 34px !important;
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+      }
+    }
+
     .tavern-shell.scene-layout {
-      height: 100dvh;
-      height: 100vh;
-      overflow: hidden;
+      min-height: 100dvh;
+      min-height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
       display: flex;
       flex-direction: column;
       background-color: var(--wood-deep, #1a1005);
     }
 
     .tavern-shell.scene-layout .scene-wrapper {
-      flex: 1 1 auto;
-      min-height: 0;
+      flex: 1 1 0;
+      min-height: calc(100dvh - var(--hud-height, 48px));
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -228,6 +257,7 @@ const isScene = location === 'tavern' || location === 'messenger';
     :global(:-webkit-full-screen) .tavern-shell.scene-layout {
       height: 100vh !important;
       height: 100dvh !important;
+      overflow: hidden !important;
     }
 
     :global(:fullscreen) .scene-container,
@@ -237,13 +267,14 @@ const isScene = location === 'tavern' || location === 'messenger';
       max-width: calc(100vh * (2560 / 1431)) !important;
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 768px) and (orientation: portrait) {
       .tavern-shell.scene-layout {
         height: auto;
         min-height: 100dvh;
         overflow-y: auto;
       }
       .tavern-shell.scene-layout .scene-wrapper {
+        min-height: 0;
         height: auto;
         overflow-y: auto;
         justify-content: flex-start;

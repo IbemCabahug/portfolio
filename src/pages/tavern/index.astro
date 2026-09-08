@@ -99,12 +99,12 @@ const sceneObjects = [
   <div class="scene-container">
     <picture>
       <source
-        media="(min-width: 769px), (orientation: landscape)"
+        media="(min-width: 601px), (orientation: landscape)"
         srcset="/art/tavern-room-1280.webp 1280w, /art/tavern-room-2560.webp 2560w"
         sizes="100vw"
       />
       <img 
-        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+        src="/art/tavern-room-1280.webp"
         width="2560"
         height="1431"
         alt=""
@@ -419,13 +419,15 @@ const sceneObjects = [
   .scene-container {
     position: relative;
     container-type: inline-size;
-    width: 100%;
-    max-width: calc((100dvh - 48px) * (2560 / 1431));
-    max-height: calc(100dvh - 48px);
     aspect-ratio: 2560 / 1431;
+    width: min(100vw, calc((100dvh - var(--hud-height, 48px)) * (2560 / 1431)));
+    height: min(calc(100dvh - var(--hud-height, 48px)), calc(100vw * (1431 / 2560)));
+    max-width: 100vw;
+    max-height: calc(100dvh - var(--hud-height, 48px));
     margin: auto;
     overflow: hidden;
     background-color: var(--wood-deep, #1a1005);
+    flex-shrink: 0;
   }
 
   .scene-container picture {
@@ -438,7 +440,7 @@ const sceneObjects = [
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: fill;
   }
 
   .scene-overlay {
@@ -762,10 +764,11 @@ const sceneObjects = [
 
   /* Positions */
   .skills-panel {
-    left: 20%;
-    bottom: 10%;
-    width: 60%;
-    max-height: 70%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: min(94%, 700px);
+    max-height: 88%;
     overflow-y: auto;
   }
   
@@ -1270,36 +1273,38 @@ const sceneObjects = [
     }
   }
 
-  /* The parchment list belongs to narrow screens only */
-  @media (min-width: 769px) {
-    .narrow-links {
-      display: none;
-    }
-  }
-
-  /* Fine pointers don't need narrow-links in landscape when the scene is visible */
-  @media (orientation: landscape) and (hover: hover) and (pointer: fine) {
-    .narrow-links {
-      display: none;
-    }
-  }
-
-  /* Touch devices have no hover, so the list names the destinations instead */
-  @media (max-width: 1000px) and (hover: none) {
-    .narrow-links {
-      display: flex;
-    }
-  }
-
-  /* F19: Always suppress orientation prompt in landscape viewports */
+  /* Landscape Viewports: Chamber takes first-fold, parchment links accessible below fold */
   @media (orientation: landscape) {
     .orientation-prompt {
       display: none !important;
     }
+    .narrow-links {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      padding: 24px 16px 40px;
+      width: 100%;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    .narrow-link {
+      flex: 1 1 200px;
+      font-size: 0.875rem;
+      padding: 10px 16px;
+    }
   }
 
-  /* F19: In portrait narrow screens (<= 768px), hide scene and show narrow links + orientation prompt */
-  @media (max-width: 768px) and (orientation: portrait) {
+  /* Fine pointer widescreen desktops: hide below-fold parchment links */
+  @media (orientation: landscape) and (hover: hover) and (pointer: fine) and (min-width: 1024px) {
+    .narrow-links {
+      display: none;
+    }
+  }
+
+  /* In portrait narrow screens (<= 600px), hide scene and show narrow links + orientation prompt */
+  @media (max-width: 600px) and (orientation: portrait) {
     .dialogue-panel .innkeeper-portrait { display: none; }
     .dialogue-panel .dialogue-stack { left: 4%; right: 4%; bottom: 2%; max-height: 88%; }
     .dialogue-panel .dialogue-replies { max-width: 100%; width: 100%; }
@@ -1321,11 +1326,42 @@ const sceneObjects = [
     }
   }
 
-  /* F19: Compact dialogue for short landscape viewports (e.g. mobile phones in landscape) */
+  /* Tablet portrait (601px to 1024px in portrait): Show scene + below-fold links */
+  @media (min-width: 601px) and (orientation: portrait) {
+    .orientation-prompt {
+      display: none !important;
+    }
+    .scene-container {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      aspect-ratio: 2560 / 1431;
+      height: auto;
+    }
+    .narrow-links {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      padding: 24px 16px;
+      width: 100%;
+      max-width: 768px;
+      margin: 0 auto;
+    }
+    .narrow-link {
+      flex: 1 1 200px;
+    }
+  }
+
+  /* Compact dialogue for short landscape viewports (e.g. mobile phones in landscape) */
   @media (max-height: 500px) and (orientation: landscape) {
     .dialogue-panel .innkeeper-portrait { display: none; }
     .dialogue-panel .dialogue-stack { left: 4%; right: 4%; bottom: 2%; max-height: 94%; }
     .dialogue-panel .dialogue-replies { max-width: 60%; }
+    .dialogue-panel .dialogue-prose { font-size: 0.95rem; line-height: 1.45; }
+    .dialogue-panel .reply-btn { min-height: 40px; padding: 6px 12px 6px 24px; font-size: 0.85rem; }
+    .dialogue-panel .panel-header h2 { font-size: 1.15rem; }
   }
 </style>
 
