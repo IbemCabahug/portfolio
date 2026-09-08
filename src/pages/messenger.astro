@@ -1630,6 +1630,33 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
   :root[data-motion="reduced"] .scene-object:is(:hover, :focus-visible) img {
     transform: none !important;
   }
+
+  /* Labels off on limited-size devices, matching tavern room behavior */
+  @media (max-width: 1000px) {
+    .scene-tooltip {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+
+  /* Fine pointers get labels back on hover: ≤1000px */
+  @media (max-width: 1000px) and (hover: hover) and (pointer: fine) {
+    .scene-object:hover .scene-tooltip,
+    .scene-object:focus-visible .scene-tooltip,
+    .scene-object:focus-within .scene-tooltip {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  /* Keyboard focus always reveals the label, on every device */
+  @media (max-width: 1000px) {
+    .scene-object:focus-visible .scene-tooltip,
+    .scene-object:focus-within .scene-tooltip {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
 </style>
 
 <script>
