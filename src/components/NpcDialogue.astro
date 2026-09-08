@@ -1,0 +1,839 @@
+---
+interface ReplyItem {
+  id?: string | number;
+  question: string;
+  answer?: string;
+  offerLabel?: string;
+  offerHref?: string;
+  followUp?: string;
+}
+
+interface Props {
+  npcId: string;
+  title: string;
+  portraitSrc?: string;
+  portraitWidth?: number;
+  portraitHeight?: number;
+  initialBeats: string[];
+  replies: ReplyItem[];
+  farewell?: {
+    question: string;
+    answer?: string;
+    href?: string;
+  };
+  closeLabel?: string;
+  closeHref?: string;
+  mode?: 'modal' | 'page';
+  stackId?: string;
+  repliesId?: string;
+  class?: string;
+}
+
+const {
+  npcId,
+  title,
+  portraitSrc,
+  portraitWidth = 519,
+  portraitHeight = 1365,
+  initialBeats = [],
+  replies = [],
+  farewell = { question: "Farewell.", answer: "Safe travels, traveller." },
+  closeLabel = "Close Dialogue (Esc)",
+  closeHref = "/tavern",
+  mode = "modal",
+  stackId,
+  repliesId,
+  class: className = ""
+} = Astro.props;
+
+const isModal = mode === 'modal';
+const TitleTag = isModal ? 'h2' : 'h1';
+---
+
+<div
+  id={`dialog-${npcId}`}
+  class={`npc-dialogue-container dialogue-panel tavern-panel ${isModal ? 'modal-dialogue' : 'page-dialogue'} ${className}`}
+  role="dialog"
+  aria-modal={isModal ? "true" : "false"}
+  aria-labelledby={`${npcId}-dialogue-title`}
+  aria-describedby={`${npcId}-dialogue-prose`}
+  hidden={isModal}
+  data-npc-id={npcId}
+  data-mode={mode}
+>
+  {portraitSrc && (
+    <img
+      class="npc-dialogue-portrait"
+      src={portraitSrc}
+      width={portraitWidth}
+      height={portraitHeight}
+      alt=""
+      aria-hidden="true"
+      loading="lazy"
+      decoding="async"
+    />
+  )}
+
+  <div class="dialogue-stack" id={stackId || `${npcId}-stack`} hidden={!isModal}>
+    <!-- Speech Band (Left in landscape, top in portrait) -->
+    <div class="dialogue-band" id={`${npcId}-band`}>
+      <div class="panel-header flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="speech-pip" aria-hidden="true"></span>
+          <TitleTag id={`${npcId}-dialogue-title`} class="text-base sm:text-lg font-bold text-[var(--candle)] font-serif leading-tight">
+            {title}
+          </TitleTag>
+        </div>
+        {isModal ? (
+          <button
+            type="button"
+            class="close-panel-btn panel-close-icon-btn"
+            aria-label={`Close ${title}`}
+            data-action="close"
+          >
+            ✕
+          </button>
+        ) : (
+          <a
+            href={closeHref}
+            class="close-panel-btn panel-close-icon-btn"
+            aria-label={`Back from ${title}`}
+          >
+            ✕
+          </a>
+        )}
+      </div>
+
+      <div class="panel-body">
+        <div class="dialogue-prose" id={`${npcId}-dialogue-prose`} tabindex="-1">
+          {initialBeats.map((line) => (
+            <p>{line}</p>
+          ))}
+        </div>
+      </div>
+
+      <div class="panel-actions flex items-center justify-between">
+        <span class="dialogue-hint text-[11px] text-[var(--parchment)]/70 hidden sm:inline">
+          Tap box or press Space to skip
+        </span>
+        {isModal ? (
+          <button type="button" class="close-panel-btn ml-auto" data-action="close">
+            {closeLabel}
+          </button>
+        ) : (
+          <a href={closeHref} class="close-panel-btn ml-auto">
+            {closeLabel}
+          </a>
+        )}
+      </div>
+    </div>
+
+    <!-- Replies Tray (Right in landscape, bottom in portrait) -->
+    <div class="dialogue-replies-tray" id={`${npcId}-replies-tray`}>
+      <div class="replies-header">
+        <span>Inquiries</span>
+        <span class="text-[10px] text-[var(--brass)]/80 tracking-wider">SELECT A TOPIC</span>
+      </div>
+      <ul class="dialogue-replies" id={repliesId || `${npcId}-replies`}>
+        {replies.map((reply, i) => (
+          <li>
+            <button
+              type="button"
+              class="reply-btn"
+              data-reply-index={i}
+              data-question-index={i}
+            >
+              {reply.question}
+            </button>
+          </li>
+        ))}
+        {farewell && (
+          <li>
+            <button type="button" class="reply-btn farewell-btn" data-action="farewell">
+              {farewell.question}
+            </button>
+          </li>
+        )}
+      </ul>
+    </div>
+  </div>
+
+  <div id={`${npcId}-announce`} class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Embedded JSON Data for Deterministic Script Engine -->
+  <script
+    type="application/json"
+    id={`${npcId}-data`}
+    is:inline
+    set:html={JSON.stringify({
+      title,
+      beats: initialBeats,
+      replies,
+      farewell,
+      mode
+    })}
+  />
+</div>
+
+<style>
+  /* --------------------------------------------------------------------------
+     Base Dialogue Panel Container
+     -------------------------------------------------------------------------- */
+  .npc-dialogue-container {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    pointer-events: none;
+    z-index: 50;
+    box-sizing: border-box;
+    display: block;
+    background: none;
+    border: none;
+    box-shadow: none;
+    animation: none !important;
+    transform: none !important;
+  }
+  .npc-dialogue-container[hidden] {
+    display: none !important;
+  }
+  .npc-dialogue-container > * {
+    pointer-events: auto;
+  }
+
+  .speech-pip {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--brass, #a87a27);
+    box-shadow: 0 0 6px var(--candle, #ffe4a0);
+  }
+
+  /* --------------------------------------------------------------------------
+     Common Shared Components & Typography (Base styles)
+     -------------------------------------------------------------------------- */
+  .dialogue-band {
+    align-self: stretch;
+    background: rgba(15, 10, 5, 0.95);
+    border: 2px solid #8b6b4a;
+    border-radius: 6px;
+    padding: 12px 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
+
+  .dialogue-prose p {
+    margin: 0 0 0.75em;
+    line-height: 1.5;
+    color: var(--parchment, #f4ebd9);
+  }
+  .dialogue-prose p:last-child {
+    margin-bottom: 0;
+  }
+  .dialogue-prose {
+    max-width: 66ch;
+    font-size: 1.05rem;
+    line-height: 1.5;
+    text-align: left;
+    color: var(--parchment, #f4ebd9);
+  }
+  .dialogue-prose span {
+    color: inherit;
+  }
+  .dialogue-prose a {
+    color: var(--candle, #ffe4a0);
+    text-decoration: underline;
+    font-weight: bold;
+  }
+  .dialogue-prose a:hover {
+    color: #fff;
+  }
+
+  :global(.dialogue-unread) {
+    visibility: hidden;
+  }
+
+  :global(.dialogue-followup) {
+    font-style: italic;
+    color: var(--candle, #ffe4a0);
+    opacity: 0.9;
+    margin-top: 0.5em !important;
+  }
+
+  .dialogue-replies-tray {
+    background: rgba(15, 10, 5, 0.95);
+    border: 2px solid #8b6b4a;
+    border-radius: 6px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
+
+  .dialogue-replies {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .replies-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--candle, #ffe4a0);
+    border-bottom: 1px solid rgba(139, 107, 74, 0.4);
+    padding-bottom: 4px;
+    margin-bottom: 6px;
+    flex-shrink: 0;
+  }
+
+  .reply-btn {
+    border: 1px solid rgba(139, 107, 74, 0.35);
+    border-radius: 4px;
+    width: 100%;
+    position: relative;
+    padding: 8px 12px 8px 24px;
+    text-align: left;
+    background: rgba(30, 18, 8, 0.8);
+    color: var(--parchment, #f4ebd9);
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+  .reply-btn::before {
+    content: "\25B8";
+    position: absolute;
+    left: 8px;
+    color: var(--brass, #a87a27);
+    transition: transform 0.15s ease, color 0.15s ease;
+  }
+  .reply-btn:is(:hover, :focus-visible) {
+    background: rgba(50, 30, 12, 0.95);
+    border-color: var(--candle, #ffe4a0);
+    color: var(--candle, #ffe4a0);
+  }
+  .reply-btn:is(:hover, :focus-visible)::before {
+    color: var(--candle, #ffe4a0);
+    transform: translateX(2px);
+  }
+  .reply-btn.reply-visited {
+    color: #a89880;
+    border-color: rgba(139, 107, 74, 0.2);
+  }
+  .reply-btn.reply-visited:hover {
+    color: #fdf6e3;
+    border-color: var(--brass, #a87a27);
+  }
+
+  .farewell-btn {
+    border-top: 1px dashed rgba(168, 122, 39, 0.4);
+    margin-top: 2px;
+  }
+
+  .panel-close-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    min-height: 36px;
+    padding: 0;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 4px;
+    background: rgba(30, 18, 8, 0.85);
+    border: 1px solid var(--brass, #a87a27);
+    color: var(--candle, #ffe4a0);
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+  .panel-close-icon-btn:is(:hover, :focus-visible) {
+    background: #000;
+    border-color: var(--candle, #ffe4a0);
+    color: #fff;
+  }
+
+  /* Themed Fantasy Scrollbars */
+  .dialogue-replies,
+  .dialogue-band .panel-body {
+    scrollbar-width: thin;
+    scrollbar-color: var(--brass, #c49a45) rgba(15, 10, 5, 0.6);
+  }
+  .dialogue-replies::-webkit-scrollbar,
+  .dialogue-band .panel-body::-webkit-scrollbar {
+    width: 6px;
+  }
+  .dialogue-replies::-webkit-scrollbar-track,
+  .dialogue-band .panel-body::-webkit-scrollbar-track {
+    background: rgba(15, 10, 5, 0.7);
+    border-radius: 3px;
+  }
+  .dialogue-replies::-webkit-scrollbar-thumb,
+  .dialogue-band .panel-body::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #d5a350, #8b6b4a);
+    border-radius: 3px;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* --------------------------------------------------------------------------
+     Desktop Widescreen Layout (>= 1024px width & >= 550px height)
+     -------------------------------------------------------------------------- */
+  @media (min-width: 1024px) and (min-height: 550px) {
+    .npc-dialogue-portrait {
+      position: absolute;
+      left: 7%;
+      bottom: 0;
+      height: 72vh;
+      max-height: 640px;
+      width: auto;
+      object-fit: contain;
+      object-position: bottom center;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .dialogue-stack {
+      position: absolute;
+      left: 32%;
+      right: 8%;
+      bottom: 4%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+      max-height: 85%;
+      z-index: 2;
+    }
+
+    .dialogue-band {
+      width: 100%;
+      min-height: 150px;
+    }
+
+    .dialogue-replies-tray {
+      width: 100%;
+      max-width: 480px;
+      max-height: 240px;
+    }
+
+    .dialogue-replies {
+      max-height: 190px;
+      overflow-y: auto;
+    }
+
+    .page-dialogue .dialogue-stack {
+      left: 42%;
+      right: 6%;
+    }
+  }
+
+  /* --------------------------------------------------------------------------
+     Mobile Portrait Layout (<= 600px width in portrait)
+     Staged RPG Bottom Sheet: Character art in top 44%, Dialogue in bottom 56%
+     -------------------------------------------------------------------------- */
+  @media (max-width: 600px) and (orientation: portrait) {
+    .npc-dialogue-portrait {
+      display: none !important;
+    }
+
+    .dialogue-stack {
+      position: fixed;
+      left: 3%;
+      right: 3%;
+      bottom: 8px;
+      width: auto;
+      transform: none;
+      max-height: 56dvh;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 50;
+    }
+
+    .dialogue-band {
+      padding: 10px 14px;
+      flex: 0 0 auto;
+      max-height: 48%;
+      overflow: hidden;
+    }
+
+    .dialogue-band .panel-header {
+      padding-bottom: 6px;
+      flex-shrink: 0;
+    }
+    .dialogue-band .panel-header h1,
+    .dialogue-band .panel-header h2 {
+      font-size: 1.05rem !important;
+      margin: 0;
+    }
+
+    .dialogue-band .panel-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      max-height: 100px;
+    }
+
+    .dialogue-prose {
+      font-size: 0.92rem !important;
+      line-height: 1.4 !important;
+    }
+
+    .dialogue-band .panel-actions {
+      padding-top: 6px;
+      flex-shrink: 0;
+    }
+    .dialogue-band .close-panel-btn {
+      min-height: 38px !important;
+      padding: 6px 12px !important;
+      font-size: 0.85rem !important;
+    }
+
+    .dialogue-replies-tray {
+      padding: 8px 10px;
+      flex: 1 1 auto;
+      min-height: 0;
+      max-height: 52%;
+      overflow: hidden;
+    }
+
+    .replies-header {
+      font-size: 0.72rem;
+      padding-bottom: 4px;
+      margin-bottom: 6px;
+      flex-shrink: 0;
+    }
+
+    .dialogue-replies {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      gap: 6px;
+    }
+
+    .reply-btn {
+      min-height: 42px !important;
+      padding: 8px 12px 8px 24px !important;
+      font-size: 0.85rem !important;
+    }
+  }
+
+  /* --------------------------------------------------------------------------
+     Mobile Landscape Dual-Pane Layout (<= 500px height in landscape)
+     Solves the vertical double-box clash by splitting speech & replies side-by-side
+     -------------------------------------------------------------------------- */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .npc-dialogue-portrait {
+      display: none !important;
+    }
+
+    .dialogue-stack {
+      position: fixed;
+      left: 50%;
+      bottom: 4px;
+      transform: translateX(-50%);
+      width: min(96vw, 860px);
+      height: calc(100dvh - var(--hud-height, 40px) - 8px);
+      max-height: calc(100dvh - var(--hud-height, 40px) - 8px);
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 10px;
+      align-items: stretch;
+      z-index: 50;
+    }
+
+    .page-dialogue .dialogue-stack {
+      left: 36%;
+      right: 2%;
+      width: auto;
+      transform: none;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .dialogue-band {
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 0;
+      height: 100%;
+      max-height: 100%;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9);
+      overflow: hidden;
+    }
+
+    .dialogue-band .panel-header {
+      padding-bottom: 4px;
+      flex-shrink: 0;
+    }
+    .dialogue-band .panel-header h1,
+    .dialogue-band .panel-header h2 {
+      font-size: 1rem !important;
+      margin: 0;
+    }
+
+    .dialogue-band .panel-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      margin: 4px 0;
+    }
+
+    .dialogue-prose {
+      font-size: 0.875rem !important;
+      line-height: 1.35 !important;
+    }
+
+    .dialogue-band .panel-actions {
+      padding-top: 4px;
+      flex-shrink: 0;
+    }
+    .dialogue-band .close-panel-btn {
+      min-height: 38px !important;
+      padding: 5px 12px !important;
+      font-size: 0.8rem !important;
+    }
+
+    .dialogue-replies-tray {
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      height: 100%;
+      max-height: 100%;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9);
+      overflow: hidden;
+    }
+
+    .replies-header {
+      font-size: 0.72rem;
+      padding-bottom: 4px;
+      margin-bottom: 4px;
+      flex-shrink: 0;
+    }
+
+    .dialogue-replies {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      gap: 4px;
+    }
+
+    .reply-btn {
+      min-height: 38px !important;
+      padding: 5px 8px 5px 20px !important;
+      font-size: 0.8rem !important;
+      line-height: 1.25 !important;
+    }
+    .reply-btn::before {
+      left: 6px !important;
+    }
+  }
+</style>
+
+<script>
+  // Unified Deterministic NPC Dialogue Controller
+  function setupNpcDialogue() {
+    const containers = document.querySelectorAll<HTMLElement>('.npc-dialogue-container');
+
+    containers.forEach((container) => {
+      const npcId = container.getAttribute('data-npc-id');
+      if (!npcId) return;
+
+      const dataEl = document.getElementById(`${npcId}-data`);
+      if (!dataEl) return;
+
+      const data = JSON.parse(dataEl.textContent || '{}');
+      const prose = container.querySelector<HTMLElement>('.dialogue-prose');
+      const repliesList = container.querySelector<HTMLUListElement>('.dialogue-replies');
+      const announce = container.querySelector<HTMLElement>('[aria-live]');
+      const band = container.querySelector<HTMLElement>('.dialogue-band');
+
+      if (!prose || !repliesList) return;
+
+      // Progressive enhancement: reveal page stack and hide fallback when JS runs
+      if (data.mode === 'page') {
+        const stackEl = container.querySelector<HTMLElement>('.dialogue-stack');
+        if (stackEl) stackEl.hidden = false;
+        const fb = document.getElementById('npc-fallback');
+        if (fb) fb.hidden = true;
+      }
+
+      const TYPE_MS = 24;
+      const PAUSE_AFTER: Record<string, number> = { '.': 8, '!': 8, '?': 8, ',': 4, ';': 4, ':': 4 };
+      let typeTimer: number | null = null;
+      let typingDone = true;
+      let finishTyping: (() => void) | null = null;
+
+      function stopTyping() {
+        if (typeTimer !== null) {
+          clearTimeout(typeTimer);
+          typeTimer = null;
+        }
+      }
+
+      function renderProse(html: string) {
+        if (!prose) return;
+        stopTyping();
+        finishTyping = null;
+
+        const temp = document.createElement('div');
+        temp.innerHTML = html;
+        const plain = temp.textContent || '';
+
+        const settle = () => {
+          stopTyping();
+          finishTyping = null;
+          prose.innerHTML = html;
+          typingDone = true;
+          if (announce) announce.textContent = plain;
+        };
+
+        if (document.documentElement.dataset.motion !== 'full') {
+          settle();
+          return;
+        }
+
+        typingDone = false;
+        finishTyping = settle;
+
+        prose.innerHTML = '';
+        const paragraphs = Array.from(temp.querySelectorAll('p'));
+        const targetElements = paragraphs.length ? paragraphs : [temp];
+
+        const runs: { shown: HTMLSpanElement; hidden: HTMLSpanElement; text: string }[] = [];
+
+        targetElements.forEach((p) => {
+          const text = p.textContent || '';
+          if (!text.trim()) return;
+
+          const pWrapper = document.createElement('p');
+          const shown = document.createElement('span');
+          shown.setAttribute('aria-hidden', 'true');
+          const rest = document.createElement('span');
+          rest.setAttribute('aria-hidden', 'true');
+          rest.className = 'dialogue-unread';
+          rest.textContent = text;
+
+          pWrapper.appendChild(shown);
+          pWrapper.appendChild(rest);
+          prose.appendChild(pWrapper);
+          runs.push({ shown, hidden: rest, text });
+        });
+
+        if (!runs.length) {
+          settle();
+          return;
+        }
+
+        let ri = 0;
+        let ci = 0;
+        const step = () => {
+          const run = runs[ri];
+          ci += 1;
+          run.shown.textContent = run.text.slice(0, ci);
+          run.hidden.textContent = run.text.slice(ci);
+          const ch = run.text[ci - 1];
+          if (ci >= run.text.length) {
+            ri += 1;
+            ci = 0;
+          }
+          if (ri >= runs.length) {
+            settle();
+            return;
+          }
+          typeTimer = window.setTimeout(step, TYPE_MS * (PAUSE_AFTER[ch] ?? 1));
+        };
+        typeTimer = window.setTimeout(step, TYPE_MS);
+      }
+
+      // Tap / Click band to instantly complete speech
+      if (band) {
+        band.addEventListener('click', () => {
+          if (!typingDone && finishTyping) finishTyping();
+        });
+      }
+
+      // Space / Enter to complete speech
+      document.addEventListener('keydown', (e) => {
+        if (container.hidden) return;
+        if (typingDone || !finishTyping) return;
+        if (e.key === ' ' || e.key === 'Spacebar' || e.key === 'Enter') {
+          e.preventDefault();
+          finishTyping();
+        }
+      });
+
+      // Handle reply clicks
+      repliesList.addEventListener('click', (e) => {
+        const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.reply-btn');
+        if (!btn) return;
+
+        if (btn.getAttribute('data-action') === 'farewell') {
+          if (data.farewell?.href) {
+            window.location.href = data.farewell.href;
+            return;
+          }
+          if (data.mode === 'page' && data.closeHref) {
+            window.location.href = data.closeHref;
+            return;
+          }
+          if (data.farewell?.answer) {
+            renderProse(`<p>${data.farewell.answer}</p>`);
+          }
+          prose.focus();
+          return;
+        }
+
+        const idxStr = btn.getAttribute('data-reply-index');
+        if (idxStr !== null) {
+          const idx = parseInt(idxStr, 10);
+          const reply = data.replies[idx];
+          if (reply) {
+            renderProse(`
+              <p>${reply.answer}</p>
+              ${reply.offerHref ? `<p><a href="${reply.offerHref}">${reply.offerLabel || 'Inspect Dossier \u2192'}</a></p>` : ''}
+              ${reply.followUp ? `<p class="dialogue-followup">${reply.followUp}</p>` : ''}
+            `);
+            btn.classList.add('reply-visited');
+            prose.focus();
+          }
+        }
+      });
+
+      // Expose reset method for modals
+      (container as any).__resetDialogue = () => {
+        stopTyping();
+        typingDone = true;
+        prose.innerHTML = (data.beats || []).map((b: string) => `<p>${b}</p>`).join('');
+      };
+    });
+  }
+
+  document.addEventListener('astro:page-load', setupNpcDialogue);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupNpcDialogue);
+  } else {
+    setupNpcDialogue();
+  }
+</script>

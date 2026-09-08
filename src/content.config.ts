@@ -53,6 +53,9 @@ const npc = defineCollection({
     question: z.string(),
     answer: z.string().optional(),
     order: z.number(),
+    offerLabel: z.string().optional(),
+    offerHref: z.string().optional(),
+    followUp: z.string().optional(),
   }),
 });
 

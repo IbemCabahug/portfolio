@@ -1,6 +1,7 @@
 ---
 import TavernLayout from '../../layouts/TavernLayout.astro';
 import ThematicIcon from '../../components/icons/ThematicIcon.astro';
+import NpcDialogue from '../../components/NpcDialogue.astro';
 
 import { getCollection } from 'astro:content';
 
@@ -17,12 +18,17 @@ const levelMap: Record<string, number> = {
 };
 
 const innkeeperEntries = await getCollection('innkeeper');
-  const innkeeperAll = innkeeperEntries
-    .map(entry => entry.data)
-    .sort((a: any, b: any) => a.order - b.order);
-  const innkeeperBeats = innkeeperAll.filter((d: any) => d.line);
-  const innkeeperReplies = innkeeperAll.filter((d: any) => d.question && d.offerHref);
-  const innkeeperFarewell = innkeeperAll.find((d: any) => d.question && !d.offerHref);
+const innkeeperAll = innkeeperEntries
+  .map(entry => entry.data)
+  .sort((a: any, b: any) => a.order - b.order);
+const innkeeperBeats = innkeeperAll.filter((d: any) => d.line);
+const innkeeperReplies = innkeeperAll.filter((d: any) => d.question && d.offerHref);
+const innkeeperFarewell = innkeeperAll.find((d: any) => d.question && !d.offerHref);
+
+const npcEntries = await getCollection('npc');
+const regularQuestions = npcEntries
+  .map(entry => entry.data)
+  .sort((a: any, b: any) => a.order - b.order);
 
 // Data structure for the interactive scene objects
 const sceneObjects = [
@@ -238,7 +244,7 @@ const sceneObjects = [
   </script>
 
   <div class="narrow-links">
-    <a href="/tavern/npc" class="narrow-link">Talk to the Tavern Regular</a>
+    <a href="/tavern/npc" id="narrow-regular" class="narrow-link">Talk to the Tavern Regular</a>
     <button type="button" class="narrow-link" id="narrow-innkeeper">Talk to the Innkeeper</button>
     <a href="/tavern/skills" id="narrow-skills" class="narrow-link">View Skills</a>
     <a href="/quests" id="narrow-questboard" class="narrow-link">Go to the Quest Board</a>
@@ -282,41 +288,48 @@ const sceneObjects = [
     </div>
   </div>
 
-  <!-- Innkeeper Dialogue -->
-  <div id="dialog-innkeeper" class="tavern-panel dialogue-panel" role="dialog" aria-modal="true"
-       aria-labelledby="innkeeper-title" aria-describedby="innkeeper-prose" hidden>
-    <img class="innkeeper-portrait" src="/art/innkeeper-portrait-519.webp" width="519" height="1365"
-         alt="" aria-hidden="true" loading="lazy" decoding="async" />
-    <div class="dialogue-stack">
-      <ul class="dialogue-replies" id="innkeeper-replies">
-        {innkeeperReplies.map((d: any, i: number) => (
-          <li>
-            <button type="button" class="reply-btn" data-reply-index={i}>{d.question}</button>
-          </li>
-        ))}
-        {innkeeperFarewell && (
-          <li>
-            <button type="button" class="reply-btn farewell-btn">{innkeeperFarewell.question}</button>
-          </li>
-        )}
-      </ul>
-      <div class="dialogue-band">
-        <div class="panel-header flex items-center justify-between">
-          <h2 id="innkeeper-title">The Innkeeper Says...</h2>
-          <button type="button" class="close-panel-btn panel-close-icon-btn" aria-label="Close Innkeeper Dialogue">✕</button>
-        </div>
-        <div class="panel-body">
-          <div class="dialogue-prose" id="innkeeper-prose" tabindex="-1">
-            {innkeeperBeats.map((d: any) => (<p>{d.line}</p>))}
-          </div>
-        </div>
-        <div class="panel-actions flex justify-end">
-          <button type="button" class="close-panel-btn ml-auto">Close Dialogue (Esc)</button>
-        </div>
-      </div>
-    </div>
-    <div id="innkeeper-announce" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
-  </div>
+  <!-- Innkeeper Dialogue (Unified Architecture) -->
+  <NpcDialogue
+    npcId="innkeeper"
+    title="The Innkeeper"
+    portraitSrc="/art/innkeeper-portrait-519.webp"
+    portraitWidth={519}
+    portraitHeight={1365}
+    initialBeats={innkeeperBeats.map((d: any) => d.line)}
+    replies={innkeeperReplies.map((d: any) => ({
+      question: d.question,
+      answer: d.answer,
+      offerLabel: d.offerLabel,
+      offerHref: d.offerHref,
+      followUp: d.followUp
+    }))}
+    farewell={innkeeperFarewell?.question ? {
+      question: innkeeperFarewell.question,
+      answer: innkeeperFarewell.answer || ''
+    } : undefined}
+    closeLabel="Close Dialogue (Esc)"
+    mode="modal"
+  />
+
+  <!-- Tavern Regular Dialogue (In-Scene Unified Modal) -->
+  <NpcDialogue
+    npcId="regular"
+    title="The Tavern Regular"
+    portraitSrc="/art/tavern-regular-bust-1024.webp"
+    portraitWidth={1024}
+    portraitHeight={1205}
+    initialBeats={["What would you like to know about Nhovem or the guild?"]}
+    replies={regularQuestions.map((q: any) => ({
+      question: q.question,
+      answer: q.answer
+    }))}
+    farewell={{
+      question: "End conversation",
+      answer: "Safe journeys. Come back if you need any more answers about the developer."
+    }}
+    closeLabel="Close Dialogue (Esc)"
+    mode="modal"
+  />
 
   <!-- Quest Board Bounty Popup -->
   <div id="dialog-questboard" class="tavern-panel questboard-panel" role="dialog" aria-modal="true" aria-labelledby="questboard-title" hidden>
@@ -842,169 +855,6 @@ const sceneObjects = [
     opacity: 0 !important;
   }
 
-  .dialogue-panel {
-    position: fixed;
-    inset: 0;
-    width: 100vw;
-    height: 100dvh;
-    max-height: 100dvh;
-    background: none;
-    border: none;
-    padding: 0;
-    display: block;
-    pointer-events: none;
-    box-shadow: none;
-    z-index: 50;
-    animation: none !important;
-    transform: none !important;
-  }
-  .dialogue-panel > * {
-    pointer-events: auto;
-  }
-
-  /* Desktop layout for dialogue panel */
-  @media (min-width: 1024px) and (min-height: 550px) {
-    .dialogue-panel .dialogue-stack {
-      position: absolute;
-      left: 32%;
-      right: 8%;
-      bottom: 4%;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 12px;
-      max-height: 85%;
-    }
-    .dialogue-panel .innkeeper-portrait {
-      position: absolute;
-      left: 8%;
-      bottom: 0;
-      height: 70vh;
-      max-height: 600px;
-      width: auto;
-      object-fit: contain;
-      object-position: bottom center;
-    }
-  }
-
-  /* Mobile / Narrow / Short screens for dialogue panel */
-  @media (max-width: 1023px), (max-height: 549px) {
-    .dialogue-panel .innkeeper-portrait {
-      display: none;
-    }
-    .dialogue-panel .dialogue-stack {
-      position: absolute;
-      left: 3%;
-      right: 3%;
-      width: auto;
-      transform: none;
-      bottom: 8px;
-      max-height: calc(100dvh - var(--hud-height, 40px) - 16px);
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 6px;
-    }
-  }
-
-  .dialogue-panel .dialogue-band {
-    align-self: stretch;
-    background: rgba(15, 10, 5, 0.95);
-    border: 2px solid #8b6b4a;
-    border-radius: 6px;
-    padding: 12px 20px;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-  }
-  .dialogue-panel .panel-body {
-    flex: 1 1 auto;
-    min-height: 0;
-  }
-.dialogue-panel .dialogue-prose p {
-  margin: 0 0 0.85em;
-  line-height: 1.5;
-}
-.dialogue-panel .dialogue-prose p:last-child {
-  margin-bottom: 0;
-}
-.dialogue-panel .dialogue-prose {
-  max-width: 66ch;
-  font-size: 1.0625rem;
-  line-height: 1.5;
-  text-align: left;
-}
-.dialogue-panel :global(.dialogue-unread) {
-  visibility: hidden;
-}
-
-  .dialogue-panel .innkeeper-portrait {
-    position: absolute;
-    left: 9%;
-    bottom: -8%;
-    height: 72%;
-    width: auto;
-    max-width: 20%;
-    object-fit: contain;
-    object-position: bottom center;
-  }
-
-  .dialogue-panel .dialogue-replies {
-    list-style: none;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    width: 100%;
-    max-width: 480px;
-    align-self: flex-end;
-    flex: 0 0 auto;
-    background: rgba(15, 10, 5, 0.95);
-    border: 2px solid #8b6b4a;
-    border-radius: 6px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-    padding: 6px;
-    gap: 4px;
-  }
-.dialogue-panel .dialogue-replies[hidden] {
-  display: flex !important;
-  visibility: hidden;
-}
-
-  /* 11J: reclaim band chrome. Scoped so the Skills panel is untouched. */
-  .dialogue-panel .panel-header {
-    padding-bottom: 8px;
-  }
-  .dialogue-panel .panel-header h2 {
-    font-size: 1.25rem;
-  }
-  .dialogue-panel .panel-actions {
-    padding-top: 10px;
-  }
-
-  .dialogue-panel .dialogue-replies .reply-btn {
-    border: none;
-    border-radius: 4px;
-    width: 100%;
-    position: relative;
-    padding: 10px 12px 10px 28px;
-  }
-
-  .dialogue-panel .dialogue-replies .reply-btn::before {
-    content: "\25B8";
-    position: absolute;
-    left: 10px;
-    opacity: 0;
-    transition: opacity 0.15s ease-out;
-  }
-  .dialogue-panel .dialogue-replies .reply-btn:hover::before,
-  .dialogue-panel .dialogue-replies .reply-btn:focus-visible::before { opacity: 1; }
-
-  .dialogue-panel .reply-btn.reply-visited { color: #a89880; }
-  .dialogue-panel .reply-btn.reply-visited:hover { color: #fdf6e3; }
-  .dialogue-panel .dialogue-followup { color: #e6d3a8; font-style: italic; margin-bottom: 0; }
-
   .visually-hidden {
     position: absolute;
     width: 1px;
@@ -1269,35 +1119,6 @@ const sceneObjects = [
     .skill-category ul li {
       padding: 3px 6px;
       font-size: 12px;
-    }
-
-    /* Innkeeper Dialogue Short Landscape */
-    .dialogue-panel .dialogue-band {
-      padding: 8px 14px;
-    }
-    .dialogue-panel .dialogue-prose {
-      font-size: 0.9rem;
-      line-height: 1.35;
-      max-height: 80px;
-      overflow-y: auto;
-    }
-    .dialogue-panel .panel-header h2 {
-      font-size: 1rem;
-    }
-    .dialogue-panel .dialogue-replies {
-      max-height: 80px;
-      overflow-y: auto;
-      gap: 4px;
-    }
-    .dialogue-panel .reply-btn {
-      min-height: 36px;
-      padding: 4px 10px 4px 20px;
-      font-size: 0.8rem;
-    }
-    .dialogue-panel .close-panel-btn {
-      min-height: 36px;
-      padding: 4px 12px;
-      font-size: 0.8rem;
     }
   }
 
@@ -1574,23 +1395,8 @@ const sceneObjects = [
       flex: 1 1 200px;
     }
   }
-
-  /* Compact dialogue for short landscape viewports (e.g. mobile phones in landscape) */
-  @media (max-height: 500px) and (orientation: landscape) {
-    .dialogue-panel .innkeeper-portrait { display: none; }
-    .dialogue-panel .dialogue-stack { left: 3%; right: 3%; width: auto; transform: none; bottom: 4px; max-height: calc(100dvh - var(--hud-height, 40px) - 6px); }
-    .dialogue-panel .dialogue-replies { max-width: 60%; }
-    .dialogue-panel .dialogue-prose { font-size: 0.95rem; line-height: 1.45; }
-    .dialogue-panel .reply-btn { min-height: 40px; padding: 6px 12px 6px 24px; font-size: 0.85rem; }
-    .dialogue-panel .panel-header h2 { font-size: 1.15rem; }
-  }
 </style>
 
-  <script type="application/json" id="innkeeper-data" is:inline set:html={JSON.stringify({
-    replies: innkeeperReplies,
-    farewell: innkeeperFarewell,
-    beats: innkeeperBeats.map((d: any) => d.line),
-  })} />
 <script>
   import { initPerformanceGovernor } from '../../lib/perf-governor';
   import { soundEngine } from '../../lib/sound-engine';
@@ -1600,10 +1406,13 @@ const sceneObjects = [
     soundEngine.init();
     const triggerInnkeeper = document.getElementById('trigger-innkeeper');
     const narrowInnkeeper = document.getElementById('narrow-innkeeper');
+    const triggerRegular = document.getElementById('trigger-regular');
+    const narrowRegular = document.getElementById('narrow-regular');
     const triggerQuestBoard = document.getElementById('trigger-quest-board');
     
     const dialogSkills = document.getElementById('dialog-skills');
     const dialogInnkeeper = document.getElementById('dialog-innkeeper');
+    const dialogRegular = document.getElementById('dialog-regular');
     const dialogQuestboard = document.getElementById('dialog-questboard');
 
     const sceneInteractives = document.querySelectorAll<HTMLElement>('.scene-object, .scene-papers, .scene-door');
@@ -1737,9 +1546,27 @@ const sceneObjects = [
         trigger.setAttribute('aria-controls', 'dialog-innkeeper');
         trigger.addEventListener('click', (e) => {
           e.preventDefault();
-          resetInnkeeperDialog();
+          if ((dialogInnkeeper as any).__resetDialogue) {
+            (dialogInnkeeper as any).__resetDialogue();
+          }
           document.querySelector('.scene-container')?.classList.add('innkeeper-away');
           openDialog(dialogInnkeeper, trigger);
+        });
+      }
+    });
+
+    // Setup Tavern Regular triggers
+    [triggerRegular, narrowRegular].forEach(trigger => {
+      if (trigger && dialogRegular) {
+        trigger.setAttribute('aria-haspopup', 'dialog');
+        trigger.setAttribute('aria-expanded', 'false');
+        trigger.setAttribute('aria-controls', 'dialog-regular');
+        trigger.addEventListener('click', (e) => {
+          e.preventDefault();
+          if ((dialogRegular as any).__resetDialogue) {
+            (dialogRegular as any).__resetDialogue();
+          }
+          openDialog(dialogRegular, trigger);
         });
       }
     });
@@ -1786,142 +1613,6 @@ const sceneObjects = [
         document.querySelector('.scene-container')?.classList.remove('innkeeper-away');
       }
     });
-
-    const innkeeperDataEl = document.getElementById('innkeeper-data');
-    const innkeeperData = innkeeperDataEl ? JSON.parse(innkeeperDataEl.textContent || '{}') : null;
-    const innkeeperProse = document.getElementById('innkeeper-prose');
-    const innkeeperRepliesList = document.getElementById('innkeeper-replies');
-    const innkeeperRepliesInitialHTML = innkeeperRepliesList ? innkeeperRepliesList.innerHTML : '';
-
-    const innkeeperAnnounce = document.getElementById('innkeeper-announce');
-    const TYPE_MS = 25;
-    const PAUSE_AFTER: Record<string, number> = { '.': 8, '!': 8, '?': 8, ',': 4, ';': 4, ':': 4 };
-    let typeTimer: number | null = null;
-    let typingDone = true;
-    let finishTyping: (() => void) | null = null;
-
-    function stopTyping() {
-      if (typeTimer !== null) { clearTimeout(typeTimer); typeTimer = null; }
-    }
-
-    function renderProse(html: string) {
-      if (!innkeeperProse) return;
-      stopTyping();
-      finishTyping = null;
-
-      const probe = document.createElement('div');
-      probe.innerHTML = html;
-      const plain = (probe.textContent || '').replace(/\s+/g, ' ').trim();
-
-      const settle = () => {
-        stopTyping();
-        finishTyping = null;
-        innkeeperProse.innerHTML = html;
-        typingDone = true;
-        if (innkeeperAnnounce) innkeeperAnnounce.textContent = plain;
-        if (innkeeperRepliesList) innkeeperRepliesList.hidden = false;
-      };
-
-      if (document.documentElement.dataset.motion !== 'full') {
-        settle();
-        return;
-      }
-
-      typingDone = false;
-      finishTyping = settle;
-      if (innkeeperRepliesList) innkeeperRepliesList.hidden = true;
-      innkeeperProse.innerHTML = html;
-
-      const walker = document.createTreeWalker(innkeeperProse, NodeFilter.SHOW_TEXT);
-      const originals: Text[] = [];
-      let found: Node | null;
-      while ((found = walker.nextNode())) originals.push(found as Text);
-
-      const runs: Array<{ shown: HTMLElement; hidden: HTMLElement; text: string }> = [];
-      for (const original of originals) {
-        const text = original.nodeValue || '';
-        if (!text.trim()) continue;
-        const shown = document.createElement('span');
-        shown.setAttribute('aria-hidden', 'true');
-        const rest = document.createElement('span');
-        rest.setAttribute('aria-hidden', 'true');
-        rest.className = 'dialogue-unread';
-        rest.textContent = text;
-        const frag = document.createDocumentFragment();
-        frag.appendChild(shown);
-        frag.appendChild(rest);
-        original.parentNode?.replaceChild(frag, original);
-        runs.push({ shown, hidden: rest, text });
-      }
-
-      if (!runs.length) { settle(); return; }
-
-      let ri = 0;
-      let ci = 0;
-      const step = () => {
-        const run = runs[ri];
-        ci += 1;
-        run.shown.textContent = run.text.slice(0, ci);
-        run.hidden.textContent = run.text.slice(ci);
-        const ch = run.text[ci - 1];
-        if (ci >= run.text.length) { ri += 1; ci = 0; }
-        if (ri >= runs.length) { settle(); return; }
-        typeTimer = window.setTimeout(step, TYPE_MS * (PAUSE_AFTER[ch] ?? 1));
-      };
-      typeTimer = window.setTimeout(step, TYPE_MS);
-    }
-
-    const innkeeperBand = document.querySelector('#dialog-innkeeper .dialogue-band');
-    if (innkeeperBand) {
-      innkeeperBand.addEventListener('click', () => {
-        if (!typingDone && finishTyping) finishTyping();
-      });
-    }
-
-    document.addEventListener('keydown', (e) => {
-      const panel = document.getElementById('dialog-innkeeper');
-      if (!panel || panel.hidden) return;
-      if (typingDone || !finishTyping) return;
-      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-        e.preventDefault();
-        finishTyping();
-      }
-    });
-
-    function resetInnkeeperDialog() {
-      stopTyping();
-      typingDone = true;
-      if (!innkeeperProse || !innkeeperRepliesList || !innkeeperData) return;
-      renderProse(innkeeperData.beats.map((line: string) => `<p>${line}</p>`).join(''));
-      innkeeperRepliesList.innerHTML = innkeeperRepliesInitialHTML;
-    }
-
-    if (innkeeperRepliesList) {
-      innkeeperRepliesList.addEventListener('click', (e) => {
-        const btn = (e.target as HTMLElement).closest('.reply-btn');
-        if (!btn || !innkeeperProse || !innkeeperData) return;
-
-        if (btn.classList.contains('farewell-btn')) {
-          renderProse(`<p>${innkeeperData.farewell.answer}</p>`);
-          innkeeperRepliesList.innerHTML = '';
-          innkeeperProse.focus();
-        } else {
-          const indexStr = btn.getAttribute('data-reply-index');
-          if (indexStr !== null) {
-            const idx = parseInt(indexStr, 10);
-            const reply = innkeeperData.replies[idx];
-            if (reply) {
-              renderProse(`
-                <p>${reply.answer}</p>
-                ${reply.offerHref ? `<p><a href="${reply.offerHref}">${reply.offerLabel}</a></p>` : ''}
-                ${reply.followUp ? `<p class="dialogue-followup">${reply.followUp}</p>` : ''}
-              `);
-              btn.classList.add('reply-visited');
-            }
-          }
-        }
-      });
-    }
 
     // F19: Orientation Prompt Session Dismissal
     const promptEl = document.getElementById('tavern-orientation-prompt');
