@@ -1347,20 +1347,6 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
 
   
   /* Short landscape screens (<= 500px height in landscape) */
-  @media (max-height: 500px) and (orientation: landscape) {
-    .tavern-panel {
-      max-height: 96dvh;
-      padding: 10px 14px;
-      gap: 8px;
-    }
-    #dialog-machine.transceiver-viewport-modal {
-      width: 96vw;
-      height: 96dvh;
-      max-height: 96dvh;
-      padding: 8px 10px;
-    }
-  }
-
   .tavern-panel[hidden] {
     display: none !important;
   }
@@ -1383,6 +1369,65 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
       max-height: 92vh;
       padding: 10px 12px;
       gap: 6px;
+    }
+  }
+
+  /* Short landscape screens (<= 500px height in landscape) */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .tavern-panel {
+      max-height: 96dvh;
+      padding: 10px 14px;
+      gap: 8px;
+    }
+    #dialog-machine.transceiver-viewport-modal {
+      width: 98vw;
+      max-width: 98vw;
+      height: 97dvh;
+      max-height: 97dvh;
+      padding: 5px 8px;
+      gap: 4px;
+    }
+    #dialog-machine .panel-header {
+      padding-bottom: 2px;
+    }
+    #dialog-machine .panel-header h2 {
+      font-size: 0.95rem;
+      line-height: 1.1;
+    }
+    #dialog-machine .panel-badge-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+    #dialog-machine .close-panel-btn {
+      min-height: 28px;
+      padding: 2px 8px;
+      font-size: 11px;
+    }
+    #dialog-machine .panel-body {
+      gap: 4px;
+    }
+    #dialog-machine .panel-body > div:first-child {
+      padding: 2px 8px;
+    }
+    #dialog-machine #transceiver-fullscreen-btn,
+    #dialog-machine #transceiver-unload-btn {
+      min-height: 26px;
+      padding: 2px 6px;
+      font-size: 11px;
+    }
+    #dialog-machine #transceiver-resting-view {
+      padding: 6px 12px;
+      gap: 4px;
+    }
+    #dialog-machine #transceiver-resting-view p {
+      font-size: 11px;
+      line-height: 1.3;
+    }
+    #dialog-machine #transceiver-resting-view button,
+    #dialog-machine #transceiver-resting-view a {
+      min-height: 34px;
+      padding: 4px 12px;
+      font-size: 11px;
     }
   }
 
@@ -1655,6 +1700,31 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
     .scene-object:focus-within .scene-tooltip {
       opacity: 1;
       visibility: visible;
+    }
+  }
+
+  /* Transceiver in-world HUD screen optimization for rotated phone and limited devices */
+  @media (max-width: 1000px), (max-height: 500px) and (orientation: landscape) {
+    .screen-header,
+    .screen-footer {
+      background: transparent;
+      border: none;
+      padding: 1px 2px;
+    }
+    .screen-status-text,
+    .screen-commit {
+      display: none;
+    }
+    .screen-pulse-dot {
+      width: 3px;
+      height: 3px;
+    }
+    .screen-bars {
+      height: 4px;
+      gap: 1px;
+    }
+    .screen-bars .bar {
+      width: 1px;
     }
   }
 </style>
