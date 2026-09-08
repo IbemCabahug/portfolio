@@ -319,7 +319,8 @@ const totalCount = JOURNAL_MILESTONES.length;
     updateView();
   }
 
-  // Initialize on load and on view transitions if any
+  // Initialize on load and on view transitions
+  document.addEventListener('astro:page-load', initJournal);
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initJournal);
   } else {

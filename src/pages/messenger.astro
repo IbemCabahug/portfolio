@@ -62,6 +62,12 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
       </picture>
 
       <div class="scene-overlay" aria-hidden="false">
+        <!-- In-Scene Ambient Chamber Title (Desktop) -->
+        <div class="chamber-ambient-badge" aria-hidden="true">
+          <span class="badge-dot"></span>
+          <span>Tavern Aviary &bull; Chamber IV &bull; The Courier's Roost</span>
+        </div>
+
         <!-- Hotspot 1: Perched Raven (Email Dispatch) -->
         <button
           type="button"
@@ -92,7 +98,7 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
           type="button"
           id="trigger-arcane-machine"
           class="scene-object scene-hotspot machine-hotspot"
-          aria-label="The Arcane Transceiver (GitHub Engineering Record)"
+          aria-label="The Arcane Transceiver (GitHub Code Archive)"
           aria-haspopup="dialog"
           aria-expanded="false"
           aria-controls="dialog-machine"
@@ -332,15 +338,18 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
                 <span>Turnaround: 24–48 hours</span>
               </div>
 
-              <div class="panel-actions pt-2">
+              <div class="panel-actions pt-2 flex flex-wrap items-center justify-between gap-3">
                 <button
                   type="submit"
                   class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-sm rounded hover:bg-[var(--candle)] transition-colors shadow-md cursor-pointer"
                 >
                   Seal & Dispatch Raven &rarr;
                 </button>
-                <button type="button" class="close-panel-btn-secondary min-h-[44px] px-4 py-2 text-sm text-[var(--parchment)]/80 hover:text-[var(--candle)]">
-                  Return to Roost
+                <button
+                  type="button"
+                  class="close-panel-btn inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-xs sm:text-sm rounded hover:bg-[var(--candle)] transition-colors cursor-pointer ml-auto"
+                >
+                  Return to Roost (Esc)
                 </button>
               </div>
             </form>
@@ -370,35 +379,44 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
               <div class="mt-2 pt-2 border-t border-[var(--brass)]/20 whitespace-pre-wrap" id="receipt-body"></div>
             </div>
 
-            <div class="panel-actions pt-2 flex flex-wrap gap-2">
+            <div class="panel-actions pt-2 flex flex-wrap items-center justify-between gap-3">
+              <div class="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  id="receipt-copy-btn"
+                  class="inline-flex items-center justify-center min-h-[44px] px-4 py-2 bg-[var(--wood-deep)] text-[var(--candle)] border border-[var(--brass)] font-bold text-xs sm:text-sm rounded hover:bg-black transition-colors cursor-pointer"
+                >
+                  Copy Formatted Missive
+                </button>
+                <a
+                  id="receipt-gmail-link"
+                  href={`https://mail.google.com/mail/?view=cm&fs=1&to=${mailAddress}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center justify-center min-h-[44px] px-4 py-2 bg-[var(--wood-deep)] text-[var(--candle)] border border-[var(--brass)] font-bold text-xs sm:text-sm rounded hover:bg-black transition-colors"
+                >
+                  Open in Gmail Webmail &rarr;
+                </a>
+                <button
+                  type="button"
+                  id="receipt-reset-btn"
+                  class="min-h-[44px] px-3 py-2 text-xs sm:text-sm text-[var(--candle)]/80 hover:text-[var(--candle)] hover:underline cursor-pointer"
+                >
+                  Write Another Missive
+                </button>
+              </div>
+
               <button
                 type="button"
-                id="receipt-copy-btn"
-                class="inline-flex items-center justify-center min-h-[44px] px-5 py-2 bg-[var(--brass)] text-black font-bold text-xs sm:text-sm rounded hover:bg-[var(--candle)] transition-colors cursor-pointer"
+                class="close-panel-btn inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-xs sm:text-sm rounded hover:bg-[var(--candle)] transition-colors cursor-pointer ml-auto"
               >
-                Copy Formatted Missive
-              </button>
-              <a
-                id="receipt-gmail-link"
-                href={`https://mail.google.com/mail/?view=cm&fs=1&to=${mailAddress}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center justify-center min-h-[44px] px-5 py-2 bg-[var(--wood-deep)] text-[var(--candle)] border border-[var(--brass)] font-bold text-xs sm:text-sm rounded hover:bg-black transition-colors"
-              >
-                Open in Gmail Webmail &rarr;
-              </a>
-              <button
-                type="button"
-                id="receipt-reset-btn"
-                class="close-panel-btn-secondary min-h-[44px] px-4 py-2 text-xs sm:text-sm text-[var(--parchment)]/80 hover:text-[var(--candle)] ml-auto"
-              >
-                Write Another Missive
+                Return to Roost (Esc)
               </button>
             </div>
           </div>
         </div>
 
-        <!-- Modal 2: Arcane Transceiver (GitHub Engineering Record) -->
+        <!-- Modal 2: Arcane Transceiver (GitHub Code Archive) -->
         <div
           id="dialog-machine"
           class="tavern-panel"
@@ -424,7 +442,7 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
 
           <div class="panel-body space-y-2.5">
             <p class="text-xs sm:text-sm text-[var(--parchment)]/90 leading-relaxed">
-              This brass-and-crystal terminal synchronizes live telemetry from Nhovem's engineering forge. Inspect verified code repositories, TypeScript architecture, and active web experiments.
+              This brass-and-crystal terminal synchronizes live telemetry from Nhovem's code repositories and development forge. Inspect verified code repositories, TypeScript architecture, and active web experiments.
             </p>
 
             <div class="tavern-scrollbar space-y-2 max-h-[42vh] sm:max-h-[38vh] overflow-y-auto pr-1.5">
@@ -510,17 +528,20 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
             </div>
           </div>
 
-          <div class="panel-actions">
+          <div class="panel-actions flex flex-wrap items-center justify-between gap-3 pt-3">
             <a
               href={githubUrl}
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-sm rounded hover:bg-[var(--candle)] transition-colors shadow-md"
+              class="inline-flex items-center justify-center min-h-[44px] px-5 py-2 bg-[var(--wood-deep)] text-[var(--candle)] border border-[var(--brass)] font-bold text-xs sm:text-sm rounded hover:bg-black hover:border-[var(--candle)] transition-colors shadow-md"
             >
               Inspect GitHub Profile &rarr;
             </a>
-            <button type="button" class="close-panel-btn-secondary min-h-[44px] px-4 py-2 text-sm text-[var(--parchment)]/80 hover:text-[var(--candle)]">
-              Close Transceiver
+            <button
+              type="button"
+              class="close-panel-btn inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-xs sm:text-sm rounded hover:bg-[var(--candle)] transition-colors cursor-pointer ml-auto"
+            >
+              Close Transceiver (Esc)
             </button>
           </div>
         </div>
@@ -554,7 +575,7 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
 
           <div class="panel-body space-y-3">
             <p class="text-xs sm:text-sm text-[var(--parchment)]/90 leading-relaxed">
-              Inscribed with meticulous care under the candlelight rests Nhovem's verified academic credentials, engineering history, and core technical proficiencies.
+              Inscribed with meticulous care under the candlelight rests Nhovem's verified academic credentials, software development history, and core technical proficiencies.
             </p>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
@@ -611,22 +632,27 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
             </div>
           </div>
 
-          <div class="panel-actions">
-            <a
-              href="/resume"
-              class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-sm rounded hover:bg-[var(--candle)] transition-colors shadow-md"
+          <div class="panel-actions flex flex-wrap items-center justify-between gap-3 pt-3">
+            <div class="flex flex-wrap items-center gap-2">
+              <a
+                href="/resume"
+                class="inline-flex items-center justify-center min-h-[44px] px-5 py-2 bg-[var(--wood-deep)] text-[var(--candle)] border border-[var(--brass)] font-bold text-xs sm:text-sm rounded hover:bg-black hover:border-[var(--candle)] transition-colors shadow-md"
+              >
+                View Full Web Resume &rarr;
+              </a>
+              <a
+                href="/resume.pdf"
+                download
+                class="inline-flex items-center justify-center min-h-[44px] px-4 py-2 bg-[var(--wood-deep)] text-[var(--candle)] border border-[var(--brass)]/70 text-xs sm:text-sm font-semibold rounded hover:bg-black hover:border-[var(--candle)] transition-colors"
+              >
+                Download PDF &darr;
+              </a>
+            </div>
+            <button
+              type="button"
+              class="close-panel-btn inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-xs sm:text-sm rounded hover:bg-[var(--candle)] transition-colors cursor-pointer ml-auto"
             >
-              View Full Web Resume &rarr;
-            </a>
-            <a
-              href="/resume.pdf"
-              download
-              class="inline-flex items-center justify-center min-h-[44px] px-4 py-2 bg-[var(--wood-deep)] text-[var(--candle)] border border-[var(--brass)] text-xs sm:text-sm font-semibold rounded hover:bg-black transition-colors"
-            >
-              Download PDF &darr;
-            </a>
-            <button type="button" class="close-panel-btn-secondary min-h-[44px] px-4 py-2 text-sm text-[var(--parchment)]/80 hover:text-[var(--candle)] ml-auto">
-              Close Ledger
+              Close Ledger (Esc)
             </button>
           </div>
         </div>
@@ -670,7 +696,7 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
                     {profile?.availability || 'Open to junior developer roles'}
                   </span>
                 </div>
-                <p class="text-[11px] text-[var(--parchment)]/80">Immediate deployment readiness for junior web developer roles, contracts, and frontend engineering positions.</p>
+                <p class="text-[11px] text-[var(--parchment)]/80">Immediate deployment readiness for junior developer roles, frontend contracts, and software development teams.</p>
               </div>
 
               <!-- Compartment 2: Realm Station & Timezone -->
@@ -702,16 +728,19 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
             </div>
           </div>
 
-          <div class="panel-actions">
+          <div class="panel-actions flex flex-wrap items-center justify-between gap-3 pt-3">
             <button
               type="button"
               id="satchel-dispatch-btn"
-              class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-sm rounded hover:bg-[var(--candle)] transition-colors shadow-md cursor-pointer"
+              class="inline-flex items-center justify-center min-h-[44px] px-5 py-2 bg-[var(--wood-deep)] text-[var(--candle)] border border-[var(--brass)] font-bold text-xs sm:text-sm rounded hover:bg-black hover:border-[var(--candle)] transition-colors shadow-md cursor-pointer"
             >
               Send Message with the Raven &rarr;
             </button>
-            <button type="button" class="close-panel-btn-secondary min-h-[44px] px-4 py-2 text-sm text-[var(--parchment)]/80 hover:text-[var(--candle)]">
-              Close Satchel
+            <button
+              type="button"
+              class="close-panel-btn inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-xs sm:text-sm rounded hover:bg-[var(--candle)] transition-colors cursor-pointer ml-auto"
+            >
+              Close Satchel (Esc)
             </button>
           </div>
         </div>
@@ -833,11 +862,11 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
             </div>
 
             <h2 class="text-2xl font-bold text-[var(--ink)] mb-1">
-              GitHub Engineering Record
+              GitHub Code Archive
             </h2>
 
             <p class="text-sm sm:text-base text-[var(--ink)]/85 mb-2 leading-relaxed">
-              Inspect complete source repositories, production commits, TypeScript architectures, and active engineering projects.
+              Inspect complete source repositories, production commits, TypeScript architectures, and active software projects.
             </p>
 
             <div class="flex items-center justify-between gap-2">
@@ -952,7 +981,11 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
   .roost-page-wrapper {
     position: relative;
     width: 100%;
-    padding-bottom: 2.5rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
 
   /* 2.5D Room Scene Container */
@@ -960,19 +993,61 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
     position: relative;
     container-type: inline-size;
     width: 100%;
-    max-width: 2560px;
-    margin: 0 auto 2rem auto;
+    max-width: calc((100dvh - 48px) * (2560 / 1429));
+    max-height: calc(100dvh - 48px);
+    aspect-ratio: 2560 / 1429;
+    margin: auto;
     overflow: hidden;
     background-color: var(--wood-deep, #1a1005);
     border-radius: 8px;
     box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 0, 0, 0.6);
   }
 
+  .scene-container picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
   .scene-background {
     display: block;
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: contain;
     user-select: none;
+  }
+
+  /* In-Scene Ambient Chamber Badge (Desktop) */
+  .chamber-ambient-badge {
+    position: absolute;
+    top: 3.5%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 16px;
+    border-radius: 9999px;
+    background: rgba(15, 10, 5, 0.85);
+    border: 1px solid rgba(213, 128, 59, 0.6);
+    color: var(--candle, #ffe4a0);
+    font-size: clamp(0.55rem, 0.8cqw, 0.75rem);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7);
+    pointer-events: none;
+    z-index: 10;
+    white-space: nowrap;
+    backdrop-filter: blur(2px);
+  }
+
+  .chamber-ambient-badge .badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #34d399;
+    box-shadow: 0 0 8px #34d399;
   }
 
   .scene-overlay {
@@ -1014,12 +1089,9 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
     transition: filter 0.25s ease-out, transform 0.25s ease-out;
   }
 
-  /* Sprite Hotspot Glow on Hover / Focus */
+  /* Sprite Hotspot Glow on Hover / Focus - Single-pass GPU accelerated */
   .scene-object:is(:hover, :focus-visible) img {
-    filter: brightness(1.16)
-      drop-shadow(0 0 4px rgba(255, 228, 160, 0.95))
-      drop-shadow(0 0 14px rgba(213, 128, 59, 0.75))
-      drop-shadow(0 0 24px rgba(213, 128, 59, 0.45));
+    filter: brightness(1.14) drop-shadow(0 0 10px rgba(213, 128, 59, 0.85));
     transform: scale(1.025);
   }
 
@@ -1092,10 +1164,10 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
   /* In-World Arcane Telemetry HUD Screen */
   .transceiver-screen {
     position: absolute;
-    left: 29.2%;
-    top: 17%;
-    width: 42.6%;
-    height: 57.9%;
+    left: 28.6%;
+    top: 16.2%;
+    width: 43.6%;
+    height: 68.5%;
     pointer-events: none;
     overflow: hidden;
     display: flex;
@@ -1165,13 +1237,13 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 1px;
+    gap: 3px;
     margin: auto 0;
   }
 
   .octocat-icon {
-    width: clamp(14px, 2.2cqw, 20px);
-    height: clamp(14px, 2.2cqw, 20px);
+    width: clamp(16px, 2.5cqw, 24px);
+    height: clamp(16px, 2.5cqw, 24px);
     color: var(--candle, #ffe4a0);
     filter: drop-shadow(0 0 3px rgba(255, 228, 160, 0.6));
     transition: transform 0.25s ease-out, filter 0.25s ease-out;
@@ -1184,7 +1256,7 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
 
   .screen-handle {
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-size: clamp(0.38rem, 0.62cqw, 0.5625rem);
+    font-size: clamp(0.42rem, 0.68cqw, 0.6rem);
     font-weight: 700;
     color: #fdf6e3;
     text-shadow: 0 0 4px rgba(213, 128, 59, 0.8);
@@ -1217,21 +1289,24 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
 
   .screen-bars .bar {
     width: 1.5px;
+    height: 100%;
     background: var(--brass, #a87a27);
     border-radius: 1px;
+    transform-origin: bottom;
+    will-change: transform;
     animation: screen-equalizer 1.4s ease-in-out infinite alternate;
   }
 
-  .screen-bars .bar-1 { height: 30%; animation-delay: 0.1s; }
-  .screen-bars .bar-2 { height: 70%; animation-delay: 0.3s; }
-  .screen-bars .bar-3 { height: 100%; animation-delay: 0.0s; }
-  .screen-bars .bar-4 { height: 50%; animation-delay: 0.4s; }
-  .screen-bars .bar-5 { height: 80%; animation-delay: 0.2s; }
+  .screen-bars .bar-1 { animation-delay: 0.1s; }
+  .screen-bars .bar-2 { animation-delay: 0.3s; }
+  .screen-bars .bar-3 { animation-delay: 0.0s; }
+  .screen-bars .bar-4 { animation-delay: 0.4s; }
+  .screen-bars .bar-5 { animation-delay: 0.2s; }
 
   @keyframes screen-equalizer {
-    0% { height: 20%; background: var(--brass, #a87a27); }
-    50% { height: 90%; background: var(--candle, #ffe4a0); }
-    100% { height: 40%; background: var(--brass, #a87a27); }
+    0% { transform: scaleY(0.2); background: var(--brass, #a87a27); }
+    50% { transform: scaleY(0.9); background: var(--candle, #ffe4a0); }
+    100% { transform: scaleY(0.4); background: var(--brass, #a87a27); }
   }
 
   /* Precision Cutout Sprites & Hit Targets */
@@ -1291,7 +1366,7 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
   @keyframes modalPop {
     from {
       opacity: 0;
-      transform: translate(-50%, -46%) scale(0.96);
+      transform: translate(-50%, -50%) scale(0.97);
     }
     to {
       opacity: 1;
@@ -1356,47 +1431,64 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
     justify-content: center;
   }
 
-  .close-panel-btn {
-    background: transparent;
-    border: 1px solid rgba(213, 128, 59, 0.4);
-    color: var(--candle, #fdf6e3);
-    font-size: 1.5rem;
-    line-height: 1;
-    width: 36px;
-    height: 36px;
-    border-radius: 6px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.15s, border-color 0.15s;
-  }
-  .close-panel-btn:hover {
-    background: rgba(213, 128, 59, 0.2);
-    border-color: #ffd782;
-  }
-
   .panel-actions {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 10px;
-    border-top: 1px solid rgba(213, 128, 59, 0.25);
-    padding-top: 12px;
-    margin-top: 2px;
+    justify-content: space-between;
+    gap: 12px;
+    border-top: 1px solid rgba(213, 128, 59, 0.3);
+    padding-top: 14px;
+    margin-top: 4px;
+  }
+
+  .close-panel-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--brass, #d5803b);
+    color: #120b04;
+    border: 1px solid var(--brass, #d5803b);
+    padding: 8px 18px;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    border-radius: 4px;
+    cursor: pointer;
+    min-height: 44px;
+    margin-left: auto;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  }
+  .close-panel-btn:is(:hover, :focus-visible) {
+    background: var(--candle, #fdf6e3);
+    border-color: var(--candle, #fdf6e3);
+    color: #000;
+    outline: 2px solid var(--candle, #fdf6e3);
+    outline-offset: 2px;
+  }
+  .close-panel-btn:active {
+    transform: scale(0.97);
   }
 
   .close-panel-btn-secondary {
-    background: transparent;
-    border: 1px solid rgba(213, 128, 59, 0.3);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--wood-deep, #1a1005);
+    border: 1px solid rgba(213, 128, 59, 0.4);
+    color: var(--candle, #fdf6e3);
+    padding: 8px 16px;
+    font-size: 0.8125rem;
     border-radius: 4px;
     cursor: pointer;
     font-weight: 600;
-    transition: background 0.15s, color 0.15s;
+    min-height: 44px;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
   }
-  .close-panel-btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: var(--brass);
+  .close-panel-btn-secondary:is(:hover, :focus-visible) {
+    background: rgba(0, 0, 0, 0.8);
+    border-color: var(--candle, #fdf6e3);
+    color: #fff;
   }
 
   /* Template selection pill styling */
@@ -1457,6 +1549,9 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
 
   /* Responsive Display Rules */
   @media (min-width: 769px) {
+    .roost-header {
+      display: none;
+    }
     .scene-container {
       display: block;
     }
@@ -1466,6 +1561,10 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
   }
 
   @media (max-width: 768px) {
+    .roost-page-wrapper {
+      height: auto;
+      padding-bottom: 2.5rem;
+    }
     .scene-container {
       display: none;
     }
@@ -1507,297 +1606,304 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
 </style>
 
 <script>
-  // Interactive Scene Hotspots and Modal Management
-  const triggers = [
-    { triggerId: 'trigger-perch-raven', dialogId: 'dialog-raven' },
-    { triggerId: 'trigger-arcane-machine', dialogId: 'dialog-machine' },
-    { triggerId: 'trigger-scribe-desk', dialogId: 'dialog-desk' },
-    { triggerId: 'trigger-courier-satchel', dialogId: 'dialog-satchel' }
-  ];
+  import { initPerformanceGovernor } from '../lib/perf-governor';
 
-  const backdrop = document.getElementById('dialog-backdrop');
-  const sceneObjects = document.querySelectorAll('.scene-object');
-  let activeDialog: HTMLElement | null = null;
-  let activeTrigger: HTMLElement | null = null;
+  function initMessengerPage() {
+    initPerformanceGovernor();
+    // Interactive Scene Hotspots and Modal Management
+    const triggers = [
+      { triggerId: 'trigger-perch-raven', dialogId: 'dialog-raven' },
+      { triggerId: 'trigger-arcane-machine', dialogId: 'dialog-machine' },
+      { triggerId: 'trigger-scribe-desk', dialogId: 'dialog-desk' },
+      { triggerId: 'trigger-courier-satchel', dialogId: 'dialog-satchel' }
+    ];
 
-  function getFocusableElements(el: HTMLElement): HTMLElement[] {
-    return Array.from(el.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'));
-  }
+    const backdrop = document.getElementById('dialog-backdrop');
+    const sceneObjects = document.querySelectorAll('.scene-object');
+    let activeDialog: HTMLElement | null = null;
+    let activeTrigger: HTMLElement | null = null;
 
-  function openDialog(dialog: HTMLElement, trigger: HTMLElement) {
-    sceneObjects.forEach((el) => {
-      el.classList.add('disabled-by-dialog');
-      el.setAttribute('tabindex', '-1');
-    });
-
-    if (backdrop) {
-      backdrop.hidden = false;
-      backdrop.setAttribute('aria-hidden', 'false');
+    function getFocusableElements(el: HTMLElement): HTMLElement[] {
+      return Array.from(el.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'));
     }
 
-    dialog.hidden = false;
-    dialog.setAttribute('aria-hidden', 'false');
-    trigger.setAttribute('aria-expanded', 'true');
-    activeDialog = dialog;
-    activeTrigger = trigger;
+    function openDialog(dialog: HTMLElement, trigger: HTMLElement) {
+      sceneObjects.forEach((el) => {
+        el.classList.add('disabled-by-dialog');
+        el.setAttribute('tabindex', '-1');
+      });
 
-    const focusables = getFocusableElements(dialog);
-    if (focusables.length) {
-      focusables[0].focus();
+      if (backdrop) {
+        backdrop.hidden = false;
+        backdrop.setAttribute('aria-hidden', 'false');
+      }
+
+      dialog.hidden = false;
+      dialog.setAttribute('aria-hidden', 'false');
+      trigger.setAttribute('aria-expanded', 'true');
+      activeDialog = dialog;
+      activeTrigger = trigger;
+
+      const focusables = getFocusableElements(dialog);
+      if (focusables.length) {
+        focusables[0].focus({ preventScroll: true });
+      }
+
+      document.addEventListener('keydown', handleKeydown);
     }
 
-    document.addEventListener('keydown', handleKeydown);
-  }
+    function closeDialog() {
+      if (!activeDialog) return;
 
-  function closeDialog() {
-    if (!activeDialog) return;
+      sceneObjects.forEach((el) => {
+        el.classList.remove('disabled-by-dialog');
+        el.removeAttribute('tabindex');
+      });
 
-    sceneObjects.forEach((el) => {
-      el.classList.remove('disabled-by-dialog');
-      el.removeAttribute('tabindex');
-    });
+      if (backdrop) {
+        backdrop.hidden = true;
+        backdrop.setAttribute('aria-hidden', 'true');
+      }
 
-    if (backdrop) {
-      backdrop.hidden = true;
-      backdrop.setAttribute('aria-hidden', 'true');
+      activeDialog.hidden = true;
+      activeDialog.setAttribute('aria-hidden', 'true');
+
+      if (activeTrigger) {
+        activeTrigger.setAttribute('aria-expanded', 'false');
+        activeTrigger.focus({ preventScroll: true });
+      }
+
+      activeDialog = null;
+      activeTrigger = null;
+      document.removeEventListener('keydown', handleKeydown);
     }
 
-    activeDialog.hidden = true;
-    activeDialog.setAttribute('aria-hidden', 'true');
+    function handleKeydown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        closeDialog();
+        return;
+      }
+      if (e.key === 'Tab' && activeDialog) {
+        const focusables = getFocusableElements(activeDialog);
+        if (focusables.length === 0) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
 
-    if (activeTrigger) {
-      activeTrigger.setAttribute('aria-expanded', 'false');
-      activeTrigger.focus();
-    }
-
-    activeDialog = null;
-    activeTrigger = null;
-    document.removeEventListener('keydown', handleKeydown);
-  }
-
-  function handleKeydown(e: KeyboardEvent) {
-    if (e.key === 'Escape') {
-      closeDialog();
-      return;
-    }
-    if (e.key === 'Tab' && activeDialog) {
-      const focusables = getFocusableElements(activeDialog);
-      if (focusables.length === 0) return;
-      const first = focusables[0];
-      const last = focusables[focusables.length - 1];
-
-      if (e.shiftKey) {
-        if (document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
-        }
-      } else {
-        if (document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
         }
       }
     }
-  }
 
-  // Bind trigger buttons to their respective modals
-  triggers.forEach(({ triggerId, dialogId }) => {
-    const trigger = document.getElementById(triggerId);
-    const dialog = document.getElementById(dialogId);
-    if (trigger && dialog) {
-      trigger.addEventListener('click', (e) => {
+    // Bind trigger buttons to their respective modals
+    triggers.forEach(({ triggerId, dialogId }) => {
+      const trigger = document.getElementById(triggerId);
+      const dialog = document.getElementById(dialogId);
+      if (trigger && dialog) {
+        trigger.addEventListener('click', (e) => {
+          e.preventDefault();
+          openDialog(dialog, trigger);
+        });
+      }
+    });
+
+    // Satchel modal shortcut to Raven modal
+    const satchelDispatchBtn = document.getElementById('satchel-dispatch-btn');
+    const ravenDialog = document.getElementById('dialog-raven');
+    const ravenTrigger = document.getElementById('trigger-perch-raven');
+    if (satchelDispatchBtn && ravenDialog && ravenTrigger) {
+      satchelDispatchBtn.addEventListener('click', () => {
+        closeDialog();
+        setTimeout(() => {
+          openDialog(ravenDialog, ravenTrigger);
+        }, 50);
+      });
+    }
+
+    // Bind all close buttons inside panels
+    document.querySelectorAll('.close-panel-btn, .close-panel-btn-secondary').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
         e.preventDefault();
-        openDialog(dialog, trigger);
+        closeDialog();
+      });
+    });
+
+    // Clicking backdrop closes active dialog
+    if (backdrop) {
+      backdrop.addEventListener('click', () => {
+        closeDialog();
       });
     }
-  });
 
-  // Satchel modal shortcut to Raven modal
-  const satchelDispatchBtn = document.getElementById('satchel-dispatch-btn');
-  const ravenDialog = document.getElementById('dialog-raven');
-  const ravenTrigger = document.getElementById('trigger-perch-raven');
-  if (satchelDispatchBtn && ravenDialog && ravenTrigger) {
-    satchelDispatchBtn.addEventListener('click', () => {
-      closeDialog();
-      setTimeout(() => {
-        openDialog(ravenDialog, ravenTrigger);
-      }, 50);
-    });
-  }
+    // Missive Template Selector logic (GitHub Issue style)
+    function setupTemplatePills(selector: string, subjectInputId: string, bodyInputId: string) {
+      const pills = document.querySelectorAll<HTMLButtonElement>(selector);
+      const subjectInput = document.getElementById(subjectInputId) as HTMLInputElement | null;
+      const bodyInput = document.getElementById(bodyInputId) as HTMLTextAreaElement | null;
 
-  // Bind all close buttons inside panels
-  document.querySelectorAll('.close-panel-btn, .close-panel-btn-secondary').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      closeDialog();
-    });
-  });
+      pills.forEach((pill) => {
+        pill.addEventListener('click', () => {
+          pills.forEach((p) => p.classList.remove('active'));
+          pill.classList.add('active');
 
-  // Clicking backdrop closes active dialog
-  if (backdrop) {
-    backdrop.addEventListener('click', () => {
-      closeDialog();
-    });
-  }
+          const prefix = pill.getAttribute('data-prefix') || '';
+          const subject = pill.getAttribute('data-subject') || '';
+          const placeholder = pill.getAttribute('data-placeholder') || '';
 
-  // Missive Template Selector logic (GitHub Issue style)
-  function setupTemplatePills(selector: string, subjectInputId: string, bodyInputId: string) {
-    const pills = document.querySelectorAll<HTMLButtonElement>(selector);
-    const subjectInput = document.getElementById(subjectInputId) as HTMLInputElement | null;
-    const bodyInput = document.getElementById(bodyInputId) as HTMLTextAreaElement | null;
+          if (subjectInput) {
+            subjectInput.value = `${prefix} ${subject}`;
+          }
+          if (bodyInput) {
+            bodyInput.placeholder = placeholder;
+            if (!bodyInput.value.trim()) {
+              bodyInput.focus();
+            }
+          }
+        });
+      });
+    }
 
-    pills.forEach((pill) => {
-      pill.addEventListener('click', () => {
-        pills.forEach((p) => p.classList.remove('active'));
-        pill.classList.add('active');
+    setupTemplatePills('.template-pill', 'desktop-missive-subject', 'desktop-missive-body');
+    setupTemplatePills('.mobile-template-pill', 'mobile-missive-subject', 'mobile-missive-body');
 
-        const prefix = pill.getAttribute('data-prefix') || '';
-        const subject = pill.getAttribute('data-subject') || '';
-        const placeholder = pill.getAttribute('data-placeholder') || '';
+    // Form Handling and Missive Dispatching
+    const recipientEmail = 'ncabahug223@gmail.com';
 
-        if (subjectInput) {
-          subjectInput.value = `${prefix} ${subject}`;
-        }
-        if (bodyInput) {
-          bodyInput.placeholder = placeholder;
-          if (!bodyInput.value.trim()) {
-            bodyInput.focus();
+    function handleMissiveSubmission(
+      formId: string,
+      nameId: string,
+      emailId: string,
+      subjectId: string,
+      bodyId: string,
+      isDesktop: boolean
+    ) {
+      const form = document.getElementById(formId) as HTMLFormElement | null;
+      if (!form) return;
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const name = (document.getElementById(nameId) as HTMLInputElement)?.value.trim() || 'Traveler';
+        const email = (document.getElementById(emailId) as HTMLInputElement)?.value.trim() || '';
+        const subject = (document.getElementById(subjectId) as HTMLInputElement)?.value.trim() || 'Tavern Dispatch';
+        const body = (document.getElementById(bodyId) as HTMLTextAreaElement)?.value.trim() || '';
+
+        const fullFormattedBody = `Sender: ${name}\nReturn Address: ${email}\n\n--------------------------------------------------\n${body}\n--------------------------------------------------\n(Dispatched via Ibem's Tavern Messenger Roost)`;
+
+        // 1. Invoke mailto client
+        const mailtoUrl = `mailto:${recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(fullFormattedBody)}`;
+        window.location.href = mailtoUrl;
+
+        // 2. If on desktop modal, show the receipt view
+        if (isDesktop) {
+          const composerView = document.getElementById('raven-composer-view');
+          const receiptView = document.getElementById('raven-receipt-view');
+          const receiptSubject = document.getElementById('receipt-subject');
+          const receiptFrom = document.getElementById('receipt-from');
+          const receiptBody = document.getElementById('receipt-body');
+          const receiptGmailLink = document.getElementById('receipt-gmail-link') as HTMLAnchorElement | null;
+
+          if (composerView && receiptView) {
+            composerView.classList.add('hidden');
+            receiptView.classList.remove('hidden');
+
+            if (receiptSubject) receiptSubject.textContent = subject;
+            if (receiptFrom) receiptFrom.textContent = `${name} <${email}>`;
+            if (receiptBody) receiptBody.textContent = body;
+
+            if (receiptGmailLink) {
+              receiptGmailLink.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${recipientEmail}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(fullFormattedBody)}`;
+            }
+
+            // Setup copy formatted missive button
+            const receiptCopyBtn = document.getElementById('receipt-copy-btn');
+            if (receiptCopyBtn) {
+              receiptCopyBtn.onclick = async () => {
+                try {
+                  await navigator.clipboard.writeText(fullFormattedBody);
+                } catch {
+                  const textarea = document.createElement('textarea');
+                  textarea.value = fullFormattedBody;
+                  document.body.appendChild(textarea);
+                  textarea.select();
+                  document.execCommand('copy');
+                  document.body.removeChild(textarea);
+                }
+                const oldText = receiptCopyBtn.textContent;
+                receiptCopyBtn.textContent = 'Copied to Clipboard!';
+                setTimeout(() => {
+                  receiptCopyBtn.textContent = oldText;
+                }, 2500);
+              };
+            }
+
+            // Reset button
+            const resetBtn = document.getElementById('receipt-reset-btn');
+            if (resetBtn) {
+              resetBtn.onclick = () => {
+                receiptView.classList.add('hidden');
+                composerView.classList.remove('hidden');
+                form.reset();
+              };
+            }
           }
         }
       });
-    });
-  }
+    }
 
-  setupTemplatePills('.template-pill', 'desktop-missive-subject', 'desktop-missive-body');
-  setupTemplatePills('.mobile-template-pill', 'mobile-missive-subject', 'mobile-missive-body');
+    handleMissiveSubmission(
+      'desktop-raven-form',
+      'desktop-sender-name',
+      'desktop-sender-email',
+      'desktop-missive-subject',
+      'desktop-missive-body',
+      true
+    );
 
-  // Form Handling and Missive Dispatching
-  const recipientEmail = 'ncabahug223@gmail.com';
+    handleMissiveSubmission(
+      'mobile-raven-form',
+      'mobile-sender-name',
+      'mobile-sender-email',
+      'mobile-missive-subject',
+      'mobile-missive-body',
+      false
+    );
 
-  function handleMissiveSubmission(
-    formId: string,
-    nameId: string,
-    emailId: string,
-    subjectId: string,
-    bodyId: string,
-    isDesktop: boolean
-  ) {
-    const form = document.getElementById(formId) as HTMLFormElement | null;
-    if (!form) return;
+    // Mobile address copy button
+    const mobileCopyBtn = document.getElementById('mobile-copy-email-btn');
+    const mobileEmail = document.getElementById('mobile-email-address');
+    const mobileStatus = document.getElementById('mobile-copy-status');
 
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-
-      const name = (document.getElementById(nameId) as HTMLInputElement)?.value.trim() || 'Traveler';
-      const email = (document.getElementById(emailId) as HTMLInputElement)?.value.trim() || '';
-      const subject = (document.getElementById(subjectId) as HTMLInputElement)?.value.trim() || 'Tavern Dispatch';
-      const body = (document.getElementById(bodyId) as HTMLTextAreaElement)?.value.trim() || '';
-
-      const fullFormattedBody = `Sender: ${name}\nReturn Address: ${email}\n\n--------------------------------------------------\n${body}\n--------------------------------------------------\n(Dispatched via Ibem's Tavern Messenger Roost)`;
-
-      // 1. Invoke mailto client
-      const mailtoUrl = `mailto:${recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(fullFormattedBody)}`;
-      window.location.href = mailtoUrl;
-
-      // 2. If on desktop modal, show the receipt view
-      if (isDesktop) {
-        const composerView = document.getElementById('raven-composer-view');
-        const receiptView = document.getElementById('raven-receipt-view');
-        const receiptSubject = document.getElementById('receipt-subject');
-        const receiptFrom = document.getElementById('receipt-from');
-        const receiptBody = document.getElementById('receipt-body');
-        const receiptGmailLink = document.getElementById('receipt-gmail-link') as HTMLAnchorElement | null;
-
-        if (composerView && receiptView) {
-          composerView.classList.add('hidden');
-          receiptView.classList.remove('hidden');
-
-          if (receiptSubject) receiptSubject.textContent = subject;
-          if (receiptFrom) receiptFrom.textContent = `${name} <${email}>`;
-          if (receiptBody) receiptBody.textContent = body;
-
-          if (receiptGmailLink) {
-            receiptGmailLink.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${recipientEmail}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(fullFormattedBody)}`;
-          }
-
-          // Setup copy formatted missive button
-          const receiptCopyBtn = document.getElementById('receipt-copy-btn');
-          if (receiptCopyBtn) {
-            receiptCopyBtn.onclick = async () => {
-              try {
-                await navigator.clipboard.writeText(fullFormattedBody);
-              } catch {
-                const textarea = document.createElement('textarea');
-                textarea.value = fullFormattedBody;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-              }
-              const oldText = receiptCopyBtn.textContent;
-              receiptCopyBtn.textContent = 'Copied to Clipboard!';
-              setTimeout(() => {
-                receiptCopyBtn.textContent = oldText;
-              }, 2500);
-            };
-          }
-
-          // Reset button
-          const resetBtn = document.getElementById('receipt-reset-btn');
-          if (resetBtn) {
-            resetBtn.onclick = () => {
-              receiptView.classList.add('hidden');
-              composerView.classList.remove('hidden');
-              form.reset();
-            };
-          }
+    if (mobileCopyBtn && mobileEmail && mobileStatus) {
+      mobileCopyBtn.addEventListener('click', async () => {
+        const email = mobileEmail.textContent?.trim() || recipientEmail;
+        try {
+          await navigator.clipboard.writeText(email);
+        } catch {
+          const textarea = document.createElement('textarea');
+          textarea.value = email;
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textarea);
         }
-      }
-    });
+        mobileStatus.classList.remove('hidden');
+        mobileCopyBtn.textContent = 'Copied!';
+        setTimeout(() => {
+          mobileStatus.classList.add('hidden');
+          mobileCopyBtn.textContent = 'Copy Address';
+        }, 2500);
+      });
+    }
   }
 
-  handleMissiveSubmission(
-    'desktop-raven-form',
-    'desktop-sender-name',
-    'desktop-sender-email',
-    'desktop-missive-subject',
-    'desktop-missive-body',
-    true
-  );
-
-  handleMissiveSubmission(
-    'mobile-raven-form',
-    'mobile-sender-name',
-    'mobile-sender-email',
-    'mobile-missive-subject',
-    'mobile-missive-body',
-    false
-  );
-
-  // Mobile address copy button
-  const mobileCopyBtn = document.getElementById('mobile-copy-email-btn');
-  const mobileEmail = document.getElementById('mobile-email-address');
-  const mobileStatus = document.getElementById('mobile-copy-status');
-
-  if (mobileCopyBtn && mobileEmail && mobileStatus) {
-    mobileCopyBtn.addEventListener('click', async () => {
-      const email = mobileEmail.textContent?.trim() || recipientEmail;
-      try {
-        await navigator.clipboard.writeText(email);
-      } catch {
-        const textarea = document.createElement('textarea');
-        textarea.value = email;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-      }
-      mobileStatus.classList.remove('hidden');
-      mobileCopyBtn.textContent = 'Copied!';
-      setTimeout(() => {
-        mobileStatus.classList.add('hidden');
-        mobileCopyBtn.textContent = 'Copy Address';
-      }, 2500);
-    });
-  }
+  document.addEventListener('astro:page-load', initMessengerPage);
 </script>

@@ -7,7 +7,7 @@
       if (motion === 'full' || motion === 'reduced') {
         document.documentElement.dataset.motion = motion;
       } else {
-        var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         document.documentElement.dataset.motion = prefersReduced ? 'reduced' : 'full';
       }
 
@@ -17,9 +17,27 @@
       } else {
         document.documentElement.dataset.sound = 'off';
       }
+
+      // Adaptive Performance Tier Auto-Detection
+      var perf = localStorage.getItem('perf');
+      if (perf === 'low' || perf === 'high') {
+        document.documentElement.dataset.perf = perf;
+      } else {
+        var isCoarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+        var lowCores = typeof navigator.hardwareConcurrency === 'number' && navigator.hardwareConcurrency <= 4;
+        var lowMemory = typeof navigator.deviceMemory === 'number' && navigator.deviceMemory <= 4;
+        var prefersReduced = document.documentElement.dataset.motion === 'reduced';
+        
+        if (lowCores || lowMemory || prefersReduced || isCoarse) {
+          document.documentElement.dataset.perf = 'low';
+        } else {
+          document.documentElement.dataset.perf = 'high';
+        }
+      }
     } catch (e) {
       document.documentElement.dataset.motion = 'reduced';
       document.documentElement.dataset.sound = 'off';
+      document.documentElement.dataset.perf = 'low';
     }
   })();
 </script>

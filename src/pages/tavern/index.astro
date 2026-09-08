@@ -1,10 +1,14 @@
 ---
 import TavernLayout from '../../layouts/TavernLayout.astro';
+import ThematicIcon from '../../components/icons/ThematicIcon.astro';
 
 import { getCollection } from 'astro:content';
 
 const skillsEntries = await getCollection('skills');
 const skills = skillsEntries.map(entry => entry.data);
+
+const allProjects = await getCollection('projects');
+const projects = allProjects.sort((a, b) => a.data.order - b.data.order);
 
 const levelMap: Record<string, number> = {
   learning: 1,
@@ -162,9 +166,9 @@ const sceneObjects = [
         );
       })}
 
-      <!-- The Courier's Roost (Messenger's Corner) Arched Doorway -->
+      <!-- Messenger's Corner Arched Doorway -->
       <a href="/messenger" id="trigger-door-roost" class="scene-object scene-hotspot door-hotspot"
-         aria-label="Enter The Courier's Roost (Messenger's Corner)"
+         aria-label="Enter Messenger's Corner"
          style="left: 80.94%; bottom: 26.43%; width: 5.31%; height: 37.34%; z-index: 2;">
         <img
           src="/art/door-to-roost-prop-tight.webp"
@@ -175,16 +179,20 @@ const sceneObjects = [
           decoding="async"
           class="door-roost-sprite"
         />
-        <span class="scene-tooltip" data-placement="top">The Courier's Roost</span>
+        <span class="scene-tooltip" data-placement="left">Messenger's Corner</span>
       </a>
 
-      <a href="/quests" id="trigger-quest-board" class="scene-object scene-hotspot" aria-label="Go to the Quest Board"
+      <a href="/quests" id="trigger-quest-board" class="scene-object scene-hotspot"
+         aria-label="Inspect the Quest Board"
+         aria-haspopup="dialog"
+         aria-expanded="false"
+         aria-controls="dialog-questboard"
          style="left: 90.6%; bottom: 41.5%; width: 5.5%; z-index: 2;">
         <img src="/art/quest-board-prop-512.webp"
              srcset="/art/quest-board-prop-256.webp 256w, /art/quest-board-prop-512.webp 512w"
              sizes="(max-width: 1280px) 256px, 512px"
              width="512" height="885" alt="" loading="lazy" decoding="async" />
-        <span class="scene-tooltip" data-placement="left">Quest Board</span>
+        <span class="scene-tooltip" data-placement="bottom">Quest Board</span>
       </a>
 
       <!-- Papers Hotspots -->
@@ -215,8 +223,8 @@ const sceneObjects = [
             </div>
           ))}
         </div>
-        <div class="panel-actions">
-          <button type="button" class="close-panel-btn">Close Skills</button>
+        <div class="panel-actions flex justify-end">
+          <button type="button" class="close-panel-btn ml-auto">Close Skills (Esc)</button>
         </div>
       </div>
 
@@ -247,12 +255,111 @@ const sceneObjects = [
                 {innkeeperBeats.map((d: any) => (<p>{d.line}</p>))}
               </div>
             </div>
-            <div class="panel-actions">
-              <button type="button" class="close-panel-btn">Close Dialogue</button>
+            <div class="panel-actions flex justify-end">
+              <button type="button" class="close-panel-btn ml-auto">Close Dialogue (Esc)</button>
             </div>
           </div>
         </div>
         <div id="innkeeper-announce" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+      </div>
+
+      <!-- Quest Board Bounty Popup -->
+      <div id="dialog-questboard" class="tavern-panel questboard-panel" role="dialog" aria-modal="true" aria-labelledby="questboard-title" hidden>
+        <div class="panel-header flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-[#140b04] border border-[var(--brass)] flex items-center justify-center shrink-0 shadow">
+              <ThematicIcon name="scroll" class="w-6 h-6 text-[var(--candle)]" />
+            </div>
+            <div>
+              <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-[#d5803b]">Active Bounties & Proof of Work</span>
+              <h2 id="questboard-title" class="text-xl sm:text-2xl font-bold text-[var(--candle)] font-serif leading-tight">
+                The Quest Board
+              </h2>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-body questboard-body">
+          <p class="text-xs sm:text-sm text-[var(--parchment)]/90 leading-relaxed mb-3">
+            Pinned upon the weathered tavern cork are active bounties and completed software development projects. Inspect any bounty notice to review the full architectural case study dossier.
+          </p>
+
+          <!-- 3 Pinned Bounty Cards Grid -->
+          <div class="bounties-grid">
+            {projects.map((project) => (
+              <article class="bounty-slip" id={`bounty-${project.data.slug}`}>
+                <div class="bounty-pin" aria-hidden="true"></div>
+
+                <div class="bounty-top">
+                  <div class="flex items-center gap-2.5 mb-1.5">
+                    <div class="w-8 h-8 rounded-md border border-[var(--brass)] bg-[#1e1208] p-0.5 flex items-center justify-center shrink-0 overflow-hidden shadow-xs">
+                      {project.data.thumbnail ? (
+                        <img
+                          src={project.data.thumbnail}
+                          alt=""
+                          class="w-full h-full object-contain rounded-xs"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      ) : (
+                        <ThematicIcon name="swords" class="w-5 h-5 text-[var(--candle)]" />
+                      )}
+                    </div>
+                    <h3 class="bounty-heading">
+                      {project.data.title.split('—')[0].trim()}
+                    </h3>
+                  </div>
+
+                  <div class="flex items-center justify-between gap-1 text-[10px] font-mono mb-2">
+                    <span class="bounty-role text-[#5c3e21] font-semibold">{project.data.role}</span>
+                    <span class={`bounty-badge ${project.data.status === 'Shipped' ? 'badge-shipped' : 'badge-progress'}`}>
+                      {project.data.status === 'Shipped' ? '● Shipped' : '◐ In Progress'}
+                    </span>
+                  </div>
+
+                  <p class="bounty-desc">
+                    {project.data.summary}
+                  </p>
+                </div>
+
+                <div class="bounty-bottom">
+                  <div class="bounty-tags mb-3">
+                    {project.data.stack.slice(0, 3).map((tech: string) => (
+                      <span class="bounty-tag">{tech}</span>
+                    ))}
+                    {project.data.stack.length > 3 && (
+                      <span class="bounty-tag opacity-80">+{project.data.stack.length - 3}</span>
+                    )}
+                  </div>
+
+                  <a
+                    href={`/quests/${project.data.slug}`}
+                    class="bounty-cta"
+                  >
+                    <span>Inspect Dossier &rarr;</span>
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+
+        <div class="panel-actions questboard-footer flex flex-wrap items-center justify-between gap-3 pt-3">
+          <a
+            href="/quests"
+            class="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--candle)] hover:underline min-h-[44px] px-2"
+          >
+            <ThematicIcon name="scroll" class="w-4 h-4 text-[var(--brass)]" />
+            <span>Inspect Full Quest Catalog &rarr;</span>
+          </a>
+
+          <button
+            type="button"
+            class="close-panel-btn inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-xs sm:text-sm rounded hover:bg-[var(--candle)] transition-colors cursor-pointer ml-auto"
+          >
+            Close Board (Esc)
+          </button>
+        </div>
       </div>
       
       <!-- Reserved Space: Dark centre floor -->
@@ -265,7 +372,7 @@ const sceneObjects = [
     <button type="button" class="narrow-link" id="narrow-innkeeper">Talk to the Innkeeper</button>
     <a href="/tavern/skills" class="narrow-link">View Skills</a>
     <a href="/quests" class="narrow-link">Go to the Quest Board</a>
-    <a href="/messenger" class="narrow-link">Enter The Courier's Roost (Messenger's Corner)</a>
+    <a href="/messenger" class="narrow-link">Go to Messenger's Corner</a>
   </div>
 </TavernLayout>
 
@@ -278,16 +385,25 @@ const sceneObjects = [
     position: relative;
     container-type: inline-size;
     width: 100%;
-    max-width: 2560px;
-    margin: 0 auto;
+    max-width: calc((100dvh - 48px) * (2560 / 1431));
+    max-height: calc(100dvh - 48px);
+    aspect-ratio: 2560 / 1431;
+    margin: auto;
     overflow: hidden;
     background-color: var(--wood-deep, #1a1005);
+  }
+
+  .scene-container picture {
+    display: block;
+    width: 100%;
+    height: 100%;
   }
 
   .scene-background {
     display: block;
     width: 100%;
-    height: auto; /* Uses intrinsic aspect ratio */
+    height: 100%;
+    object-fit: contain;
   }
 
   .scene-overlay {
@@ -329,6 +445,9 @@ const sceneObjects = [
     width: 100%;
     height: auto;
     pointer-events: none;
+    will-change: transform, filter;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
   }
 
   /* Tooltip: visible by default */
@@ -375,12 +494,9 @@ const sceneObjects = [
   #trigger-shield-tools .scene-tooltip { translate: 1.8cqw 0; }
 
 
-  /* Highlight feedback */
+  /* Highlight feedback - Single-pass GPU accelerated glow */
   .scene-object:is(:hover, :focus-visible) {
-    filter: brightness(1.12)
-        drop-shadow(0 0 2px rgba(255, 228, 160, 0.95))
-        drop-shadow(0 0 8px rgba(255, 228, 160, 0.7))
-        drop-shadow(0 0 22px rgba(213, 128, 59, 0.55));
+    filter: brightness(1.12) drop-shadow(0 0 10px rgba(213, 128, 59, 0.85));
   }
 
   .scene-object:focus-visible {
@@ -390,10 +506,7 @@ const sceneObjects = [
 
   /* Active state: brief press feedback */
   .scene-object:active {
-    filter: brightness(1.2)
-        drop-shadow(0 0 2px rgba(255, 228, 160, 0.95))
-        drop-shadow(0 0 8px rgba(255, 228, 160, 0.7))
-        drop-shadow(0 0 22px rgba(213, 128, 59, 0.55));
+    filter: brightness(1.2) drop-shadow(0 0 10px rgba(213, 128, 59, 0.95));
     transform: scale(0.98);
   }
 
@@ -826,6 +939,183 @@ const sceneObjects = [
     outline-offset: 2px;
   }
 
+  /* Quest Board Bounty Panel */
+  .questboard-panel {
+    top: 4%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(94%, 860px);
+    max-height: 92%;
+    padding: 14px 18px 12px;
+    gap: 8px;
+    overflow-y: auto;
+    background: rgba(18, 11, 5, 0.97);
+    border: 2px solid #8b6b4a;
+    border-radius: 8px;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.9);
+    animation: fadeInBoard 0.25s ease-out forwards;
+  }
+
+  @keyframes fadeInBoard {
+    from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+
+  .questboard-panel .panel-header {
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(253, 246, 227, 0.15);
+  }
+
+  .questboard-body {
+    overflow-y: visible;
+  }
+
+  .bounties-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  @media (max-width: 768px) {
+    .bounties-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .bounty-slip {
+    position: relative;
+    background: #f6efe2;
+    border: 1px solid #c4b195;
+    border-radius: 4px;
+    padding: 12px 12px 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .bounty-slip:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.6);
+  }
+
+  .bounty-pin {
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #ffe4a0, #a1641f);
+    border: 1px solid #5a350e;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  }
+
+  .bounty-heading {
+    font-family: serif;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: #1a1005;
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  .bounty-emblem {
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+
+  .bounty-badge {
+    font-size: 9px;
+    font-family: monospace;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  .badge-shipped {
+    background: #dcfce7;
+    color: #14532d;
+    border: 1px solid #86efac;
+  }
+
+  .badge-progress {
+    background: #fef9c3;
+    color: #713f12;
+    border: 1px solid #fde047;
+  }
+
+  .bounty-desc {
+    font-size: 0.72rem;
+    line-height: 1.4;
+    color: #3b2819;
+    margin: 0 0 8px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .bounty-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  .bounty-tag {
+    font-family: monospace;
+    font-size: 0.625rem;
+    font-weight: 600;
+    background: #e5d8c3;
+    color: #2b1a0d;
+    border: 1px solid #beab8f;
+    padding: 1.5px 5px;
+    border-radius: 3px;
+  }
+
+  .bounty-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    width: 100%;
+    background: #241407;
+    color: #ffe4a0;
+    border: 1px solid #8b6b4a;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+
+  .bounty-cta:is(:hover, :focus-visible) {
+    background: #b37424;
+    color: #000;
+    border-color: #ffd782;
+  }
+
+  .questboard-footer {
+    padding-top: 6px;
+    margin-top: 2px;
+    border-top: 1px solid rgba(253, 246, 227, 0.15);
+  }
+
+  .close-panel-btn-secondary {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .close-panel-btn-secondary:hover {
+    border-color: rgba(213, 128, 59, 0.5);
+  }
+
   /* Labels off, scene on: 769px to 1000px */
   @media (max-width: 1000px) {
     .scene-tooltip {
@@ -893,286 +1183,300 @@ const sceneObjects = [
     beats: innkeeperBeats.map((d: any) => d.line),
   })} />
 <script>
-  const triggerInnkeeper = document.getElementById('trigger-innkeeper');
-  
-  const narrowInnkeeper = document.getElementById('narrow-innkeeper');
-  
-  const dialogSkills = document.getElementById('dialog-skills');
-  const dialogInnkeeper = document.getElementById('dialog-innkeeper');
+  import { initPerformanceGovernor } from '../../lib/perf-governor';
 
-  const sceneInteractives = document.querySelectorAll('.scene-object, .narrow-link');
-  let activeDialog: HTMLElement | null = null;
-  let activeTrigger: HTMLElement | null = null;
-
-  function openDialog(dialog: HTMLElement, trigger: HTMLElement, filterCategory?: string) {
-    sceneInteractives.forEach(el => {
-      el.classList.add('disabled-by-dialog');
-      el.setAttribute('tabindex', '-1');
-    });
+  function initTavernPage() {
+    initPerformanceGovernor();
+    const triggerInnkeeper = document.getElementById('trigger-innkeeper');
+    const narrowInnkeeper = document.getElementById('narrow-innkeeper');
+    const triggerQuestBoard = document.getElementById('trigger-quest-board');
     
-    // Handle filtering for skills dialog
-    if (dialog === dialogSkills) {
-      const categories = dialog.querySelectorAll('.skill-category');
-      categories.forEach(cat => {
-        if (filterCategory && cat.getAttribute('data-category') !== filterCategory) {
-          cat.classList.add('filtered-out');
-        } else {
-          cat.classList.remove('filtered-out');
-        }
+    const dialogSkills = document.getElementById('dialog-skills');
+    const dialogInnkeeper = document.getElementById('dialog-innkeeper');
+    const dialogQuestboard = document.getElementById('dialog-questboard');
+
+    const sceneInteractives = document.querySelectorAll('.scene-object, .narrow-link');
+    let activeDialog: HTMLElement | null = null;
+    let activeTrigger: HTMLElement | null = null;
+
+    function openDialog(dialog: HTMLElement, trigger: HTMLElement, filterCategory?: string) {
+      sceneInteractives.forEach(el => {
+        el.classList.add('disabled-by-dialog');
+        el.setAttribute('tabindex', '-1');
       });
-    }
-    
-    dialog.hidden = false;
-    dialog.setAttribute('aria-hidden', 'false');
-    trigger.setAttribute('aria-expanded', 'true');
-    activeDialog = dialog;
-    activeTrigger = trigger;
-    
-    if (dialog === dialogSkills) {
-      const icon = dialog.querySelector('.panel-icon');
-      if (icon) {
-        if (filterCategory) {
-          const shieldId = trigger.id.replace('trigger-', '');
-          icon.setAttribute('src', `/art/${shieldId}-256.webp`);
-          icon.removeAttribute('srcset');
-        } else {
-          icon.setAttribute('src', '/art/adventurers-badge-384.webp');
-        }
-      }
-      const title = dialog.querySelector('#skills-title');
-      if (title) {
-        title.textContent = filterCategory ? filterCategory : 'Skills & Arsenal';
-      }
-    }
-    
-    const focusables = getFocusableElements(dialog);
-    if (focusables.length) focusables[0].focus();
-    
-    document.addEventListener('keydown', handleKeydown);
-  }
-
-  function closeDialog() {
-    if (!activeDialog) return;
-    sceneInteractives.forEach(el => {
-      el.classList.remove('disabled-by-dialog');
-      el.removeAttribute('tabindex');
-    });
-    activeDialog.hidden = true;
-    activeDialog.setAttribute('aria-hidden', 'true');
-    if (activeTrigger) {
-      activeTrigger.setAttribute('aria-expanded', 'false');
-      activeTrigger.focus();
-    }
-    activeDialog = null;
-    activeTrigger = null;
-    document.removeEventListener('keydown', handleKeydown);
-  }
-
-  function getFocusableElements(el: HTMLElement): HTMLElement[] {
-    return Array.from(el.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'));
-  }
-
-  function handleKeydown(e: KeyboardEvent) {
-    if (e.key === 'Escape') {
-      closeDialog();
-      return;
-    }
-    if (e.key === 'Tab' && activeDialog) {
-      const focusables = getFocusableElements(activeDialog);
-      const first = focusables[0];
-      const last = focusables[focusables.length - 1];
       
-      if (e.shiftKey) {
-        if (document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
+      // Handle filtering for skills dialog
+      if (dialog === dialogSkills) {
+        const categories = dialog.querySelectorAll('.skill-category');
+        categories.forEach(cat => {
+          if (filterCategory && cat.getAttribute('data-category') !== filterCategory) {
+            cat.classList.add('filtered-out');
+          } else {
+            cat.classList.remove('filtered-out');
+          }
+        });
+      }
+      
+      dialog.hidden = false;
+      dialog.setAttribute('aria-hidden', 'false');
+      trigger.setAttribute('aria-expanded', 'true');
+      activeDialog = dialog;
+      activeTrigger = trigger;
+      
+      if (dialog === dialogSkills) {
+        const icon = dialog.querySelector('.panel-icon');
+        if (icon) {
+          if (filterCategory) {
+            const shieldId = trigger.id.replace('trigger-', '');
+            icon.setAttribute('src', `/art/${shieldId}-256.webp`);
+            icon.removeAttribute('srcset');
+          } else {
+            icon.setAttribute('src', '/art/adventurers-badge-384.webp');
+          }
         }
-      } else {
-        if (document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
+        const title = dialog.querySelector('#skills-title');
+        if (title) {
+          title.textContent = filterCategory ? filterCategory : 'Skills & Arsenal';
         }
       }
+      
+      const focusables = getFocusableElements(dialog);
+      if (focusables.length) focusables[0].focus({ preventScroll: true });
+      
+      document.addEventListener('keydown', handleKeydown);
     }
-  }
 
-  // Setup shield triggers
-  document.querySelectorAll('button[id^="trigger-shield-"]').forEach(trigger => {
-    if (dialogSkills && trigger instanceof HTMLElement) {
-      trigger.setAttribute('aria-haspopup', 'dialog');
-      trigger.setAttribute('aria-expanded', 'false');
-      trigger.setAttribute('aria-controls', 'dialog-skills');
-      trigger.addEventListener('click', (e) => {
-        e.preventDefault();
-        const filter = trigger.getAttribute('data-filter') || undefined;
-        openDialog(dialogSkills, trigger, filter);
+    function closeDialog() {
+      if (!activeDialog) return;
+      sceneInteractives.forEach(el => {
+        el.classList.remove('disabled-by-dialog');
+        el.removeAttribute('tabindex');
       });
-    }
-  });
-
-  // Setup Innkeeper triggers
-  [triggerInnkeeper, narrowInnkeeper].forEach(trigger => {
-    if (trigger && dialogInnkeeper) {
-      trigger.setAttribute('aria-haspopup', 'dialog');
-      trigger.setAttribute('aria-expanded', 'false');
-      trigger.setAttribute('aria-controls', 'dialog-innkeeper');
-      trigger.addEventListener('click', (e) => {
-        e.preventDefault();
-        resetInnkeeperDialog();
-        document.querySelector('.scene-container')?.classList.add('innkeeper-away');
-        openDialog(dialogInnkeeper, trigger);
-      });
-    }
-  });
-  
-
-
-  document.querySelectorAll('.close-panel-btn').forEach(btn => {
-    btn.addEventListener('click', closeDialog);
-    btn.addEventListener('click', () => {
-      document.querySelector('.scene-container')?.classList.remove('innkeeper-away');
-    });
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      document.querySelector('.scene-container')?.classList.remove('innkeeper-away');
-    }
-  });
-
-  const innkeeperDataEl = document.getElementById('innkeeper-data');
-  const innkeeperData = innkeeperDataEl ? JSON.parse(innkeeperDataEl.textContent || '{}') : null;
-  const innkeeperProse = document.getElementById('innkeeper-prose');
-  const innkeeperRepliesList = document.getElementById('innkeeper-replies');
-  const innkeeperRepliesInitialHTML = innkeeperRepliesList ? innkeeperRepliesList.innerHTML : '';
-
-  const innkeeperAnnounce = document.getElementById('innkeeper-announce');
-  const TYPE_MS = 25;
-  const PAUSE_AFTER: Record<string, number> = { '.': 8, '!': 8, '?': 8, ',': 4, ';': 4, ':': 4 };
-  let typeTimer: number | null = null;
-  let typingDone = true;
-  let finishTyping: (() => void) | null = null;
-
-  function stopTyping() {
-    if (typeTimer !== null) { clearTimeout(typeTimer); typeTimer = null; }
-  }
-
-  function renderProse(html: string) {
-    if (!innkeeperProse) return;
-    stopTyping();
-    finishTyping = null;
-
-    const probe = document.createElement('div');
-    probe.innerHTML = html;
-    const plain = (probe.textContent || '').replace(/\s+/g, ' ').trim();
-
-    const settle = () => {
-      stopTyping();
-      finishTyping = null;
-      innkeeperProse.innerHTML = html;
-      typingDone = true;
-      if (innkeeperAnnounce) innkeeperAnnounce.textContent = plain;
-      if (innkeeperRepliesList) innkeeperRepliesList.hidden = false;
-    };
-
-    if (document.documentElement.dataset.motion !== 'full') {
-      settle();
-      return;
+      activeDialog.hidden = true;
+      activeDialog.setAttribute('aria-hidden', 'true');
+      if (activeTrigger) {
+        activeTrigger.setAttribute('aria-expanded', 'false');
+        activeTrigger.focus({ preventScroll: true });
+      }
+      activeDialog = null;
+      activeTrigger = null;
+      document.removeEventListener('keydown', handleKeydown);
     }
 
-    typingDone = false;
-    finishTyping = settle;
-    if (innkeeperRepliesList) innkeeperRepliesList.hidden = true;
-    innkeeperProse.innerHTML = html;
-
-    const walker = document.createTreeWalker(innkeeperProse, NodeFilter.SHOW_TEXT);
-    const originals: Text[] = [];
-    let found: Node | null;
-    while ((found = walker.nextNode())) originals.push(found as Text);
-
-    const runs: Array<{ shown: HTMLElement; hidden: HTMLElement; text: string }> = [];
-    for (const original of originals) {
-      const text = original.nodeValue || '';
-      if (!text.trim()) continue;
-      const shown = document.createElement('span');
-      shown.setAttribute('aria-hidden', 'true');
-      const rest = document.createElement('span');
-      rest.setAttribute('aria-hidden', 'true');
-      rest.className = 'dialogue-unread';
-      rest.textContent = text;
-      const frag = document.createDocumentFragment();
-      frag.appendChild(shown);
-      frag.appendChild(rest);
-      original.parentNode?.replaceChild(frag, original);
-      runs.push({ shown, hidden: rest, text });
+    function getFocusableElements(el: HTMLElement): HTMLElement[] {
+      return Array.from(el.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'));
     }
 
-    if (!runs.length) { settle(); return; }
-
-    let ri = 0;
-    let ci = 0;
-    const step = () => {
-      const run = runs[ri];
-      ci += 1;
-      run.shown.textContent = run.text.slice(0, ci);
-      run.hidden.textContent = run.text.slice(ci);
-      const ch = run.text[ci - 1];
-      if (ci >= run.text.length) { ri += 1; ci = 0; }
-      if (ri >= runs.length) { settle(); return; }
-      typeTimer = window.setTimeout(step, TYPE_MS * (PAUSE_AFTER[ch] ?? 1));
-    };
-    typeTimer = window.setTimeout(step, TYPE_MS);
-  }
-
-  const innkeeperBand = document.querySelector('#dialog-innkeeper .dialogue-band');
-  if (innkeeperBand) {
-    innkeeperBand.addEventListener('click', () => {
-      if (!typingDone && finishTyping) finishTyping();
-    });
-  }
-
-  document.addEventListener('keydown', (e) => {
-    const panel = document.getElementById('dialog-innkeeper');
-    if (!panel || panel.hidden) return;
-    if (typingDone || !finishTyping) return;
-    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-      e.preventDefault();
-      finishTyping();
-    }
-  });
-
-  function resetInnkeeperDialog() {
-    stopTyping();
-    typingDone = true;
-    if (!innkeeperProse || !innkeeperRepliesList || !innkeeperData) return;
-    renderProse(innkeeperData.beats.map((line: string) => `<p>${line}</p>`).join(''));
-    innkeeperRepliesList.innerHTML = innkeeperRepliesInitialHTML;
-  }
-
-  if (innkeeperRepliesList) {
-    innkeeperRepliesList.addEventListener('click', (e) => {
-      const btn = (e.target as HTMLElement).closest('.reply-btn');
-      if (!btn || !innkeeperProse || !innkeeperData) return;
-
-      if (btn.classList.contains('farewell-btn')) {
-        renderProse(`<p>${innkeeperData.farewell.answer}</p>`);
-        innkeeperRepliesList.innerHTML = '';
-        innkeeperProse.focus();
-      } else {
-        const indexStr = btn.getAttribute('data-reply-index');
-        if (indexStr !== null) {
-          const idx = parseInt(indexStr, 10);
-          const reply = innkeeperData.replies[idx];
-          if (reply) {
-            renderProse(`
-              <p>${reply.answer}</p>
-              ${reply.offerHref ? `<p><a href="${reply.offerHref}">${reply.offerLabel}</a></p>` : ''}
-              ${reply.followUp ? `<p class="dialogue-followup">${reply.followUp}</p>` : ''}
-            `);
-            btn.classList.add('reply-visited');
+    function handleKeydown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        closeDialog();
+        return;
+      }
+      if (e.key === 'Tab' && activeDialog) {
+        const focusables = getFocusableElements(activeDialog);
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
           }
         }
       }
+    }
+
+    // Setup shield triggers
+    document.querySelectorAll('button[id^="trigger-shield-"]').forEach(trigger => {
+      if (dialogSkills && trigger instanceof HTMLElement) {
+        trigger.setAttribute('aria-haspopup', 'dialog');
+        trigger.setAttribute('aria-expanded', 'false');
+        trigger.setAttribute('aria-controls', 'dialog-skills');
+        trigger.addEventListener('click', (e) => {
+          e.preventDefault();
+          const filter = trigger.getAttribute('data-filter') || undefined;
+          openDialog(dialogSkills, trigger, filter);
+        });
+      }
     });
+
+    // Setup Innkeeper triggers
+    [triggerInnkeeper, narrowInnkeeper].forEach(trigger => {
+      if (trigger && dialogInnkeeper) {
+        trigger.setAttribute('aria-haspopup', 'dialog');
+        trigger.setAttribute('aria-expanded', 'false');
+        trigger.setAttribute('aria-controls', 'dialog-innkeeper');
+        trigger.addEventListener('click', (e) => {
+          e.preventDefault();
+          resetInnkeeperDialog();
+          document.querySelector('.scene-container')?.classList.add('innkeeper-away');
+          openDialog(dialogInnkeeper, trigger);
+        });
+      }
+    });
+
+    // Setup Quest Board trigger
+    if (triggerQuestBoard && dialogQuestboard) {
+      triggerQuestBoard.addEventListener('click', (e) => {
+        e.preventDefault();
+        openDialog(dialogQuestboard, triggerQuestBoard);
+      });
+    }
+
+    document.querySelectorAll('.close-panel-btn, .close-panel-btn-secondary').forEach(btn => {
+      btn.addEventListener('click', closeDialog);
+      btn.addEventListener('click', () => {
+        document.querySelector('.scene-container')?.classList.remove('innkeeper-away');
+      });
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelector('.scene-container')?.classList.remove('innkeeper-away');
+      }
+    });
+
+    const innkeeperDataEl = document.getElementById('innkeeper-data');
+    const innkeeperData = innkeeperDataEl ? JSON.parse(innkeeperDataEl.textContent || '{}') : null;
+    const innkeeperProse = document.getElementById('innkeeper-prose');
+    const innkeeperRepliesList = document.getElementById('innkeeper-replies');
+    const innkeeperRepliesInitialHTML = innkeeperRepliesList ? innkeeperRepliesList.innerHTML : '';
+
+    const innkeeperAnnounce = document.getElementById('innkeeper-announce');
+    const TYPE_MS = 25;
+    const PAUSE_AFTER: Record<string, number> = { '.': 8, '!': 8, '?': 8, ',': 4, ';': 4, ':': 4 };
+    let typeTimer: number | null = null;
+    let typingDone = true;
+    let finishTyping: (() => void) | null = null;
+
+    function stopTyping() {
+      if (typeTimer !== null) { clearTimeout(typeTimer); typeTimer = null; }
+    }
+
+    function renderProse(html: string) {
+      if (!innkeeperProse) return;
+      stopTyping();
+      finishTyping = null;
+
+      const probe = document.createElement('div');
+      probe.innerHTML = html;
+      const plain = (probe.textContent || '').replace(/\s+/g, ' ').trim();
+
+      const settle = () => {
+        stopTyping();
+        finishTyping = null;
+        innkeeperProse.innerHTML = html;
+        typingDone = true;
+        if (innkeeperAnnounce) innkeeperAnnounce.textContent = plain;
+        if (innkeeperRepliesList) innkeeperRepliesList.hidden = false;
+      };
+
+      if (document.documentElement.dataset.motion !== 'full') {
+        settle();
+        return;
+      }
+
+      typingDone = false;
+      finishTyping = settle;
+      if (innkeeperRepliesList) innkeeperRepliesList.hidden = true;
+      innkeeperProse.innerHTML = html;
+
+      const walker = document.createTreeWalker(innkeeperProse, NodeFilter.SHOW_TEXT);
+      const originals: Text[] = [];
+      let found: Node | null;
+      while ((found = walker.nextNode())) originals.push(found as Text);
+
+      const runs: Array<{ shown: HTMLElement; hidden: HTMLElement; text: string }> = [];
+      for (const original of originals) {
+        const text = original.nodeValue || '';
+        if (!text.trim()) continue;
+        const shown = document.createElement('span');
+        shown.setAttribute('aria-hidden', 'true');
+        const rest = document.createElement('span');
+        rest.setAttribute('aria-hidden', 'true');
+        rest.className = 'dialogue-unread';
+        rest.textContent = text;
+        const frag = document.createDocumentFragment();
+        frag.appendChild(shown);
+        frag.appendChild(rest);
+        original.parentNode?.replaceChild(frag, original);
+        runs.push({ shown, hidden: rest, text });
+      }
+
+      if (!runs.length) { settle(); return; }
+
+      let ri = 0;
+      let ci = 0;
+      const step = () => {
+        const run = runs[ri];
+        ci += 1;
+        run.shown.textContent = run.text.slice(0, ci);
+        run.hidden.textContent = run.text.slice(ci);
+        const ch = run.text[ci - 1];
+        if (ci >= run.text.length) { ri += 1; ci = 0; }
+        if (ri >= runs.length) { settle(); return; }
+        typeTimer = window.setTimeout(step, TYPE_MS * (PAUSE_AFTER[ch] ?? 1));
+      };
+      typeTimer = window.setTimeout(step, TYPE_MS);
+    }
+
+    const innkeeperBand = document.querySelector('#dialog-innkeeper .dialogue-band');
+    if (innkeeperBand) {
+      innkeeperBand.addEventListener('click', () => {
+        if (!typingDone && finishTyping) finishTyping();
+      });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      const panel = document.getElementById('dialog-innkeeper');
+      if (!panel || panel.hidden) return;
+      if (typingDone || !finishTyping) return;
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+        e.preventDefault();
+        finishTyping();
+      }
+    });
+
+    function resetInnkeeperDialog() {
+      stopTyping();
+      typingDone = true;
+      if (!innkeeperProse || !innkeeperRepliesList || !innkeeperData) return;
+      renderProse(innkeeperData.beats.map((line: string) => `<p>${line}</p>`).join(''));
+      innkeeperRepliesList.innerHTML = innkeeperRepliesInitialHTML;
+    }
+
+    if (innkeeperRepliesList) {
+      innkeeperRepliesList.addEventListener('click', (e) => {
+        const btn = (e.target as HTMLElement).closest('.reply-btn');
+        if (!btn || !innkeeperProse || !innkeeperData) return;
+
+        if (btn.classList.contains('farewell-btn')) {
+          renderProse(`<p>${innkeeperData.farewell.answer}</p>`);
+          innkeeperRepliesList.innerHTML = '';
+          innkeeperProse.focus();
+        } else {
+          const indexStr = btn.getAttribute('data-reply-index');
+          if (indexStr !== null) {
+            const idx = parseInt(indexStr, 10);
+            const reply = innkeeperData.replies[idx];
+            if (reply) {
+              renderProse(`
+                <p>${reply.answer}</p>
+                ${reply.offerHref ? `<p><a href="${reply.offerHref}">${reply.offerLabel}</a></p>` : ''}
+                ${reply.followUp ? `<p class="dialogue-followup">${reply.followUp}</p>` : ''}
+              `);
+              btn.classList.add('reply-visited');
+            }
+          }
+        }
+      });
+    }
   }
+
+  document.addEventListener('astro:page-load', initTavernPage);
 </script>

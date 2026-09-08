@@ -80,3 +80,63 @@ font-weight: 700; cursor: pointer; text-decoration: none;
 .close-panel-btn:is(:hover, :focus-visible) {
 background: #1a1005; color: #e6d3a8; outline: 2px solid #e6d3a8; outline-offset: 2px;
 }
+
+/* ==========================================================================
+   Adaptive Performance Governor: Cross-Device Frame Rate Safeguards
+   Eliminates jank and FPS drops on Android, Mac Retina, and older machines
+   ========================================================================== */
+
+/* GPU Compositor Isolation for Interactive Canvas Scenes */
+.scene-container {
+  contain: layout paint;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.tavern-panel {
+  contain: layout paint style;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+.scene-object img {
+  will-change: transform, filter;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* Auto-pause hidden ambient animations when modal is open */
+body:has(.tavern-panel:not([hidden])) .screen-bars .bar,
+body:has(.tavern-panel:not([hidden])) .screen-pulse-dot {
+  animation-play-state: paused !important;
+}
+
+/* Low-Power / Low-Spec Mode (Auto-engaged on low-end hardware, Android, or jitter) */
+html[data-perf="low"] .dialog-backdrop,
+:root[data-perf="low"] .dialog-backdrop,
+@media (pointer: coarse) {
+  .dialog-backdrop {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(10, 6, 2, 0.86) !important;
+  }
+}
+
+html[data-perf="low"] .tavern-panel,
+:root[data-perf="low"] .tavern-panel {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9) !important;
+}
+
+html[data-perf="low"] .screen-bars .bar,
+:root[data-perf="low"] .screen-bars .bar {
+  animation: none !important;
+}
+
+html[data-perf="low"] .screen-pulse-dot,
+:root[data-perf="low"] .screen-pulse-dot {
+  animation: none !important;
+}
+

@@ -1,7 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import PreferenceControls from '../components/PreferenceControls.astro';
-import LocationIndicator from '../components/LocationIndicator.astro';
 import QuestLog from '../components/QuestLog.astro';
 
 interface Props {
@@ -43,67 +42,273 @@ const scenes: Record<string, Scene> = {
 };
 
 const currentScene = scenes[location];
+const isScene = location === 'tavern' || location === 'messenger';
 ---
 <BaseLayout title={title} description={description} hideDefaultNav={true}>
+  <div
+    class={`tavern-shell ${isScene ? 'scene-layout' : 'document-layout'}`}
+    data-left-link={currentScene.left?.link || ''}
+    data-right-link={currentScene.right?.link || ''}
+  >
+    {/* Single-Row Unified Tavern HUD */}
+    <header class="tavern-hud px-2 sm:px-4 bg-[var(--wood-deep)] text-[var(--parchment)] flex items-center justify-between border-b border-[var(--brass)] h-12 shrink-0 z-40 relative">
+      {/* Left: Tavern Brand & Chamber Badge */}
+      <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+        <a
+          href="/tavern"
+          class="flex items-center gap-1.5 min-h-[44px] text-xs sm:text-sm font-bold text-[var(--candle)] hover:text-white transition-colors"
+          title="Return to Main Tavern Room"
+        >
+          <span class="font-serif tracking-wide">Ibem's Tavern</span>
+        </a>
+        <span class="text-xs font-semibold px-2 py-0.5 rounded bg-[#1e1208] border border-[var(--brass)]/50 text-[var(--candle)]">
+          {currentScene.current}
+        </span>
+      </div>
 
-  
-  <div class="tavern-shell">
-  <header class="p-2 sm:px-4 sm:py-1.5 bg-[var(--wood-deep)] text-[var(--parchment)] flex flex-col sm:flex-row flex-wrap justify-between items-center border-b border-[var(--brass)] gap-2 sm:gap-4">
-    <nav aria-label="Main Navigation" class="w-full sm:w-auto">
-      <details class="sm:hidden group">
-        <summary class="flex items-center justify-center min-h-[44px] px-4 font-semibold cursor-pointer hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)]">
-          Menu
-        </summary>
-        <ul class="flex flex-col gap-2 p-2 mt-2 border-t border-[var(--brass)] text-sm font-semibold">
-          <li><a href="/" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Home</a></li>
-          <li><a href="/about" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">About</a></li>
-          <li><a href="/resume" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Resume</a></li>
-          <li><a href="/tavern" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Main Tavern</a></li>
-          <li><a href="/tavern/skills" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Adventurer's Badge</a></li>
-          <li><a href="/tavern/npc" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Tavern Regular</a></li>
-          <li><a href="/quests" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Quest Board</a></li>
-          <li><a href="/messenger" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Messenger's Corner</a></li>
-        </ul>
-      </details>
-      <ul class="hidden sm:flex flex-wrap justify-center sm:justify-start gap-2 sm:gap-4 text-xs sm:text-sm font-semibold">
-        <li><a href="/" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Home</a></li>
-        <li><a href="/about" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">About</a></li>
-        <li><a href="/resume" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Resume</a></li>
-        <li><a href="/tavern" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Main Tavern</a></li>
-        <li><a href="/tavern/skills" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Adventurer's Badge</a></li>
-        <li><a href="/tavern/npc" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Tavern Regular</a></li>
-        <li><a href="/quests" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Quest Board</a></li>
-        <li><a href="/messenger" class="flex items-center min-h-[44px] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] px-2">Messenger's Corner</a></li>
-      </ul>
-    </nav>
-    <div class="flex flex-wrap justify-center sm:justify-end gap-2 sm:gap-4 items-center w-full sm:w-auto">
-      <QuestLog />
-      <PreferenceControls />
-      <a href="/simple" class="flex items-center min-h-[44px] underline hover:text-[var(--candle)] font-semibold px-2 focus-visible:outline-2 focus-visible:outline-[var(--brass)]">Field Ledger (Simple Mode)</a>
+      {/* Center: Quick Portfolio Navigation */}
+      <nav aria-label="Main Navigation" class="hidden xl:flex items-center gap-1 text-xs font-semibold">
+        <a href="/" class="flex items-center min-h-[44px] px-2 hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)]">Home</a>
+        <a href="/about" class="flex items-center min-h-[44px] px-2 hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)]">About</a>
+        <a href="/resume" class="flex items-center min-h-[44px] px-2 text-[var(--candle)] font-bold hover:underline focus-visible:outline-2 focus-visible:outline-[var(--brass)]">Resume</a>
+        <a href="/quests" class="flex items-center min-h-[44px] px-2 hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)]">Quest Board</a>
+      </nav>
+
+      {/* Right: Controls, Modals & Site Menu */}
+      <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+        <QuestLog />
+        <PreferenceControls />
+        <a
+          href="/simple"
+          class="hidden sm:flex items-center min-h-[44px] px-1.5 text-xs font-semibold underline hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)]"
+          title="High-contrast, zero-JS text edition"
+        >
+          Field Ledger
+        </a>
+
+        {/* Chambers & Site Menu Dropdown */}
+        <details class="relative group">
+          <summary
+            class="flex items-center justify-center min-h-[44px] px-2.5 py-1 text-xs font-semibold rounded border border-[var(--brass)]/70 bg-[#1e1208] text-[var(--candle)] cursor-pointer hover:bg-black hover:border-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] list-none select-none transition-colors"
+            aria-label="Toggle site chambers and navigation menu"
+          >
+            <span class="flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-[var(--brass)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+              <span class="hidden sm:inline">Menu</span>
+            </span>
+          </summary>
+          <ul class="absolute right-0 top-full mt-1 w-52 p-2 rounded-md bg-[var(--wood-deep)] border-2 border-[var(--brass)] text-xs font-semibold shadow-2xl z-50 flex flex-col gap-0.5">
+            <li class="px-2 py-1 text-[10px] uppercase tracking-widest text-[var(--brass)] font-extrabold border-b border-[var(--brass)]/30 mb-1">
+              Tavern Chambers
+            </li>
+            <li><a href="/tavern" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Main Tavern</a></li>
+            <li><a href="/tavern/skills" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Adventurer's Badge (Skills)</a></li>
+            <li><a href="/tavern/npc" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Tavern Regular (Q&A)</a></li>
+            <li><a href="/quests" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Quest Board (Projects)</a></li>
+            <li><a href="/messenger" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Messenger's Corner (Contact)</a></li>
+            <li class="border-t border-[var(--brass)]/30 my-1"></li>
+            <li class="px-2 py-1 text-[10px] uppercase tracking-widest text-[var(--brass)] font-extrabold border-b border-[var(--brass)]/30 mb-1">
+              Portfolio Records
+            </li>
+            <li><a href="/" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Home / Entrance</a></li>
+            <li><a href="/about" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">About Nhovem</a></li>
+            <li><a href="/resume" class="flex items-center min-h-[44px] px-2 rounded text-[var(--candle)] font-bold hover:bg-[var(--brass)]/20">Resume (PDF & View)</a></li>
+            <li><a href="/simple" class="flex items-center min-h-[44px] px-2 rounded text-[var(--parchment)]/80 hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Field Ledger (Simple Mode)</a></li>
+            <li class="border-t border-[var(--brass)]/30 my-1"></li>
+            <li>
+              <button
+                type="button"
+                id="menu-toggle-fullscreen"
+                class="w-full flex items-center justify-between min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)] text-left cursor-pointer transition-colors text-xs text-[var(--parchment)]"
+              >
+                <span class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-[var(--brass)] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                  </svg>
+                  <span id="fullscreen-btn-text">Enter Fullscreen</span>
+                </span>
+                <span class="text-[10px] font-mono text-[var(--brass)]/80">⛶</span>
+              </button>
+            </li>
+          </ul>
+        </details>
+      </div>
+    </header>
+
+    {/* Floating Exit Fullscreen Pill (Visible ONLY in Fullscreen) */}
+    <button
+      type="button"
+      id="fullscreen-exit-pill"
+      class="fullscreen-exit-pill"
+      aria-label="Exit Fullscreen Mode"
+      title="Exit Fullscreen Mode (Esc)"
+    >
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+      <span>Exit Fullscreen</span>
+    </button>
+
+    <div class={isScene ? 'scene-wrapper' : 'p-4 sm:p-8 bg-[var(--wood-deep)] text-[var(--parchment)] min-h-screen tavern-content'}>
+      <slot />
     </div>
-  </header>
-
-  <LocationIndicator
-    currentLabel={currentScene.current}
-    leftLabel={currentScene.left?.label}
-    leftLink={currentScene.left?.link}
-    rightLabel={currentScene.right?.label}
-    rightLink={currentScene.right?.link}
-  />
-
-  <div class="p-4 sm:p-8 bg-[var(--wood-deep)] text-[var(--parchment)] min-h-screen tavern-content">
-    <slot />
   </div>
-  </div>
+
+  <style>
+    .tavern-shell.scene-layout {
+      height: 100dvh;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--wood-deep, #1a1005);
+    }
+
+    .tavern-shell.scene-layout .scene-wrapper {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 0;
+      position: relative;
+    }
+
+    /* Floating Exit Fullscreen Pill */
+    .fullscreen-exit-pill {
+      display: none;
+    }
+
+    :global(:fullscreen) .fullscreen-exit-pill,
+    :global(:-webkit-full-screen) .fullscreen-exit-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 1000;
+      background: rgba(15, 10, 5, 0.88);
+      border: 1px solid rgba(213, 128, 59, 0.6);
+      color: var(--candle, #ffe4a0);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7);
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      opacity: 0.8;
+      transition: opacity 0.2s, background 0.2s, border-color 0.2s;
+    }
+
+    :global(:fullscreen) .fullscreen-exit-pill:hover,
+    :global(:-webkit-full-screen) .fullscreen-exit-pill:hover {
+      opacity: 1;
+      background: rgba(26, 16, 5, 0.98);
+      border-color: #ffd782;
+    }
+
+    /* Pure Canvas Fullscreen: completely remove the HUD navigation */
+    :global(:fullscreen) .tavern-hud,
+    :global(:-webkit-full-screen) .tavern-hud {
+      display: none !important;
+    }
+
+    :global(:fullscreen) .tavern-shell.scene-layout,
+    :global(:-webkit-full-screen) .tavern-shell.scene-layout {
+      height: 100vh !important;
+      height: 100dvh !important;
+    }
+
+    :global(:fullscreen) .scene-container,
+    :global(:-webkit-full-screen) .scene-container {
+      max-height: 100vh !important;
+      max-height: 100dvh !important;
+      max-width: calc(100vh * (2560 / 1431)) !important;
+    }
+
+    @media (max-width: 768px) {
+      .tavern-shell.scene-layout {
+        height: auto;
+        min-height: 100dvh;
+        overflow-y: auto;
+      }
+      .tavern-shell.scene-layout .scene-wrapper {
+        height: auto;
+        overflow-y: auto;
+        justify-content: flex-start;
+      }
+    }
+  </style>
 
   <script>
+    import { navigate } from 'astro:transitions/client';
+
+    function initTavernHud() {
+      const fsBtn = document.getElementById('menu-toggle-fullscreen');
+      const fsText = document.getElementById('fullscreen-btn-text');
+      const exitPill = document.getElementById('fullscreen-exit-pill');
+
+      function updateFsState() {
+        if (document.fullscreenElement) {
+          if (fsText) fsText.textContent = 'Exit Fullscreen';
+          sessionStorage.setItem('tavern_fullscreen', 'true');
+        } else {
+          if (fsText) fsText.textContent = 'Enter Fullscreen';
+          sessionStorage.removeItem('tavern_fullscreen');
+        }
+      }
+
+      updateFsState();
+
+      fsBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          if (document.exitFullscreen) {
+            document.exitFullscreen().catch(() => {});
+          }
+        }
+      });
+
+      exitPill?.addEventListener('click', () => {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        }
+      });
+    }
+
+    // Bind on every astro page load
+    document.addEventListener('astro:page-load', initTavernHud);
+
+    // Track fullscreen changes globally
+    document.addEventListener('fullscreenchange', () => {
+      const fsText = document.getElementById('fullscreen-btn-text');
+      if (document.fullscreenElement) {
+        if (fsText) fsText.textContent = 'Exit Fullscreen';
+        sessionStorage.setItem('tavern_fullscreen', 'true');
+      } else {
+        if (fsText) fsText.textContent = 'Enter Fullscreen';
+        sessionStorage.removeItem('tavern_fullscreen');
+      }
+    });
+
+    // Keyboard Chamber Arrow Navigation (Client-side route swap keeps Fullscreen active)
     document.addEventListener('keydown', (e) => {
       const active = document.activeElement;
       if (active) {
         const tag = active.tagName.toLowerCase();
         const role = active.getAttribute('role');
         const isEditable = active.hasAttribute('contenteditable');
-        
         const isScrollable = active.scrollHeight > active.clientHeight || active.scrollWidth > active.clientWidth;
         
         if (tag === 'input' || tag === 'textarea' || tag === 'select' || role === 'textbox' || isEditable || isScrollable) {
@@ -111,12 +316,14 @@ const currentScene = scenes[location];
         }
       }
 
-      if (e.key === 'ArrowLeft') {
-        const leftLink = document.getElementById('nav-left');
-        if (leftLink) leftLink.click();
-      } else if (e.key === 'ArrowRight') {
-        const rightLink = document.getElementById('nav-right');
-        if (rightLink) rightLink.click();
+      const shell = document.querySelector('.tavern-shell');
+      const leftLink = shell?.getAttribute('data-left-link');
+      const rightLink = shell?.getAttribute('data-right-link');
+
+      if (e.key === 'ArrowLeft' && leftLink) {
+        navigate(leftLink);
+      } else if (e.key === 'ArrowRight' && rightLink) {
+        navigate(rightLink);
       }
     });
   </script>

@@ -1,10 +1,10 @@
 ---
 ---
-<div class="flex flex-wrap gap-4 items-center">
+<div class="flex items-center gap-1.5 sm:gap-2">
   <button
     id="toggle-motion"
     type="button"
-    class="px-4 py-2 border-2 border-[var(--brass)] bg-[var(--wood-deep)] text-[var(--parchment)] font-semibold hover:bg-[var(--parchment)] hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 min-h-[44px]"
+    class="px-2.5 sm:px-3 py-1 text-xs font-semibold rounded border border-[var(--brass)] bg-[#1e1208] text-[var(--parchment)] hover:border-[var(--candle)] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 min-h-[44px] flex items-center justify-center whitespace-nowrap transition-colors"
     aria-pressed="false"
   >
     Motion: Full
@@ -12,7 +12,7 @@
   <button
     id="toggle-sound"
     type="button"
-    class="px-4 py-2 border-2 border-[var(--brass)] bg-[var(--wood-deep)] text-[var(--parchment)] font-semibold hover:bg-[var(--parchment)] hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 min-h-[44px]"
+    class="px-2.5 sm:px-3 py-1 text-xs font-semibold rounded border border-[var(--brass)] bg-[#1e1208] text-[var(--parchment)] hover:border-[var(--candle)] hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 min-h-[44px] flex items-center justify-center whitespace-nowrap transition-colors"
     aria-pressed="false"
   >
     Sound: Off
@@ -22,32 +22,49 @@
 <script>
   import { getMotion, getSound, setMotion, setSound, subscribePreferences } from '../store/preferences';
 
-  const btnMotion = document.getElementById('toggle-motion');
-  const btnSound = document.getElementById('toggle-sound');
+  function initPreferences() {
+    const btnMotion = document.getElementById('toggle-motion');
+    const btnSound = document.getElementById('toggle-sound');
 
-  function updateDOM() {
+    function updateDOM() {
+      const motion = getMotion();
+      const sound = getSound();
+      
+      if (btnMotion) {
+        btnMotion.textContent = motion === 'full' ? 'Motion: Full' : 'Motion: Reduced';
+        btnMotion.setAttribute('aria-pressed', motion === 'reduced' ? 'true' : 'false');
+      }
+      
+      if (btnSound) {
+        btnSound.textContent = sound === 'on' ? 'Sound: On' : 'Sound: Off';
+        btnSound.setAttribute('aria-pressed', sound === 'on' ? 'true' : 'false');
+      }
+    }
+
+    updateDOM();
+
+    btnMotion?.addEventListener('click', () => {
+      setMotion(getMotion() === 'full' ? 'reduced' : 'full');
+    });
+
+    btnSound?.addEventListener('click', () => {
+      setSound(getSound() === 'on' ? 'off' : 'on');
+    });
+  }
+
+  document.addEventListener('astro:page-load', initPreferences);
+  subscribePreferences(() => {
+    const btnMotion = document.getElementById('toggle-motion');
+    const btnSound = document.getElementById('toggle-sound');
     const motion = getMotion();
     const sound = getSound();
-    
     if (btnMotion) {
       btnMotion.textContent = motion === 'full' ? 'Motion: Full' : 'Motion: Reduced';
       btnMotion.setAttribute('aria-pressed', motion === 'reduced' ? 'true' : 'false');
     }
-    
     if (btnSound) {
       btnSound.textContent = sound === 'on' ? 'Sound: On' : 'Sound: Off';
       btnSound.setAttribute('aria-pressed', sound === 'on' ? 'true' : 'false');
     }
-  }
-
-  updateDOM();
-  subscribePreferences(updateDOM);
-
-  btnMotion?.addEventListener('click', () => {
-    setMotion(getMotion() === 'full' ? 'reduced' : 'full');
-  });
-
-  btnSound?.addEventListener('click', () => {
-    setSound(getSound() === 'on' ? 'off' : 'on');
   });
 </script>
