@@ -699,7 +699,7 @@ const TitleTag = isModal ? 'h2' : 'h1';
 
         const temp = document.createElement('div');
         temp.innerHTML = html;
-        const plain = temp.textContent || '';
+        const plain = (temp.textContent || '').replace(/\s+/g, ' ').trim();
 
         const settle = () => {
           stopTyping();
@@ -709,7 +709,9 @@ const TitleTag = isModal ? 'h2' : 'h1';
           if (announce) announce.textContent = plain;
         };
 
-        if (document.documentElement.dataset.motion !== 'full') {
+        const isReduced = document.documentElement.dataset.motion === 'reduced' ||
+          (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+        if (isReduced) {
           settle();
           return;
         }
@@ -717,29 +719,29 @@ const TitleTag = isModal ? 'h2' : 'h1';
         typingDone = false;
         finishTyping = settle;
 
-        prose.innerHTML = '';
-        const paragraphs = Array.from(temp.querySelectorAll('p'));
-        const targetElements = paragraphs.length ? paragraphs : [temp];
+        prose.innerHTML = html;
 
-        const runs: { shown: HTMLSpanElement; hidden: HTMLSpanElement; text: string }[] = [];
+        const walker = document.createTreeWalker(prose, NodeFilter.SHOW_TEXT);
+        const originals: Text[] = [];
+        let found: Node | null;
+        while ((found = walker.nextNode())) originals.push(found as Text);
 
-        targetElements.forEach((p) => {
-          const text = p.textContent || '';
-          if (!text.trim()) return;
-
-          const pWrapper = document.createElement('p');
+        const runs: Array<{ shown: HTMLElement; hidden: HTMLElement; text: string }> = [];
+        for (const original of originals) {
+          const text = original.nodeValue || '';
+          if (!text.trim()) continue;
           const shown = document.createElement('span');
           shown.setAttribute('aria-hidden', 'true');
           const rest = document.createElement('span');
           rest.setAttribute('aria-hidden', 'true');
           rest.className = 'dialogue-unread';
           rest.textContent = text;
-
-          pWrapper.appendChild(shown);
-          pWrapper.appendChild(rest);
-          prose.appendChild(pWrapper);
+          const frag = document.createDocumentFragment();
+          frag.appendChild(shown);
+          frag.appendChild(rest);
+          original.parentNode?.replaceChild(frag, original);
           runs.push({ shown, hidden: rest, text });
-        });
+        }
 
         if (!runs.length) {
           settle();
@@ -769,7 +771,9 @@ const TitleTag = isModal ? 'h2' : 'h1';
 
       // Tap / Click band to instantly complete speech
       if (band) {
-        band.addEventListener('click', () => {
+        band.addEventListener('click', (e) => {
+          const target = e.target as HTMLElement;
+          if (target && (target.closest('button') || target.closest('a'))) return;
           if (!typingDone && finishTyping) finishTyping();
         });
       }
@@ -778,6 +782,8 @@ const TitleTag = isModal ? 'h2' : 'h1';
       document.addEventListener('keydown', (e) => {
         if (container.hidden) return;
         if (typingDone || !finishTyping) return;
+        const target = e.target as HTMLElement;
+        if (target && (target.tagName === 'BUTTON' || target.tagName === 'A')) return;
         if (e.key === ' ' || e.key === 'Spacebar' || e.key === 'Enter') {
           e.preventDefault();
           finishTyping();
@@ -821,11 +827,26 @@ const TitleTag = isModal ? 'h2' : 'h1';
         }
       });
 
-      // Expose reset method for modals
-      (container as any).__resetDialogue = () => {
+      // Expose reset and control methods for modals
+      (container as any).__resetDialogue = (animate = true) => {
+        stopTyping();
+        const introHtml = (data.beats || []).map((b: string) => `<p>${b}</p>`).join('');
+        if (animate) {
+          renderProse(introHtml);
+        } else {
+          typingDone = true;
+          finishTyping = null;
+          if (prose) prose.innerHTML = introHtml;
+        }
+        repliesList.querySelectorAll<HTMLButtonElement>('.reply-btn').forEach((btn) => {
+          btn.classList.remove('reply-visited');
+        });
+      };
+
+      (container as any).__stopDialogue = () => {
         stopTyping();
         typingDone = true;
-        prose.innerHTML = (data.beats || []).map((b: string) => `<p>${b}</p>`).join('');
+        finishTyping = null;
       };
     });
   }

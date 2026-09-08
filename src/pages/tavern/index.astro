@@ -1475,6 +1475,9 @@ const sceneObjects = [
 
     function closeDialog() {
       if (!activeDialog) return;
+      if ((activeDialog as any).__stopDialogue) {
+        (activeDialog as any).__stopDialogue();
+      }
       soundEngine.playWoodClink();
       sceneInteractives.forEach(el => {
         el.classList.remove('disabled-by-dialog');
@@ -1546,11 +1549,11 @@ const sceneObjects = [
         trigger.setAttribute('aria-controls', 'dialog-innkeeper');
         trigger.addEventListener('click', (e) => {
           e.preventDefault();
-          if ((dialogInnkeeper as any).__resetDialogue) {
-            (dialogInnkeeper as any).__resetDialogue();
-          }
           document.querySelector('.scene-container')?.classList.add('innkeeper-away');
           openDialog(dialogInnkeeper, trigger);
+          if ((dialogInnkeeper as any).__resetDialogue) {
+            (dialogInnkeeper as any).__resetDialogue(true);
+          }
         });
       }
     });
@@ -1563,10 +1566,10 @@ const sceneObjects = [
         trigger.setAttribute('aria-controls', 'dialog-regular');
         trigger.addEventListener('click', (e) => {
           e.preventDefault();
-          if ((dialogRegular as any).__resetDialogue) {
-            (dialogRegular as any).__resetDialogue();
-          }
           openDialog(dialogRegular, trigger);
+          if ((dialogRegular as any).__resetDialogue) {
+            (dialogRegular as any).__resetDialogue(true);
+          }
         });
       }
     });
