@@ -93,12 +93,12 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
           <span class="scene-tooltip" data-placement="top">Send Word (Email)</span>
         </button>
 
-        <!-- Hotspot 2: Arcane Transceiver (GitHub Telemetry) - Resized and centered with breathing room -->
+        <!-- Hotspot 2: Arcane Transceiver (Arcane Typer Live Simulation) -->
         <button
           type="button"
           id="trigger-arcane-machine"
           class="scene-object scene-hotspot machine-hotspot"
-          aria-label="The Arcane Transceiver (GitHub Code Archive)"
+          aria-label="The Arcane Transceiver (Arcane Typer Live Simulation)"
           aria-haspopup="dialog"
           aria-expanded="false"
           aria-controls="dialog-machine"
@@ -121,14 +121,14 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
             
             <div class="screen-header">
               <span class="screen-pulse-dot"></span>
-              <span class="screen-status-text">GH // LIVE</span>
+              <span class="screen-status-text">ARCANE // 60FPS</span>
             </div>
 
             <div class="screen-body">
-              <svg class="octocat-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+              <svg class="octocat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
               </svg>
-              <div class="screen-handle">@IbemCabahug</div>
+              <div class="screen-handle font-mono font-bold tracking-wider text-[11px]">ARCANE TYPER</div>
             </div>
 
             <div class="screen-footer">
@@ -139,10 +139,10 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
                 <span class="bar bar-4"></span>
                 <span class="bar bar-5"></span>
               </div>
-              <span class="screen-commit">{activeSha}</span>
+              <span class="screen-commit">CANVAS // LIVE</span>
             </div>
           </div>
-          <span class="scene-tooltip" data-placement="top">Arcane Transceiver (GitHub)</span>
+          <span class="scene-tooltip" data-placement="top">Arcane Transceiver (Live Simulation)</span>
         </button>
 
         <!-- Hotspot 3: Scribe's Rolltop Desk (Full Resume) -->
@@ -416,7 +416,7 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
           </div>
         </div>
 
-        <!-- Modal 2: Arcane Transceiver (GitHub Code Archive) -->
+        <!-- Modal 2: Arcane Transceiver (Arcane Typer Live Simulation Arena) -->
         <div
           id="dialog-machine"
           class="tavern-panel"
@@ -429,114 +429,115 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
             <div class="flex items-center gap-3">
               <span class="panel-badge-icon" aria-hidden="true">
                 <svg class="w-7 h-7 text-[var(--brass)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="3"/>
-                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                 </svg>
               </span>
               <div>
-                <span class="text-xs uppercase font-extrabold tracking-widest text-[var(--ember)]">Guild Archives</span>
-                <h2 id="machine-dialog-title" class="text-xl sm:text-2xl font-bold text-[var(--candle)]">The Arcane Transceiver</h2>
+                <span class="text-xs uppercase font-extrabold tracking-widest text-[var(--ember)]">Arcane Transmission</span>
+                <h2 id="machine-dialog-title" class="text-xl sm:text-2xl font-bold text-[var(--candle)]">The Arcane Transceiver — Live Trial</h2>
               </div>
             </div>
           </div>
 
-          <div class="panel-body space-y-2.5">
-            <p class="text-xs sm:text-sm text-[var(--parchment)]/90 leading-relaxed">
-              This brass-and-crystal terminal synchronizes live telemetry from Nhovem's code repositories and development forge. Inspect verified code repositories, TypeScript architecture, and active web experiments.
-            </p>
+          <div class="panel-body space-y-3">
+            <!-- Transceiver Top Chamber Control Bar -->
+            <div class="px-3.5 py-2.5 rounded bg-[var(--wood-deep)] border border-[var(--brass)]/60 flex flex-wrap items-center justify-between gap-2.5">
+              <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/60 text-emerald-400 font-mono text-[10px] sm:text-xs font-bold">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true"></span>
+                  <span>Signal Synchronized // 60 FPS</span>
+                </span>
+                <span class="text-[11px] font-mono text-[var(--parchment)]/70 hidden sm:inline">
+                  ArcaneTyper v2.2.6
+                </span>
+              </div>
 
-            <div class="tavern-scrollbar space-y-2 max-h-[42vh] sm:max-h-[38vh] overflow-y-auto pr-1.5">
-              {projectTelemetries.map(({ project, telemetry }) => (
-                <div class="p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40 hover:border-[var(--brass)] transition-colors space-y-1.5">
-                  <div class="flex flex-wrap items-center justify-between gap-2">
-                    <div class="flex items-center gap-2">
-                      <a
-                        href={`/quests/${project.data.slug}`}
-                        class="font-bold text-[var(--candle)] font-mono text-xs sm:text-sm hover:underline hover:text-[var(--brass)]"
-                      >
-                        {project.data.title.split('—')[0].trim()}
-                      </a>
-                      <span class="text-[10px] px-1.5 py-0.2 rounded bg-[var(--wood-deep)] text-[var(--brass)] border border-[var(--brass)]/40 font-mono">
-                        {project.data.status}
-                      </span>
-                    </div>
+              <div id="transceiver-active-controls" class="hidden items-center gap-2">
+                <button
+                  type="button"
+                  id="transceiver-fullscreen-btn"
+                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-black/50 border border-[var(--brass)] text-[var(--candle)] font-mono text-xs hover:bg-black transition-colors cursor-pointer min-h-[36px]"
+                  title="Toggle Fullscreen"
+                >
+                  <span>⛶</span>
+                  <span class="hidden sm:inline">Fullscreen</span>
+                </button>
 
-                    <div class="flex items-center gap-2 text-[10px] font-mono text-[var(--parchment)]/75">
-                      {telemetry ? (
-                        <>
-                          <span class="text-amber-400">★ {telemetry.stars}</span>
-                          <span>•</span>
-                          <span>Pushed {telemetry.pushedRelative}</span>
-                        </>
-                      ) : !project.data.sourceUrl ? (
-                        <span class="text-[var(--ember)]">🔒 Offline Vault</span>
-                      ) : (
-                        <span class="text-[var(--parchment)]/60">Repo Linked</span>
-                      )}
-                    </div>
-                  </div>
-
-                  <p class="text-[11px] sm:text-xs text-[var(--parchment)]/85 leading-snug">
-                    {project.data.summary}
-                  </p>
-
-                  <div class="flex flex-wrap items-center justify-between gap-1.5 pt-1 border-t border-[var(--brass)]/20 text-[10px]">
-                    <div class="flex flex-wrap gap-1">
-                      {project.data.stack.slice(0, 4).map((tech: string) => (
-                        <span class="px-1.5 py-0.5 rounded bg-[var(--stone)]/80 text-[var(--parchment)] font-mono">
-                          {tech}
-                        </span>
-                      ))}
-                      {project.data.stack.length > 4 && (
-                        <span class="px-1 py-0.5 text-[var(--parchment)]/60 font-mono">
-                          +{project.data.stack.length - 4}
-                        </span>
-                      )}
-                    </div>
-
-                    <div class="flex items-center gap-2">
-                      {telemetry?.latestCommit && (
-                        <a
-                          href={telemetry.latestCommit.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          class="text-[var(--candle)] font-mono hover:underline truncate max-w-[130px]"
-                          title={`Commit ${telemetry.latestCommit.sha}: ${telemetry.latestCommit.message}`}
-                        >
-                          commit <span class="text-[var(--brass)] font-bold">{telemetry.latestCommit.sha}</span>
-                        </a>
-                      )}
-                      {project.data.sourceUrl && (
-                        <a
-                          href={project.data.sourceUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          class="text-[var(--brass)] font-semibold hover:underline"
-                        >
-                          Source &rarr;
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
+                <button
+                  type="button"
+                  id="transceiver-unload-btn"
+                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-red-950/70 border border-red-500/50 text-red-200 font-bold text-xs hover:bg-red-900 transition-colors cursor-pointer min-h-[36px]"
+                  title="Disengage demo and free memory"
+                >
+                  <span>✕</span>
+                  <span>Disengage</span>
+                </button>
+              </div>
             </div>
 
-            <div class="flex items-center justify-between p-2 rounded bg-black/30 border border-[var(--brass)]/30 text-xs font-mono text-[var(--parchment)]">
-              <span>GitHub Handle: <strong class="text-[var(--candle)]">@IbemCabahug</strong></span>
-              <span class="text-emerald-400">Verified Contributor</span>
+            <!-- Resting View: Thematic Brief & Boot Trigger -->
+            <div id="transceiver-resting-view" class="p-5 sm:p-7 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40 text-center space-y-4">
+              <div class="max-w-xl mx-auto space-y-2">
+                <p class="text-xs sm:text-sm text-[var(--parchment)]/90 leading-relaxed">
+                  The brass coils resonate with arcane frequency, synchronizing with Nhovem's live HTML5 Canvas engine. Engage the transceiver below to initiate real-time typing physics, spellcasting incantations, and synthesized Web Audio directly inside this chamber.
+                </p>
+                <div class="flex flex-wrap justify-center gap-1.5 pt-1">
+                  <span class="px-2 py-0.5 rounded bg-black/40 text-[var(--candle)] border border-[var(--brass)]/40 font-mono text-[10px]">60 FPS HTML5 Canvas</span>
+                  <span class="px-2 py-0.5 rounded bg-black/40 text-[var(--candle)] border border-[var(--brass)]/40 font-mono text-[10px]">Zero-Asset Web Audio</span>
+                  <span class="px-2 py-0.5 rounded bg-black/40 text-[var(--candle)] border border-[var(--brass)]/40 font-mono text-[10px]">Supabase 1v1 Duels</span>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+                <button
+                  type="button"
+                  id="transceiver-launch-btn"
+                  data-url="https://arcane-typer.vercel.app/"
+                  class="inline-flex items-center gap-2 min-h-[44px] px-6 py-2.5 rounded-md bg-[var(--brass)] text-black font-bold text-xs sm:text-sm hover:bg-[var(--candle)] transition-all shadow-lg hover:shadow-[0_0_15px_rgba(218,165,32,0.4)] cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+                >
+                  <svg class="w-4 h-4 text-black" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                  </svg>
+                  <span>Engage Arcane Typer Trial</span>
+                </button>
+
+                <a
+                  href="https://arcane-typer.vercel.app/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-2 min-h-[44px] px-5 py-2.5 rounded-md border border-[var(--brass)] text-[var(--candle)] font-bold text-xs sm:text-sm hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+                >
+                  <span>Launch in Standalone Window ↗</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Active Iframe Container (Dynamic Loading with 0 KB initial payload) -->
+            <div
+              id="transceiver-frame-container"
+              class="relative w-full aspect-video min-h-[380px] sm:min-h-[460px] bg-black rounded border border-[var(--brass)]/50 hidden overflow-hidden shadow-2xl"
+            >
+              <!-- Iframe inserted dynamically on click to ensure 0 KB initial payload -->
             </div>
           </div>
 
           <div class="panel-actions flex flex-wrap items-center justify-between gap-3 pt-3">
-            <a
-              href={githubUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex items-center justify-center min-h-[44px] px-5 py-2 bg-[var(--wood-deep)] text-[var(--candle)] border border-[var(--brass)] font-bold text-xs sm:text-sm rounded hover:bg-black hover:border-[var(--candle)] transition-colors shadow-md"
-            >
-              Inspect GitHub Profile &rarr;
-            </a>
+            <div class="flex flex-wrap items-center gap-2">
+              <a
+                href="/quests/arcanetyper"
+                class="inline-flex items-center justify-center min-h-[44px] px-4 py-2 bg-[var(--wood-deep)] text-[var(--candle)] border border-[var(--brass)] font-bold text-xs sm:text-sm rounded hover:bg-black hover:border-[var(--candle)] transition-colors shadow-md"
+              >
+                Inspect Architectural Case Study &rarr;
+              </a>
+              <a
+                href="https://github.com/IbemCabahug/ArcaneTyper"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center justify-center min-h-[44px] px-3.5 py-2 bg-black/40 text-[var(--parchment)] border border-[var(--brass)]/50 font-semibold text-xs rounded hover:bg-black hover:text-[var(--candle)] transition-colors"
+              >
+                GitHub Source ↗
+              </a>
+            </div>
             <button
               type="button"
               class="close-panel-btn inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-xs sm:text-sm rounded hover:bg-[var(--candle)] transition-colors cursor-pointer ml-auto"
@@ -1625,6 +1626,7 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
     const sceneObjects = document.querySelectorAll('.scene-object');
     let activeDialog: HTMLElement | null = null;
     let activeTrigger: HTMLElement | null = null;
+    let unloadTransceiverFn: (() => void) | null = null;
 
     function getFocusableElements(el: HTMLElement): HTMLElement[] {
       return Array.from(el.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'));
@@ -1663,6 +1665,10 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
 
     function closeDialog() {
       if (!activeDialog) return;
+
+      if (activeDialog.id === 'dialog-machine' && unloadTransceiverFn) {
+        unloadTransceiverFn();
+      }
 
       soundEngine.playWoodClink();
       sceneObjects.forEach((el) => {
@@ -1795,6 +1801,71 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
 
     setupTemplatePills('.template-pill', 'desktop-missive-subject', 'desktop-missive-body');
     setupTemplatePills('.mobile-template-pill', 'mobile-missive-subject', 'mobile-missive-body');
+
+    // Setup Arcane Transceiver Live Simulation
+    function setupTransceiverSimulation() {
+      const launchBtn = document.getElementById('transceiver-launch-btn');
+      const unloadBtn = document.getElementById('transceiver-unload-btn');
+      const fullscreenBtn = document.getElementById('transceiver-fullscreen-btn');
+      const restingView = document.getElementById('transceiver-resting-view');
+      const activeControls = document.getElementById('transceiver-active-controls');
+      const frameContainer = document.getElementById('transceiver-frame-container');
+      const machineDialog = document.getElementById('dialog-machine');
+
+      if (!launchBtn || !restingView || !activeControls || !frameContainer) return;
+
+      const liveUrl = launchBtn.getAttribute('data-url') || 'https://arcane-typer.vercel.app/';
+
+      function launchArena() {
+        soundEngine.playWoodClink();
+        const iframe = document.createElement('iframe');
+        iframe.src = liveUrl;
+        iframe.title = 'Live Simulation of Arcane Typer inside Arcane Transceiver';
+        iframe.className = 'w-full h-full border-0 absolute inset-0';
+        iframe.setAttribute('allow', 'autoplay; fullscreen');
+        iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-forms');
+        iframe.loading = 'eager';
+
+        frameContainer.innerHTML = '';
+        frameContainer.appendChild(iframe);
+
+        restingView.classList.add('hidden');
+        activeControls.classList.remove('hidden');
+        activeControls.classList.add('flex');
+        frameContainer.classList.remove('hidden');
+      }
+
+      function unloadArena() {
+        soundEngine.playWoodClink();
+        frameContainer.innerHTML = '';
+        frameContainer.classList.add('hidden');
+        activeControls.classList.add('hidden');
+        activeControls.classList.remove('flex');
+        restingView.classList.remove('hidden');
+      }
+
+      function toggleFullscreen() {
+        soundEngine.playWoodClink();
+        const target = machineDialog || frameContainer;
+        if (!document.fullscreenElement) {
+          if (target.requestFullscreen) {
+            target.requestFullscreen();
+          }
+        } else {
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          }
+        }
+      }
+
+      launchBtn.addEventListener('click', launchArena);
+      if (unloadBtn) unloadBtn.addEventListener('click', unloadArena);
+      if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+      unloadTransceiverFn = unloadArena;
+    }
+
+    setupTransceiverSimulation();
 
     // Form Handling and Missive Dispatching
     const recipientEmail = 'ncabahug223@gmail.com';
