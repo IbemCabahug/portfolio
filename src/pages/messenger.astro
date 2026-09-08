@@ -62,12 +62,6 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
       </picture>
 
       <div class="scene-overlay" aria-hidden="false">
-        <!-- In-Scene Ambient Chamber Title (Desktop) -->
-        <div class="chamber-ambient-badge" aria-hidden="true">
-          <span class="badge-dot"></span>
-          <span>Tavern Aviary &bull; Chamber IV &bull; The Courier's Roost</span>
-        </div>
-
         <!-- Hotspot 1: Perched Raven (Email Dispatch) -->
         <button
           type="button"
@@ -1002,39 +996,6 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
     height: 100%;
     object-fit: contain;
     user-select: none;
-  }
-
-  /* In-Scene Ambient Chamber Badge (Desktop) */
-  .chamber-ambient-badge {
-    position: absolute;
-    top: 3.5%;
-    left: 50%;
-    transform: translateX(-50%);
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 5px 16px;
-    border-radius: 9999px;
-    background: rgba(15, 10, 5, 0.85);
-    border: 1px solid rgba(213, 128, 59, 0.6);
-    color: var(--candle, #ffe4a0);
-    font-size: clamp(0.55rem, 0.8cqw, 0.75rem);
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7);
-    pointer-events: none;
-    z-index: 10;
-    white-space: nowrap;
-    backdrop-filter: blur(2px);
-  }
-
-  .chamber-ambient-badge .badge-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background-color: #34d399;
-    box-shadow: 0 0 8px #34d399;
   }
 
   .scene-overlay {
