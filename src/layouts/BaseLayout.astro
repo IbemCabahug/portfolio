@@ -7,9 +7,10 @@ interface Props {
   title: string;
   description: string;
   hideDefaultNav?: boolean;
+  noScript?: boolean;
 }
 
-const { title, description, hideDefaultNav } = Astro.props;
+const { title, description, hideDefaultNav, noScript = false } = Astro.props;
 
 const siteUrl = import.meta.env.PUBLIC_SITE_URL || Astro.site?.toString() || '';
 const canonicalUrl = siteUrl ? new URL(Astro.url.pathname, siteUrl).href : Astro.url.href;
@@ -19,8 +20,8 @@ const sitemapUrl = siteUrl ? new URL('/sitemap-index.xml', siteUrl).href : '/sit
 <!doctype html>
 <html lang="en">
   <head>
-    <ClientRouter />
-    <ThemeInit />
+    {!noScript && <ClientRouter />}
+    {!noScript && <ThemeInit />}
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

@@ -200,6 +200,7 @@ const totalCount = JOURNAL_MILESTONES.length;
     detectMilestoneFromPath,
     subscribeQuestLog,
   } from '../store/questlog';
+  import { soundEngine } from '../lib/sound-engine';
 
   function initJournal() {
     const trigger = document.getElementById('trigger-quest-log');
@@ -274,6 +275,7 @@ const totalCount = JOURNAL_MILESTONES.length;
     }
 
     function openDialog() {
+      soundEngine.playParchmentRustle();
       safeBackdrop.removeAttribute('hidden');
       safeDialog.removeAttribute('hidden');
       safeTrigger.setAttribute('aria-expanded', 'true');
@@ -282,6 +284,7 @@ const totalCount = JOURNAL_MILESTONES.length;
     }
 
     function closeDialog() {
+      soundEngine.playWoodClink();
       safeBackdrop.setAttribute('hidden', '');
       safeDialog.setAttribute('hidden', '');
       safeTrigger.setAttribute('aria-expanded', 'false');

@@ -21,8 +21,11 @@
 
 <script>
   import { getMotion, getSound, setMotion, setSound, subscribePreferences } from '../store/preferences';
+  import { soundEngine } from '../lib/sound-engine';
 
   function initPreferences() {
+    soundEngine.init();
+
     const btnMotion = document.getElementById('toggle-motion');
     const btnSound = document.getElementById('toggle-sound');
 
@@ -44,11 +47,19 @@
     updateDOM();
 
     btnMotion?.addEventListener('click', () => {
+      soundEngine.playWoodClink();
       setMotion(getMotion() === 'full' ? 'reduced' : 'full');
     });
 
     btnSound?.addEventListener('click', () => {
-      setSound(getSound() === 'on' ? 'off' : 'on');
+      const next = getSound() === 'on' ? 'off' : 'on';
+      if (next === 'on') {
+        soundEngine.enable();
+        soundEngine.playWoodClink();
+      } else {
+        soundEngine.disable();
+      }
+      setSound(next);
     });
   }
 

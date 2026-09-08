@@ -1184,9 +1184,11 @@ const sceneObjects = [
   })} />
 <script>
   import { initPerformanceGovernor } from '../../lib/perf-governor';
+  import { soundEngine } from '../../lib/sound-engine';
 
   function initTavernPage() {
     initPerformanceGovernor();
+    soundEngine.init();
     const triggerInnkeeper = document.getElementById('trigger-innkeeper');
     const narrowInnkeeper = document.getElementById('narrow-innkeeper');
     const triggerQuestBoard = document.getElementById('trigger-quest-board');
@@ -1195,11 +1197,12 @@ const sceneObjects = [
     const dialogInnkeeper = document.getElementById('dialog-innkeeper');
     const dialogQuestboard = document.getElementById('dialog-questboard');
 
-    const sceneInteractives = document.querySelectorAll('.scene-object, .narrow-link');
+    const sceneInteractives = document.querySelectorAll<HTMLElement>('.scene-object, .scene-papers, .scene-door');
     let activeDialog: HTMLElement | null = null;
     let activeTrigger: HTMLElement | null = null;
 
     function openDialog(dialog: HTMLElement, trigger: HTMLElement, filterCategory?: string) {
+      soundEngine.playParchmentRustle();
       sceneInteractives.forEach(el => {
         el.classList.add('disabled-by-dialog');
         el.setAttribute('tabindex', '-1');
@@ -1248,6 +1251,7 @@ const sceneObjects = [
 
     function closeDialog() {
       if (!activeDialog) return;
+      soundEngine.playWoodClink();
       sceneInteractives.forEach(el => {
         el.classList.remove('disabled-by-dialog');
         el.removeAttribute('tabindex');

@@ -1608,9 +1608,11 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
 <script>
   import { initPerformanceGovernor } from '../lib/perf-governor';
   import { sendMissive } from '../lib/contact';
+  import { soundEngine } from '../lib/sound-engine';
 
   function initMessengerPage() {
     initPerformanceGovernor();
+    soundEngine.init();
     // Interactive Scene Hotspots and Modal Management
     const triggers = [
       { triggerId: 'trigger-perch-raven', dialogId: 'dialog-raven' },
@@ -1631,6 +1633,7 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
     function openDialog(dialog: HTMLElement, trigger: HTMLElement) {
       if (activeDialog) closeDialog();
 
+      soundEngine.playParchmentRustle();
       activeDialog = dialog;
       activeTrigger = trigger;
       dialog.removeAttribute('hidden');
@@ -1648,13 +1651,10 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
       }
 
       dialog.hidden = false;
-      dialog.setAttribute('aria-hidden', 'false');
-      trigger.setAttribute('aria-expanded', 'true');
-      activeDialog = dialog;
-      activeTrigger = trigger;
+      dialog.scrollTop = 0;
 
       const focusables = getFocusableElements(dialog);
-      if (focusables.length) {
+      if (focusables.length > 0) {
         focusables[0].focus({ preventScroll: true });
       }
 
@@ -1664,6 +1664,7 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
     function closeDialog() {
       if (!activeDialog) return;
 
+      soundEngine.playWoodClink();
       sceneObjects.forEach((el) => {
         el.classList.remove('disabled-by-dialog');
         el.removeAttribute('tabindex');
