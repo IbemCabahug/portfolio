@@ -60,3 +60,28 @@ export function setSound(val: SoundPref) {
   } catch (e) {}
   notify();
 }
+
+export type ThemePref = 'night' | 'day';
+
+export function getTheme(): ThemePref {
+  if (typeof window === 'undefined') return 'night';
+  const current = document.documentElement.dataset.theme as ThemePref;
+  if (current === 'night' || current === 'day') return current;
+  try {
+    const stored = localStorage.getItem('theme') as ThemePref;
+    if (stored === 'night' || stored === 'day') {
+      document.documentElement.dataset.theme = stored;
+      return stored;
+    }
+  } catch (e) {}
+  return 'night';
+}
+
+export function setTheme(val: ThemePref) {
+  if (typeof window === 'undefined') return;
+  document.documentElement.dataset.theme = val;
+  try {
+    localStorage.setItem('theme', val);
+  } catch (e) {}
+  notify();
+}

@@ -11,6 +11,7 @@ const profile = defineCollection({
     location: z.string(),
     email: z.email(),
     github: z.url(),
+    linkedin: z.url().optional(),
     resumeFile: z.string(),
     availability: z.string(),
   }),
