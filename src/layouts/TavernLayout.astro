@@ -72,7 +72,7 @@ const isScene = location === 'tavern' || location === 'messenger';
         <a href="/" class="flex items-center min-h-[44px] px-2 hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)]">Home</a>
         <a href="/about" class="flex items-center min-h-[44px] px-2 hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)]">About</a>
         <a href="/resume" class="flex items-center min-h-[44px] px-2 text-[var(--candle)] font-bold hover:underline focus-visible:outline-2 focus-visible:outline-[var(--brass)]">Resume</a>
-        <a href="/quests" class="flex items-center min-h-[44px] px-2 hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)]">Quest Board</a>
+        <a href="/quests" class="flex items-center min-h-[44px] px-2 hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)]">Quest Board (Projects)</a>
       </nav>
 
       {/* Right: Controls, Modals & Site Menu */}
@@ -85,7 +85,8 @@ const isScene = location === 'tavern' || location === 'messenger';
           title="High-contrast, zero-JS text edition (Field Ledger)"
         >
           <ThematicIcon name="scroll" class="w-3.5 h-3.5 text-[var(--candle)] shrink-0" />
-          <span>Field Ledger</span>
+          <span class="hidden md:inline">Field Ledger (Simple)</span>
+          <span class="inline md:hidden">Field Ledger</span>
         </a>
 
         {/* Chambers & Site Menu Dropdown */}
@@ -107,7 +108,7 @@ const isScene = location === 'tavern' || location === 'messenger';
             <li class="px-2 py-1 text-[10px] uppercase tracking-widest text-[var(--brass)] font-extrabold border-b border-[var(--brass)]/30 mb-1">
               Tavern Chambers
             </li>
-            <li><a href="/tavern" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Main Tavern</a></li>
+            <li><a href="/tavern" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Main Tavern (Interactive Room)</a></li>
             <li><a href="/tavern/skills" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Adventurer's Badge (Skills)</a></li>
             <li><a href="/tavern/npc" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Tavern Regular (Q&A)</a></li>
             <li><a href="/quests" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Quest Board (Projects)</a></li>
@@ -116,7 +117,7 @@ const isScene = location === 'tavern' || location === 'messenger';
             <li class="px-2 py-1 text-[10px] uppercase tracking-widest text-[var(--brass)] font-extrabold border-b border-[var(--brass)]/30 mb-1">
               Portfolio Records
             </li>
-            <li><a href="/" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Home / Entrance</a></li>
+            <li><a href="/" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Home / Entrance (Overview)</a></li>
             <li><a href="/about" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">About Nhovem</a></li>
             <li><a href="/resume" class="flex items-center min-h-[44px] px-2 rounded text-[var(--candle)] font-bold hover:bg-[var(--brass)]/20">Resume (PDF & View)</a></li>
             <li><a href="/simple" class="flex items-center min-h-[44px] px-2 rounded text-[var(--parchment)]/80 hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Field Ledger (Simple Mode)</a></li>

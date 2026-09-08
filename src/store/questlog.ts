@@ -16,7 +16,7 @@ export const JOURNAL_MILESTONES: JournalMilestone[] = [
   // Chambers of the Tavern
   {
     id: 'tavern',
-    title: 'The Common Taproom',
+    title: 'The Common Taproom (Tavern)',
     category: 'chamber',
     path: '/tavern',
     tagline: 'Warm hearth, taproom banter, and atmospheric company',
@@ -24,7 +24,7 @@ export const JOURNAL_MILESTONES: JournalMilestone[] = [
   },
   {
     id: 'quests',
-    title: 'The Notice Board',
+    title: 'The Notice Board (Projects)',
     category: 'chamber',
     path: '/quests',
     tagline: 'Guild bounties, active software projects, and tech stacks',
@@ -32,7 +32,7 @@ export const JOURNAL_MILESTONES: JournalMilestone[] = [
   },
   {
     id: 'messenger',
-    title: "The Courier's Roost",
+    title: "The Courier's Roost (Contact)",
     category: 'chamber',
     path: '/messenger',
     tagline: 'Messenger aviary, direct email dispatch, and Arcane Transceiver',
@@ -40,7 +40,7 @@ export const JOURNAL_MILESTONES: JournalMilestone[] = [
   },
   {
     id: 'resume',
-    title: "The Master Scribe's Ledger",
+    title: "The Master Scribe's Ledger (Resume)",
     category: 'chamber',
     path: '/resume',
     tagline: 'Complete technical resume, employment history, and education',
