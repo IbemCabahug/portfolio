@@ -346,6 +346,56 @@ const questions = npcEntries
     background: var(--candle);
   }
 
+  /* Short landscape screens (<= 500px height in landscape) */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .npc-sprite {
+      width: 32%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .npc-dialogue-panel .dialogue-stack {
+      left: 36%;
+      right: 2%;
+      bottom: 4px;
+      max-height: calc(100dvh - var(--hud-height, 40px) - 8px);
+      gap: 4px;
+    }
+    .npc-dialogue-panel .dialogue-band {
+      min-height: 0;
+      padding: 8px 14px;
+      gap: 4px;
+    }
+    .npc-dialogue-panel .panel-header h1 {
+      font-size: 1rem;
+      margin-bottom: 2px;
+    }
+    .npc-dialogue-panel .dialogue-prose {
+      font-size: 0.875rem;
+      line-height: 1.35;
+      max-height: 68px;
+      overflow-y: auto;
+    }
+    .npc-dialogue-panel .panel-actions {
+      margin-top: 4px;
+    }
+    .npc-dialogue-panel .close-panel-btn {
+      min-height: 36px;
+      padding: 4px 12px;
+      font-size: 0.8rem;
+    }
+    .npc-dialogue-panel .dialogue-replies {
+      min-height: 0;
+      max-height: 72px;
+      padding: 4px;
+      gap: 4px;
+    }
+    .npc-dialogue-panel .dialogue-replies .reply-btn {
+      min-height: 34px;
+      padding: 4px 8px 4px 20px;
+      font-size: 0.8rem;
+    }
+  }
+
   /* Mobile: stack portrait above dialogue */
   @media (max-width: 639px) {
     .npc-page {

@@ -197,171 +197,6 @@ const sceneObjects = [
 
       <!-- Papers Hotspots -->
 
-      <!-- In-scene Panels -->
-      <!-- Skills Panel -->
-      <div id="dialog-skills" class="tavern-panel skills-panel" role="dialog" aria-modal="true" aria-labelledby="skills-title" hidden>
-        <div class="panel-header">
-          <img src="/art/adventurers-badge-384.webp" alt="" width="48" height="58" class="panel-icon" />
-          <h2 id="skills-title">Skills & Arsenal</h2>
-        </div>
-        <div class="panel-body skills-grid">
-          {skills.map((group) => (
-            <div class="skill-category" data-category={group.category}>
-              <ul>
-                {group.items.map((item) => (
-                  <li>
-                    <strong>{item.name}</strong>
-                    <span class="level-meter" role="img" aria-label={`${item.name}, ${item.level}, ${levelMap[item.level]} of 3`}>
-                      <span class={`notch ${levelMap[item.level] >= 1 ? 'is-filled' : ''}`}></span>
-                      <span class={`notch ${levelMap[item.level] >= 2 ? 'is-filled' : ''}`}></span>
-                      <span class={`notch ${levelMap[item.level] >= 3 ? 'is-filled' : ''}`}></span>
-                    </span>
-                    <span class="level-word" aria-hidden="true">{item.level}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-        <div class="panel-actions flex justify-end">
-          <button type="button" class="close-panel-btn ml-auto">Close Skills (Esc)</button>
-        </div>
-      </div>
-
-      <!-- Innkeeper Dialogue -->
-      <div id="dialog-innkeeper" class="tavern-panel dialogue-panel" role="dialog" aria-modal="true"
-           aria-labelledby="innkeeper-title" aria-describedby="innkeeper-prose" hidden>
-        <img class="innkeeper-portrait" src="/art/innkeeper-portrait-519.webp" width="519" height="1365"
-             alt="" aria-hidden="true" loading="lazy" decoding="async" />
-        <div class="dialogue-stack">
-          <ul class="dialogue-replies" id="innkeeper-replies">
-            {innkeeperReplies.map((d: any, i: number) => (
-              <li>
-                <button type="button" class="reply-btn" data-reply-index={i}>{d.question}</button>
-              </li>
-            ))}
-            {innkeeperFarewell && (
-              <li>
-                <button type="button" class="reply-btn farewell-btn">{innkeeperFarewell.question}</button>
-              </li>
-            )}
-          </ul>
-          <div class="dialogue-band">
-            <div class="panel-header">
-              <h2 id="innkeeper-title">The Innkeeper Says...</h2>
-            </div>
-            <div class="panel-body">
-              <div class="dialogue-prose" id="innkeeper-prose" tabindex="-1">
-                {innkeeperBeats.map((d: any) => (<p>{d.line}</p>))}
-              </div>
-            </div>
-            <div class="panel-actions flex justify-end">
-              <button type="button" class="close-panel-btn ml-auto">Close Dialogue (Esc)</button>
-            </div>
-          </div>
-        </div>
-        <div id="innkeeper-announce" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
-      </div>
-
-      <!-- Quest Board Bounty Popup -->
-      <div id="dialog-questboard" class="tavern-panel questboard-panel" role="dialog" aria-modal="true" aria-labelledby="questboard-title" hidden>
-        <div class="panel-header flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-[#140b04] border border-[var(--brass)] flex items-center justify-center shrink-0 shadow">
-              <ThematicIcon name="scroll" class="w-6 h-6 text-[var(--candle)]" />
-            </div>
-            <div>
-              <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-[#d5803b]">Active Bounties & Proof of Work</span>
-              <h2 id="questboard-title" class="text-xl sm:text-2xl font-bold text-[var(--candle)] font-serif leading-tight">
-                The Quest Board
-              </h2>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel-body questboard-body">
-          <p class="text-xs sm:text-sm text-[var(--parchment)]/90 leading-relaxed mb-3">
-            Pinned upon the weathered tavern cork are active bounties and completed software development projects. Inspect any bounty notice to review the full architectural case study dossier.
-          </p>
-
-          <!-- 3 Pinned Bounty Cards Grid -->
-          <div class="bounties-grid">
-            {projects.map((project) => (
-              <article class="bounty-slip" id={`bounty-${project.data.slug}`}>
-                <div class="bounty-pin" aria-hidden="true"></div>
-
-                <div class="bounty-top">
-                  <div class="flex items-center gap-2.5 mb-1.5">
-                    <div class="w-8 h-8 rounded-md border border-[var(--brass)] bg-[#1e1208] p-0.5 flex items-center justify-center shrink-0 overflow-hidden shadow-xs">
-                      {project.data.thumbnail ? (
-                        <img
-                          src={project.data.thumbnail}
-                          alt=""
-                          class="w-full h-full object-contain rounded-xs"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      ) : (
-                        <ThematicIcon name="swords" class="w-5 h-5 text-[var(--candle)]" />
-                      )}
-                    </div>
-                    <h3 class="bounty-heading">
-                      {project.data.title.split('—')[0].trim()}
-                    </h3>
-                  </div>
-
-                  <div class="flex items-center justify-between gap-1 text-[10px] font-mono mb-2">
-                    <span class="bounty-role text-[#5c3e21] font-semibold">{project.data.role}</span>
-                    <span class={`bounty-badge ${project.data.status === 'Shipped' ? 'badge-shipped' : 'badge-progress'}`}>
-                      {project.data.status === 'Shipped' ? '● Shipped' : '◐ In Progress'}
-                    </span>
-                  </div>
-
-                  <p class="bounty-desc">
-                    {project.data.summary}
-                  </p>
-                </div>
-
-                <div class="bounty-bottom">
-                  <div class="bounty-tags mb-3">
-                    {project.data.stack.slice(0, 3).map((tech: string) => (
-                      <span class="bounty-tag">{tech}</span>
-                    ))}
-                    {project.data.stack.length > 3 && (
-                      <span class="bounty-tag opacity-80">+{project.data.stack.length - 3}</span>
-                    )}
-                  </div>
-
-                  <a
-                    href={`/quests/${project.data.slug}`}
-                    class="bounty-cta"
-                  >
-                    <span>Inspect Dossier &rarr;</span>
-                  </a>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-
-        <div class="panel-actions questboard-footer flex flex-wrap items-center justify-between gap-3 pt-3">
-          <a
-            href="/quests"
-            class="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--candle)] hover:underline min-h-[44px] px-2"
-          >
-            <ThematicIcon name="scroll" class="w-4 h-4 text-[var(--brass)]" />
-            <span>Inspect Full Quest Catalog &rarr;</span>
-          </a>
-
-          <button
-            type="button"
-            class="close-panel-btn inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-xs sm:text-sm rounded hover:bg-[var(--candle)] transition-colors cursor-pointer ml-auto"
-          >
-            Close Board (Esc)
-          </button>
-        </div>
-      </div>
-      
       <!-- Reserved Space: Dark centre floor -->
       <div class="reserved-dialogue-area" aria-hidden="true"></div>
     </div>
@@ -405,9 +240,182 @@ const sceneObjects = [
   <div class="narrow-links">
     <a href="/tavern/npc" class="narrow-link">Talk to the Tavern Regular</a>
     <button type="button" class="narrow-link" id="narrow-innkeeper">Talk to the Innkeeper</button>
-    <a href="/tavern/skills" class="narrow-link">View Skills</a>
-    <a href="/quests" class="narrow-link">Go to the Quest Board</a>
+    <a href="/tavern/skills" id="narrow-skills" class="narrow-link">View Skills</a>
+    <a href="/quests" id="narrow-questboard" class="narrow-link">Go to the Quest Board</a>
     <a href="/messenger" class="narrow-link">Go to Messenger's Corner</a>
+  </div>
+
+  <!-- Global Modal Backdrop -->
+  <div id="dialog-backdrop" class="dialog-backdrop" hidden aria-hidden="true"></div>
+
+  <!-- Hoisted Modal Panels (Escaped from scene-container to guarantee full viewport scaling & no containment clipping) -->
+  <!-- Skills Panel -->
+  <div id="dialog-skills" class="tavern-panel skills-panel" role="dialog" aria-modal="true" aria-labelledby="skills-title" hidden>
+    <div class="panel-header flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="/art/adventurers-badge-384.webp" alt="" width="48" height="58" class="panel-icon" />
+        <h2 id="skills-title">Skills & Arsenal</h2>
+      </div>
+      <button type="button" class="close-panel-btn panel-close-icon-btn" aria-label="Close Skills">✕</button>
+    </div>
+    <div class="panel-body skills-grid">
+      {skills.map((group) => (
+        <div class="skill-category" data-category={group.category}>
+          <ul>
+            {group.items.map((item) => (
+              <li>
+                <strong>{item.name}</strong>
+                <span class="level-meter" role="img" aria-label={`${item.name}, ${item.level}, ${levelMap[item.level]} of 3`}>
+                  <span class={`notch ${levelMap[item.level] >= 1 ? 'is-filled' : ''}`}></span>
+                  <span class={`notch ${levelMap[item.level] >= 2 ? 'is-filled' : ''}`}></span>
+                  <span class={`notch ${levelMap[item.level] >= 3 ? 'is-filled' : ''}`}></span>
+                </span>
+                <span class="level-word" aria-hidden="true">{item.level}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+    <div class="panel-actions flex justify-end">
+      <button type="button" class="close-panel-btn ml-auto">Close Skills (Esc)</button>
+    </div>
+  </div>
+
+  <!-- Innkeeper Dialogue -->
+  <div id="dialog-innkeeper" class="tavern-panel dialogue-panel" role="dialog" aria-modal="true"
+       aria-labelledby="innkeeper-title" aria-describedby="innkeeper-prose" hidden>
+    <img class="innkeeper-portrait" src="/art/innkeeper-portrait-519.webp" width="519" height="1365"
+         alt="" aria-hidden="true" loading="lazy" decoding="async" />
+    <div class="dialogue-stack">
+      <ul class="dialogue-replies" id="innkeeper-replies">
+        {innkeeperReplies.map((d: any, i: number) => (
+          <li>
+            <button type="button" class="reply-btn" data-reply-index={i}>{d.question}</button>
+          </li>
+        ))}
+        {innkeeperFarewell && (
+          <li>
+            <button type="button" class="reply-btn farewell-btn">{innkeeperFarewell.question}</button>
+          </li>
+        )}
+      </ul>
+      <div class="dialogue-band">
+        <div class="panel-header flex items-center justify-between">
+          <h2 id="innkeeper-title">The Innkeeper Says...</h2>
+          <button type="button" class="close-panel-btn panel-close-icon-btn" aria-label="Close Innkeeper Dialogue">✕</button>
+        </div>
+        <div class="panel-body">
+          <div class="dialogue-prose" id="innkeeper-prose" tabindex="-1">
+            {innkeeperBeats.map((d: any) => (<p>{d.line}</p>))}
+          </div>
+        </div>
+        <div class="panel-actions flex justify-end">
+          <button type="button" class="close-panel-btn ml-auto">Close Dialogue (Esc)</button>
+        </div>
+      </div>
+    </div>
+    <div id="innkeeper-announce" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+  </div>
+
+  <!-- Quest Board Bounty Popup -->
+  <div id="dialog-questboard" class="tavern-panel questboard-panel" role="dialog" aria-modal="true" aria-labelledby="questboard-title" hidden>
+    <div class="panel-header flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-[#140b04] border border-[var(--brass)] flex items-center justify-center shrink-0 shadow">
+          <ThematicIcon name="scroll" class="w-6 h-6 text-[var(--candle)]" />
+        </div>
+        <div>
+          <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-[#d5803b]">Active Bounties & Proof of Work</span>
+          <h2 id="questboard-title" class="text-xl sm:text-2xl font-bold text-[var(--candle)] font-serif leading-tight">
+            The Quest Board
+          </h2>
+        </div>
+      </div>
+      <button type="button" class="close-panel-btn panel-close-icon-btn" aria-label="Close Quest Board">✕</button>
+    </div>
+
+    <div class="panel-body questboard-body">
+      <p class="text-xs sm:text-sm text-[var(--parchment)]/90 leading-relaxed mb-3">
+        Pinned upon the weathered tavern cork are active bounties and completed software development projects. Inspect any bounty notice to review the full architectural case study dossier.
+      </p>
+
+      <!-- 3 Pinned Bounty Cards Grid -->
+      <div class="bounties-grid">
+        {projects.map((project) => (
+          <article class="bounty-slip" id={`bounty-${project.data.slug}`}>
+            <div class="bounty-pin" aria-hidden="true"></div>
+
+            <div class="bounty-top">
+              <div class="flex items-center gap-2.5 mb-1.5">
+                <div class="w-8 h-8 rounded-md border border-[var(--brass)] bg-[#1e1208] p-0.5 flex items-center justify-center shrink-0 overflow-hidden shadow-xs">
+                  {project.data.thumbnail ? (
+                    <img
+                      src={project.data.thumbnail}
+                      alt=""
+                      class="w-full h-full object-contain rounded-xs"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <ThematicIcon name="swords" class="w-5 h-5 text-[var(--candle)]" />
+                  )}
+                </div>
+                <h3 class="bounty-heading">
+                  {project.data.title.split('—')[0].trim()}
+                </h3>
+              </div>
+
+              <div class="flex items-center justify-between gap-1 text-[10px] font-mono mb-2">
+                <span class="bounty-role text-[#5c3e21] font-semibold">{project.data.role}</span>
+                <span class={`bounty-badge ${project.data.status === 'Shipped' ? 'badge-shipped' : 'badge-progress'}`}>
+                  {project.data.status === 'Shipped' ? '● Shipped' : '◐ In Progress'}
+                </span>
+              </div>
+
+              <p class="bounty-desc">
+                {project.data.summary}
+              </p>
+            </div>
+
+            <div class="bounty-bottom">
+              <div class="bounty-tags mb-3">
+                {project.data.stack.slice(0, 3).map((tech: string) => (
+                  <span class="bounty-tag">{tech}</span>
+                ))}
+                {project.data.stack.length > 3 && (
+                  <span class="bounty-tag opacity-80">+{project.data.stack.length - 3}</span>
+                )}
+              </div>
+
+              <a
+                href={`/quests/${project.data.slug}`}
+                class="bounty-cta"
+              >
+                <span>Inspect Dossier &rarr;</span>
+              </a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+
+    <div class="panel-actions questboard-footer flex flex-wrap items-center justify-between gap-3 pt-3">
+      <a
+        href="/quests"
+        class="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--candle)] hover:underline min-h-[44px] px-2"
+      >
+        <ThematicIcon name="scroll" class="w-4 h-4 text-[var(--brass)]" />
+        <span>Inspect Full Quest Catalog &rarr;</span>
+      </a>
+
+      <button
+        type="button"
+        class="close-panel-btn inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-xs sm:text-sm rounded hover:bg-[var(--candle)] transition-colors cursor-pointer ml-auto"
+      >
+        Close Board (Esc)
+      </button>
+    </div>
   </div>
 </TavernLayout>
 
@@ -729,27 +737,47 @@ const sceneObjects = [
   
   /* Panels styling */
   .tavern-panel {
-    position: absolute;
-    background: rgba(15, 10, 5, 0.95);
+    position: fixed;
+    background: rgba(15, 10, 5, 0.96);
     border: 2px solid #8b6b4a;
     border-radius: 8px;
     color: #fdf6e3;
-    padding: 24px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.85);
     z-index: 50;
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    animation: slideUp 0.3s ease-out forwards;
+    gap: 12px;
+    animation: slideUp 0.25s ease-out forwards;
   }
 
   .tavern-panel[hidden] {
     display: none !important;
   }
 
+  /* Global Backdrop */
+  .dialog-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 5, 2, 0.78);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 45;
+    animation: backdropFade 0.2s ease-out forwards;
+  }
+
+  .dialog-backdrop[hidden] {
+    display: none !important;
+  }
+
+  @keyframes backdropFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
   @keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px) scale(0.95); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
+    from { opacity: 0; transform: translate(-50%, -46%) scale(0.97); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -762,13 +790,39 @@ const sceneObjects = [
     }
   }
 
+  /* Header Close Icon Button */
+  .panel-close-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid var(--brass, #8b6b4a);
+    color: var(--candle, #fdf6e3);
+    font-size: 1.125rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+  }
+  .panel-close-icon-btn:is(:hover, :focus-visible) {
+    background: var(--brass, #8b6b4a);
+    color: #1a1005;
+    outline: 2px solid var(--candle, #fdf6e3);
+  }
+
   /* Positions */
   .skills-panel {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: min(94%, 700px);
-    max-height: 88%;
+    width: min(94vw, 700px);
+    max-height: min(90dvh, 640px);
     overflow-y: auto;
   }
   
@@ -789,41 +843,76 @@ const sceneObjects = [
   }
 
   .dialogue-panel {
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    width: auto;
-    height: auto;
-    max-height: none;
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
     background: none;
     border: none;
     padding: 0;
     display: block;
     pointer-events: none;
     box-shadow: none;
+    z-index: 50;
+    animation: none !important;
+    transform: none !important;
   }
   .dialogue-panel > * {
     pointer-events: auto;
   }
 
-  .dialogue-panel .dialogue-stack {
-    position: absolute;
-    left: 20%;
-    right: 6%;
-    bottom: 2%;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 12px;
-    max-height: 92%;
+  /* Desktop layout for dialogue panel */
+  @media (min-width: 1024px) and (min-height: 550px) {
+    .dialogue-panel .dialogue-stack {
+      position: absolute;
+      left: 32%;
+      right: 8%;
+      bottom: 4%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+      max-height: 85%;
+    }
+    .dialogue-panel .innkeeper-portrait {
+      position: absolute;
+      left: 8%;
+      bottom: 0;
+      height: 70vh;
+      max-height: 600px;
+      width: auto;
+      object-fit: contain;
+      object-position: bottom center;
+    }
   }
+
+  /* Mobile / Narrow / Short screens for dialogue panel */
+  @media (max-width: 1023px), (max-height: 549px) {
+    .dialogue-panel .innkeeper-portrait {
+      display: none;
+    }
+    .dialogue-panel .dialogue-stack {
+      position: absolute;
+      left: 3%;
+      right: 3%;
+      width: auto;
+      transform: none;
+      bottom: 8px;
+      max-height: calc(100dvh - var(--hud-height, 40px) - 16px);
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+    }
+  }
+
   .dialogue-panel .dialogue-band {
     align-self: stretch;
     background: rgba(15, 10, 5, 0.95);
     border: 2px solid #8b6b4a;
     border-radius: 6px;
-    padding: 14px 26px;
+    padding: 12px 20px;
     display: flex;
     flex-direction: column;
     min-height: 0;
@@ -835,13 +924,16 @@ const sceneObjects = [
   }
 .dialogue-panel .dialogue-prose p {
   margin: 0 0 0.85em;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 .dialogue-panel .dialogue-prose p:last-child {
   margin-bottom: 0;
 }
 .dialogue-panel .dialogue-prose {
-  max-width: 66ch; font-size: 1.1875rem; line-height: 1.5; text-align: left;
+  max-width: 66ch;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  text-align: left;
 }
 .dialogue-panel :global(.dialogue-unread) {
   visibility: hidden;
@@ -864,8 +956,9 @@ const sceneObjects = [
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    width: max-content;
-    max-width: 44%;
+    width: 100%;
+    max-width: 480px;
+    align-self: flex-end;
     flex: 0 0 auto;
     background: rgba(15, 10, 5, 0.95);
     border: 2px solid #8b6b4a;
@@ -1071,11 +1164,12 @@ const sceneObjects = [
 
   /* Quest Board Bounty Panel */
   .questboard-panel {
-    top: 4%;
+    position: fixed;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
-    width: min(94%, 860px);
-    max-height: 92%;
+    transform: translate(-50%, -50%);
+    width: min(94vw, 860px);
+    max-height: min(92dvh, 720px);
     padding: 14px 18px 12px;
     gap: 8px;
     overflow-y: auto;
@@ -1083,12 +1177,13 @@ const sceneObjects = [
     border: 2px solid #8b6b4a;
     border-radius: 8px;
     box-shadow: 0 16px 48px rgba(0,0,0,0.9);
+    z-index: 50;
     animation: fadeInBoard 0.25s ease-out forwards;
   }
 
   @keyframes fadeInBoard {
-    from { opacity: 0; transform: translateX(-50%) translateY(12px); }
-    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    from { opacity: 0; transform: translate(-50%, -46%) scale(0.97); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
   }
 
   .questboard-panel .panel-header {
@@ -1109,6 +1204,132 @@ const sceneObjects = [
   @media (max-width: 768px) {
     .bounties-grid {
       grid-template-columns: 1fr;
+    }
+  }
+
+  /* Short landscape screens (<= 500px height in landscape) */
+  @media (max-height: 500px) and (orientation: landscape) {
+    /* Quest Board Short Landscape */
+    .questboard-panel {
+      max-height: 96dvh;
+      padding: 8px 12px;
+      gap: 6px;
+    }
+    .questboard-panel .panel-header {
+      padding-bottom: 4px;
+    }
+    .questboard-panel .questboard-body > p {
+      display: none; /* Reclaim critical vertical space */
+    }
+    .bounties-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .bounty-slip {
+      padding: 8px;
+    }
+    .bounty-heading {
+      font-size: 0.85rem;
+    }
+    .bounty-desc {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      font-size: 11px;
+      line-height: 1.35;
+      margin-bottom: 4px;
+    }
+    .bounty-tags {
+      margin-bottom: 4px;
+    }
+    .bounty-tag {
+      font-size: 9px;
+      padding: 1px 4px;
+    }
+    .bounty-cta {
+      padding: 4px 8px;
+      min-height: 36px;
+      font-size: 11px;
+    }
+    .questboard-footer {
+      padding-top: 4px;
+    }
+
+    /* Skills Panel Short Landscape */
+    .skills-panel {
+      max-height: 96dvh;
+      padding: 8px 14px;
+      gap: 6px;
+    }
+    .skills-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+    }
+    .skill-category ul li {
+      padding: 3px 6px;
+      font-size: 12px;
+    }
+
+    /* Innkeeper Dialogue Short Landscape */
+    .dialogue-panel .dialogue-band {
+      padding: 8px 14px;
+    }
+    .dialogue-panel .dialogue-prose {
+      font-size: 0.9rem;
+      line-height: 1.35;
+      max-height: 80px;
+      overflow-y: auto;
+    }
+    .dialogue-panel .panel-header h2 {
+      font-size: 1rem;
+    }
+    .dialogue-panel .dialogue-replies {
+      max-height: 80px;
+      overflow-y: auto;
+      gap: 4px;
+    }
+    .dialogue-panel .reply-btn {
+      min-height: 36px;
+      padding: 4px 10px 4px 20px;
+      font-size: 0.8rem;
+    }
+    .dialogue-panel .close-panel-btn {
+      min-height: 36px;
+      padding: 4px 12px;
+      font-size: 0.8rem;
+    }
+  }
+
+  /* Narrow mobile screens (<= 600px in portrait) */
+  @media (max-width: 600px) and (orientation: portrait) {
+    .questboard-panel {
+      width: 95vw;
+      max-height: 92dvh;
+      padding: 12px;
+    }
+    .bounties-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .skills-panel {
+      width: 95vw;
+      max-height: 92dvh;
+      padding: 12px;
+    }
+    .skills-grid {
+      grid-template-columns: 1fr;
+    }
+    .dialogue-panel .dialogue-stack {
+      width: 95vw;
+      bottom: 12px;
+      max-height: 85dvh;
+    }
+    .dialogue-panel .dialogue-replies {
+      width: 100%;
+      max-width: 100%;
+      max-height: 140px;
+      overflow-y: auto;
     }
   }
 
@@ -1306,7 +1527,7 @@ const sceneObjects = [
   /* In portrait narrow screens (<= 600px), hide scene and show narrow links + orientation prompt */
   @media (max-width: 600px) and (orientation: portrait) {
     .dialogue-panel .innkeeper-portrait { display: none; }
-    .dialogue-panel .dialogue-stack { left: 4%; right: 4%; bottom: 2%; max-height: 88%; }
+    .dialogue-panel .dialogue-stack { left: 3%; right: 3%; width: auto; transform: none; bottom: 8px; max-height: 88dvh; }
     .dialogue-panel .dialogue-replies { max-width: 100%; width: 100%; }
     .scene-container {
       display: none;
@@ -1357,7 +1578,7 @@ const sceneObjects = [
   /* Compact dialogue for short landscape viewports (e.g. mobile phones in landscape) */
   @media (max-height: 500px) and (orientation: landscape) {
     .dialogue-panel .innkeeper-portrait { display: none; }
-    .dialogue-panel .dialogue-stack { left: 4%; right: 4%; bottom: 2%; max-height: 94%; }
+    .dialogue-panel .dialogue-stack { left: 3%; right: 3%; width: auto; transform: none; bottom: 4px; max-height: calc(100dvh - var(--hud-height, 40px) - 6px); }
     .dialogue-panel .dialogue-replies { max-width: 60%; }
     .dialogue-panel .dialogue-prose { font-size: 0.95rem; line-height: 1.45; }
     .dialogue-panel .reply-btn { min-height: 40px; padding: 6px 12px 6px 24px; font-size: 0.85rem; }
@@ -1408,6 +1629,12 @@ const sceneObjects = [
         });
       }
       
+      const backdrop = document.getElementById('dialog-backdrop');
+      if (backdrop) {
+        backdrop.hidden = false;
+        backdrop.setAttribute('aria-hidden', 'false');
+      }
+
       dialog.hidden = false;
       dialog.setAttribute('aria-hidden', 'false');
       trigger.setAttribute('aria-expanded', 'true');
@@ -1444,6 +1671,11 @@ const sceneObjects = [
         el.classList.remove('disabled-by-dialog');
         el.removeAttribute('tabindex');
       });
+      const backdrop = document.getElementById('dialog-backdrop');
+      if (backdrop) {
+        backdrop.hidden = true;
+        backdrop.setAttribute('aria-hidden', 'true');
+      }
       activeDialog.hidden = true;
       activeDialog.setAttribute('aria-hidden', 'true');
       if (activeTrigger) {
@@ -1519,6 +1751,28 @@ const sceneObjects = [
         openDialog(dialogQuestboard, triggerQuestBoard);
       });
     }
+
+    // Setup Narrow Viewport Triggers for Portrait Mode
+    const narrowSkills = document.getElementById('narrow-skills');
+    const narrowQuestboard = document.getElementById('narrow-questboard');
+    if (narrowSkills && dialogSkills) {
+      narrowSkills.addEventListener('click', (e) => {
+        e.preventDefault();
+        openDialog(dialogSkills, narrowSkills);
+      });
+    }
+    if (narrowQuestboard && dialogQuestboard) {
+      narrowQuestboard.addEventListener('click', (e) => {
+        e.preventDefault();
+        openDialog(dialogQuestboard, narrowQuestboard);
+      });
+    }
+
+    // Backdrop click closes dialog
+    document.getElementById('dialog-backdrop')?.addEventListener('click', () => {
+      closeDialog();
+      document.querySelector('.scene-container')?.classList.remove('innkeeper-away');
+    });
 
     document.querySelectorAll('.close-panel-btn, .close-panel-btn-secondary').forEach(btn => {
       btn.addEventListener('click', closeDialog);

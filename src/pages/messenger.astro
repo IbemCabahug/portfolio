@@ -194,7 +194,11 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
           <span class="scene-tooltip" data-placement="left">Main Tavern (Return)</span>
         </a>
 
-        <!-- Modal Backdrop -->
+        </div>
+    </section>
+
+    <!-- Hoisted Modals Outside scene-container -->
+    <!-- Modal Backdrop -->
         <div id="dialog-backdrop" class="dialog-backdrop" hidden aria-hidden="true"></div>
 
         <!-- Modal 1: Raven Interactive Missive Composer -->
@@ -206,7 +210,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
           aria-labelledby="raven-dialog-title"
           hidden
         >
-          <div class="panel-header">
+          <div class="panel-header flex items-center justify-between">
             <div class="flex items-center gap-3">
               <span class="panel-badge-icon" aria-hidden="true">
                 <svg class="w-7 h-7 text-[var(--brass)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -220,6 +224,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
                 <h2 id="raven-dialog-title" class="text-xl sm:text-2xl font-bold text-[var(--candle)]">Send Word with the Raven</h2>
               </div>
             </div>
+            <button type="button" class="close-panel-btn panel-close-icon-btn" aria-label="Close Raven Missive">✕</button>
           </div>
 
           <!-- Composer View -->
@@ -714,8 +719,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
             </button>
           </div>
         </div>
-      </div>
-    </section>
+
 
     <!-- Mobile Viewport & No-JS Fallback: Tactile Guild Dispatch Slips Stack -->
     <section class="narrow-dispatch-stack px-4 max-w-3xl mx-auto space-y-6" aria-label="Dispatch Channels List">
@@ -1283,9 +1287,9 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
 
   /* Dialog Backdrop */
   .dialog-backdrop {
-    position: absolute;
+    position: fixed;
     inset: 0;
-    background: rgba(8, 5, 2, 0.72);
+    background: rgba(8, 5, 2, 0.78);
     backdrop-filter: blur(2.5px);
     z-index: 40;
     cursor: pointer;
@@ -1296,12 +1300,12 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
 
   /* Modals / Tavern Panels */
   .tavern-panel {
-    position: absolute;
+    position: fixed;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: min(92%, 620px);
-    max-height: min(92%, 620px);
+    width: min(94vw, 620px);
+    max-height: min(92dvh, 620px);
     overflow-y: auto;
     background: rgba(22, 14, 7, 0.97);
     border: 2px solid var(--brass, #8b6b4a);
@@ -1314,6 +1318,47 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
     flex-direction: column;
     gap: 12px;
     animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .panel-close-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
+    padding: 0;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid var(--brass, #8b6b4a);
+    color: var(--candle, #fdf6e3);
+    font-size: 1.125rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+  }
+  .panel-close-icon-btn:is(:hover, :focus-visible) {
+    background: var(--brass, #8b6b4a);
+    color: #1a1005;
+    outline: 2px solid var(--candle, #fdf6e3);
+  }
+
+  
+  /* Short landscape screens (<= 500px height in landscape) */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .tavern-panel {
+      max-height: 96dvh;
+      padding: 10px 14px;
+      gap: 8px;
+    }
+    #dialog-machine.transceiver-viewport-modal {
+      width: 96vw;
+      height: 96dvh;
+      max-height: 96dvh;
+      padding: 8px 10px;
+    }
   }
 
   .tavern-panel[hidden] {
