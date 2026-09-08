@@ -154,40 +154,45 @@ const sitemapUrl = siteUrl ? new URL('/sitemap-index.xml', siteUrl).href : '/sit
                     <a
                       href="/quests"
                       class={`inline-flex items-center min-h-[44px] px-2.5 py-1 rounded transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)] ${Astro.url.pathname.startsWith('/quests') ? 'text-[var(--candle)] bg-[var(--brass)]/20 font-bold' : 'text-[var(--parchment)] hover:text-[var(--candle)] hover:bg-[var(--brass)]/20'}`}
+                      title="Quest Board (Projects)"
                     >
-                      Quest Board (Projects)
+                      Quest Board
                     </a>
                   </li>
                   <li>
                     <a
                       href="/tavern"
                       class={`inline-flex items-center min-h-[44px] px-2.5 py-1 rounded transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)] ${Astro.url.pathname === '/tavern' ? 'text-[var(--candle)] bg-[var(--brass)]/20 font-bold' : 'text-[var(--parchment)] hover:text-[var(--candle)] hover:bg-[var(--brass)]/20'}`}
+                      title="Main Tavern (Interactive Room)"
                     >
-                      Main Tavern (Interactive)
+                      Main Tavern
                     </a>
                   </li>
                   <li>
                     <a
                       href="/tavern/skills"
                       class={`inline-flex items-center min-h-[44px] px-2.5 py-1 rounded transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)] ${Astro.url.pathname.startsWith('/tavern/skills') ? 'text-[var(--candle)] bg-[var(--brass)]/20 font-bold' : 'text-[var(--parchment)] hover:text-[var(--candle)] hover:bg-[var(--brass)]/20'}`}
+                      title="Adventurer's Badge (Skills)"
                     >
-                      Adventurer's Badge (Skills)
+                      Adventurer's Badge
                     </a>
                   </li>
                   <li>
                     <a
                       href="/tavern/npc"
                       class={`inline-flex items-center min-h-[44px] px-2.5 py-1 rounded transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)] ${Astro.url.pathname.startsWith('/tavern/npc') ? 'text-[var(--candle)] bg-[var(--brass)]/20 font-bold' : 'text-[var(--parchment)] hover:text-[var(--candle)] hover:bg-[var(--brass)]/20'}`}
+                      title="Tavern Regular (FAQ)"
                     >
-                      Tavern Regular (FAQ)
+                      Tavern Regular
                     </a>
                   </li>
                   <li>
                     <a
                       href="/messenger"
                       class={`inline-flex items-center min-h-[44px] px-2.5 py-1 rounded transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)] ${Astro.url.pathname.startsWith('/messenger') ? 'text-[var(--candle)] bg-[var(--brass)]/20 font-bold' : 'text-[var(--parchment)] hover:text-[var(--candle)] hover:bg-[var(--brass)]/20'}`}
+                      title="Messenger's Corner (Contact)"
                     >
-                      Messenger's Corner (Contact)
+                      Messenger's Corner
                     </a>
                   </li>
                   <li>
@@ -196,7 +201,7 @@ const sitemapUrl = siteUrl ? new URL('/sitemap-index.xml', siteUrl).href : '/sit
                       class="inline-flex items-center min-h-[44px] px-2.5 py-1 ml-1 rounded border border-[var(--brass)] text-[var(--candle)] hover:bg-[var(--brass)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)] text-xs font-bold"
                       title="Switch to Field Ledger (Simple Mode)"
                     >
-                      Field Ledger (Simple) &rarr;
+                      Field Ledger &rarr;
                     </a>
                   </li>
                 </ul>

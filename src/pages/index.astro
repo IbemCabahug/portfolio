@@ -44,59 +44,65 @@ const featuredProjects = allProjects.sort((a, b) => a.data.order - b.data.order)
               I build accessible, fast web applications with TypeScript. I develop with AI assistance, and I review, test and make the architectural decisions myself. Recently shipped features and bug fixes for a biometric tracking system in production.
             </p>
 
-            {/* Quick Direct Contacts */}
-            <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3 text-sm font-medium">
-              <a
-                href="/messenger?compose=true"
-                class="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 bg-[var(--stone)] text-[var(--candle)] border border-[var(--brass)] rounded hover:bg-[var(--brass)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
-                aria-label="Send a Raven — Dispatch missive via Messenger's Roost (Contact)"
-              >
-                <ThematicIcon name="raven" class="w-4 h-4 text-[var(--candle)]" />
-                <span>Send a Raven <span class="text-xs opacity-80 font-normal font-sans">(Contact)</span></span>
-              </a>
-
-              {/* 1-Click Plaintext Email Copy Pill */}
-              <div class="inline-flex items-center rounded bg-black/40 border border-[var(--brass)]/60 text-xs font-mono overflow-hidden min-h-[44px] shadow-sm">
+            {/* Quick Action Links & Direct Contact */}
+            <div class="space-y-3">
+              <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3 text-sm font-medium">
                 <a
-                  href="mailto:cabahugnhovem@gmail.com"
-                  class="px-3 py-2 text-[var(--candle)] hover:text-white transition-colors flex items-center gap-1.5 focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
-                  title="Direct mailto dispatch"
+                  href="/messenger?compose=true"
+                  class="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 bg-[var(--stone)] text-[var(--candle)] border border-[var(--brass)] rounded hover:bg-[var(--brass)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+                  aria-label="Send a Raven — Dispatch missive via Messenger's Roost"
                 >
-                  <span class="text-[var(--ember)]">✉</span>
-                  <span>cabahugnhovem@gmail.com</span>
+                  <ThematicIcon name="raven" class="w-4 h-4 text-[var(--candle)]" />
+                  <span>Send a Raven</span>
                 </a>
-                <button
-                  type="button"
-                  id="hero-copy-email-btn"
-                  class="px-2.5 py-2 bg-[var(--wood-deep)] hover:bg-[var(--stone)] text-[var(--candle)] border-l border-[var(--brass)]/50 transition-colors cursor-pointer flex items-center gap-1 font-sans text-xs font-semibold focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
-                  title="Copy email address to clipboard"
-                  aria-label="Copy email address to clipboard"
+
+                <a
+                  href="https://github.com/IbemCabahug"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 bg-[var(--stone)] text-[var(--candle)] border border-[var(--brass)] rounded hover:bg-[var(--brass)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+                  aria-label="Inspect GitHub Profile"
                 >
-                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                  </svg>
-                  <span id="hero-copy-status">Copy</span>
-                </button>
+                  <ThematicIcon name="github" class="w-4 h-4 text-[var(--candle)]" />
+                  <span>GitHub</span>
+                </a>
+
+                <a
+                  href="/resume"
+                  class="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 bg-transparent text-[var(--parchment)] border border-[var(--brass)]/80 rounded hover:bg-[var(--parchment)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+                  aria-label="View Resume"
+                >
+                  <ThematicIcon name="resume" class="w-4 h-4 text-[var(--candle)]" />
+                  <span>Resume</span>
+                </a>
               </div>
 
-              <a
-                href="https://github.com/IbemCabahug"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 bg-[var(--stone)] text-[var(--candle)] border border-[var(--brass)] rounded hover:bg-[var(--brass)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
-                aria-label="Inspect GitHub Profile"
-              >
-                <ThematicIcon name="github" class="w-4 h-4 text-[var(--candle)]" />
-                <span>GitHub</span>
-              </a>
-              <a
-                href="/resume"
-                class="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 bg-transparent text-[var(--parchment)] border border-[var(--brass)]/80 rounded hover:bg-[var(--parchment)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
-              >
-                <ThematicIcon name="resume" class="w-4 h-4 text-[var(--candle)]" />
-                <span>Resume</span>
-              </a>
+              {/* 1-Click Plaintext Email Copy Pill */}
+              <div class="flex items-center justify-center lg:justify-start">
+                <div class="inline-flex items-center rounded bg-black/40 border border-[var(--brass)]/60 text-xs font-mono overflow-hidden min-h-[40px] shadow-sm">
+                  <a
+                    href="mailto:cabahugnhovem@gmail.com"
+                    class="px-3 py-1.5 text-[var(--candle)] hover:text-white transition-colors flex items-center gap-1.5 focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+                    title="Direct mailto dispatch"
+                  >
+                    <span class="text-[var(--ember)]">✉</span>
+                    <span>cabahugnhovem@gmail.com</span>
+                  </a>
+                  <button
+                    type="button"
+                    id="hero-copy-email-btn"
+                    class="px-2.5 py-1.5 bg-[var(--wood-deep)] hover:bg-[var(--stone)] text-[var(--candle)] border-l border-[var(--brass)]/50 transition-colors cursor-pointer flex items-center gap-1 font-sans text-xs font-semibold focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+                    title="Copy email address to clipboard"
+                    aria-label="Copy email address to clipboard"
+                  >
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                    </svg>
+                    <span id="hero-copy-status">Copy</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </header>
 
