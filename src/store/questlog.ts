@@ -24,7 +24,7 @@ export const JOURNAL_MILESTONES: JournalMilestone[] = [
   },
   {
     id: 'quests',
-    title: 'The Notice Board (Projects)',
+    title: 'The Notice Board',
     category: 'chamber',
     path: '/quests',
     tagline: 'Guild bounties, active software projects, and tech stacks',
@@ -32,7 +32,7 @@ export const JOURNAL_MILESTONES: JournalMilestone[] = [
   },
   {
     id: 'messenger',
-    title: "The Courier's Roost (Contact)",
+    title: "The Courier's Roost",
     category: 'chamber',
     path: '/messenger',
     tagline: 'Messenger aviary, direct email dispatch, and Arcane Transceiver',
@@ -40,7 +40,7 @@ export const JOURNAL_MILESTONES: JournalMilestone[] = [
   },
   {
     id: 'resume',
-    title: "The Master Scribe's Ledger (Resume)",
+    title: "The Master Scribe's Ledger",
     category: 'chamber',
     path: '/resume',
     tagline: 'Complete technical resume, employment history, and education',
