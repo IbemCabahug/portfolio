@@ -421,29 +421,38 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
         <!-- Modal 2: Arcane Transceiver (Arcane Typer Live Simulation Arena) -->
         <div
           id="dialog-machine"
-          class="tavern-panel"
+          class="tavern-panel transceiver-viewport-modal"
           role="dialog"
           aria-modal="true"
           aria-labelledby="machine-dialog-title"
           hidden
         >
-          <div class="panel-header">
-            <div class="flex items-center gap-3">
+          <div class="panel-header flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
               <span class="panel-badge-icon" aria-hidden="true">
-                <svg class="w-7 h-7 text-[var(--brass)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="w-6 h-6 text-[var(--brass)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                 </svg>
               </span>
               <div>
-                <span class="text-xs uppercase font-extrabold tracking-widest text-[var(--ember)]">Arcane Transmission</span>
-                <h2 id="machine-dialog-title" class="text-xl sm:text-2xl font-bold text-[var(--candle)]">The Arcane Transceiver — Live Trial</h2>
+                <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-[var(--ember)]">Arcane Transmission</span>
+                <h2 id="machine-dialog-title" class="text-lg sm:text-xl font-bold text-[var(--candle)] leading-tight">The Arcane Transceiver — Live Trial</h2>
               </div>
             </div>
+
+            <button
+              type="button"
+              class="close-panel-btn inline-flex items-center justify-center min-h-[36px] px-3 py-1 rounded bg-black/40 hover:bg-black text-[var(--candle)] border border-[var(--brass)]/50 text-xs font-bold transition-colors cursor-pointer"
+              title="Close Transceiver (Esc)"
+              aria-label="Close Transceiver"
+            >
+              <span>✕ Close</span>
+            </button>
           </div>
 
-          <div class="panel-body space-y-3">
+          <div class="panel-body flex-1 min-h-0 flex flex-col gap-2.5 overflow-hidden">
             <!-- Transceiver Top Chamber Control Bar -->
-            <div class="px-3.5 py-2.5 rounded bg-[var(--wood-deep)] border border-[var(--brass)]/60 flex flex-wrap items-center justify-between gap-2.5">
+            <div class="px-3 py-1.5 rounded bg-[var(--wood-deep)] border border-[var(--brass)]/60 flex items-center justify-between gap-2 shrink-0">
               <div class="flex items-center gap-2">
                 <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/60 text-emerald-400 font-mono text-[10px] sm:text-xs font-bold">
                   <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true"></span>
@@ -458,7 +467,7 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
                 <button
                   type="button"
                   id="transceiver-fullscreen-btn"
-                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-black/50 border border-[var(--brass)] text-[var(--candle)] font-mono text-xs hover:bg-black transition-colors cursor-pointer min-h-[36px]"
+                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-black/50 border border-[var(--brass)] text-[var(--candle)] font-mono text-xs hover:bg-black transition-colors cursor-pointer min-h-[32px]"
                   title="Toggle Fullscreen"
                 >
                   <span>⛶</span>
@@ -468,7 +477,7 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
                 <button
                   type="button"
                   id="transceiver-unload-btn"
-                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-red-950/70 border border-red-500/50 text-red-200 font-bold text-xs hover:bg-red-900 transition-colors cursor-pointer min-h-[36px]"
+                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-red-950/70 border border-red-500/50 text-red-200 font-bold text-xs hover:bg-red-900 transition-colors cursor-pointer min-h-[32px]"
                   title="Disengage demo and free memory"
                 >
                   <span>✕</span>
@@ -478,7 +487,7 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
             </div>
 
             <!-- Resting View: Thematic Brief & Boot Trigger -->
-            <div id="transceiver-resting-view" class="p-5 sm:p-7 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40 text-center space-y-4">
+            <div id="transceiver-resting-view" class="flex-1 min-h-0 w-full p-4 sm:p-6 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40 flex flex-col items-center justify-center text-center space-y-4 overflow-hidden">
               <div class="max-w-xl mx-auto space-y-2">
                 <p class="text-xs sm:text-sm text-[var(--parchment)]/90 leading-relaxed">
                   The brass coils resonate with arcane frequency, synchronizing with Nhovem's live HTML5 Canvas engine. Engage the transceiver below to initiate real-time typing physics, spellcasting incantations, and synthesized Web Audio directly inside this chamber.
@@ -509,27 +518,18 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
                   rel="noopener noreferrer"
                   class="inline-flex items-center gap-2 min-h-[44px] px-5 py-2.5 rounded-md border border-[var(--brass)] text-[var(--candle)] font-bold text-xs sm:text-sm hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
                 >
-                  <span>Launch in Standalone Window ↗</span>
+                  <span>Launch in Standalone Window</span>
                 </a>
               </div>
             </div>
 
-            <!-- Active Iframe Container (Dynamic Loading with 0 KB initial payload) -->
+            <!-- Active Iframe Container: Full Viewport Scaled Arena -->
             <div
               id="transceiver-frame-container"
-              class="relative w-full aspect-video min-h-[380px] sm:min-h-[460px] bg-black rounded border border-[var(--brass)]/50 hidden overflow-hidden shadow-2xl"
+              class="flex-1 min-h-0 w-full bg-black rounded border border-[var(--brass)]/50 hidden relative overflow-hidden shadow-2xl"
             >
-              <!-- Iframe inserted dynamically on click to ensure 0 KB initial payload -->
+              <!-- Dynamically scaled iframe inserted on click -->
             </div>
-          </div>
-
-          <div class="panel-actions flex items-center justify-end pt-3">
-            <button
-              type="button"
-              class="close-panel-btn inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-xs sm:text-sm rounded hover:bg-[var(--candle)] transition-colors cursor-pointer"
-            >
-              Close Transceiver (Esc)
-            </button>
           </div>
         </div>
 
@@ -1366,6 +1366,27 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
     display: none !important;
   }
 
+  /* Transceiver Full Viewport App Modal */
+  #dialog-machine.transceiver-viewport-modal {
+    width: min(94vw, 960px);
+    max-width: 960px;
+    height: min(88vh, 660px);
+    max-height: 88vh;
+    padding: 14px 18px;
+    overflow: hidden;
+    gap: 8px;
+  }
+
+  @media (max-width: 640px) {
+    #dialog-machine.transceiver-viewport-modal {
+      width: 96vw;
+      height: 92vh;
+      max-height: 92vh;
+      padding: 10px 12px;
+      gap: 6px;
+    }
+  }
+
   @keyframes modalPop {
     from {
       opacity: 0;
@@ -1818,12 +1839,35 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
 
       const liveUrl = launchBtn.getAttribute('data-url') || 'https://arcane-typer.vercel.app/';
 
+      function fitArena() {
+        const iframe = frameContainer.querySelector('iframe');
+        if (!iframe) return;
+
+        const cw = frameContainer.clientWidth;
+        const ch = frameContainer.clientHeight;
+        if (!cw || !ch) return;
+
+        // Arcane Typer base design space: 800 x 600
+        const baseW = 800;
+        const baseH = 600;
+        const scale = Math.min(cw / baseW, ch / baseH);
+
+        iframe.style.width = `${baseW}px`;
+        iframe.style.height = `${baseH}px`;
+        iframe.style.position = 'absolute';
+        iframe.style.left = '50%';
+        iframe.style.top = '50%';
+        iframe.style.transform = `translate(-50%, -50%) scale(${scale})`;
+        iframe.style.transformOrigin = 'center center';
+      }
+
       function launchArena() {
         soundEngine.playWoodClink();
         const iframe = document.createElement('iframe');
         iframe.src = liveUrl;
         iframe.title = 'Live Simulation of Arcane Typer inside Arcane Transceiver';
-        iframe.className = 'w-full h-full border-0 absolute inset-0';
+        iframe.className = 'border-0 overflow-hidden';
+        iframe.setAttribute('scrolling', 'no');
         iframe.setAttribute('allow', 'autoplay; fullscreen');
         iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-forms');
         iframe.loading = 'eager';
@@ -1835,6 +1879,10 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
         activeControls.classList.remove('hidden');
         activeControls.classList.add('flex');
         frameContainer.classList.remove('hidden');
+
+        fitArena();
+        requestAnimationFrame(fitArena);
+        setTimeout(fitArena, 150);
       }
 
       function unloadArena() {
@@ -1859,6 +1907,14 @@ const activeSha = projectTelemetries.find(t => t.telemetry?.latestCommit)?.telem
           }
         }
       }
+
+      const resizeObserver = new ResizeObserver(() => {
+        if (!frameContainer.classList.contains('hidden')) {
+          fitArena();
+        }
+      });
+      resizeObserver.observe(frameContainer);
+      window.addEventListener('resize', fitArena);
 
       launchBtn.addEventListener('click', launchArena);
       if (unloadBtn) unloadBtn.addEventListener('click', unloadArena);
