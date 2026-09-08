@@ -2,6 +2,7 @@
 import BaseLayout from './BaseLayout.astro';
 import PreferenceControls from '../components/PreferenceControls.astro';
 import QuestLog from '../components/QuestLog.astro';
+import ThematicIcon from '../components/icons/ThematicIcon.astro';
 
 interface Props {
   title: string;
@@ -80,10 +81,11 @@ const isScene = location === 'tavern' || location === 'messenger';
         <PreferenceControls />
         <a
           href="/simple"
-          class="hidden sm:flex items-center min-h-[44px] px-1.5 text-xs font-semibold underline hover:text-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)]"
-          title="High-contrast, zero-JS text edition"
+          class="hidden sm:inline-flex items-center gap-1.5 min-h-[44px] px-2.5 sm:px-3 py-1 text-xs font-semibold rounded border border-[var(--brass)] bg-[#1e1208] text-[var(--parchment)] hover:border-[var(--candle)] hover:text-[var(--candle)] hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 whitespace-nowrap shadow-xs"
+          title="High-contrast, zero-JS text edition (Field Ledger)"
         >
-          Field Ledger
+          <ThematicIcon name="scroll" class="w-3.5 h-3.5 text-[var(--candle)] shrink-0" />
+          <span>Field Ledger</span>
         </a>
 
         {/* Chambers & Site Menu Dropdown */}

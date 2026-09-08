@@ -1,43 +1,48 @@
 ---
 ---
-<script is:inline>
+<script is:inline data-astro-rerun>
   (function() {
-    try {
-      var motion = localStorage.getItem('motion');
-      if (motion === 'full' || motion === 'reduced') {
-        document.documentElement.dataset.motion = motion;
-      } else {
-        var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        document.documentElement.dataset.motion = prefersReduced ? 'reduced' : 'full';
-      }
-
-      var sound = localStorage.getItem('sound');
-      if (sound === 'on' || sound === 'off') {
-        document.documentElement.dataset.sound = sound;
-      } else {
-        document.documentElement.dataset.sound = 'off';
-      }
-
-      // Adaptive Performance Tier Auto-Detection
-      var perf = localStorage.getItem('perf');
-      if (perf === 'low' || perf === 'high') {
-        document.documentElement.dataset.perf = perf;
-      } else {
-        var isCoarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
-        var lowCores = typeof navigator.hardwareConcurrency === 'number' && navigator.hardwareConcurrency <= 4;
-        var lowMemory = typeof navigator.deviceMemory === 'number' && navigator.deviceMemory <= 4;
-        var prefersReduced = document.documentElement.dataset.motion === 'reduced';
-        
-        if (lowCores || lowMemory || prefersReduced || isCoarse) {
-          document.documentElement.dataset.perf = 'low';
+    function applyTheme() {
+      try {
+        var motion = localStorage.getItem('motion');
+        if (motion === 'full' || motion === 'reduced') {
+          document.documentElement.dataset.motion = motion;
         } else {
-          document.documentElement.dataset.perf = 'high';
+          var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          document.documentElement.dataset.motion = prefersReduced ? 'reduced' : 'full';
         }
+
+        var sound = localStorage.getItem('sound');
+        if (sound === 'on' || sound === 'off') {
+          document.documentElement.dataset.sound = sound;
+        } else {
+          document.documentElement.dataset.sound = 'off';
+        }
+
+        // Adaptive Performance Tier Auto-Detection
+        var perf = localStorage.getItem('perf');
+        if (perf === 'low' || perf === 'high') {
+          document.documentElement.dataset.perf = perf;
+        } else {
+          var isCoarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+          var lowCores = typeof navigator.hardwareConcurrency === 'number' && navigator.hardwareConcurrency <= 4;
+          var lowMemory = typeof navigator.deviceMemory === 'number' && navigator.deviceMemory <= 4;
+          var isReduced = document.documentElement.dataset.motion === 'reduced';
+          
+          if (lowCores || lowMemory || isReduced || isCoarse) {
+            document.documentElement.dataset.perf = 'low';
+          } else {
+            document.documentElement.dataset.perf = 'high';
+          }
+        }
+      } catch (e) {
+        document.documentElement.dataset.motion = 'reduced';
+        document.documentElement.dataset.sound = 'off';
+        document.documentElement.dataset.perf = 'low';
       }
-    } catch (e) {
-      document.documentElement.dataset.motion = 'reduced';
-      document.documentElement.dataset.sound = 'off';
-      document.documentElement.dataset.perf = 'low';
     }
+
+    applyTheme();
+    document.addEventListener('astro:after-swap', applyTheme);
   })();
 </script>
