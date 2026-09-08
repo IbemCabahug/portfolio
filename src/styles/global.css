@@ -10,23 +10,12 @@
   --color-ember: var(--ember);
 }
 
-:root,
-:root[data-theme="night"] {
+:root {
   --wood-deep: #1e1208;
   --stone: #2c2d30;
   --parchment: #f4ebd9;
   --ink: #1a1818;
   --candle: #ffe4a0;
-  --brass: #a87a27;
-  --ember: #b52c0b;
-}
-
-:root[data-theme="day"] {
-  --wood-deep: #2a180d;
-  --stone: #38393d;
-  --parchment: #faf4e8;
-  --ink: #141210;
-  --candle: #ffd166;
   --brass: #a87a27;
   --ember: #b52c0b;
 }

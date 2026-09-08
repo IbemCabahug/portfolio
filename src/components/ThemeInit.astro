@@ -19,13 +19,6 @@
           document.documentElement.dataset.sound = 'off';
         }
 
-        var theme = localStorage.getItem('theme');
-        if (theme === 'day' || theme === 'night') {
-          document.documentElement.dataset.theme = theme;
-        } else {
-          document.documentElement.dataset.theme = 'night';
-        }
-
         // Adaptive Performance Tier Auto-Detection
         var perf = localStorage.getItem('perf');
         if (perf === 'low' || perf === 'high') {
@@ -46,7 +39,6 @@
         document.documentElement.dataset.motion = 'reduced';
         document.documentElement.dataset.sound = 'off';
         document.documentElement.dataset.perf = 'low';
-        document.documentElement.dataset.theme = 'night';
       }
     }
 
