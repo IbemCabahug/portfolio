@@ -1,0 +1,26 @@
+{
+  "order": 4,
+  "type": "branch",
+  "question": "How can I make contact?",
+  "lead": "No surveillance trackers, corporate cookie walls, or bloated forms exist here. You may communicate through direct electronic dispatch or inspect the public repositories.",
+  "inquiries": [
+    {
+      "label": "Dispatch an email to Nhovem",
+      "response": "You can write directly to cabahugnhovem@gmail.com for development roles, technical inquiries, or collaboration opportunities.",
+      "offerLabel": "Compose Email Direct",
+      "offerHref": "mailto:cabahugnhovem@gmail.com"
+    },
+    {
+      "label": "Inspect GitHub repositories",
+      "response": "Explore Nhovem's public codebases, commits, and open-source contributions at github.com/IbemCabahug.",
+      "offerLabel": "Open GitHub Profile ↗",
+      "offerHref": "https://github.com/IbemCabahug"
+    },
+    {
+      "label": "Enter Messenger's Corner",
+      "response": "The Courier's Roost in the tavern provides direct contact avenues, the Scribe's Ledger, and the Arcane Transceiver live simulation arena.",
+      "offerLabel": "Enter Messenger's Corner",
+      "offerHref": "/messenger"
+    }
+  ]
+}

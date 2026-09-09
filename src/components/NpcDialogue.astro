@@ -3,9 +3,16 @@ interface ReplyItem {
   id?: string | number;
   question: string;
   answer?: string;
+  lead?: string;
   offerLabel?: string;
   offerHref?: string;
   followUp?: string;
+  inquiries?: Array<{
+    label: string;
+    response: string;
+    offerLabel?: string;
+    offerHref?: string;
+  }>;
 }
 
 interface Props {
@@ -24,6 +31,7 @@ interface Props {
   closeLabel?: string;
   closeHref?: string;
   mode?: 'modal' | 'page';
+  showCloseIcon?: boolean;
   stackId?: string;
   repliesId?: string;
   class?: string;
@@ -41,6 +49,7 @@ const {
   closeLabel = "Close Dialogue (Esc)",
   closeHref = "/tavern",
   mode = "modal",
+  showCloseIcon = true,
   stackId,
   repliesId,
   class: className = ""
@@ -84,23 +93,25 @@ const TitleTag = isModal ? 'h2' : 'h1';
             {title}
           </TitleTag>
         </div>
-        {isModal ? (
-          <button
-            type="button"
-            class="close-panel-btn panel-close-icon-btn"
-            aria-label={`Close ${title}`}
-            data-action="close"
-          >
-            ✕
-          </button>
-        ) : (
-          <a
-            href={closeHref}
-            class="close-panel-btn panel-close-icon-btn"
-            aria-label={`Back from ${title}`}
-          >
-            ✕
-          </a>
+        {showCloseIcon && (
+          isModal ? (
+            <button
+              type="button"
+              class="close-panel-btn panel-close-icon-btn"
+              aria-label={`Close ${title}`}
+              data-action="close"
+            >
+              ✕
+            </button>
+          ) : (
+            <a
+              href={closeHref}
+              class="close-panel-btn panel-close-icon-btn"
+              aria-label={`Back from ${title}`}
+            >
+              ✕
+            </a>
+          )
         )}
       </div>
 
@@ -175,7 +186,7 @@ const TitleTag = isModal ? 'h2' : 'h1';
   />
 </div>
 
-<style>
+<style is:global>
   /* --------------------------------------------------------------------------
      Base Dialogue Panel Container
      -------------------------------------------------------------------------- */
@@ -253,11 +264,11 @@ const TitleTag = isModal ? 'h2' : 'h1';
     color: #fff;
   }
 
-  :global(.dialogue-unread) {
+  .dialogue-unread {
     visibility: hidden;
   }
 
-  :global(.dialogue-followup) {
+  .dialogue-followup {
     font-style: italic;
     color: var(--candle, #ffe4a0);
     opacity: 0.9;
@@ -297,16 +308,20 @@ const TitleTag = isModal ? 'h2' : 'h1';
   }
 
   .reply-btn {
-    border: 1px solid rgba(139, 107, 74, 0.35);
+    display: block;
+    box-sizing: border-box;
+    border: 1.5px solid rgba(168, 122, 39, 0.45);
     border-radius: 4px;
     width: 100%;
     position: relative;
     padding: 8px 12px 8px 24px;
     text-align: left;
-    background: rgba(30, 18, 8, 0.8);
-    color: var(--parchment, #f4ebd9);
+    background: rgba(30, 18, 8, 0.92);
+    color: var(--parchment, #f4ebd9) !important;
     cursor: pointer;
     font-weight: 600;
+    font-size: 0.92rem;
+    line-height: 1.35;
     transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   }
   .reply-btn::before {
@@ -317,26 +332,36 @@ const TitleTag = isModal ? 'h2' : 'h1';
     transition: transform 0.15s ease, color 0.15s ease;
   }
   .reply-btn:is(:hover, :focus-visible) {
-    background: rgba(50, 30, 12, 0.95);
+    background: rgba(55, 35, 15, 0.98);
     border-color: var(--candle, #ffe4a0);
-    color: var(--candle, #ffe4a0);
+    color: var(--candle, #ffe4a0) !important;
   }
   .reply-btn:is(:hover, :focus-visible)::before {
     color: var(--candle, #ffe4a0);
     transform: translateX(2px);
   }
   .reply-btn.reply-visited {
-    color: #a89880;
-    border-color: rgba(139, 107, 74, 0.2);
+    color: #ded0bc !important;
+    border-color: rgba(139, 107, 74, 0.3);
   }
   .reply-btn.reply-visited:hover {
-    color: #fdf6e3;
+    color: #ffffff !important;
     border-color: var(--brass, #a87a27);
   }
 
   .farewell-btn {
     border-top: 1px dashed rgba(168, 122, 39, 0.4);
     margin-top: 2px;
+  }
+
+  .back-topics-btn {
+    border-top: 1px dashed rgba(168, 122, 39, 0.4);
+    margin-top: 4px;
+    color: var(--candle, #ffe4a0);
+    font-style: italic;
+  }
+  .back-topics-btn::before {
+    content: "\25C2" !important;
   }
 
   .panel-close-icon-btn {
@@ -401,21 +426,22 @@ const TitleTag = isModal ? 'h2' : 'h1';
   @media (min-width: 1024px) and (min-height: 550px) {
     .npc-dialogue-portrait {
       position: absolute;
-      left: 7%;
+      left: 6%;
       bottom: 0;
-      height: 72vh;
-      max-height: 640px;
+      height: 76vh;
+      max-height: 680px;
       width: auto;
       object-fit: contain;
       object-position: bottom center;
       z-index: 1;
       pointer-events: none;
+      filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.9));
     }
 
     .dialogue-stack {
       position: absolute;
-      left: 32%;
-      right: 8%;
+      left: 25%;
+      right: 7%;
       bottom: 4%;
       display: flex;
       flex-direction: column;
@@ -427,13 +453,13 @@ const TitleTag = isModal ? 'h2' : 'h1';
 
     .dialogue-band {
       width: 100%;
-      min-height: 150px;
+      min-height: 140px;
     }
 
     .dialogue-replies-tray {
       width: 100%;
-      max-width: 480px;
-      max-height: 240px;
+      max-width: 520px;
+      max-height: 250px;
     }
 
     .dialogue-replies {
@@ -790,6 +816,62 @@ const TitleTag = isModal ? 'h2' : 'h1';
         }
       });
 
+      function showChildInquiries(reply: any, parentIdx: number) {
+        if (!repliesList) return;
+        repliesList.innerHTML = '';
+        (reply.inquiries || []).forEach((inq: any, cIdx: number) => {
+          const li = document.createElement('li');
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'reply-btn';
+          b.setAttribute('data-parent-index', String(parentIdx));
+          b.setAttribute('data-child-index', String(cIdx));
+          b.textContent = inq.label;
+          li.appendChild(b);
+          repliesList.appendChild(li);
+        });
+
+        // Back to all topics button
+        const backLi = document.createElement('li');
+        const backBtn = document.createElement('button');
+        backBtn.type = 'button';
+        backBtn.className = 'reply-btn back-topics-btn';
+        backBtn.setAttribute('data-action', 'back-to-topics');
+        backBtn.textContent = '← Return to all topics';
+        backLi.appendChild(backBtn);
+        repliesList.appendChild(backLi);
+
+        const firstBtn = repliesList.querySelector<HTMLButtonElement>('.reply-btn');
+        if (firstBtn) firstBtn.focus();
+      }
+
+      function restoreTopLevelReplies() {
+        if (!repliesList) return;
+        repliesList.innerHTML = '';
+        (data.replies || []).forEach((r: any, i: number) => {
+          const li = document.createElement('li');
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'reply-btn';
+          b.setAttribute('data-reply-index', String(i));
+          b.setAttribute('data-question-index', String(i));
+          b.textContent = r.question;
+          li.appendChild(b);
+          repliesList.appendChild(li);
+        });
+
+        if (data.farewell) {
+          const li = document.createElement('li');
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'reply-btn farewell-btn';
+          b.setAttribute('data-action', 'farewell');
+          b.textContent = data.farewell.question;
+          li.appendChild(b);
+          repliesList.appendChild(li);
+        }
+      }
+
       // Handle reply clicks
       repliesList.addEventListener('click', (e) => {
         const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.reply-btn');
@@ -811,11 +893,48 @@ const TitleTag = isModal ? 'h2' : 'h1';
           return;
         }
 
+        if (btn.getAttribute('data-action') === 'back-to-topics') {
+          restoreTopLevelReplies();
+          const introHtml = (data.beats || []).map((b: string) => `<p>${b}</p>`).join('');
+          renderProse(introHtml);
+          const firstBtn = repliesList.querySelector<HTMLButtonElement>('.reply-btn');
+          if (firstBtn) firstBtn.focus();
+          return;
+        }
+
+        const childIdxStr = btn.getAttribute('data-child-index');
+        const parentIdxStr = btn.getAttribute('data-parent-index');
+        if (childIdxStr !== null && parentIdxStr !== null) {
+          const pIdx = parseInt(parentIdxStr, 10);
+          const cIdx = parseInt(childIdxStr, 10);
+          const inq = data.replies[pIdx]?.inquiries?.[cIdx];
+          if (inq) {
+            renderProse(`
+              <p>${inq.response}</p>
+              ${inq.offerHref ? `<p><a href="${inq.offerHref}">${inq.offerLabel || 'Inspect Record \u2192'}</a></p>` : ''}
+              <p class="dialogue-followup">Select another inquiry below, or return to all topics.</p>
+            `);
+            btn.classList.add('reply-visited');
+            prose.focus();
+          }
+          return;
+        }
+
         const idxStr = btn.getAttribute('data-reply-index');
         if (idxStr !== null) {
           const idx = parseInt(idxStr, 10);
           const reply = data.replies[idx];
           if (reply) {
+            if (reply.inquiries && reply.inquiries.length > 0) {
+              renderProse(`
+                <p>${reply.lead || reply.answer}</p>
+                <p class="dialogue-followup">Select a specific inquiry below, or return to all topics.</p>
+              `);
+              btn.classList.add('reply-visited');
+              showChildInquiries(reply, idx);
+              return;
+            }
+
             renderProse(`
               <p>${reply.answer}</p>
               ${reply.offerHref ? `<p><a href="${reply.offerHref}">${reply.offerLabel || 'Inspect Dossier \u2192'}</a></p>` : ''}
@@ -830,6 +949,7 @@ const TitleTag = isModal ? 'h2' : 'h1';
       // Expose reset and control methods for modals
       (container as any).__resetDialogue = (animate = true) => {
         stopTyping();
+        restoreTopLevelReplies();
         const introHtml = (data.beats || []).map((b: string) => `<p>${b}</p>`).join('');
         if (animate) {
           renderProse(introHtml);

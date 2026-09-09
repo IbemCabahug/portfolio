@@ -110,12 +110,31 @@ const resume = defineCollection({
   }),
 });
 
+const archivist = defineCollection({
+  loader: glob({ pattern: "**/*.json", base: "./src/content/archivist" }),
+  schema: z.object({
+    order: z.number(),
+    type: z.enum(["intro", "branch"]).default("branch"),
+    lines: z.array(z.string()).optional(),
+    question: z.string().optional(),
+    lead: z.string().optional(),
+    inquiries: z.array(z.object({
+      label: z.string(),
+      response: z.string(),
+      offerLabel: z.string().optional(),
+      offerHref: z.string().optional(),
+    })).optional(),
+  }),
+});
+
 export const collections = {
   profile,
   skills,
   projects,
   npc,
   innkeeper,
+  archivist,
   links,
   resume,
 };
+

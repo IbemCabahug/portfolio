@@ -1,0 +1,26 @@
+{
+  "order": 1,
+  "type": "branch",
+  "question": "Which project should I inspect first?",
+  "lead": "That depends on the discipline you seek to evaluate. Nhovem engineers real-time interactive canvas engines, distributed enterprise systems, and client-side hardened vaults.",
+  "inquiries": [
+    {
+      "label": "Show me real-time interactive canvas gameplay",
+      "response": "Inspect Arcane Typer. A fast-paced HTML5 Canvas typing engine built entirely solo, featuring 60 FPS rendering, custom keystroke telemetry, and an in-page live simulation arena.",
+      "offerLabel": "Inspect Arcane Typer Case Study",
+      "offerHref": "/quests/arcanetyper"
+    },
+    {
+      "label": "Show me large-scale enterprise system design",
+      "response": "Inspect BITS. A production biometric attendance system built over six months with a team of eight. Nhovem built the overtime processing engine, biometric check-in flow, and multi-shift normalization layers.",
+      "offerLabel": "Inspect BITS Case Study",
+      "offerHref": "/quests/bits"
+    },
+    {
+      "label": "Show me security & offline vault architecture",
+      "response": "Inspect Mimic. A cross-platform party game engineered around an isolated, client-side AES-256 encrypted game vault with zero telemetry.",
+      "offerLabel": "Inspect Mimic Case Study",
+      "offerHref": "/quests/mimic"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "order": 2,
+  "type": "branch",
+  "question": "How was this portfolio built?",
+  "lead": "This tavern is an accessible portfolio wrapped in a tavern, never a game that traps your information. It is governed by twelve binding quality budgets.",
+  "inquiries": [
+    {
+      "label": "What are the 12 Quality Budgets?",
+      "response": "Every build must pass 12 verified budgets: 100% Lighthouse A11y, 0 axe violations, 90+ mobile performance, strict contrast (4.5:1 text, 3.0:1 UI borders), and complete keyboard navigability.",
+      "offerLabel": "Inspect About & Principles",
+      "offerHref": "/about"
+    },
+    {
+      "label": "Tell me about the Zero-JS fallback",
+      "response": "The Field Ledger (/simple) delivers the entire portfolio—experience, skills, and case studies—in a single semantic document with exactly 0 bytes of JavaScript.",
+      "offerLabel": "View The Field Ledger",
+      "offerHref": "/simple"
+    },
+    {
+      "label": "How does the fireplace sound work without audio files?",
+      "response": "The tavern uses a procedural Web Audio synthesis engine. It generates Brownian chimney drafts and randomized ember pops using browser mathematics, with zero audio file downloads.",
+      "offerLabel": "Experience The Tavern",
+      "offerHref": "/tavern"
+    }
+  ]
+}

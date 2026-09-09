@@ -30,6 +30,26 @@ const regularQuestions = npcEntries
   .map(entry => entry.data)
   .sort((a: any, b: any) => a.order - b.order);
 
+const archivistEntries = await getCollection('archivist');
+const archivistIntro = archivistEntries.find(e => e.data.type === 'intro');
+const archivistBranches = archivistEntries
+  .filter(e => e.data.type === 'branch')
+  .sort((a, b) => a.data.order - b.data.order);
+
+const archivistBeats = archivistIntro?.data.lines || [
+  "Peace to your footsteps, traveller. I am the Archivist.",
+  "I maintain the chronicle of Nhovem's works, decisions, and technical disciplines.",
+  "Select a line of inquiry below, and I shall guide you through the records."
+];
+
+const archivistReplies = archivistBranches.map(b => ({
+  id: b.id,
+  question: b.data.question || '',
+  lead: b.data.lead || '',
+  answer: b.data.lead || '',
+  inquiries: b.data.inquiries || []
+}));
+
 // Data structure for the interactive scene objects
 const sceneObjects = [
   {
@@ -144,6 +164,17 @@ const sceneObjects = [
         <span class="scene-tooltip" data-placement="top">Ask the Innkeeper</span>
       </a>
 
+      <!-- The Hooded Archivist -->
+      <a href="/tavern/archivist" id="trigger-archivist" class="scene-object" aria-label="Consult the Hooded Archivist"
+         style="left: 20.8%; bottom: 24.8%; width: 6.4%; z-index: 2;">
+        <div class="ground-shadow"></div>
+        <img src="/art/archivist-neutral-520.webp"
+             srcset="/art/archivist-neutral-260.webp 260w, /art/archivist-neutral-520.webp 520w"
+             sizes="(max-width: 1280px) 260px, 520px"
+             width="520" height="1263" alt="" loading="lazy" decoding="async" />
+        <span class="scene-tooltip" data-placement="top">The Hooded Archivist</span>
+      </a>
+
       <!-- Painted Object Hotspots -->
       {sceneObjects.map(obj => {
         if (obj.action.type === 'dialog') {
@@ -246,6 +277,7 @@ const sceneObjects = [
   <div class="narrow-links">
     <a href="/tavern/npc" id="narrow-regular" class="narrow-link">Talk to the Tavern Regular</a>
     <button type="button" class="narrow-link" id="narrow-innkeeper">Talk to the Innkeeper</button>
+    <a href="/tavern/archivist" id="narrow-archivist" class="narrow-link">Consult the Archivist</a>
     <a href="/tavern/skills" id="narrow-skills" class="narrow-link">View Skills</a>
     <a href="/quests" id="narrow-questboard" class="narrow-link">Go to the Quest Board</a>
     <a href="/messenger" class="narrow-link">Go to Messenger's Corner</a>
@@ -328,6 +360,24 @@ const sceneObjects = [
       answer: "Safe journeys. Come back if you need any more answers about the developer."
     }}
     closeLabel="Close Dialogue (Esc)"
+    mode="modal"
+  />
+
+  <!-- The Hooded Archivist Dialogue (In-Scene Unified Modal) -->
+  <NpcDialogue
+    npcId="archivist"
+    title="The Hooded Archivist"
+    showCloseIcon={false}
+    portraitSrc="/art/archivist-neutral-520.webp"
+    portraitWidth={520}
+    portraitHeight={1263}
+    initialBeats={archivistBeats}
+    replies={archivistReplies}
+    farewell={{
+      question: "Conclude inquiry",
+      answer: "May your craft be sound and your tests pass true. Return whenever the archives are needed."
+    }}
+    closeLabel="Close Archives (Esc)"
     mode="modal"
   />
 
@@ -469,9 +519,13 @@ const sceneObjects = [
     inset: 0;
   }
 
-  #trigger-innkeeper img { transition: opacity 0.25s ease-out; }
+  #trigger-innkeeper img,
+  #trigger-archivist img {
+    transition: opacity 0.25s ease-out;
+  }
 
-  .scene-container.innkeeper-away #trigger-innkeeper img {
+  .scene-container.innkeeper-away #trigger-innkeeper img,
+  .scene-container.archivist-away #trigger-archivist img {
     opacity: 0;
     pointer-events: none;
   }
@@ -1413,7 +1467,11 @@ const sceneObjects = [
     const dialogSkills = document.getElementById('dialog-skills');
     const dialogInnkeeper = document.getElementById('dialog-innkeeper');
     const dialogRegular = document.getElementById('dialog-regular');
+    const dialogArchivist = document.getElementById('dialog-archivist');
     const dialogQuestboard = document.getElementById('dialog-questboard');
+
+    const triggerArchivist = document.getElementById('trigger-archivist');
+    const narrowArchivist = document.getElementById('narrow-archivist');
 
     const sceneInteractives = document.querySelectorAll<HTMLElement>('.scene-object, .scene-papers, .scene-door');
     let activeDialog: HTMLElement | null = null;
@@ -1574,6 +1632,23 @@ const sceneObjects = [
       }
     });
 
+    // Setup The Hooded Archivist triggers
+    [triggerArchivist, narrowArchivist].forEach(trigger => {
+      if (trigger && dialogArchivist) {
+        trigger.setAttribute('aria-haspopup', 'dialog');
+        trigger.setAttribute('aria-expanded', 'false');
+        trigger.setAttribute('aria-controls', 'dialog-archivist');
+        trigger.addEventListener('click', (e) => {
+          e.preventDefault();
+          document.querySelector('.scene-container')?.classList.add('archivist-away');
+          openDialog(dialogArchivist, trigger);
+          if ((dialogArchivist as any).__resetDialogue) {
+            (dialogArchivist as any).__resetDialogue(true);
+          }
+        });
+      }
+    });
+
     // Setup Quest Board trigger
     if (triggerQuestBoard && dialogQuestboard) {
       triggerQuestBoard.addEventListener('click', (e) => {
@@ -1601,19 +1676,19 @@ const sceneObjects = [
     // Backdrop click closes dialog
     document.getElementById('dialog-backdrop')?.addEventListener('click', () => {
       closeDialog();
-      document.querySelector('.scene-container')?.classList.remove('innkeeper-away');
+      document.querySelector('.scene-container')?.classList.remove('innkeeper-away', 'archivist-away');
     });
 
     document.querySelectorAll('.close-panel-btn, .close-panel-btn-secondary').forEach(btn => {
       btn.addEventListener('click', closeDialog);
       btn.addEventListener('click', () => {
-        document.querySelector('.scene-container')?.classList.remove('innkeeper-away');
+        document.querySelector('.scene-container')?.classList.remove('innkeeper-away', 'archivist-away');
       });
     });
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        document.querySelector('.scene-container')?.classList.remove('innkeeper-away');
+        document.querySelector('.scene-container')?.classList.remove('innkeeper-away', 'archivist-away');
       }
     });
 
