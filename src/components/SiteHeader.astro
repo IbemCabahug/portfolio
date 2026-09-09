@@ -26,6 +26,7 @@ if (!badgeLabel) {
   else if (pathname === '/tavern/npc') badgeLabel = 'Tavern Regular';
   else if (pathname === '/tavern/archivist') badgeLabel = 'The Archivist';
   else if (pathname.startsWith('/quests')) badgeLabel = 'Quest Board';
+  else if (pathname.startsWith('/tales')) badgeLabel = 'Field Dispatches';
   else if (pathname.startsWith('/messenger')) badgeLabel = "Messenger's Corner";
   else if (pathname.startsWith('/about')) badgeLabel = 'About';
   else if (pathname.startsWith('/resume')) badgeLabel = 'Resume';
@@ -134,6 +135,7 @@ const navLinks = [
         <li><a href="/" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Home / Entrance</a></li>
         <li><a href="/about" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">About Nhovem</a></li>
         <li><a href="/resume" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Resume</a></li>
+        <li><a href="/tales" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Field Dispatches (Tales)</a></li>
         <li><a href="/simple" class="flex items-center min-h-[44px] px-2 rounded text-[var(--parchment)]/80 hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Field Ledger (0-JS)</a></li>
         <li class="border-t border-[var(--brass)]/30 my-1"></li>
         <li>

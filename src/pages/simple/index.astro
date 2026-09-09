@@ -9,6 +9,9 @@ const profile = profileEntry?.data;
 const rawProjects = await getCollection('projects');
 const projectsList = [...rawProjects].sort((a, b) => a.data.order - b.data.order);
 
+const rawTales = await getCollection('tales');
+const talesList = [...rawTales].sort((a, b) => a.data.order - b.data.order);
+
 // Key technical highlights per project to showcase architecture trade-offs & proof of work
 const technicalHighlights: Record<string, { problem: string; decisions: string[]; verification: string }> = {
   arcanetyper: {
@@ -259,7 +262,60 @@ const description = "The Field Ledger: Technical proof-of-work showcase, archite
           </div>
         </section>
 
-        {/* Section 3: Formal Resume Cross-Link Card */}
+        {/* Section 3: Field Dispatches & Technical Writing */}
+        <section aria-labelledby="tales-heading" class="pt-6">
+          <div class="mb-6 pb-2 border-b-2 border-[var(--brass)] flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+            <div>
+              <h2 id="tales-heading" class="text-2xl font-bold text-[var(--ink)] font-serif">
+                Field Dispatches & Technical Writing
+              </h2>
+              <p class="text-sm text-[var(--ink)]/80 mt-1">
+                Deep architectural breakdowns of offline-first systems, biometric hardware integration, and UI state machines.
+              </p>
+            </div>
+            <a
+              href="/tales"
+              class="text-xs font-bold text-[#7c531d] hover:text-[var(--ember)] underline inline-flex items-center min-h-[44px]"
+            >
+              Browse All Dispatches &rarr;
+            </a>
+          </div>
+
+          <div class="flex flex-col gap-4">
+            {talesList.map((tale) => (
+              <article class="bg-[#fcf7ee] border border-[var(--brass)]/80 p-5 rounded">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-2 text-xs font-mono text-[#7c531d]">
+                  <span>{tale.data.publishDate} &bull; {tale.data.readTime}</span>
+                  <div class="flex flex-wrap gap-1">
+                    {tale.data.tags.slice(0, 3).map((tag: string) => (
+                      <span class="px-1.5 py-0.5 rounded bg-[#e8dbbe] border border-[var(--brass)]/40 text-[10px] font-semibold text-[var(--wood-deep)]">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <h3 class="text-base sm:text-lg font-bold text-[var(--ink)] mb-2 font-serif">
+                  <a href={`/tales/${tale.id}`} class="hover:underline">
+                    {tale.data.title}
+                  </a>
+                </h3>
+                <p class="text-xs sm:text-sm text-[var(--ink)]/85 mb-3 leading-relaxed">
+                  {tale.data.description}
+                </p>
+                <div class="border-t border-[var(--brass)]/30 pt-2 flex justify-end">
+                  <a
+                    href={`/tales/${tale.id}`}
+                    class="text-xs font-bold text-[#7c531d] hover:text-[var(--ember)] underline inline-flex items-center min-h-[44px]"
+                  >
+                    Read Technical Dispatch &rarr;
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {/* Section 4: Formal Resume Cross-Link Card */}
         <section aria-labelledby="resume-card-heading" class="pt-6 scroll-mt-16" id="resume-card-heading-section">
           <div class="bg-[#24170d] text-[var(--parchment)] border-2 border-[var(--brass)] p-6 sm:p-8 rounded shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div>

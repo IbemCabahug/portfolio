@@ -1,0 +1,142 @@
+---
+title: "Architecting an Offline-First 2.5D Taproom in Astro"
+description: "How we engineered an atmospheric RPG tavern portfolio with zero client framework bloat, aspect-ratio locked coordinate spaces, and a 100% accessible zero-JS semantic fallback."
+publishDate: "2026-09-08"
+readTime: "6 min read"
+tags: ["Architecture", "Astro", "Accessibility", "Performance", "CSS"]
+order: 1
+featured: true
+author: "Nhovem Cabahug"
+---
+
+When designing a portfolio, developers often face a binary trade-off: build a conventional, utilitarian document that looks like every other resume, or build an elaborate, WebGL-heavy gamified experience that takes 8 seconds to load on mobile and breaks screen readers entirely.
+
+For this portfolio, we refused that trade-off. 
+
+The goal was to craft **Ibem's Tavern**—a candlelit, 2.5D atmospheric taproom where visitors can converse with NPCs and explore bounties—while strictly abiding by **hard engineering budgets**:
+- **0kb Runtime Framework Overhead**: No React or Vue runtime shipped to client browsers.
+- **Zero-JavaScript Fallback Parity**: 100% of all information (skills, projects, dialogues, contact methods) must be readable and navigable with JavaScript disabled.
+- **Lighthouse Performance Budget**: 95+ performance across mobile and desktop devices.
+- **WCAG 2.1 AA Compliance**: Full keyboard navigation, focus traps, aria-live regions, and color contrast compliance.
+
+Here is how the architecture was designed and implemented.
+
+---
+
+## 1. The Island Architecture & Pure Static HTML
+
+Modern full-stack developers instinctively reach for client-side frameworks (`React`, `Vue`, `Svelte`) even when building largely static promotional websites. This introduces a hydration waterfall: HTML arrives, external bundles download, the runtime boots, and the DOM re-renders.
+
+Instead, we built upon **Astro 5** with its Content Collections and static site generation (`output: 'static'`).
+
+```astro
+---
+// src/layouts/TavernLayout.astro
+import BaseLayout from './BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+
+const { title, description, location } = Astro.props;
+---
+<BaseLayout title={title} description={description} hideDefaultNav={true}>
+  <div class="tavern-shell scene-layout">
+    <SiteHeader currentLocation="Main Tavern" isTavernHud={true} />
+    <slot />
+  </div>
+</BaseLayout>
+```
+
+Every page is rendered to static HTML at build time. Interactions—such as modal overlays and preference controls—are written in vanilla, standards-compliant TypeScript that mounts asynchronously without delaying the initial paint.
+
+---
+
+## 2. 2.5D Coordinate Space & Aspect Ratio Locking
+
+In a 2.5D visual chamber, hotspots (NPC characters, noticeboards, shields on the wall) must remain pinned to exact coordinates relative to the underlying painting regardless of whether the user is on a 4K desktop monitor or a rotated smartphone.
+
+A common pitfall is using absolute pixel positioning (`px`), which desynchronizes as soon as the background image scales. Another pitfall is using `object-fit: cover`, which crops the edges of the room and pushes wall hotspots out of the viewport.
+
+### The CSS Solution: Inline Container Queries & Aspect Ratio Clamping
+
+We locked the chamber container to the native canvas aspect ratio (`2560 / 1431 ≈ 1.789`) and clamped both dimensions using modern CSS `min()`:
+
+```css
+.scene-container {
+  position: relative;
+  container-type: inline-size;
+  aspect-ratio: 2560 / 1431;
+  width: min(100vw, calc((100dvh - var(--hud-height, 48px)) * (2560 / 1431)));
+  height: min(calc(100dvh - var(--hud-height, 48px)), calc(100vw * (1431 / 2560)));
+  max-width: 100vw;
+  max-height: calc(100dvh - var(--hud-height, 48px));
+  margin: auto;
+  overflow: hidden;
+  background-color: var(--wood-deep, #1a1005);
+}
+```
+
+By defining all clickable elements using percentage-based bounding boxes (`left: X%`, `bottom: Y%`, `width: W%`), hotspots remain pixel-perfect over the painted furniture at any resolution:
+
+```astro
+<!-- The Hooded Archivist Hotspot -->
+<a
+  href="/tavern/archivist"
+  id="trigger-archivist"
+  class="scene-object"
+  style="left: 20.8%; bottom: 24.8%; width: 6.4%; z-index: 2;"
+  aria-label="Consult the Hooded Archivist"
+>
+  <div class="ground-shadow"></div>
+  <img
+    src="/art/archivist-neutral-520.webp"
+    srcset="/art/archivist-neutral-260.webp 260w, /art/archivist-neutral-520.webp 520w"
+    sizes="(max-width: 1280px) 260px, 520px"
+    alt=""
+    loading="lazy"
+  />
+  <span class="scene-tooltip" data-placement="top">The Hooded Archivist</span>
+</a>
+```
+
+Notice that the trigger is an `<a>` tag pointing to `/tavern/archivist`. When JavaScript is enabled, a client script intercepts the click and lifts an interactive dialog modal into the DOM. When JavaScript is disabled, the browser simply navigates to the dedicated, fully accessible archive document!
+
+---
+
+## 3. The Dual-Track Accessibility Model (0-JS Parity)
+
+A portfolio that excludes disabled users or recruiters on locked-down enterprise networks is an architectural failure. 
+
+To solve this, we instituted the **Dual-Track Access Contract**:
+
+1. **The Field Ledger (`/simple`)**: A high-contrast, zero-runtime-JavaScript document edition containing complete resumes, deep architectural breakdowns of all projects, live repository metrics, and verified contact channels.
+2. **Semantic Fallback Routes**: Every modal trigger in the Tavern maps to a real URL:
+   - Clicking the Shields opens `#dialog-skills` on desktop, or navigates to `/tavern/skills` without JS.
+   - Clicking the Noticeboard opens `#dialog-questboard` or routes to `/quests`.
+   - Clicking the Archivist opens `#dialog-archivist` or routes to `/tavern/archivist`.
+3. **Automated Headless Auditing**: A custom Node script (`scripts/nojs-check.mjs`) builds the site and evaluates the generated HTML files, confirming that zero text content is hidden with `style="display: none"` in the initial payload.
+
+```bash
+# Automated Zero-JS Verification
+$ node scripts/nojs-check.mjs /tavern/archivist
+[nojs-check] Testing /tavern/archivist...
+[nojs-check] Found 4 readable conversation branches.
+[nojs-check] PASS: 0 hidden text-bearing elements.
+```
+
+---
+
+## 4. Mobile Ergonomics & Landscape Widescreen Strategy
+
+Mobile devices present an extreme constraint: portrait viewports (e.g. 390×844px) cannot render a 16:9 tavern without shrinking the characters to unclickable specs.
+
+Rather than compromising the visual quality, we implemented an orientation-aware layout engine:
+
+- **Portrait Mode**: The visual canvas is gracefully hidden, replaced by an accessible list of touch-friendly buttons and a dismissible prompt: *"Rotate for Tavern View — The interactive chamber renders best in widescreen."*
+- **Landscape Mode**: The 2.5D visual taproom commands 100% of the viewport. We deliberately suppressed below-fold buttons (`display: none !important`) so users don't experience jarring "peephole" scrolling. Dual-thumb interaction allows immediate tapping on the characters, the shields, and the quest board.
+
+---
+
+## Key Takeaways
+
+1. **Immersion does not require high runtime overhead**: By offloading visual assets to optimized modern formats (`WebP` / `AVIF`) and leveraging CSS container queries, you can deliver a rich atmosphere with negligible CPU footprint.
+2. **Accessible by default, enhanced by choice**: Never let client-side scripting be the single point of failure between a recruiter and your technical proof of work.
+3. **Hardware budgets enforce discipline**: Hard limits on bundle size and contrast force cleaner code and more robust visual hierarchies.

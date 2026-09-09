@@ -1,0 +1,155 @@
+---
+title: "Edge Cases in Biometric Attendance: Deriving Overtime from Hardware Feeds"
+description: "Lessons learned while building BITS: handling multi-scan shifts, resolving split-shift anomalies, and deriving accurate payroll hours across 25 relational tables."
+publishDate: "2026-09-08"
+readTime: "7 min read"
+tags: ["Backend", "PostgreSQL", "Systems Engineering", "TypeScript", "Database Design"]
+order: 2
+featured: true
+author: "Nhovem Cabahug"
+---
+
+In textbook full-stack development, timekeeping is deceptively simple: an employee clocks in at `08:00`, clocks out at `17:00`, and the system subtracts the timestamps.
+
+In industrial reality, building an enterprise attendance platform connected to physical biometric hardware (**ZKTeco** fingerprint and facial scanners) introduces a minefield of edge cases:
+- Employees scan multiple times in panic when the hardware reader beeps slowly.
+- Night-shift workers clock in at `22:00` on Monday and clock out at `06:00` on Tuesday, confusing naive daily aggregations.
+- Approved overtime requests get overwritten when an employee scans their fingerprint on their way out the door.
+- Split-shift workers produce phantom "missing checkout" exceptions.
+
+During my OJT internship at Avega Bros. Integrated Shipping Corp., our 8-person engineering team built **BITS (Biometric Integrated Tracking System)** to replace paper overtime slips and fragile spreadsheets. 
+
+As the backend and attendance engine contributor, here is how we tackled the trickiest computational challenges across **25 normalized PostgreSQL models**.
+
+---
+
+## 1. The Overwrite Trap: Separating Hardware Events from Attendance State
+
+The first architectural mistake most teams make is storing raw biometric punches directly inside the `attendance_records` table:
+
+```sql
+-- NAIVE SCHEMA (DO NOT DO THIS)
+CREATE TABLE attendance_records (
+    id SERIAL PRIMARY KEY,
+    employee_id INT,
+    work_date DATE,
+    time_in TIMESTAMP,
+    time_out TIMESTAMP -- Third scan overwrites this!
+);
+```
+
+When an employee works an 8-hour shift, clocks out at `17:00`, and then starts an approved 3-hour overtime block at `18:00`, their checkout scan at `21:00` would overwrite the `17:00` checkout, erasing proof of their regular shift.
+
+### The Solution: An Immutable Event Sourcing Log
+
+We decoupled the raw hardware feed from derived attendance state:
+
+```
+[Physical Biometric Scanner]
+           │
+           ▼
+[biometric_punches] (Immutable Raw Event Log: device_id, employee_id, raw_timestamp, punch_state)
+           │
+           ▼
+[Attendance Derivation Engine] (Runs on schedule or webhook)
+           │
+     ┌─────┴────────────────┐
+     ▼                      ▼
+[daily_shifts]      [overtime_claims]
+(Reg hours, tardiness) (Approved OT, night differentials)
+```
+
+1. **`biometric_punches`**: Every hardware scan is stored as an immutable audit record. It is never modified or deleted.
+2. **Derivation Engine**: A state machine processes punches against the employee's assigned **shift matrix**, determining whether a scan represents:
+   - Shift check-in
+   - Shift check-out
+   - Mid-day break punch (ignored or logged)
+   - Overtime start
+   - Overtime conclusion
+
+---
+
+## 2. Handling the Midnight Rollover & Split Shifts
+
+For standard day workers (`08:00 - 17:00`), grouping scans by `DATE(timestamp)` works fine. But in shipping logistics, maritime dock crews and IT operators frequently work overnight (`22:00 - 06:00`).
+
+If you group by `DATE(timestamp)`:
+- Monday gets a check-in at `22:00` with **no checkout** (flagged as abandoned).
+- Tuesday gets a checkout at `06:00` with **no check-in** (flagged as missing punch).
+
+### The Solution: Shift Windows with Logical Day Anchors
+
+Instead of grouping by calendar dates, each shift is defined by a **Shift Window** with an allowed clock-in threshold and anchor date:
+
+```typescript
+interface ShiftDefinition {
+  shiftId: string;
+  name: string;
+  startWindow: string;   // e.g. "21:30" (earliest punch)
+  nominalStart: string;  // e.g. "22:00"
+  nominalEnd: string;    // e.g. "06:00"
+  endWindow: string;     // e.g. "07:30" (latest punch)
+  isOvernight: boolean;
+}
+
+function resolveLogicalWorkDate(punchTime: Date, shift: ShiftDefinition): string {
+  // If punch occurs in the early morning for an overnight shift,
+  // attribute the punch to yesterday's logical shift date.
+  if (shift.isOvernight && punchTime.getHours() < 12) {
+    const previousDay = new Date(punchTime);
+    previousDay.setDate(previousDay.getDate() - 1);
+    return previousDay.toISOString().split('T')[0];
+  }
+  return punchTime.toISOString().split('T')[0];
+}
+```
+
+By attributing all scans to a **logical work date**, the overnight shift correctly pairs the Monday night punch with the Tuesday morning punch, calculating tardiness and undertime with zero manual HR intervention.
+
+---
+
+## 3. Deriving Overtime Without Race Conditions
+
+Overtime calculation requires strict validation:
+1. Did the employee actually punch out after shift end?
+2. Is there an approved `overtime_request` submitted by their supervisor?
+3. Does the actual scan time match or exceed the requested hours?
+
+To prevent race conditions where two simultaneous dashboard requests recalculate attendance at the same instant, we wrapped derivation in an atomic PostgreSQL transaction with row-level locks:
+
+```sql
+BEGIN;
+
+-- Lock the target employee's record for this logical date
+SELECT id 
+FROM daily_attendance 
+WHERE employee_id = $1 AND logical_date = $2 
+FOR UPDATE;
+
+-- Derive regular hours, tardiness, and eligible OT window
+WITH shift_punches AS (
+  SELECT * FROM biometric_punches 
+  WHERE employee_id = $1 AND logical_date = $2 
+  ORDER BY punch_time ASC
+)
+...
+
+COMMIT;
+```
+
+---
+
+## 4. Key Metrics and Results
+
+Over the 6-month deployment of BITS across Avega Bros. branches:
+- **4 Role-Scoped Portals**: Super Admin, HR Manager, Department Head, and Employee self-service.
+- **25 Relational Models**: Tracking department hierarchies, shift rosters, punch logs, leave credits, and audit trails.
+- **Error Reduction**: Eliminated 100% of punch overwrite collisions and reduced end-of-month payroll computation time from three days of manual Excel reconciliation to an automated, auditable click.
+
+---
+
+## Lessons for Systems Engineers
+
+1. **Hardware is untrusted input**: Treat hardware devices like public web forms. Assume sensors will double-fire, send skewed clocks, or drop connections.
+2. **Decouple raw facts from derived conclusions**: Raw punches are facts; shift durations are interpretations. If your business logic changes (e.g. new grace period rules), an immutable event log allows you to recompute historical records with 100% fidelity.
+3. **Database transactions are non-negotiable**: When calculating financial and payroll hours, optimistic UI updates cannot replace ACID guarantees.

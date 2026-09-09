@@ -1,0 +1,130 @@
+---
+title: "Why Deterministic Branching Beats Generative AI for Professional Portfolios"
+description: "Examining architectural decision D5: mitigating hallucination risks in high-stakes professional representation, state-machine dialogue trees, and graceful farewell flows."
+publishDate: "2026-09-08"
+readTime: "5 min read"
+tags: ["UI/UX", "State Machines", "Accessibility", "Architecture", "AI Safety"]
+order: 3
+featured: true
+author: "Nhovem Cabahug"
+---
+
+When building an interactive RPG-themed portfolio with conversational characters (**The Innkeeper**, **The Tavern Regular**, and **The Hooded Archivist**), the immediate temptation in 2026 is to connect an LLM endpoint and let visitors "chat freely with an AI version of the developer."
+
+In our portfolio's architectural planning, this was proposed as **Feature F3**. 
+
+However, after rigorous evaluation against engineering risk models, we formally **blocked** runtime generative AI under **Decision D5**. Instead, we built a **deterministic, multi-turn state-machine dialogue system**.
+
+Here is the engineering rationale behind that choice, and how we designed a tactile, responsive conversational interface.
+
+---
+
+## 1. The High-Stakes Risk: Hallucinations on Identity
+
+A portfolio is not a toy; it is an authoritative professional document. Recruiters, engineering directors, and prospective clients inspect it to evaluate:
+- What technologies does this engineer actually know?
+- What was their exact role on previous teams?
+- Are their achievements verifiable?
+
+If an ungrounded or poorly guarded LLM answers a recruiter with:
+> *"Nhovem single-handedly designed the entire enterprise backend infrastructure from scratch as lead architect!"*
+
+...when in reality Nhovem was an **OJT contributor** who built the biometric attendance engine as part of an 8-person team, that generative "hallucination" becomes **misrepresentation**.
+
+In an interview, the candidate is held responsible for every claim made on their site. Delegating your professional integrity to a probabilistic token generator with a non-zero hallucination rate is an unacceptable risk.
+
+---
+
+## 2. The Deterministic State Machine Architecture
+
+Instead of open-ended generation, we structured each NPC's knowledge as a deterministic state machine:
+
+```
+[Initial NPC Beat] (Typewriter effect with instant reveal control)
+        │
+        ▼
+[Branch Options] (Curated inquiries: Architecture, Experience, Contact)
+        │
+        ├──────────────────────────┬──────────────────────────┐
+        ▼                          ▼                          ▼
+ [Inquiry 1: Built]        [Inquiry 2: Roles]       [Farewell Flow]
+   (Follow-up link)          (Follow-up link)       (Auto-close & reset)
+```
+
+Each dialogue is modeled with strict TypeScript interfaces:
+
+```typescript
+export interface DialogueOption {
+  question: string;
+  answer: string;
+  offerLabel?: string;
+  offerHref?: string;
+  followUp?: string;
+}
+
+export interface NpcConfig {
+  npcId: string;
+  title: string;
+  initialBeats: string[];
+  replies: DialogueOption[];
+  farewell?: DialogueOption;
+}
+```
+
+### Advantages of Determinism:
+1. **100% Factually Grounded**: Every sentence is human-authored, reviewed, and audited against the resume.
+2. **0ms Cold Starts**: No waiting 2.5 seconds for a remote model API to stream tokens.
+3. **Zero API Cost & Rate Limits**: Can withstand viral traffic spikes without hitting OpenAI or Anthropic credit caps.
+4. **Offline Capability**: Works completely offline on mobile service drops.
+
+---
+
+## 3. Micro-Interactions that Delight: Visited States & Graceful Farewells
+
+To make deterministic branching feel as engaging as a classic RPG without sacrificing usability, we introduced three key interaction patterns:
+
+### A. The "Dusk Inscription" Visited Indicator
+When navigating multiple questions, users easily forget which options they have already explored. Instead of hiding clicked buttons, we apply a subtle session-scoped indicator:
+- Text softens from bright parchment (`#f6efe2`) to warm dusk (`#bfae98`).
+- Background opacity recedes by 15%.
+- Hovering over a visited option re-illuminates it with a golden candle border (`#ffd782`).
+- Closing the modal automatically resets all visited states, ensuring returning visitors start with a fresh slate.
+
+### B. The Graceful Farewell
+When a user clicks *"End conversation"* or *"Conclude inquiry"*, traditional dialogue modals awkwardly hang open until manually closed. 
+
+We implemented a **two-phase graceful farewell**:
+1. The NPC delivers their closing remark (e.g. *"Safe journeys. Come back if you need any more answers."*).
+2. The dialogue system locks further input, waits an ergonomic reading pause (1.2s normal, 800ms if typewriter was skipped), and smoothly fades out the modal automatically.
+
+```typescript
+if (isFarewell) {
+  // Lock replies to prevent double-clicks
+  repliesContainer.querySelectorAll('button').forEach(b => (b as HTMLButtonElement).disabled = true);
+  
+  const readingDelay = wasSkipped ? 800 : 1200;
+  setTimeout(() => {
+    modalElement.classList.add('dialogue-fade-out');
+    setTimeout(() => {
+      closeDialogueModal();
+      modalElement.classList.remove('dialogue-fade-out');
+    }, 200);
+  }, readingDelay);
+}
+```
+
+---
+
+## 4. Full WCAG 2.1 AA Keyboard Parity
+
+Every NPC dialogue strictly satisfies web accessibility standards:
+- **Focus Trap**: Pressing `Tab` cycles exclusively within the open modal.
+- **Escape Key Dismissal**: Pressing `Esc` immediately exits to the scene.
+- **Focus Restoration**: Closing the modal returns DOM focus to the original NPC trigger button.
+- **Screen Reader Announcements**: New speech beats are declared inside an `aria-live="polite"` region.
+
+---
+
+## Conclusion
+
+Technical novelty should never eclipse user trust. By choosing deterministic state machines over generative chat for this portfolio, we created an experience that is fast, accessible, atmospheric, and above all, **100% trustworthy**.

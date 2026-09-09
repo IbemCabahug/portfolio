@@ -1,0 +1,251 @@
+---
+import TavernLayout from '../../layouts/TavernLayout.astro';
+import { getCollection, render } from 'astro:content';
+import ThematicIcon from '../../components/icons/ThematicIcon.astro';
+
+export async function getStaticPaths() {
+  const tales = (await getCollection('tales')).sort((a, b) => a.data.order - b.data.order);
+  return tales.map((entry, index) => ({
+    params: { slug: entry.id },
+    props: {
+      entry,
+      prevTale: index > 0 ? tales[index - 1] : null,
+      nextTale: index < tales.length - 1 ? tales[index + 1] : null,
+    },
+  }));
+}
+
+const { entry, prevTale, nextTale } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<TavernLayout
+  title={`${entry.data.title} — Nhovem Cabahug`}
+  description={entry.data.description}
+  location="tales"
+>
+  <div class="max-w-4xl mx-auto py-4 sm:py-6 px-4">
+    {/* Breadcrumb Navigation */}
+    <nav class="mb-6 flex justify-between items-center" aria-label="Breadcrumb">
+      <a
+        href="/tales"
+        class="inline-flex items-center gap-1.5 min-h-[44px] text-sm font-semibold text-[var(--candle)] underline hover:text-[var(--parchment)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+      >
+        &larr; Back to Field Dispatches
+      </a>
+      <span class="text-xs text-[var(--parchment)]/70 uppercase tracking-widest font-mono">
+        Dispatch #{entry.data.order}
+      </span>
+    </nav>
+
+    {/* Main Reading Parchment Document */}
+    <article class="bg-[var(--parchment)] text-[var(--ink)] p-6 sm:p-10 rounded shadow-2xl border-2 border-[var(--brass)]">
+      {/* Header */}
+      <header class="border-b-2 border-[var(--brass)] pb-6 mb-8">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4 text-xs font-mono">
+          <div class="flex items-center gap-2 text-[var(--wood-deep)] font-semibold">
+            <time datetime={entry.data.publishDate}>{entry.data.publishDate}</time>
+            <span>&bull;</span>
+            <span class="px-2.5 py-0.5 rounded bg-[var(--wood-deep)] text-[var(--candle)] font-bold">
+              {entry.data.readTime}
+            </span>
+          </div>
+          <span class="text-stone-700 italic font-sans font-medium">
+            Inscribed by {entry.data.author}
+          </span>
+        </div>
+
+        <h1 class="text-2xl sm:text-4xl font-extrabold text-[var(--ink)] mb-4 leading-tight font-serif">
+          {entry.data.title}
+        </h1>
+
+        <p class="text-base sm:text-lg text-[var(--ink)]/90 leading-relaxed font-sans mb-6">
+          {entry.data.description}
+        </p>
+
+        {/* Topic Tags */}
+        <div class="flex flex-wrap items-center gap-2 pt-2">
+          <span class="text-xs uppercase tracking-wider text-[var(--ink)]/80 font-mono font-bold">Topics:</span>
+          <div class="flex flex-wrap gap-1.5" aria-label="Article topics">
+            {entry.data.tags.map((tag: string) => (
+              <span class="text-xs font-mono font-semibold px-2.5 py-0.5 rounded bg-[#e8dbbe] text-[var(--wood-deep)] border border-[var(--brass)]/60">
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      </header>
+
+      {/* MDX Body Content */}
+      <div class="tales-prose prose max-w-none text-[var(--ink)]">
+        <Content />
+      </div>
+
+      {/* Cross-Article Navigation Footer */}
+      <footer class="mt-14 pt-8 border-t-2 border-[var(--brass)]/50">
+        <div class="grid grid-cols-1 sm:grid-cols-2 items-center gap-4 mb-8">
+          {/* Previous Dispatch */}
+          <div>
+            {prevTale ? (
+              <a
+                href={`/tales/${prevTale.id}`}
+                class="inline-flex flex-col gap-1 w-full p-4 rounded border border-[var(--brass)] bg-[#e8dbbe] text-[var(--wood-deep)] hover:bg-[var(--brass)]/30 transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)]"
+              >
+                <span class="text-[11px] uppercase tracking-wider font-mono font-bold text-stone-600">
+                  &larr; Previous Dispatch
+                </span>
+                <span class="text-sm font-serif font-bold text-[var(--wood-deep)] line-clamp-1">
+                  {prevTale.data.title}
+                </span>
+              </a>
+            ) : (
+              <div class="h-full"></div>
+            )}
+          </div>
+
+          {/* Next Dispatch */}
+          <div>
+            {nextTale ? (
+              <a
+                href={`/tales/${nextTale.id}`}
+                class="inline-flex flex-col gap-1 w-full p-4 rounded border border-[var(--brass)] bg-[#e8dbbe] text-[var(--wood-deep)] hover:bg-[var(--brass)]/30 transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] text-right"
+              >
+                <span class="text-[11px] uppercase tracking-wider font-mono font-bold text-stone-600">
+                  Next Dispatch &rarr;
+                </span>
+                <span class="text-sm font-serif font-bold text-[var(--wood-deep)] line-clamp-1">
+                  {nextTale.data.title}
+                </span>
+              </a>
+            ) : (
+              <div class="h-full"></div>
+            )}
+          </div>
+        </div>
+
+        {/* Discussion & Contact Banner */}
+        <div class="p-5 rounded-lg bg-[#1e1208] border border-[var(--brass)] text-[var(--parchment)] flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-[#2a1a0c] border border-[var(--brass)] flex items-center justify-center shrink-0">
+              <ThematicIcon name="scroll" class="w-5 h-5 text-[var(--candle)]" />
+            </div>
+            <div>
+              <p class="text-sm font-bold text-[var(--candle)]">Questions or thoughts on this architecture?</p>
+              <p class="text-xs text-[var(--parchment)]/80">Send word directly to Nhovem's desk in Messenger's Corner.</p>
+            </div>
+          </div>
+          <a
+            href="/messenger"
+            class="inline-flex items-center justify-center min-h-[44px] px-5 py-2 bg-[var(--brass)] text-black font-bold text-xs sm:text-sm rounded hover:bg-[var(--candle)] transition-colors shrink-0"
+          >
+            Open Messenger's Corner &rarr;
+          </a>
+        </div>
+      </footer>
+    </article>
+  </div>
+</TavernLayout>
+
+<style is:global>
+  /* Prose Styling specifically tailored for Tales Parchment */
+  .tales-prose {
+    font-size: 1.0625rem;
+    line-height: 1.8;
+    color: var(--ink);
+  }
+
+  .tales-prose h2 {
+    font-family: Georgia, Cambria, 'Times New Roman', Times, serif;
+    font-size: 1.625rem;
+    font-weight: 700;
+    color: #1a0f05;
+    margin-top: 2.25rem;
+    margin-bottom: 0.875rem;
+    padding-bottom: 0.375rem;
+    border-bottom: 1.5px solid rgba(139, 107, 74, 0.4);
+  }
+
+  .tales-prose h3 {
+    font-family: Georgia, Cambria, 'Times New Roman', Times, serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #2b1808;
+    margin-top: 1.75rem;
+    margin-bottom: 0.625rem;
+  }
+
+  .tales-prose p {
+    margin-bottom: 1.25rem;
+  }
+
+  .tales-prose ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .tales-prose ol {
+    list-style-type: decimal;
+    padding-left: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .tales-prose li {
+    margin-bottom: 0.5rem;
+    padding-left: 0.25rem;
+  }
+
+  .tales-prose blockquote {
+    border-left: 4px solid var(--brass, #8b6b4a);
+    background: #ede2cd;
+    padding: 0.875rem 1.25rem;
+    margin: 1.5rem 0;
+    font-style: italic;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .tales-prose blockquote p:last-child {
+    margin-bottom: 0;
+  }
+
+  .tales-prose pre {
+    background: #140b04 !important;
+    color: #f7eedf !important;
+    border: 1px solid var(--brass, #8b6b4a);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  .tales-prose code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+
+  .tales-prose p code,
+  .tales-prose li code {
+    background: #e8d9c0;
+    color: #1f1105;
+    padding: 0.15rem 0.35rem;
+    border-radius: 3px;
+    border: 1px solid rgba(139, 107, 74, 0.4);
+    font-size: 0.875em;
+    font-weight: 600;
+  }
+
+  .tales-prose hr {
+    border: 0;
+    height: 1px;
+    background: rgba(139, 107, 74, 0.4);
+    margin: 2.25rem 0;
+  }
+
+  .tales-prose strong {
+    color: #1a0f05;
+    font-weight: 700;
+  }
+</style>

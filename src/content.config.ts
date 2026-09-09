@@ -127,6 +127,20 @@ const archivist = defineCollection({
   }),
 });
 
+const tales = defineCollection({
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/tales" }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    publishDate: z.string(),
+    readTime: z.string(),
+    tags: z.array(z.string()),
+    order: z.number().default(1),
+    featured: z.boolean().default(false),
+    author: z.string().default("Nhovem Cabahug"),
+  }),
+});
+
 export const collections = {
   profile,
   skills,
@@ -136,5 +150,6 @@ export const collections = {
   archivist,
   links,
   resume,
+  tales,
 };
 

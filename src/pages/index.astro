@@ -6,6 +6,9 @@ import InteractiveAvatar from '../components/InteractiveAvatar.astro';
 
 const allProjects = await getCollection('projects');
 const featuredProjects = allProjects.sort((a, b) => a.data.order - b.data.order);
+
+const allTales = await getCollection('tales');
+const featuredTales = allTales.sort((a, b) => a.data.order - b.data.order);
 ---
 
 <BaseLayout
@@ -278,6 +281,60 @@ const featuredProjects = allProjects.sort((a, b) => a.data.order - b.data.order)
         </div>
       </section>
 
+      {/* Field Dispatches & Architecture Articles Section */}
+      <section aria-labelledby="featured-tales-heading" class="mb-14">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-6 pb-2 border-b border-[var(--brass)]/30 gap-2">
+          <div>
+            <h2 id="featured-tales-heading" class="text-2xl sm:text-3xl font-bold text-[var(--candle)] font-serif">
+              Field Dispatches & Architecture
+            </h2>
+            <p class="text-sm text-[var(--parchment)]/80 mt-1">
+              Technical chronicles detailing production edge cases, systems design, and accessibility architecture.
+            </p>
+          </div>
+          <a
+            href="/tales"
+            class="text-sm font-semibold text-[var(--candle)] hover:underline inline-flex items-center min-h-[44px]"
+          >
+            Read All Dispatches ({featuredTales.length}) →
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {featuredTales.map((tale) => (
+            <article class="bg-[#24170d] text-[var(--parchment)] p-6 rounded border-2 border-[var(--brass)] shadow-xl flex flex-col justify-between hover:border-[var(--candle)] transition-colors">
+              <div>
+                <div class="flex justify-between items-center gap-2 mb-3 text-xs font-mono text-[var(--brass)]">
+                  <span>{tale.data.publishDate}</span>
+                  <span class="px-2 py-0.5 rounded bg-[#150c05] text-[var(--candle)] font-bold">
+                    {tale.data.readTime}
+                  </span>
+                </div>
+                <h3 class="text-lg font-bold text-[var(--candle)] mb-2 font-serif leading-snug">
+                  <a href={`/tales/${tale.id}`} class="hover:underline">
+                    {tale.data.title}
+                  </a>
+                </h3>
+                <p class="text-xs text-[var(--parchment)]/85 mb-4 leading-relaxed line-clamp-3">
+                  {tale.data.description}
+                </p>
+              </div>
+              <div class="pt-3 border-t border-[var(--brass)]/30 flex items-center justify-between">
+                <span class="text-[11px] font-mono text-[var(--candle)]/80">
+                  {tale.data.tags[0]} · {tale.data.tags[1]}
+                </span>
+                <a
+                  href={`/tales/${tale.id}`}
+                  class="text-xs font-bold text-[var(--candle)] hover:underline inline-flex items-center min-h-[44px]"
+                >
+                  Read &rarr;
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
       {/* Navigation Ledger & Footer */}
       <footer class="mt-16 pt-8 border-t-2 border-[var(--brass)] text-center text-sm text-[var(--parchment)]/70">
         <nav aria-label="Tavern Navigation" class="mb-6">
@@ -285,6 +342,7 @@ const featuredProjects = allProjects.sort((a, b) => a.data.order - b.data.order)
             <li><a href="/" class="hover:text-[var(--candle)] underline min-h-[44px] inline-flex items-center">Entrance</a></li>
             <li><a href="/tavern" class="hover:text-[var(--candle)] underline min-h-[44px] inline-flex items-center">Main Tavern</a></li>
             <li><a href="/quests" class="hover:text-[var(--candle)] underline min-h-[44px] inline-flex items-center">Quest Board</a></li>
+            <li><a href="/tales" class="hover:text-[var(--candle)] underline min-h-[44px] inline-flex items-center">Field Dispatches</a></li>
             <li><a href="/tavern/skills" class="hover:text-[var(--candle)] underline min-h-[44px] inline-flex items-center">Adventurer's Badge</a></li>
             <li><a href="/tavern/npc" class="hover:text-[var(--candle)] underline min-h-[44px] inline-flex items-center">Tavern Regular</a></li>
             <li><a href="/messenger" class="hover:text-[var(--candle)] underline min-h-[44px] inline-flex items-center">Messenger's Corner</a></li>

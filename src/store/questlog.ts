@@ -46,6 +46,14 @@ export const JOURNAL_MILESTONES: JournalMilestone[] = [
     tagline: 'Complete technical resume, employment history, and education',
     iconName: 'ledger',
   },
+  {
+    id: 'tales',
+    title: "Field Dispatches (The Scribe's Desk)",
+    category: 'chamber',
+    path: '/tales',
+    tagline: 'Technical writing, systems architecture deep dives, and edge cases',
+    iconName: 'scroll',
+  },
 
   // Case Study Dossiers
   {

@@ -5,7 +5,7 @@ import SiteHeader from '../components/SiteHeader.astro';
 interface Props {
   title: string;
   description: string;
-  location: 'messenger' | 'tavern' | 'quests' | 'skills' | 'npc' | 'archivist';
+  location: 'messenger' | 'tavern' | 'quests' | 'skills' | 'npc' | 'archivist' | 'tales';
 }
 
 const { title, description, location } = Astro.props;
@@ -41,6 +41,11 @@ const scenes: Record<string, Scene> = {
   'archivist': {
     left: { label: 'Main Tavern', link: '/tavern' },
     current: "The Archivist",
+  },
+  'tales': {
+    left: { label: 'Main Tavern', link: '/tavern' },
+    current: "Field Dispatches",
+    right: { label: 'Quest Board', link: '/quests' },
   }
 };
 
