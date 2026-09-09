@@ -1,0 +1,63 @@
+---
+/**
+ * Standalone BITS simulator page for iframe embedding inside the Transceiver.
+ * No layout chrome — renders only the simulator component within a themed container.
+ */
+import BitsAttendanceSimulator from '../../components/simulators/BitsAttendanceSimulator.astro';
+---
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>BITS Simulator — Transceiver Embed</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cinzel:wght@500;600;700&display=swap');
+
+    :root {
+      --parchment: #f5e6c8;
+      --ink: #1a0f00;
+      --wood-deep: #2b180a;
+      --brass: #c9a84c;
+      --candle: #ffe4a0;
+      --ember: #d5803b;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background: #0d0703;
+      color: var(--parchment);
+      font-family: 'Inter', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      padding: 12px;
+    }
+
+    /* Override the simulator card margins */
+    .bits-simulator-card {
+      margin: 0 auto !important;
+      max-width: 1100px;
+      width: 100%;
+    }
+
+    /* Styled scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0d0703; }
+    ::-webkit-scrollbar-thumb { background: var(--brass); border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <BitsAttendanceSimulator />
+</body>
+</html>

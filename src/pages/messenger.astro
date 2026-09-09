@@ -100,6 +100,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
           <!-- In-World Arcane Telemetry HUD Screen -->
           <div class="transceiver-screen" aria-hidden="true">
             <img
+              id="transceiver-screen-thumb"
               src="/art/arcane-typer-splash.webp"
               alt=""
               width="1004"
@@ -112,7 +113,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
             
             <div class="screen-header">
               <span class="screen-pulse-dot"></span>
-              <span class="screen-status-text">ARCANE // 60FPS</span>
+              <span id="transceiver-hud-status" class="screen-status-text">ARCANE // 60FPS</span>
             </div>
 
             <div class="screen-footer">
@@ -123,7 +124,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
                 <span class="bar bar-4"></span>
                 <span class="bar bar-5"></span>
               </div>
-              <span class="screen-commit">CANVAS // LIVE</span>
+              <span id="transceiver-hud-commit" class="screen-commit">CANVAS // LIVE</span>
             </div>
           </div>
           <span class="scene-tooltip" data-placement="top">Arcane Transceiver (Live Simulation)</span>
@@ -406,7 +407,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
           </div>
         </div>
 
-        <!-- Modal 2: Arcane Transceiver (Arcane Typer Live Simulation Arena) -->
+        <!-- Modal 2: Arcane Transceiver (Scalable Project Simulation Browser) -->
         <div
           id="dialog-machine"
           class="tavern-panel transceiver-viewport-modal"
@@ -423,7 +424,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
                 </svg>
               </span>
               <div>
-                <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-[var(--ember)]">Arcane Transmission</span>
+                <span id="transceiver-subtitle" class="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-[var(--ember)]">Arcane Transmission</span>
                 <h2 id="machine-dialog-title" class="text-lg sm:text-xl font-bold text-[var(--candle)] leading-tight">The Arcane Transceiver — Live Trial</h2>
               </div>
             </div>
@@ -444,9 +445,9 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
               <div class="flex items-center gap-2">
                 <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/60 text-emerald-400 font-mono text-[10px] sm:text-xs font-bold">
                   <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true"></span>
-                  <span>Signal Synchronized // 60 FPS</span>
+                  <span>Signal Synchronized</span>
                 </span>
-                <span class="text-[11px] font-mono text-[var(--parchment)]/70 hidden sm:inline">
+                <span id="transceiver-version-text" class="text-[11px] font-mono text-[var(--parchment)]/70 hidden sm:inline">
                   ArcaneTyper v2.2.6
                 </span>
               </div>
@@ -474,40 +475,82 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
               </div>
             </div>
 
-            <!-- Resting View: Thematic Brief & Boot Trigger -->
-            <div id="transceiver-resting-view" class="flex-1 min-h-0 w-full p-4 sm:p-6 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40 flex flex-col items-center justify-center text-center space-y-4 overflow-hidden">
-              <div class="max-w-xl mx-auto space-y-2">
-                <p class="text-xs sm:text-sm text-[var(--parchment)]/90 leading-relaxed">
-                  The brass coils resonate with arcane frequency, synchronizing with Nhovem's live HTML5 Canvas engine. Engage the transceiver below to initiate real-time typing physics, spellcasting incantations, and synthesized Web Audio directly inside this chamber.
+            <!-- Resting View: Dynamic Project Preview with Navigation -->
+            <div id="transceiver-resting-view" class="flex-1 min-h-0 w-full rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40 flex flex-col items-center justify-center text-center overflow-hidden relative">
+              <!-- Left Navigation Arrow -->
+              <button
+                type="button"
+                id="transceiver-prev-btn"
+                class="transceiver-nav-arrow transceiver-nav-prev"
+                aria-label="Previous project simulation"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                  <polyline points="15 18 9 12 15 6"/>
+                </svg>
+              </button>
+
+              <!-- Right Navigation Arrow -->
+              <button
+                type="button"
+                id="transceiver-next-btn"
+                class="transceiver-nav-arrow transceiver-nav-next"
+                aria-label="Next project simulation"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                  <polyline points="9 6 15 12 9 18"/>
+                </svg>
+              </button>
+
+              <!-- Dynamic Content Container (populated by JS) -->
+              <div id="transceiver-project-content" class="p-4 sm:p-6 space-y-4 w-full max-w-xl mx-auto transceiver-content-fade">
+                <p id="transceiver-description" class="text-xs sm:text-sm text-[var(--parchment)]/90 leading-relaxed">
+                  <!-- Populated by JS -->
                 </p>
-                <div class="flex flex-wrap justify-center gap-1.5 pt-1">
-                  <span class="px-2 py-0.5 rounded bg-black/40 text-[var(--candle)] border border-[var(--brass)]/40 font-mono text-[10px]">60 FPS HTML5 Canvas</span>
-                  <span class="px-2 py-0.5 rounded bg-black/40 text-[var(--candle)] border border-[var(--brass)]/40 font-mono text-[10px]">Zero-Asset Web Audio</span>
-                  <span class="px-2 py-0.5 rounded bg-black/40 text-[var(--candle)] border border-[var(--brass)]/40 font-mono text-[10px]">Supabase 1v1 Duels</span>
+                <div id="transceiver-badges" class="flex flex-wrap justify-center gap-1.5 pt-1">
+                  <!-- Populated by JS -->
                 </div>
               </div>
 
-              <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+              <div class="flex flex-wrap items-center justify-center gap-3 pt-2 pb-3 px-4">
                 <button
                   type="button"
                   id="transceiver-launch-btn"
-                  data-url="https://arcane-typer.vercel.app/"
                   class="inline-flex items-center gap-2 min-h-[44px] px-6 py-2.5 rounded-md bg-[var(--brass)] text-black font-bold text-xs sm:text-sm hover:bg-[var(--candle)] transition-all shadow-lg hover:shadow-[0_0_15px_rgba(218,165,32,0.4)] cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
                 >
                   <svg class="w-4 h-4 text-black" viewBox="0 0 24 24" fill="currentColor">
                     <polygon points="5 3 19 12 5 21 5 3"/>
                   </svg>
-                  <span>Engage Arcane Typer Trial</span>
+                  <span id="transceiver-launch-label">Engage Arcane Typer Trial</span>
                 </button>
 
                 <a
+                  id="transceiver-standalone-link"
                   href="https://arcane-typer.vercel.app/"
                   target="_blank"
                   rel="noopener noreferrer"
                   class="inline-flex items-center gap-2 min-h-[44px] px-5 py-2.5 rounded-md border border-[var(--brass)] text-[var(--candle)] font-bold text-xs sm:text-sm hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
                 >
-                  <span>Launch in Standalone Window</span>
+                  <span id="transceiver-standalone-label">Launch in Standalone Window</span>
                 </a>
+
+                <a
+                  id="transceiver-dossier-link"
+                  href="/quests/arcanetyper"
+                  class="inline-flex items-center gap-2 min-h-[44px] px-5 py-2.5 rounded-md border border-[var(--brass)]/50 text-[var(--candle)]/80 font-bold text-xs sm:text-sm hover:bg-black/50 hover:text-[var(--candle)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+                >
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                  </svg>
+                  <span>View Full Dossier</span>
+                </a>
+              </div>
+
+              <!-- Carousel Indicator Dots -->
+              <div id="transceiver-indicators" class="flex justify-center gap-2 pb-3" aria-label="Project navigation indicators">
+                <!-- Populated by JS -->
               </div>
             </div>
 
@@ -1431,6 +1474,111 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
     }
   }
 
+  /* Transceiver Carousel Navigation & Indicators */
+  .transceiver-nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 15;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(27, 15, 7, 0.88);
+    border: 1.5px solid var(--brass);
+    color: var(--candle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    backdrop-filter: blur(4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .transceiver-nav-arrow:hover {
+    background: rgba(201, 168, 76, 0.25);
+    border-color: var(--candle);
+    color: #fff;
+    transform: translateY(-50%) scale(1.08);
+    box-shadow: 0 0 16px rgba(201, 168, 76, 0.5), 0 4px 16px rgba(0, 0, 0, 0.6);
+  }
+
+  .transceiver-nav-arrow:active {
+    transform: translateY(-50%) scale(0.95);
+  }
+
+  .transceiver-nav-arrow:focus-visible {
+    outline: 2px solid var(--candle);
+    outline-offset: 2px;
+  }
+
+  .transceiver-nav-prev {
+    left: 14px;
+  }
+
+  .transceiver-nav-next {
+    right: 14px;
+  }
+
+  @media (max-width: 640px) {
+    .transceiver-nav-arrow {
+      width: 36px;
+      height: 36px;
+    }
+    .transceiver-nav-prev {
+      left: 6px;
+    }
+    .transceiver-nav-next {
+      right: 6px;
+    }
+  }
+
+  /* Carousel Indicator Dots */
+  .transceiver-indicator-dot {
+    height: 8px;
+    width: 8px;
+    border-radius: 4px;
+    background: rgba(201, 168, 76, 0.3);
+    border: 1px solid rgba(201, 168, 76, 0.4);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 0;
+  }
+
+  .transceiver-indicator-dot:hover {
+    background: rgba(201, 168, 76, 0.6);
+    border-color: var(--brass);
+    transform: scale(1.15);
+  }
+
+  .transceiver-indicator-dot.active {
+    width: 26px;
+    background: var(--brass);
+    border-color: var(--candle);
+    box-shadow: 0 0 10px rgba(201, 168, 76, 0.6);
+  }
+
+  /* Content Transition Animation */
+  .transceiver-content-fade {
+    animation: transceiverFade 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes transceiverFade {
+    0% {
+      opacity: 0;
+      transform: translateY(6px) scale(0.99);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Screen Thumbnail Transition */
+  .screen-thumb-bg {
+    transition: opacity 0.3s ease;
+  }
+
   @keyframes modalPop {
     from {
       opacity: 0;
@@ -1978,7 +2126,88 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
     setupTemplatePills('.template-pill', 'desktop-missive-subject', 'desktop-missive-body');
     setupTemplatePills('.mobile-template-pill', 'mobile-missive-subject', 'mobile-missive-body');
 
-    // Setup Arcane Transceiver Live Simulation
+    // Scalable Transceiver Project Simulations Registry
+    interface TransceiverProject {
+      id: string;
+      name: string;
+      subtitle: string;
+      modalTitle: string;
+      version: string;
+      description: string;
+      badges: string[];
+      launchLabel: string;
+      standaloneUrl: string;
+      standaloneLabel: string;
+      dossierPath: string;
+      liveUrl: string;
+      scalingMode: 'fit-canvas' | 'responsive';
+      baseWidth?: number;
+      baseHeight?: number;
+      thumbnail: string;
+      hudStatus: string;
+      hudCommit: string;
+    }
+
+    const TRANSCEIVER_PROJECTS: TransceiverProject[] = [
+      {
+        id: 'arcanetyper',
+        name: 'Arcane Typer',
+        subtitle: 'Arcane Transmission // Live Simulation',
+        modalTitle: 'The Arcane Transceiver — Arcane Typer',
+        version: 'ArcaneTyper v2.2.6',
+        description: "The brass coils resonate with arcane frequency, synchronizing with Nhovem's live HTML5 Canvas engine. Engage the transceiver below to initiate real-time typing physics, spellcasting incantations, and synthesized Web Audio directly inside this chamber.",
+        badges: ['60 FPS HTML5 Canvas', 'Zero-Asset Web Audio', 'Supabase 1v1 Duels'],
+        launchLabel: 'Engage Arcane Typer Trial',
+        standaloneUrl: 'https://arcane-typer.vercel.app/',
+        standaloneLabel: 'Launch in Standalone Window',
+        dossierPath: '/quests/arcanetyper',
+        liveUrl: 'https://arcane-typer.vercel.app/',
+        scalingMode: 'fit-canvas',
+        baseWidth: 800,
+        baseHeight: 600,
+        thumbnail: '/art/arcane-typer-splash.webp',
+        hudStatus: 'ARCANE // 60FPS',
+        hudCommit: 'CANVAS // LIVE'
+      },
+      {
+        id: 'bits',
+        name: 'BITS Engine',
+        subtitle: 'Biometric Telemetry // Hardware Simulation',
+        modalTitle: 'The Arcane Transceiver — BITS Engine',
+        version: 'BITS Engine v1.0.4',
+        description: 'Interfacing with the BukSU Integrated Terrestrial Scanner attendance telemetry system. Simulate live NFC and barcode punch streams, queue-sync pipelines, and edge offline validation state machine algorithms.',
+        badges: ['Offline-First Edge Sync', 'Hardware Emulation', 'Queue Pipeline', 'Attendance Engine'],
+        launchLabel: 'Engage BITS Engine Simulator',
+        standaloneUrl: '/simulators/bits',
+        standaloneLabel: 'Open Standalone Simulator',
+        dossierPath: '/quests/bits',
+        liveUrl: '/simulators/bits',
+        scalingMode: 'responsive',
+        thumbnail: '/art/bits-transceiver-splash.jpg',
+        hudStatus: 'BITS // SYNC',
+        hudCommit: 'EDGE // TELEMETRY'
+      },
+      {
+        id: 'mimic',
+        name: 'Mimic Vault',
+        subtitle: 'Cryptographic Vault // App Simulation',
+        modalTitle: 'The Arcane Transceiver — Mimic Vault',
+        version: 'Mimic Vault v0.9.8',
+        description: 'Awakening the encrypted party game mimicry simulation. Explore the complete onboarding journey, biometric and cryptographic vault unlocks, decoy vaults, and zero-knowledge recovery mechanics.',
+        badges: ['AES-GCM-256 Vault', 'Decoy Chameleon UI', 'Zero-Knowledge Recovery', 'Mobile Simulation'],
+        launchLabel: 'Engage Mimic Vault Simulator',
+        standaloneUrl: '/simulators/mimic',
+        standaloneLabel: 'Open Standalone Simulator',
+        dossierPath: '/quests/mimic',
+        liveUrl: '/simulators/mimic',
+        scalingMode: 'responsive',
+        thumbnail: '/art/mimic-transceiver-splash.jpg',
+        hudStatus: 'MIMIC // VAULT',
+        hudCommit: 'AES // ENCRYPTED'
+      }
+    ];
+
+    // Setup Arcane Transceiver Scalable Simulation Browser
     function setupTransceiverSimulation() {
       const launchBtn = document.getElementById('transceiver-launch-btn');
       const unloadBtn = document.getElementById('transceiver-unload-btn');
@@ -1988,55 +2217,214 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
       const frameContainer = document.getElementById('transceiver-frame-container');
       const machineDialog = document.getElementById('dialog-machine');
 
+      const prevBtn = document.getElementById('transceiver-prev-btn');
+      const nextBtn = document.getElementById('transceiver-next-btn');
+      const subtitleEl = document.getElementById('transceiver-subtitle');
+      const titleEl = document.getElementById('machine-dialog-title');
+      const versionEl = document.getElementById('transceiver-version-text');
+      const descEl = document.getElementById('transceiver-description');
+      const badgesEl = document.getElementById('transceiver-badges');
+      const launchLabelEl = document.getElementById('transceiver-launch-label');
+      const standaloneLink = document.getElementById('transceiver-standalone-link') as HTMLAnchorElement | null;
+      const standaloneLabel = document.getElementById('transceiver-standalone-label');
+      const dossierLink = document.getElementById('transceiver-dossier-link') as HTMLAnchorElement | null;
+      const indicatorsContainer = document.getElementById('transceiver-indicators');
+      const contentEl = document.getElementById('transceiver-project-content');
+
+      // In-world HUD screen elements
+      const hudThumb = document.getElementById('transceiver-screen-thumb') as HTMLImageElement | null;
+      const hudStatus = document.getElementById('transceiver-hud-status');
+      const hudCommit = document.getElementById('transceiver-hud-commit');
+
       if (!launchBtn || !restingView || !activeControls || !frameContainer) return;
 
-      const container = frameContainer;
-      const resting = restingView;
-      const controls = activeControls;
-      const dialog = machineDialog;
+      const STORAGE_KEY = 'transceiver_last_project';
+      let currentProjectIndex = 0;
 
-      const liveUrl = launchBtn.getAttribute('data-url') || 'https://arcane-typer.vercel.app/';
+      // Restore saved project preference
+      try {
+        const savedId = localStorage.getItem(STORAGE_KEY);
+        if (savedId) {
+          const idx = TRANSCEIVER_PROJECTS.findIndex(p => p.id === savedId);
+          if (idx !== -1) currentProjectIndex = idx;
+        }
+      } catch {}
+
+      function saveProjectPreference() {
+        try {
+          const proj = TRANSCEIVER_PROJECTS[currentProjectIndex];
+          if (proj) {
+            localStorage.setItem(STORAGE_KEY, proj.id);
+          }
+        } catch {}
+      }
+
+      function renderIndicators() {
+        if (!indicatorsContainer) return;
+        indicatorsContainer.innerHTML = '';
+        TRANSCEIVER_PROJECTS.forEach((proj, idx) => {
+          const dot = document.createElement('button');
+          dot.type = 'button';
+          dot.className = `transceiver-indicator-dot ${idx === currentProjectIndex ? 'active' : ''}`;
+          dot.setAttribute('aria-label', `Navigate to ${proj.name} simulation`);
+          dot.setAttribute('title', proj.name);
+          dot.addEventListener('click', () => {
+            if (currentProjectIndex !== idx) {
+              soundEngine.playWoodClink();
+              setProject(idx);
+            }
+          });
+          indicatorsContainer.appendChild(dot);
+        });
+      }
+
+      function updateIndicators() {
+        if (!indicatorsContainer) return;
+        const dots = indicatorsContainer.querySelectorAll('.transceiver-indicator-dot');
+        dots.forEach((dot, idx) => {
+          if (idx === currentProjectIndex) {
+            dot.classList.add('active');
+          } else {
+            dot.classList.remove('active');
+          }
+        });
+      }
+
+      function renderProject(animate = true) {
+        const proj = TRANSCEIVER_PROJECTS[currentProjectIndex];
+        if (!proj) return;
+
+        if (subtitleEl) subtitleEl.textContent = proj.subtitle;
+        if (titleEl) titleEl.textContent = proj.modalTitle;
+        if (versionEl) versionEl.textContent = proj.version;
+        if (descEl) descEl.textContent = proj.description;
+
+        if (badgesEl) {
+          badgesEl.innerHTML = proj.badges
+            .map(b => `<span class="px-2 py-0.5 rounded bg-black/40 text-[var(--candle)] border border-[var(--brass)]/40 font-mono text-[10px]">${b}</span>`)
+            .join('');
+        }
+
+        if (launchLabelEl) launchLabelEl.textContent = proj.launchLabel;
+
+        if (standaloneLink) {
+          standaloneLink.href = proj.standaloneUrl;
+          if (standaloneLabel) standaloneLabel.textContent = proj.standaloneLabel;
+        }
+
+        if (dossierLink) {
+          dossierLink.href = proj.dossierPath;
+        }
+
+        // Update in-world HUD screen
+        if (hudThumb) {
+          hudThumb.src = proj.thumbnail;
+        }
+        if (hudStatus) hudStatus.textContent = proj.hudStatus;
+        if (hudCommit) hudCommit.textContent = proj.hudCommit;
+
+        updateIndicators();
+        saveProjectPreference();
+
+        if (animate && contentEl) {
+          contentEl.classList.remove('transceiver-content-fade');
+          void contentEl.offsetWidth; // Force reflow
+          contentEl.classList.add('transceiver-content-fade');
+        }
+      }
+
+      function setProject(index: number) {
+        currentProjectIndex = (index + TRANSCEIVER_PROJECTS.length) % TRANSCEIVER_PROJECTS.length;
+        renderProject(true);
+      }
+
+      function prevProject() {
+        soundEngine.playWoodClink();
+        setProject(currentProjectIndex - 1);
+      }
+
+      function nextProject() {
+        soundEngine.playWoodClink();
+        setProject(currentProjectIndex + 1);
+      }
+
+      if (prevBtn) prevBtn.addEventListener('click', prevProject);
+      if (nextBtn) nextBtn.addEventListener('click', nextProject);
+
+      // Keyboard arrow navigation when resting view is active
+      window.addEventListener('keydown', (e) => {
+        if (!machineDialog || machineDialog.hidden) return;
+        if (restingView.classList.contains('hidden')) return; // simulation is running
+
+        if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          prevProject();
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          nextProject();
+        }
+      });
 
       function fitArena() {
-        const iframe = container.querySelector('iframe');
+        const iframe = frameContainer.querySelector('iframe');
         if (!iframe) return;
 
-        const cw = container.clientWidth;
-        const ch = container.clientHeight;
-        if (!cw || !ch) return;
+        const proj = TRANSCEIVER_PROJECTS[currentProjectIndex];
+        if (!proj) return;
 
-        // Arcane Typer base design space: 800 x 600
-        const baseW = 800;
-        const baseH = 600;
-        const scale = Math.min(cw / baseW, ch / baseH);
+        if (proj.scalingMode === 'fit-canvas') {
+          const cw = frameContainer.clientWidth;
+          const ch = frameContainer.clientHeight;
+          if (!cw || !ch) return;
 
-        iframe.style.width = `${baseW}px`;
-        iframe.style.height = `${baseH}px`;
-        iframe.style.position = 'absolute';
-        iframe.style.left = '50%';
-        iframe.style.top = '50%';
-        iframe.style.transform = `translate(-50%, -50%) scale(${scale})`;
-        iframe.style.transformOrigin = 'center center';
+          const baseW = proj.baseWidth || 800;
+          const baseH = proj.baseHeight || 600;
+          const scale = Math.min(cw / baseW, ch / baseH);
+
+          iframe.style.width = `${baseW}px`;
+          iframe.style.height = `${baseH}px`;
+          iframe.style.position = 'absolute';
+          iframe.style.left = '50%';
+          iframe.style.top = '50%';
+          iframe.style.transform = `translate(-50%, -50%) scale(${scale})`;
+          iframe.style.transformOrigin = 'center center';
+        } else {
+          // Responsive mode for BITS & Mimic
+          iframe.style.width = '100%';
+          iframe.style.height = '100%';
+          iframe.style.position = 'relative';
+          iframe.style.left = 'auto';
+          iframe.style.top = 'auto';
+          iframe.style.transform = 'none';
+          iframe.style.transformOrigin = 'initial';
+        }
       }
 
       function launchArena() {
         soundEngine.playWoodClink();
+        const proj = TRANSCEIVER_PROJECTS[currentProjectIndex];
+        if (!proj) return;
+
         const iframe = document.createElement('iframe');
-        iframe.src = liveUrl;
-        iframe.title = 'Live Simulation of Arcane Typer inside Arcane Transceiver';
-        iframe.className = 'border-0 overflow-hidden';
-        iframe.setAttribute('scrolling', 'no');
+        iframe.src = proj.liveUrl;
+        iframe.title = `Live Simulation of ${proj.name} inside Arcane Transceiver`;
+        iframe.className = 'border-0 w-full h-full';
+        if (proj.scalingMode === 'fit-canvas') {
+          iframe.setAttribute('scrolling', 'no');
+        } else {
+          iframe.setAttribute('scrolling', 'yes');
+        }
         iframe.setAttribute('allow', 'autoplay; fullscreen');
         iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-forms');
         iframe.loading = 'eager';
 
-        container.innerHTML = '';
-        container.appendChild(iframe);
+        frameContainer.innerHTML = '';
+        frameContainer.appendChild(iframe);
 
-        resting.classList.add('hidden');
-        controls.classList.remove('hidden');
-        controls.classList.add('flex');
-        container.classList.remove('hidden');
+        restingView.classList.add('hidden');
+        activeControls.classList.remove('hidden');
+        activeControls.classList.add('flex');
+        frameContainer.classList.remove('hidden');
 
         fitArena();
         requestAnimationFrame(fitArena);
@@ -2045,16 +2433,16 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
 
       function unloadArena() {
         soundEngine.playWoodClink();
-        container.innerHTML = '';
-        container.classList.add('hidden');
-        controls.classList.add('hidden');
-        controls.classList.remove('flex');
-        resting.classList.remove('hidden');
+        frameContainer.innerHTML = '';
+        frameContainer.classList.add('hidden');
+        activeControls.classList.add('hidden');
+        activeControls.classList.remove('flex');
+        restingView.classList.remove('hidden');
       }
 
       function toggleFullscreen() {
         soundEngine.playWoodClink();
-        const target = dialog || container;
+        const target = machineDialog || frameContainer;
         if (!document.fullscreenElement) {
           if (target && target.requestFullscreen) {
             target.requestFullscreen();
@@ -2067,11 +2455,11 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
       }
 
       const resizeObserver = new ResizeObserver(() => {
-        if (!container.classList.contains('hidden')) {
+        if (!frameContainer.classList.contains('hidden')) {
           fitArena();
         }
       });
-      resizeObserver.observe(container);
+      resizeObserver.observe(frameContainer);
       window.addEventListener('resize', fitArena);
 
       launchBtn.addEventListener('click', launchArena);
@@ -2079,6 +2467,10 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
       if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen);
 
       unloadTransceiverFn = unloadArena;
+
+      // Initialize indicators and project display
+      renderIndicators();
+      renderProject(false);
     }
 
     setupTransceiverSimulation();
