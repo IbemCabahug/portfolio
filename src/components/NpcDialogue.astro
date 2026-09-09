@@ -368,12 +368,21 @@ const TitleTag = isModal ? 'h2' : 'h1';
     transform: translateX(2px);
   }
   .reply-btn.reply-visited {
-    color: #ded0bc !important;
-    border-color: rgba(139, 107, 74, 0.3);
+    background: rgba(18, 11, 5, 0.75);
+    color: #bfae98 !important;
+    border-color: rgba(139, 107, 74, 0.25);
   }
-  .reply-btn.reply-visited:hover {
-    color: #ffffff !important;
-    border-color: var(--brass, #a87a27);
+  .reply-btn.reply-visited::before {
+    color: rgba(168, 122, 39, 0.35);
+  }
+  .reply-btn.reply-visited:is(:hover, :focus-visible) {
+    background: rgba(55, 35, 15, 0.98);
+    border-color: var(--candle, #ffe4a0);
+    color: var(--candle, #ffe4a0) !important;
+  }
+  .reply-btn.reply-visited:is(:hover, :focus-visible)::before {
+    color: var(--candle, #ffe4a0);
+    transform: translateX(2px);
   }
 
   .farewell-btn {
@@ -740,6 +749,7 @@ const TitleTag = isModal ? 'h2' : 'h1';
 
       let isFarewellActive = false;
       let farewellTimer: number | null = null;
+      const visitedKeys = new Set<string>();
 
       function clearFarewellTimer() {
         if (farewellTimer !== null) {
@@ -900,7 +910,8 @@ const TitleTag = isModal ? 'h2' : 'h1';
           const li = document.createElement('li');
           const b = document.createElement('button');
           b.type = 'button';
-          b.className = 'reply-btn';
+          const isVisited = visitedKeys.has(`child-${parentIdx}-${cIdx}`);
+          b.className = 'reply-btn' + (isVisited ? ' reply-visited' : '');
           b.setAttribute('data-parent-index', String(parentIdx));
           b.setAttribute('data-child-index', String(cIdx));
           b.textContent = inq.label;
@@ -929,7 +940,8 @@ const TitleTag = isModal ? 'h2' : 'h1';
           const li = document.createElement('li');
           const b = document.createElement('button');
           b.type = 'button';
-          b.className = 'reply-btn';
+          const isVisited = visitedKeys.has(`top-${i}`);
+          b.className = 'reply-btn' + (isVisited ? ' reply-visited' : '');
           b.setAttribute('data-reply-index', String(i));
           b.setAttribute('data-question-index', String(i));
           b.textContent = r.question;
@@ -941,7 +953,8 @@ const TitleTag = isModal ? 'h2' : 'h1';
           const li = document.createElement('li');
           const b = document.createElement('button');
           b.type = 'button';
-          b.className = 'reply-btn farewell-btn';
+          const isVisited = visitedKeys.has('farewell');
+          b.className = 'reply-btn farewell-btn' + (isVisited ? ' reply-visited' : '');
           b.setAttribute('data-action', 'farewell');
           b.textContent = data.farewell.question;
           li.appendChild(b);
@@ -963,8 +976,9 @@ const TitleTag = isModal ? 'h2' : 'h1';
             window.location.href = data.closeHref;
             return;
           }
+          visitedKeys.add('farewell');
+          btn.classList.add('reply-visited');
           if (data.farewell?.answer) {
-            btn.classList.add('reply-visited');
             isFarewellActive = true;
             if (repliesList) {
               repliesList.classList.add('replies-concluding');
@@ -993,6 +1007,8 @@ const TitleTag = isModal ? 'h2' : 'h1';
         if (childIdxStr !== null && parentIdxStr !== null) {
           const pIdx = parseInt(parentIdxStr, 10);
           const cIdx = parseInt(childIdxStr, 10);
+          visitedKeys.add(`child-${pIdx}-${cIdx}`);
+          btn.classList.add('reply-visited');
           const inq = data.replies[pIdx]?.inquiries?.[cIdx];
           if (inq) {
             renderProse(`
@@ -1000,7 +1016,6 @@ const TitleTag = isModal ? 'h2' : 'h1';
               ${inq.offerHref ? `<p><a href="${inq.offerHref}">${inq.offerLabel || 'Inspect Record \u2192'}</a></p>` : ''}
               <p class="dialogue-followup">Select another inquiry below, or return to all topics.</p>
             `);
-            btn.classList.add('reply-visited');
             prose.focus();
           }
           return;
@@ -1009,6 +1024,8 @@ const TitleTag = isModal ? 'h2' : 'h1';
         const idxStr = btn.getAttribute('data-reply-index');
         if (idxStr !== null) {
           const idx = parseInt(idxStr, 10);
+          visitedKeys.add(`top-${idx}`);
+          btn.classList.add('reply-visited');
           const reply = data.replies[idx];
           if (reply) {
             if (reply.inquiries && reply.inquiries.length > 0) {
@@ -1016,7 +1033,6 @@ const TitleTag = isModal ? 'h2' : 'h1';
                 <p>${reply.lead || reply.answer}</p>
                 <p class="dialogue-followup">Select a specific inquiry below, or return to all topics.</p>
               `);
-              btn.classList.add('reply-visited');
               showChildInquiries(reply, idx);
               return;
             }
@@ -1026,7 +1042,6 @@ const TitleTag = isModal ? 'h2' : 'h1';
               ${reply.offerHref ? `<p><a href="${reply.offerHref}">${reply.offerLabel || 'Inspect Dossier \u2192'}</a></p>` : ''}
               ${reply.followUp ? `<p class="dialogue-followup">${reply.followUp}</p>` : ''}
             `);
-            btn.classList.add('reply-visited');
             prose.focus();
           }
         }
@@ -1034,6 +1049,7 @@ const TitleTag = isModal ? 'h2' : 'h1';
 
       // Expose reset and control methods for modals
       (container as any).__resetDialogue = (animate = true) => {
+        visitedKeys.clear();
         clearFarewellTimer();
         isFarewellActive = false;
         container.classList.remove('dialogue-concluding-fade');
@@ -1048,12 +1064,10 @@ const TitleTag = isModal ? 'h2' : 'h1';
           finishTyping = null;
           if (prose) prose.innerHTML = introHtml;
         }
-        repliesList.querySelectorAll<HTMLButtonElement>('.reply-btn').forEach((btn) => {
-          btn.classList.remove('reply-visited');
-        });
       };
 
       (container as any).__stopDialogue = () => {
+        visitedKeys.clear();
         clearFarewellTimer();
         isFarewellActive = false;
         container.classList.remove('dialogue-concluding-fade');
@@ -1061,6 +1075,7 @@ const TitleTag = isModal ? 'h2' : 'h1';
         stopTyping();
         typingDone = true;
         finishTyping = null;
+        restoreTopLevelReplies();
       };
     });
   }
