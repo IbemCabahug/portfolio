@@ -521,7 +521,7 @@ const sceneObjects = [
       <div class="beer-lyrics-container min-h-[120px] flex items-center justify-center px-4">
         <h2
           id="beer-active-lyric"
-          class="beer-lyric-text text-2xl sm:text-4xl md:text-5xl font-serif italic font-semibold text-stone-900 leading-relaxed tracking-wide select-none"
+          class="beer-lyric-text text-xl sm:text-3xl md:text-4xl leading-relaxed tracking-tight select-none"
         >
           ...
         </h2>
@@ -542,6 +542,8 @@ const sceneObjects = [
 </TavernLayout>
 
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
   body, html {
     background-color: var(--wood-deep, #1a1005);
   }
@@ -1524,8 +1526,10 @@ const sceneObjects = [
     100% { opacity: 0; }
   }
   .beer-lyric-text {
+    font-family: 'Courier Prime', 'Courier New', Courier, monospace;
+    font-weight: 700;
+    color: #1a1818;
     transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    color: #1c1917;
   }
   .beer-lyric-text.lyric-switching {
     opacity: 0;
