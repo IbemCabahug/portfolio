@@ -1371,33 +1371,13 @@ const sceneObjects = [
     }
   }
 
-  /* Landscape Viewports: Chamber takes first-fold, parchment links accessible below fold */
+  /* Landscape Viewports: Pure cinematic taproom commands the viewport, hide below-fold links */
   @media (orientation: landscape) {
     .orientation-prompt {
       display: none !important;
     }
     .narrow-links {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 12px;
-      padding: 24px 16px 40px;
-      width: 100%;
-      max-width: 860px;
-      margin: 0 auto;
-    }
-    .narrow-link {
-      flex: 1 1 200px;
-      font-size: 0.875rem;
-      padding: 10px 16px;
-    }
-  }
-
-  /* Fine pointer widescreen desktops: hide below-fold parchment links */
-  @media (orientation: landscape) and (hover: hover) and (pointer: fine) and (min-width: 1024px) {
-    .narrow-links {
-      display: none;
+      display: none !important;
     }
   }
 
