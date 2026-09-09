@@ -232,6 +232,29 @@ const sceneObjects = [
         <span class="scene-tooltip" data-placement="bottom">Quest Board</span>
       </a>
 
+      <!-- Red Horse Beer Litro Easter Egg (Frontdesk Bar Counter) -->
+      <button
+        type="button"
+        id="trigger-beer"
+        class="scene-object scene-hotspot beer-bottle-hotspot"
+        aria-label="Inspect the Red Horse Litro on the bar counter"
+        aria-haspopup="dialog"
+        aria-expanded="false"
+        aria-controls="dialog-beer-blackout"
+        style="left: 60.5%; bottom: 42.0%; width: 1.35%; z-index: 3;"
+      >
+        <img
+          src="/art/red-horse-litro.webp"
+          width="62"
+          height="197"
+          alt="Red Horse Litro (Extra Strong)"
+          loading="lazy"
+          decoding="async"
+          class="beer-bottle-sprite"
+        />
+        <span class="scene-tooltip" data-placement="top">Red Horse Litro</span>
+      </button>
+
       <!-- Papers Hotspots -->
 
       <!-- Reserved Space: Dark centre floor -->
@@ -281,6 +304,7 @@ const sceneObjects = [
     <a href="/tavern/skills" id="narrow-skills" class="narrow-link">View Skills</a>
     <a href="/quests" id="narrow-questboard" class="narrow-link">Go to the Quest Board</a>
     <a href="/messenger" class="narrow-link">Go to Messenger's Corner</a>
+    <button type="button" class="narrow-link" id="narrow-beer">🍺 Red Horse Litro (Senti)</button>
   </div>
 
   <!-- Global Modal Backdrop -->
@@ -478,6 +502,66 @@ const sceneObjects = [
       >
         Close Board (Esc)
       </button>
+    </div>
+  </div>
+
+  <!-- Red Horse Senti Blackout Easter Egg Overlay -->
+  <div
+    id="dialog-beer-blackout"
+    class="beer-blackout-overlay fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black text-center p-6 select-none opacity-0 pointer-events-none transition-opacity duration-300"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Senti sa Tavern - Red Horse Beer Easter Egg"
+    hidden
+  >
+    <!-- Background Vignette -->
+    <div class="beer-vignette absolute inset-0 pointer-events-none" aria-hidden="true"></div>
+
+    <!-- Center Cinematic Stage -->
+    <div class="beer-stage relative z-10 max-w-2xl mx-auto flex flex-col items-center px-4">
+      <!-- Faint Warm Crimson Heartbreak Aura -->
+      <div class="beer-aura mb-6 flex items-center justify-center" aria-hidden="true">
+        <div class="w-20 h-20 rounded-full bg-red-600/25 blur-xl animate-pulse"></div>
+        <img
+          src="/art/red-horse-litro.webp"
+          alt="Red Horse Litro"
+          width="62"
+          height="197"
+          class="w-14 h-auto max-h-44 object-contain drop-shadow-[0_0_25px_rgba(239,68,68,0.7)] animate-bounce-slow"
+        />
+      </div>
+
+      <!-- Tag / Subtitle -->
+      <p class="beer-subtext font-mono text-xs uppercase tracking-[0.3em] text-red-400 font-bold mb-4 opacity-0 transition-opacity duration-700">
+        🍺 ITO ANG TAMA • RED HORSE LITRO 🍺
+      </p>
+
+      <!-- Active Animated Lyric Line -->
+      <div class="beer-lyrics-container min-h-[90px] flex items-center justify-center px-2">
+        <h2
+          id="beer-active-lyric"
+          class="beer-lyric-text text-xl sm:text-3xl md:text-4xl font-serif font-extrabold text-[#fef3c7] leading-relaxed tracking-wide drop-shadow-[0_2px_12px_rgba(245,158,11,0.4)]"
+        >
+          ...
+        </h2>
+      </div>
+
+      <!-- Artist & Song Attribution -->
+      <p class="beer-artist-attribution mt-6 text-xs text-stone-400 font-mono tracking-wider opacity-0 transition-opacity duration-1000">
+        "Beer" — The Itchyworms
+      </p>
+    </div>
+
+    <!-- Bottom HUD Dismiss Prompt -->
+    <div class="beer-hud-prompt absolute bottom-8 inset-x-0 flex flex-col items-center gap-2 z-20">
+      <button
+        type="button"
+        id="btn-close-beer-blackout"
+        class="px-5 py-2 rounded-full border border-stone-700 bg-stone-900/80 text-stone-300 hover:text-white hover:border-red-500/80 hover:bg-stone-800 text-xs font-mono uppercase tracking-widest transition-all shadow-lg flex items-center gap-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-red-500"
+      >
+        <span>Press <kbd class="px-1.5 py-0.5 rounded bg-stone-800 border border-stone-600 text-amber-300 text-[10px]">ESC</kbd> or click anywhere to sober up (Balik sa Tavern)</span>
+      </button>
+      <span id="beer-audio-status" class="text-[11px] text-stone-500 font-mono"></span>
     </div>
   </div>
 </TavernLayout>
@@ -1429,11 +1513,58 @@ const sceneObjects = [
       flex: 1 1 200px;
     }
   }
+
+  /* Red Horse Beer Bottle Easter Egg */
+  .beer-bottle-hotspot {
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .beer-bottle-sprite {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.6));
+    transition: filter 0.25s ease, transform 0.25s ease;
+  }
+  .beer-bottle-hotspot:hover .beer-bottle-sprite,
+  .beer-bottle-hotspot:focus-visible .beer-bottle-sprite {
+    filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.8)) drop-shadow(0 0 4px rgba(245, 158, 11, 0.9)) brightness(1.15);
+    transform: scale(1.1) translateY(-2px);
+  }
+
+  /* Red Horse Senti Blackout Overlay */
+  .beer-blackout-overlay {
+    background-color: #000000;
+    transition: opacity 0.35s ease-in-out;
+  }
+  .beer-blackout-overlay:not([hidden]) {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .beer-vignette {
+    background: radial-gradient(circle at 50% 50%, rgba(220, 38, 38, 0.06) 0%, rgba(0, 0, 0, 0.95) 70%, #000000 100%);
+  }
+  .beer-lyric-text {
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    text-shadow: 0 0 24px rgba(245, 158, 11, 0.6), 0 0 48px rgba(220, 38, 38, 0.4);
+  }
+  .beer-lyric-text.lyric-switching {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  @keyframes floatSlow {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+  }
+  .animate-bounce-slow {
+    animation: floatSlow 3s ease-in-out infinite;
+  }
 </style>
 
 <script>
   import { initPerformanceGovernor } from '../../lib/perf-governor';
   import { soundEngine } from '../../lib/sound-engine';
+  import { recordMilestone } from '../../store/questlog';
+  import { getSound } from '../../store/preferences';
 
   function initTavernPage() {
     initPerformanceGovernor();
@@ -1693,6 +1824,343 @@ const sceneObjects = [
         } catch (e) {}
       });
     }
+
+    // ── Red Horse Beer Easter Egg Controller ─────────────────────
+    const triggerBeer = document.getElementById('trigger-beer');
+    const narrowBeer = document.getElementById('narrow-beer');
+    const dialogBeer = document.getElementById('dialog-beer-blackout');
+    const lyricEl = document.getElementById('beer-active-lyric');
+    const subtextEl = dialogBeer?.querySelector('.beer-subtext');
+    const artistEl = dialogBeer?.querySelector('.beer-artist-attribution');
+    const btnCloseBeer = document.getElementById('btn-close-beer-blackout');
+    const audioStatusEl = document.getElementById('beer-audio-status');
+
+    let beerAudio: HTMLAudioElement | null = null;
+    let beerTimerIds: number[] = [];
+    let isBeerActive = false;
+    let beerSynthCtx: AudioContext | null = null;
+    let synthActiveNodes: (AudioNode | number)[] = [];
+
+    function setLyric(text: string) {
+      if (!lyricEl) return;
+      lyricEl.classList.add('lyric-switching');
+      const timer = window.setTimeout(() => {
+        lyricEl.textContent = text;
+        lyricEl.classList.remove('lyric-switching');
+      }, 250);
+      beerTimerIds.push(timer);
+    }
+
+    function playProceduralBeerMelody() {
+      if (typeof window === 'undefined') return;
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+
+      try {
+        beerSynthCtx = new AudioCtx();
+        const ctx = beerSynthCtx;
+        const now = ctx.currentTime;
+
+        const master = ctx.createGain();
+        master.gain.setValueAtTime(0.001, now);
+        master.gain.linearRampToValueAtTime(0.26, now + 0.3);
+        master.connect(ctx.destination);
+        synthActiveNodes.push(master);
+
+        const reverbFilter = ctx.createBiquadFilter();
+        reverbFilter.type = 'lowpass';
+        reverbFilter.frequency.setValueAtTime(2600, now);
+        reverbFilter.connect(master);
+
+        const N = {
+          D3: 146.83, Fs3: 185.00, G3: 196.00, A3: 220.00, B3: 246.94,
+          Cs4: 277.18, D4: 293.66, E4: 329.63, Fs4: 369.99, G4: 392.00,
+          A4: 440.00, B4: 493.88, Cs5: 554.37, D5: 587.33, E5: 659.25
+        };
+
+        function pluckChord(timeOffset: number, freqs: number[]) {
+          freqs.forEach((freq, idx) => {
+            const strumTime = now + timeOffset + (idx * 0.035);
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, strumTime);
+
+            gain.gain.setValueAtTime(0.0001, strumTime);
+            gain.gain.linearRampToValueAtTime(0.11, strumTime + 0.012);
+            gain.gain.exponentialRampToValueAtTime(0.0001, strumTime + 2.2);
+
+            osc.connect(gain);
+            gain.connect(reverbFilter);
+
+            osc.start(strumTime);
+            osc.stop(strumTime + 2.3);
+            synthActiveNodes.push(osc, gain);
+          });
+        }
+
+        function playMelodyNote(timeOffset: number, freq: number, duration: number) {
+          const startTime = now + timeOffset;
+          const osc = ctx.createOscillator();
+          const vibrato = ctx.createOscillator();
+          const vibratoGain = ctx.createGain();
+          const gain = ctx.createGain();
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, startTime);
+
+          vibrato.frequency.setValueAtTime(4.8, startTime);
+          vibratoGain.gain.setValueAtTime(0, startTime);
+          vibratoGain.gain.linearRampToValueAtTime(3.5, startTime + 0.25);
+          vibrato.connect(osc.frequency);
+
+          gain.gain.setValueAtTime(0.0001, startTime);
+          gain.gain.linearRampToValueAtTime(0.14, startTime + 0.04);
+          gain.gain.setValueAtTime(0.12, startTime + duration - 0.06);
+          gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+          osc.connect(gain);
+          gain.connect(reverbFilter);
+
+          vibrato.start(startTime);
+          osc.start(startTime);
+          vibrato.stop(startTime + duration + 0.05);
+          osc.stop(startTime + duration + 0.05);
+          synthActiveNodes.push(osc, vibrato, gain);
+        }
+
+        // Chords (Key of D: D - F#m - G - A)
+        pluckChord(0.0, [N.D3, N.A3, N.Fs4, N.D5]);
+        pluckChord(2.0, [N.A3, N.D4, N.Fs4]);
+        pluckChord(4.0, [N.Fs3, N.Cs4, N.Fs4, N.A4]);
+        pluckChord(6.0, [N.Cs4, N.Fs4, N.A4]);
+        pluckChord(8.0, [N.G3, N.D4, N.G4, N.B4]);
+        pluckChord(10.0, [N.D4, N.G4, N.B4]);
+        pluckChord(12.0, [N.A3, N.E4, N.A4, N.Cs5]);
+        pluckChord(14.0, [N.E4, N.A4, N.Cs5]);
+        pluckChord(16.0, [N.D3, N.A3, N.Fs4, N.D5]);
+        pluckChord(18.0, [N.Fs3, N.Cs4, N.A4]);
+        pluckChord(20.0, [N.G3, N.D4, N.B4]);
+        pluckChord(22.0, [N.A3, N.E4, N.Cs5]);
+        pluckChord(23.5, [N.D3, N.Fs3, N.A3, N.D4, N.Fs4, N.D5]);
+
+        // Vocal melody notes
+        playMelodyNote(0.2, N.Fs4, 0.45);
+        playMelodyNote(0.7, N.G4, 0.35);
+        playMelodyNote(1.1, N.A4, 0.55);
+        playMelodyNote(1.7, N.A4, 0.4);
+        playMelodyNote(2.2, N.Fs4, 0.4);
+        playMelodyNote(2.7, N.E4, 0.8);
+
+        playMelodyNote(4.0, N.Fs4, 0.35);
+        playMelodyNote(4.4, N.G4, 0.35);
+        playMelodyNote(4.8, N.A4, 0.45);
+        playMelodyNote(5.3, N.B4, 0.4);
+        playMelodyNote(5.8, N.A4, 0.4);
+        playMelodyNote(6.3, N.G4, 0.4);
+        playMelodyNote(6.8, N.Fs4, 0.7);
+
+        playMelodyNote(8.0, N.E4, 0.35);
+        playMelodyNote(8.4, N.Fs4, 0.35);
+        playMelodyNote(8.8, N.G4, 0.45);
+        playMelodyNote(9.3, N.G4, 0.35);
+        playMelodyNote(9.7, N.Fs4, 0.35);
+        playMelodyNote(10.2, N.E4, 0.7);
+
+        playMelodyNote(12.0, N.G4, 0.35);
+        playMelodyNote(12.4, N.A4, 0.35);
+        playMelodyNote(12.8, N.B4, 0.4);
+        playMelodyNote(13.3, N.B4, 0.35);
+        playMelodyNote(13.7, N.A4, 0.35);
+        playMelodyNote(14.1, N.G4, 0.35);
+        playMelodyNote(14.5, N.Fs4, 0.4);
+        playMelodyNote(15.0, N.E4, 0.8);
+
+        playMelodyNote(16.0, N.Fs4, 0.35);
+        playMelodyNote(16.4, N.A4, 0.35);
+        playMelodyNote(16.8, N.D5, 0.55);
+        playMelodyNote(17.4, N.D5, 0.4);
+        playMelodyNote(17.9, N.Cs5, 0.35);
+        playMelodyNote(18.3, N.B4, 0.4);
+        playMelodyNote(18.8, N.A4, 0.8);
+
+        playMelodyNote(20.0, N.G4, 0.35);
+        playMelodyNote(20.4, N.A4, 0.35);
+        playMelodyNote(20.8, N.B4, 0.4);
+        playMelodyNote(21.3, N.B4, 0.35);
+        playMelodyNote(21.7, N.A4, 0.35);
+        playMelodyNote(22.1, N.G4, 0.35);
+        playMelodyNote(22.5, N.A4, 0.4);
+        playMelodyNote(23.0, N.Fs4, 0.8);
+
+        playMelodyNote(23.8, N.E4, 0.35);
+        playMelodyNote(24.2, N.Fs4, 0.35);
+        playMelodyNote(24.6, N.G4, 0.45);
+        playMelodyNote(25.1, N.Fs4, 0.35);
+        playMelodyNote(25.5, N.E4, 0.4);
+        playMelodyNote(26.0, N.D4, 1.4);
+      } catch (e) {}
+    }
+
+    function stopProceduralBeerMelody() {
+      if (beerSynthCtx) {
+        try {
+          synthActiveNodes.forEach(node => {
+            if (node && typeof (node as any).stop === 'function') {
+              try { (node as any).stop(); } catch (e) {}
+            }
+            if (node && typeof (node as any).disconnect === 'function') {
+              try { (node as any).disconnect(); } catch (e) {}
+            }
+          });
+          synthActiveNodes = [];
+          beerSynthCtx.close();
+          beerSynthCtx = null;
+        } catch (e) {}
+      }
+    }
+
+    function openBeerBlackout() {
+      if (!dialogBeer || isBeerActive) return;
+      isBeerActive = true;
+
+      // Award Wayfarer's Journal feat
+      recordMilestone('feat_red_horse');
+
+      // Duck tavern ambient sound
+      soundEngine.duckAmbient(true);
+
+      // Show blackout overlay
+      dialogBeer.hidden = false;
+      dialogBeer.setAttribute('aria-hidden', 'false');
+      requestAnimationFrame(() => {
+        dialogBeer.classList.remove('opacity-0', 'pointer-events-none');
+        dialogBeer.classList.add('opacity-100', 'pointer-events-auto');
+      });
+
+      // Audio handling: Try MP3 first, fallback to procedural Web Audio
+      if (getSound() === 'on') {
+        try {
+          const testAudio = new Audio('/audio/beer.mp3');
+          testAudio.volume = 0.85;
+          const playPromise = testAudio.play();
+          if (playPromise) {
+            playPromise.then(() => {
+              beerAudio = testAudio;
+              if (audioStatusEl) audioStatusEl.textContent = '🎵 Playing studio recording';
+            }).catch(() => {
+              playProceduralBeerMelody();
+              if (audioStatusEl) audioStatusEl.textContent = '🎵 Playing acoustic tavern melody';
+            });
+          } else {
+            playProceduralBeerMelody();
+          }
+        } catch (e) {
+          playProceduralBeerMelody();
+        }
+      } else {
+        if (audioStatusEl) audioStatusEl.textContent = '🔈 Sound is muted (toggle ON in header controls)';
+      }
+
+      // Schedule subtitles and artist fade-in
+      const subTimer = window.setTimeout(() => {
+        if (subtextEl) subtextEl.classList.remove('opacity-0');
+        if (artistEl) artistEl.classList.remove('opacity-0');
+      }, 700);
+      beerTimerIds.push(subTimer);
+
+      // Lyric sequence schedule
+      const LYRIC_TIMINGS = [
+        { time: 100, text: "Ibuhos na ang beer sa aking lalamunan..." },
+        { time: 4000, text: "Upang malunod na ang puso kong nahihirapan..." },
+        { time: 8000, text: "Bawat patak, anong sarap..." },
+        { time: 12000, text: "Ano ba talagang mas gusto ko..." },
+        { time: 16000, text: "Ang beer na 'to... o ang pag-ibig mo?" },
+        { time: 22000, text: "🍺 Ito ang tama. (Senti hour complete)" }
+      ];
+
+      LYRIC_TIMINGS.forEach(({ time, text }) => {
+        const tid = window.setTimeout(() => {
+          if (isBeerActive) setLyric(text);
+        }, time);
+        beerTimerIds.push(tid);
+      });
+
+      // Auto-sober up at 27s
+      const endTimer = window.setTimeout(() => {
+        if (isBeerActive) closeBeerBlackout();
+      }, 27000);
+      beerTimerIds.push(endTimer);
+
+      // Focus close button for keyboard accessibility
+      btnCloseBeer?.focus({ preventScroll: true });
+    }
+
+    function closeBeerBlackout() {
+      if (!dialogBeer || !isBeerActive) return;
+      isBeerActive = false;
+
+      // Stop audio
+      if (beerAudio) {
+        try {
+          beerAudio.pause();
+          beerAudio.currentTime = 0;
+          beerAudio = null;
+        } catch (e) {}
+      }
+      stopProceduralBeerMelody();
+
+      // Clear all timers
+      beerTimerIds.forEach(tid => clearTimeout(tid));
+      beerTimerIds = [];
+
+      // Restore tavern ambient sound
+      soundEngine.duckAmbient(false);
+
+      // Fade out overlay
+      dialogBeer.classList.remove('opacity-100', 'pointer-events-auto');
+      dialogBeer.classList.add('opacity-0', 'pointer-events-none');
+
+      const hideTimer = window.setTimeout(() => {
+        dialogBeer.hidden = true;
+        dialogBeer.setAttribute('aria-hidden', 'true');
+        if (subtextEl) subtextEl.classList.add('opacity-0');
+        if (artistEl) artistEl.classList.add('opacity-0');
+        if (lyricEl) lyricEl.textContent = '...';
+        triggerBeer?.focus({ preventScroll: true });
+      }, 350);
+      beerTimerIds.push(hideTimer);
+    }
+
+    triggerBeer?.addEventListener('click', (e) => {
+      e.preventDefault();
+      openBeerBlackout();
+    });
+
+    narrowBeer?.addEventListener('click', (e) => {
+      e.preventDefault();
+      openBeerBlackout();
+    });
+
+    btnCloseBeer?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeBeerBlackout();
+    });
+
+    dialogBeer?.addEventListener('click', (e) => {
+      if (e.target === dialogBeer || (e.target as HTMLElement).classList.contains('beer-stage') || (e.target as HTMLElement).classList.contains('beer-vignette')) {
+        closeBeerBlackout();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isBeerActive) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeBeerBlackout();
+      }
+    });
   }
 
   document.addEventListener('astro:page-load', initTavernPage);

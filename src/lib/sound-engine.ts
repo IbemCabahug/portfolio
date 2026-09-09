@@ -105,7 +105,7 @@ class TavernSoundEngine {
   public duckAmbient(duck: boolean) {
     if (!this.ctx || !this.hearthGain || !this.isHearthActive) return;
     const now = this.ctx.currentTime;
-    const target = duck ? 0.02 : 0.075;
+    const target = duck ? 0.002 : 0.075;
     this.hearthGain.gain.cancelScheduledValues(now);
     this.hearthGain.gain.setValueAtTime(this.hearthGain.gain.value, now);
     this.hearthGain.gain.linearRampToValueAtTime(target, now + 0.35);
