@@ -852,6 +852,8 @@ const { compact = false } = Astro.props;
 </div>
 
 <script>
+  import { recordMilestone } from '../../store/questlog';
+
   function initMimicCompleteAppDemo() {
     // Top-Level Stepper and Screen Views
     const stepButtons = document.querySelectorAll('.mimic-step-btn');
@@ -1252,6 +1254,7 @@ const { compact = false } = Astro.props;
         enteredPin = '';
         updatePinDots();
         encryptBlob('Vessel AV-Cebu-09 manifest: 4,200 metric tons raw commodities offloaded.');
+        recordMilestone('feat_mimic_vault');
         switchScreen('vault');
       } else {
         if (pinError) pinError.textContent = 'Incorrect PIN. Re-enter code.';
@@ -1289,6 +1292,7 @@ const { compact = false } = Astro.props;
       }
       setTimeout(() => {
         encryptBlob('Vessel AV-Cebu-09 manifest: 4,200 metric tons raw commodities offloaded.');
+        recordMilestone('feat_mimic_vault');
         switchScreen('vault');
       }, 350);
     });

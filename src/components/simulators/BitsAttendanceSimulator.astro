@@ -188,6 +188,8 @@ const { compact = false } = Astro.props;
 </div>
 
 <script>
+  import { recordMilestone } from '../../store/questlog';
+
   type ScenarioKey = 'standard' | 'double_scan' | 'overtime' | 'overnight' | 'tardiness';
 
   interface ScenarioData {
@@ -386,7 +388,10 @@ const { compact = false } = Astro.props;
     buttons.forEach((btn) => {
       btn.addEventListener('click', () => {
         const scenarioKey = btn.getAttribute('data-scenario') as ScenarioKey;
-        if (scenarioKey) applyScenario(scenarioKey);
+        if (scenarioKey) {
+          applyScenario(scenarioKey);
+          recordMilestone('feat_bits_punch');
+        }
       });
     });
 

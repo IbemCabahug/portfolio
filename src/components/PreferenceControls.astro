@@ -25,6 +25,7 @@
 <script>
   import { getMotion, getSound, setMotion, setSound, subscribePreferences } from '../store/preferences';
   import { soundEngine } from '../lib/sound-engine';
+  import { recordMilestone } from '../store/questlog';
 
   function initPreferences() {
     soundEngine.init();
@@ -68,6 +69,7 @@
       if (next === 'on') {
         soundEngine.enable();
         soundEngine.playWoodClink();
+        recordMilestone('feat_hearth');
       } else {
         soundEngine.disable();
       }

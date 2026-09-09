@@ -4,6 +4,7 @@ import { JOURNAL_MILESTONES } from '../store/questlog';
 
 const chambers = JOURNAL_MILESTONES.filter((m) => m.category === 'chamber');
 const dossiers = JOURNAL_MILESTONES.filter((m) => m.category === 'dossier');
+const feats = JOURNAL_MILESTONES.filter((m) => m.category === 'feat');
 const totalCount = JOURNAL_MILESTONES.length;
 ---
 
@@ -12,15 +13,15 @@ const totalCount = JOURNAL_MILESTONES.length;
   <button
     type="button"
     id="trigger-quest-log"
-    class="relative inline-flex items-center gap-2 h-8 px-3 rounded-md bg-[#1e1208] border border-[var(--brass)] text-xs font-semibold text-[var(--candle)] hover:bg-black hover:border-[var(--candle)] transition-all shadow-xs cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--candle)] focus-visible:outline-offset-2"
+    class="relative inline-flex items-center gap-2 h-8 px-2.5 sm:px-3 rounded-md bg-[#1e1208] border border-[var(--brass)] text-xs font-semibold text-[var(--candle)] hover:bg-black hover:border-[var(--candle)] transition-all shadow-xs cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--candle)] focus-visible:outline-offset-2"
     aria-haspopup="dialog"
     aria-expanded="false"
     aria-controls="journal-dialog"
-    title="Open Wayfarer's Journal (Exploration & Fast-Travel Log)"
+    title="Open Wayfarer's Journal & Explorer Feats"
   >
     <ThematicIcon name="ledger" class="w-3.5 h-3.5 text-[var(--candle)] shrink-0" />
-    <span class="journal-full-title font-serif tracking-wide">Wayfarer's Journal</span>
-    <span class="journal-short-title font-serif tracking-wide">Journal</span>
+    <span class="journal-full-title font-serif tracking-wide hidden lg:inline">Wayfarer's Journal</span>
+    <span class="journal-short-title font-serif tracking-wide lg:hidden">Journal</span>
     <span
       id="journal-counter-badge"
       class="px-1.5 py-0.5 rounded-full bg-[var(--brass)]/20 border border-[var(--brass)]/60 text-[var(--candle)] font-mono text-[10.5px] font-bold"
@@ -48,14 +49,14 @@ const totalCount = JOURNAL_MILESTONES.length;
     hidden
   >
     {/* Journal Header */}
-    <div class="journal-header sticky top-0 bg-[#f6eee0] z-10 border-b-2 border-[var(--brass)] pb-3 mb-3">
+    <div class="journal-header sticky top-0 bg-[#f6eee0] z-20 border-b-2 border-[var(--brass)] pb-3 mb-4 shadow-xs">
       <div class="flex items-center justify-between gap-4">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-lg bg-[var(--wood-deep)] border border-[var(--brass)] flex items-center justify-center shrink-0 shadow">
             <ThematicIcon name="ledger" class="w-6 h-6 text-[var(--candle)]" />
           </div>
           <div>
-            <span class="text-xs uppercase font-extrabold tracking-widest text-[#7c531d]">Traveler's Chronicles</span>
+            <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-[#7c531d]">Guild Registry & Explorer Log</span>
             <h2 id="journal-dialog-title" class="text-xl sm:text-2xl font-bold text-[var(--ink)] font-serif leading-tight">
               The Wayfarer's Journal
             </h2>
@@ -71,16 +72,23 @@ const totalCount = JOURNAL_MILESTONES.length;
       </div>
 
       <p class="text-xs sm:text-sm text-[var(--ink)]/85 mt-2.5 leading-relaxed journal-desc">
-        An inscribed chronicle of the chambers you have explored and technical dossiers you have inspected across the tavern. Select any inscribed entry to fast-travel instantly.
+        A permanent record of the chambers you have explored, technical dossiers you have examined, and interactive engineering feats you have unlocked across Ibem's realm.
       </p>
 
-      {/* Exploration Progress Bar */}
-      <div class="mt-4 pt-3 border-t border-[var(--brass)]/30">
-        <div class="flex items-center justify-between text-xs font-mono mb-1.5">
-          <span class="font-bold text-[#633a0e]">Realm Discovery Status</span>
-          <span id="journal-progress-text" class="font-bold text-[var(--ink)]">0 of {totalCount} Inscribed (0%)</span>
+      {/* Explorer Rank & Progress Banner */}
+      <div class="mt-3.5 p-3 rounded-lg bg-[#ede4d3] border border-[var(--brass)]/60 shadow-2xs">
+        <div class="flex flex-wrap items-center justify-between gap-2 text-xs mb-2">
+          <div class="flex items-center gap-2">
+            <span id="journal-rank-icon" class="text-base">🕯️</span>
+            <div>
+              <span class="text-[10px] uppercase font-bold text-[#7c531d] tracking-wider block leading-none">Adventurer Rank</span>
+              <span id="journal-rank-title" class="font-bold text-[var(--ink)] font-serif text-sm">Wayfarer Initiate</span>
+            </div>
+          </div>
+          <span id="journal-progress-text" class="font-mono text-xs font-bold text-[#633a0e]">0 of {totalCount} Inscribed (0%)</span>
         </div>
-        <div class="w-full h-3 rounded-full bg-[#e3d7c1] border border-[var(--brass)]/60 overflow-hidden shadow-inner p-0.5">
+
+        <div class="w-full h-3 rounded-full bg-[#dccbb1] border border-[var(--brass)]/60 overflow-hidden shadow-inner p-0.5">
           <div
             id="journal-progress-bar"
             class="h-full rounded-full bg-gradient-to-r from-[#b37424] via-[var(--brass)] to-[#8c5210] transition-all duration-300 w-0"
@@ -91,10 +99,85 @@ const totalCount = JOURNAL_MILESTONES.length;
           ></div>
         </div>
       </div>
+
+      {/* Filter Tabs */}
+      <div class="flex items-center gap-1.5 mt-3 pt-2 border-t border-[var(--brass)]/30 overflow-x-auto text-xs font-semibold">
+        <button
+          type="button"
+          class="journal-tab-btn active px-2.5 py-1 rounded bg-[var(--wood-deep)] text-[var(--candle)] border border-[var(--brass)] cursor-pointer"
+          data-tab="all"
+        >
+          All Deeds ({totalCount})
+        </button>
+        <button
+          type="button"
+          class="journal-tab-btn px-2.5 py-1 rounded bg-[#ede4d3] text-stone-700 hover:bg-[#e4d8c2] border border-[var(--brass)]/40 cursor-pointer"
+          data-tab="chamber"
+        >
+          Chambers ({chambers.length})
+        </button>
+        <button
+          type="button"
+          class="journal-tab-btn px-2.5 py-1 rounded bg-[#ede4d3] text-stone-700 hover:bg-[#e4d8c2] border border-[var(--brass)]/40 cursor-pointer"
+          data-tab="dossier"
+        >
+          Dossiers ({dossiers.length})
+        </button>
+        <button
+          type="button"
+          class="journal-tab-btn px-2.5 py-1 rounded bg-[#ede4d3] text-stone-700 hover:bg-[#e4d8c2] border border-[var(--brass)]/40 cursor-pointer"
+          data-tab="feat"
+        >
+          Guild Feats ({feats.length})
+        </button>
+      </div>
+    </div>
+
+    {/* Grandmaster Unlocked Seal (Hidden until 100%) */}
+    <div
+      id="journal-grandmaster-seal"
+      class="hidden p-4 mb-6 rounded-xl bg-gradient-to-br from-[#2a1809] to-[#170c04] border-2 border-[var(--candle)] shadow-xl text-[var(--parchment)] relative overflow-hidden"
+    >
+      <div class="absolute -right-8 -top-8 w-28 h-28 bg-[var(--candle)]/10 rounded-full blur-xl pointer-events-none"></div>
+      <div class="flex items-start gap-3.5">
+        <span class="text-3xl sm:text-4xl shrink-0 animate-bounce">👑</span>
+        <div class="flex-1">
+          <span class="text-[10px] uppercase tracking-widest text-[var(--candle)] font-extrabold block">Royal Guild Decrees</span>
+          <h3 class="text-base sm:text-lg font-bold text-white font-serif leading-snug">
+            Grandmaster Explorer of Ibem's Realm
+          </h3>
+          <p class="text-xs text-[var(--parchment)]/90 mt-1 leading-relaxed">
+            By royal decree, you have fully explored every chamber, inspected all architectural case studies, and proven your mastery across all interactive simulators in Nhovem's portfolio.
+          </p>
+
+          {/* Recruiter Fast-Track Card */}
+          <div class="mt-3.5 p-3 rounded-lg bg-black/40 border border-[var(--brass)]/60 flex flex-col gap-2">
+            <span class="text-[10px] uppercase tracking-wider text-[var(--candle)] font-mono font-bold">Fast-Track Hiring Dispatch</span>
+            <p class="text-xs text-stone-200 font-mono italic select-all" id="recruiter-fast-track-text">
+              "Hi Nhovem, I completed the Wayfarer's Trial across your tavern portfolio and inspected your live engineering work (BITS biometric engine, Mimic Vault, Arcane Typer). I'd love to connect regarding an engineering role."
+            </p>
+            <div class="flex flex-wrap items-center gap-2 pt-1">
+              <button
+                type="button"
+                id="copy-recruiter-missive-btn"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-[var(--candle)] text-black font-bold text-xs hover:bg-white transition-colors cursor-pointer"
+              >
+                <span id="copy-recruiter-label">Copy Recruiter Missive</span>
+              </button>
+              <a
+                href="mailto:cabahugnhovem@gmail.com?subject=Engineering%20Opportunity%20via%20Wayfarer%20Portfolio&body=Hi%20Nhovem%2C%0A%0AI%20completed%20the%20Wayfarer's%20Trial%20across%20your%20tavern%20portfolio%20and%20inspected%20your%20live%20engineering%20work%20(BITS%20biometric%20engine%2C%20Mimic%20Vault%2C%20Arcane%20Typer).%20I'd%20love%20to%20connect%20regarding%20an%20engineering%20role."
+                class="inline-flex items-center gap-1 px-3 py-1.5 rounded bg-[var(--wood-deep)] text-[var(--candle)] border border-[var(--brass)] font-semibold text-xs hover:bg-black transition-colors"
+              >
+                <span>Dispatch Direct Email &rarr;</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     {/* Section 1: Chambers of the Tavern */}
-    <div class="space-y-4 mb-6">
+    <div class="journal-section space-y-3 mb-6" data-section="chamber">
       <h3 class="text-xs uppercase font-extrabold tracking-widest text-[#7c531d] flex items-center gap-2">
         <ThematicIcon name="tavern" class="w-4 h-4 text-[var(--brass)]" />
         <span>Chambers of the Realm</span>
@@ -136,7 +219,7 @@ const totalCount = JOURNAL_MILESTONES.length;
     </div>
 
     {/* Section 2: Case Study Dossiers */}
-    <div class="space-y-4 mb-6">
+    <div class="journal-section space-y-3 mb-6" data-section="dossier">
       <h3 class="text-xs uppercase font-extrabold tracking-widest text-[#7c531d] flex items-center gap-2">
         <ThematicIcon name="scroll" class="w-4 h-4 text-[var(--brass)]" />
         <span>Inscribed Case Study Dossiers</span>
@@ -176,6 +259,55 @@ const totalCount = JOURNAL_MILESTONES.length;
       </div>
     </div>
 
+    {/* Section 3: Guild Feats & Interactive Trials */}
+    <div class="journal-section space-y-3 mb-6" data-section="feat">
+      <h3 class="text-xs uppercase font-extrabold tracking-widest text-[#7c531d] flex items-center gap-2">
+        <ThematicIcon name="swords" class="w-4 h-4 text-[var(--brass)]" />
+        <span>Guild Feats & Engineering Deeds</span>
+      </h3>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        {feats.map((feat) => (
+          <div
+            id={`journal-card-${feat.id}`}
+            class="journal-milestone-card p-3 rounded-md border border-[var(--brass)]/50 bg-[#ede4d3]/70 hover:bg-[#ede4d3] transition-colors flex flex-col justify-between gap-2 shadow-2xs"
+            data-milestone-id={feat.id}
+          >
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-1">
+                <span class="font-bold text-sm text-[var(--ink)] font-serif flex items-center gap-1.5">
+                  <ThematicIcon name={feat.iconName as any} class="w-3.5 h-3.5 text-[var(--brass)]" />
+                  <span>{feat.title}</span>
+                </span>
+                <span class="milestone-status-badge text-[10px] font-mono font-bold px-1.5 py-0.5 rounded border border-stone-400/50 text-stone-600 bg-stone-200/50 shrink-0">
+                  ○ Incomplete
+                </span>
+              </div>
+              <p class="text-[11px] text-[var(--ink)]/80 leading-snug">
+                {feat.tagline}
+              </p>
+            </div>
+
+            <div class="pt-1.5 border-t border-[var(--brass)]/20 flex items-center justify-between text-xs">
+              {feat.actionHint && (
+                <span class="text-[10px] text-[#7c531d] italic font-mono truncate mr-2" title={feat.actionHint}>
+                  Hint: {feat.actionHint}
+                </span>
+              )}
+              {feat.path && (
+                <a
+                  href={feat.path}
+                  class="inline-flex items-center gap-1 font-bold text-[#633a0e] hover:underline shrink-0 ml-auto"
+                >
+                  <span>Go to Trial &rarr;</span>
+                </a>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
     {/* Actions Footer */}
     <div class="pt-4 border-t-2 border-[var(--brass)] flex flex-wrap items-center justify-between gap-3">
       <button
@@ -196,7 +328,51 @@ const totalCount = JOURNAL_MILESTONES.length;
       </button>
     </div>
   </div>
+
+  {/* Milestone Floating Toast Notification Container */}
+  <div
+    id="milestone-toast-container"
+    class="fixed top-14 right-4 z-50 flex flex-col gap-2 pointer-events-none"
+    aria-live="polite"
+    aria-atomic="true"
+  ></div>
 </div>
+
+<style>
+  .journal-dialog-panel {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(94vw, 860px);
+    max-height: min(90dvh, 760px);
+    padding: 1.5rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  @media (max-width: 640px) {
+    .journal-dialog-panel {
+      width: 96vw;
+      max-height: 94dvh;
+      padding: 1rem;
+    }
+  }
+
+  .journal-tab-btn.active {
+    background: var(--wood-deep) !important;
+    color: var(--candle) !important;
+    border-color: var(--brass) !important;
+  }
+
+  /* Shimmer animation for Grandmaster seal */
+  @keyframes sealShimmer {
+    0% { box-shadow: 0 0 15px rgba(213, 128, 59, 0.2); }
+    50% { box-shadow: 0 0 25px rgba(255, 228, 160, 0.4); }
+    100% { box-shadow: 0 0 15px rgba(213, 128, 59, 0.2); }
+  }
+  #journal-grandmaster-seal:not(.hidden) {
+    animation: sealShimmer 3s infinite ease-in-out;
+  }
+</style>
 
 <script>
   import {
@@ -206,6 +382,7 @@ const totalCount = JOURNAL_MILESTONES.length;
     clearJournalMilestones,
     detectMilestoneFromPath,
     subscribeQuestLog,
+    getAdventurerRank,
   } from '../store/questlog';
   import { soundEngine } from '../lib/sound-engine';
 
@@ -218,6 +395,13 @@ const totalCount = JOURNAL_MILESTONES.length;
     const counterBadge = document.getElementById('journal-counter-badge');
     const progressBar = document.getElementById('journal-progress-bar');
     const progressText = document.getElementById('journal-progress-text');
+    const rankIcon = document.getElementById('journal-rank-icon');
+    const rankTitle = document.getElementById('journal-rank-title');
+    const grandmasterSeal = document.getElementById('journal-grandmaster-seal');
+    const copyRecruiterBtn = document.getElementById('copy-recruiter-missive-btn');
+    const copyRecruiterLabel = document.getElementById('copy-recruiter-label');
+    const tabBtns = document.querySelectorAll('.journal-tab-btn');
+    const sections = document.querySelectorAll('.journal-section');
 
     if (!trigger || !dialog || !backdrop) return;
 
@@ -240,6 +424,11 @@ const totalCount = JOURNAL_MILESTONES.length;
       // Update badge
       if (counterBadge) {
         counterBadge.textContent = `${count}/${total}`;
+        if (count >= total) {
+          counterBadge.className = 'px-1.5 py-0.5 rounded-full bg-amber-500/30 border border-amber-400 text-amber-300 font-mono text-[10.5px] font-bold animate-pulse';
+        } else {
+          counterBadge.className = 'px-1.5 py-0.5 rounded-full bg-[var(--brass)]/20 border border-[var(--brass)]/60 text-[var(--candle)] font-mono text-[10.5px] font-bold';
+        }
       }
 
       // Update progress bar
@@ -249,6 +438,23 @@ const totalCount = JOURNAL_MILESTONES.length;
       }
       if (progressText) {
         progressText.textContent = `${count} of ${total} Inscribed (${pct}%)`;
+      }
+
+      // Update rank
+      const rank = getAdventurerRank(count);
+      if (rankIcon) rankIcon.textContent = rank.badgeIcon;
+      if (rankTitle) {
+        rankTitle.textContent = rank.title;
+        rankTitle.className = `font-bold font-serif text-sm ${rank.colorClass}`;
+      }
+
+      // Show Grandmaster seal if 100%
+      if (grandmasterSeal) {
+        if (count >= total) {
+          grandmasterSeal.classList.remove('hidden');
+        } else {
+          grandmasterSeal.classList.add('hidden');
+        }
       }
 
       // Update milestone cards
@@ -264,7 +470,9 @@ const totalCount = JOURNAL_MILESTONES.length;
           card.classList.add('bg-emerald-950/5', 'border-emerald-700/60');
 
           if (badge) {
-            badge.textContent = milestone.category === 'chamber' ? '✓ Inscribed' : '✓ Reviewed';
+            if (milestone.category === 'chamber') badge.textContent = '✓ Inscribed';
+            else if (milestone.category === 'dossier') badge.textContent = '✓ Reviewed';
+            else badge.textContent = '✓ Mastered';
             badge.className =
               'milestone-status-badge text-[10px] font-mono font-bold px-1.5 py-0.5 rounded border border-emerald-600/70 text-emerald-800 bg-emerald-100/80 shrink-0';
           }
@@ -273,13 +481,49 @@ const totalCount = JOURNAL_MILESTONES.length;
           card.classList.add('bg-[#ede4d3]/70', 'border-[var(--brass)]/50');
 
           if (badge) {
-            badge.textContent = milestone.category === 'chamber' ? '○ Unexplored' : '○ Unread';
+            if (milestone.category === 'chamber') badge.textContent = '○ Unexplored';
+            else if (milestone.category === 'dossier') badge.textContent = '○ Unread';
+            else badge.textContent = '○ Incomplete';
             badge.className =
               'milestone-status-badge text-[10px] font-mono font-bold px-1.5 py-0.5 rounded border border-stone-400/50 text-stone-600 bg-stone-200/50 shrink-0';
           }
         }
       });
     }
+
+    // Filter tabs logic
+    tabBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        soundEngine.playWoodClink();
+        tabBtns.forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const tab = btn.getAttribute('data-tab');
+        sections.forEach((sec) => {
+          const secType = sec.getAttribute('data-section');
+          if (tab === 'all' || tab === secType) {
+            sec.classList.remove('hidden');
+          } else {
+            sec.classList.add('hidden');
+          }
+        });
+      });
+    });
+
+    // Copy Recruiter Missive button
+    copyRecruiterBtn?.addEventListener('click', async () => {
+      const text = document.getElementById('recruiter-fast-track-text')?.textContent?.trim() || '';
+      try {
+        await navigator.clipboard.writeText(text);
+        soundEngine.playParchmentRustle();
+        if (copyRecruiterLabel) copyRecruiterLabel.textContent = '✓ Copied to Clipboard!';
+        setTimeout(() => {
+          if (copyRecruiterLabel) copyRecruiterLabel.textContent = 'Copy Recruiter Missive';
+        }, 3000);
+      } catch {
+        if (copyRecruiterLabel) copyRecruiterLabel.textContent = 'Select Text Manually';
+      }
+    });
 
     function openDialog() {
       soundEngine.playParchmentRustle();
@@ -305,130 +549,82 @@ const totalCount = JOURNAL_MILESTONES.length;
       safeTrigger.focus();
     }
 
-    trigger.addEventListener('click', openDialog);
-    backdrop.addEventListener('click', closeDialog);
-    if (closeBtn) closeBtn.addEventListener('click', closeDialog);
-    dialog.querySelectorAll('.journal-header-close-btn').forEach(b => b.addEventListener('click', closeDialog));
-
-    if (resetBtn) {
-      resetBtn.addEventListener('click', () => {
-        if (window.confirm('Clear your recorded traveler inscriptions and start fresh?')) {
-          clearJournalMilestones();
-          // Re-record current page
-          if (currentMilestone) {
-            recordMilestone(currentMilestone);
-          }
-        }
-      });
+    // Bind triggers
+    if (!(safeTrigger as any).__bound) {
+      (safeTrigger as any).__bound = true;
+      safeTrigger.addEventListener('click', openDialog);
     }
+    safeBackdrop.addEventListener('click', closeDialog);
+    closeBtn?.addEventListener('click', closeDialog);
+    safeDialog.querySelector('.journal-header-close-btn')?.addEventListener('click', closeDialog);
 
-    // Keyboard support: Escape key to close
+    // Escape key
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !dialog.hasAttribute('hidden')) {
+      if (e.key === 'Escape' && !safeDialog.hasAttribute('hidden')) {
         closeDialog();
+      }
+    });
+
+    // Reset button
+    resetBtn?.addEventListener('click', () => {
+      if (window.confirm('Clear all inscribed exploration records and achievements?')) {
+        clearJournalMilestones();
+        soundEngine.playWoodClink();
       }
     });
 
     // Subscribe to store updates
     subscribeQuestLog(updateView);
-
-    // Initial render
     updateView();
+
+    // Listen for custom milestone-unlocked events to show floating toast
+    window.addEventListener('milestone-unlocked', ((e: CustomEvent) => {
+      const { milestone } = e.detail;
+      if (!milestone) return;
+
+      soundEngine.playWoodClink();
+
+      const container = document.getElementById('milestone-toast-container');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      toast.className =
+        'p-3 rounded-lg bg-[var(--wood-deep)] border-2 border-[var(--brass)] text-[var(--parchment)] shadow-2xl flex items-center gap-3 transition-all duration-300 pointer-events-auto max-w-xs sm:max-w-sm';
+      toast.style.transform = 'translateX(100%)';
+      toast.style.opacity = '0';
+
+      const icon = milestone.category === 'feat' ? '⚔️' : '📜';
+      toast.innerHTML = `
+        <span class="text-xl shrink-0">${icon}</span>
+        <div class="truncate">
+          <span class="text-[10px] uppercase font-bold text-[var(--candle)] tracking-wider block leading-none">Milestone Inscribed</span>
+          <span class="text-xs font-bold text-white block truncate">${milestone.title}</span>
+          <span class="text-[10px] text-stone-300 block truncate">${milestone.tagline}</span>
+        </div>
+      `;
+
+      container.appendChild(toast);
+
+      // Animate in
+      requestAnimationFrame(() => {
+        toast.style.transform = 'translateX(0)';
+        toast.style.opacity = '1';
+      });
+
+      // Dismiss after 4 seconds
+      setTimeout(() => {
+        toast.style.transform = 'translateX(100%)';
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 350);
+      }, 4000);
+    }) as EventListener);
   }
 
-  // Initialize on load and on view transitions
-  document.addEventListener('astro:page-load', initJournal);
+  // Initialize on load and Astro page transitions
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initJournal);
   } else {
     initJournal();
   }
+  document.addEventListener('astro:page-load', initJournal);
 </script>
-
-<style>
-  .journal-full-title {
-    display: none;
-  }
-  .journal-short-title {
-    display: none;
-  }
-
-  @media (min-width: 1024px) and (min-height: 501px) {
-    .journal-full-title {
-      display: inline;
-    }
-  }
-
-  @media (min-width: 640px) and (max-width: 1023px) and (min-height: 501px) {
-    .journal-short-title {
-      display: inline;
-    }
-  }
-
-  @media (max-height: 500px), (max-width: 860px) {
-    #trigger-quest-log {
-      padding: 2px 8px;
-      min-height: 34px;
-      gap: 6px;
-    }
-  }
-
-  #journal-dialog {
-    box-sizing: border-box;
-    -webkit-overflow-scrolling: touch;
-    width: min(92vw, 680px);
-    max-height: min(88dvh, 720px);
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 24px;
-  }
-
-  /* Short landscape screens (<= 500px height in landscape) */
-  @media (max-height: 500px) and (orientation: landscape) {
-    #journal-dialog {
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: min(94vw, 700px);
-      max-height: 94dvh;
-      padding: 10px 14px;
-    }
-    #journal-dialog .journal-desc {
-      display: none;
-    }
-    #journal-dialog .border-b-2 {
-      padding-bottom: 6px;
-      margin-bottom: 8px;
-    }
-    #journal-dialog .space-y-4 {
-      margin-bottom: 8px;
-    }
-    #journal-dialog .journal-milestone-card {
-      padding: 6px 8px;
-    }
-  }
-
-  /* Mobile portrait screens (<= 600px in portrait) */
-  @media (max-width: 600px) and (orientation: portrait) {
-    #journal-dialog {
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: min(94vw, 480px);
-      max-height: 90dvh;
-      padding: 16px 14px;
-    }
-  }
-
-  @media (pointer: coarse) {
-    #trigger-quest-log::after {
-      content: '';
-      position: absolute;
-      top: -8px;
-      bottom: -8px;
-      left: -4px;
-      right: -4px;
-    }
-  }
-</style>

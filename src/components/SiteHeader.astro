@@ -65,7 +65,7 @@ const navLinks = [
 
   {/* ZONE 2: Global Controls & Tavern Preferences (Center) */}
   <div class="contextual-controls flex items-center gap-1.5 sm:gap-2 shrink-0">
-    {showContextualControls && <QuestLog />}
+    <QuestLog />
     <div class="hidden sm:flex items-center">
       <PreferenceControls />
     </div>
@@ -141,7 +141,21 @@ const navLinks = [
         <li><a href="/simple" class="flex items-center min-h-[44px] px-2 rounded text-[var(--parchment)]/80 hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Field Ledger (0-JS)</a></li>
         <li class="border-t border-[var(--brass)]/30 my-1"></li>
         <li class="px-2 py-1 text-[10px] uppercase tracking-widest text-[var(--brass)] font-extrabold border-b border-[var(--brass)]/30 mb-1">
-          Atmosphere & Controls
+          Wayfarer & Controls
+        </li>
+        <li>
+          <button
+            type="button"
+            id="menu-trigger-quest-log"
+            class="w-full flex items-center justify-between min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)] text-left cursor-pointer transition-colors text-xs text-[var(--parchment)]"
+            aria-label="Open Wayfarer's Journal and Explorer Feats"
+          >
+            <span class="flex items-center gap-2">
+              <ThematicIcon name="ledger" class="w-4 h-4 text-[var(--brass)] shrink-0" />
+              <span>Wayfarer's Journal</span>
+            </span>
+            <span id="menu-journal-counter" class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-black/40 text-[var(--candle)]">0/14</span>
+          </button>
         </li>
         <li>
           <button
@@ -180,9 +194,34 @@ const navLinks = [
 <script>
   import { getSound, setSound, subscribePreferences } from '../store/preferences';
   import { soundEngine } from '../lib/sound-engine';
+  import { getVisitedMilestones, subscribeQuestLog, JOURNAL_MILESTONES, recordMilestone } from '../store/questlog';
 
   function initHeaderControls() {
     soundEngine.init();
+
+    // Mobile menu Wayfarer Journal trigger
+    const menuJournalBtn = document.getElementById('menu-trigger-quest-log');
+    const menuJournalCounter = document.getElementById('menu-journal-counter');
+
+    function updateMenuJournal() {
+      if (menuJournalCounter) {
+        const count = getVisitedMilestones().size;
+        menuJournalCounter.textContent = `${count}/${JOURNAL_MILESTONES.length}`;
+      }
+    }
+
+    if (menuJournalBtn && !(menuJournalBtn as any).__bound) {
+      (menuJournalBtn as any).__bound = true;
+      menuJournalBtn.addEventListener('click', () => {
+        const dropdown = document.getElementById('site-menu-dropdown') as HTMLDetailsElement | null;
+        if (dropdown) dropdown.open = false;
+        const trigger = document.getElementById('trigger-quest-log');
+        if (trigger) trigger.click();
+      });
+    }
+
+    subscribeQuestLog(updateMenuJournal);
+    updateMenuJournal();
 
     const fsBtn = document.getElementById('menu-toggle-fullscreen');
     const fsText = document.getElementById('fullscreen-btn-text');
@@ -234,6 +273,7 @@ const navLinks = [
         if (next === 'on') {
           soundEngine.enable();
           soundEngine.playWoodClink();
+          recordMilestone('feat_hearth');
         } else {
           soundEngine.disable();
         }

@@ -1,19 +1,22 @@
 /**
- * Client-side discovery store for the Wayfarer's Journal (Visitor Quest Log).
- * Stored strictly in the user's localStorage (zero analytics, zero backend).
+ * Client-side discovery store for the Wayfarer's Journal (Visitor Quest Log & Achievements).
+ * Stored strictly in the user's localStorage (zero analytics, zero backend tracking).
  */
+
+export type MilestoneCategory = 'chamber' | 'dossier' | 'feat';
 
 export interface JournalMilestone {
   id: string;
   title: string;
-  category: 'chamber' | 'dossier';
-  path: string;
+  category: MilestoneCategory;
+  path?: string;
   tagline: string;
   iconName: string;
+  actionHint?: string;
 }
 
 export const JOURNAL_MILESTONES: JournalMilestone[] = [
-  // Chambers of the Tavern
+  // ── Part 1: Chambers of the Tavern (Exploration) ─────────────────────
   {
     id: 'tavern',
     title: 'The Common Taproom (Tavern)',
@@ -55,7 +58,7 @@ export const JOURNAL_MILESTONES: JournalMilestone[] = [
     iconName: 'scroll',
   },
 
-  // Case Study Dossiers
+  // ── Part 2: Case Study Dossiers (Deep Technical Reading) ──────────────
   {
     id: 'arcanetyper',
     title: 'Arcane Typer Dossier',
@@ -79,6 +82,61 @@ export const JOURNAL_MILESTONES: JournalMilestone[] = [
     path: '/quests/mimic',
     tagline: 'Flutter party game and offline AES-256 encrypted hardware vault',
     iconName: 'swords',
+  },
+
+  // ── Part 3: Guild Feats & Deeds (Interactive Trials) ─────────────────
+  {
+    id: 'feat_hearth',
+    title: 'Kindle the Hearthfire',
+    category: 'feat',
+    tagline: 'Ignite the ambient procedural fireplace soundscape in the header controls',
+    iconName: 'candle',
+    actionHint: 'Toggle "Sound: On" in the top bar or mobile menu',
+  },
+  {
+    id: 'feat_transceiver',
+    title: 'Tuning the Transceiver',
+    category: 'feat',
+    path: '/messenger',
+    tagline: 'Engage a live interactive project trial in the Arcane Transceiver',
+    iconName: 'terminal',
+    actionHint: 'Visit the Courier\'s Roost and launch any project simulation',
+  },
+  {
+    id: 'feat_mimic_vault',
+    title: 'The Mimic Decrypted',
+    category: 'feat',
+    path: '/quests/mimic',
+    tagline: 'Unlock the concealed cryptographic vault using secret PIN 1337',
+    iconName: 'swords',
+    actionHint: 'In the Mimic simulator, enter PIN 1337 or use fingerprint recognition',
+  },
+  {
+    id: 'feat_bits_punch',
+    title: 'Clockwork Shifter',
+    category: 'feat',
+    path: '/quests/bits',
+    tagline: 'Trigger a biometric telemetry punch scenario in the BITS engine simulator',
+    iconName: 'terminal',
+    actionHint: 'In the BITS simulator, click any attendance scenario button',
+  },
+  {
+    id: 'feat_tavern_dialogue',
+    title: 'Taproom Confidant',
+    category: 'feat',
+    path: '/tavern',
+    tagline: 'Confer with the Tavern Innkeeper or Regular about architectural lore',
+    iconName: 'tavern',
+    actionHint: 'Click an inquiry topic when speaking with any tavern NPC',
+  },
+  {
+    id: 'feat_raven_missive',
+    title: "Courier's Dispatch",
+    category: 'feat',
+    path: '/messenger',
+    tagline: 'Compose or prepare an inquiry missive to send via the Tavern Raven',
+    iconName: 'raven',
+    actionHint: 'Click "Send Missive" or copy the missive address in the Courier\'s Roost',
   },
 ];
 
@@ -122,6 +180,16 @@ export function recordMilestone(id: string): void {
       current.add(id);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(current)));
       notify();
+
+      // Emit event for real-time celebration toast
+      const milestone = JOURNAL_MILESTONES.find((m) => m.id === id);
+      if (milestone) {
+        window.dispatchEvent(
+          new CustomEvent('milestone-unlocked', {
+            detail: { id, milestone },
+          })
+        );
+      }
     }
   } catch {}
 }
@@ -132,6 +200,61 @@ export function clearJournalMilestones(): void {
     localStorage.removeItem(STORAGE_KEY);
     notify();
   } catch {}
+}
+
+export interface AdventurerRank {
+  rank: string;
+  tier: number;
+  title: string;
+  badgeIcon: string;
+  colorClass: string;
+}
+
+export function getAdventurerRank(count: number): AdventurerRank {
+  const total = JOURNAL_MILESTONES.length;
+  if (count >= total) {
+    return {
+      rank: 'Grandmaster Guildmaster',
+      tier: 5,
+      title: 'Grandmaster of Ibem’s Realm',
+      badgeIcon: '👑',
+      colorClass: 'text-amber-500 font-extrabold',
+    };
+  }
+  if (count >= 11) {
+    return {
+      rank: 'Master Wayfarer',
+      tier: 4,
+      title: 'Master Wayfarer & Systems Inquisitor',
+      badgeIcon: '⭐',
+      colorClass: 'text-amber-600 font-bold',
+    };
+  }
+  if (count >= 8) {
+    return {
+      rank: 'Veteran Adventurer',
+      tier: 3,
+      title: 'Veteran Guild Adventurer',
+      badgeIcon: '🗡️',
+      colorClass: 'text-yellow-700 font-bold',
+    };
+  }
+  if (count >= 4) {
+    return {
+      rank: 'Journeyman Explorer',
+      tier: 2,
+      title: 'Journeyman Explorer of the Taproom',
+      badgeIcon: '📜',
+      colorClass: 'text-stone-700 font-semibold',
+    };
+  }
+  return {
+    rank: 'Wayfarer Initiate',
+    tier: 1,
+    title: 'Wayfarer Initiate at the Threshold',
+    badgeIcon: '🕯️',
+    colorClass: 'text-stone-600 font-medium',
+  };
 }
 
 /**
@@ -146,6 +269,7 @@ export function detectMilestoneFromPath(pathname: string): string | null {
   if (clean === '/quests') return 'quests';
   if (clean.startsWith('/messenger')) return 'messenger';
   if (clean.startsWith('/resume')) return 'resume';
+  if (clean.startsWith('/tales')) return 'tales';
   if (clean.startsWith('/tavern')) return 'tavern';
 
   return null;

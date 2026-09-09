@@ -714,6 +714,8 @@ const TitleTag = isModal ? 'h2' : 'h1';
 </style>
 
 <script>
+  import { recordMilestone } from '../store/questlog';
+
   // Unified Deterministic NPC Dialogue Controller
   function setupNpcDialogue() {
     const containers = document.querySelectorAll<HTMLElement>('.npc-dialogue-container');
@@ -966,6 +968,7 @@ const TitleTag = isModal ? 'h2' : 'h1';
       repliesList.addEventListener('click', (e) => {
         const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.reply-btn');
         if (!btn) return;
+        recordMilestone('feat_tavern_dialogue');
 
         if (btn.getAttribute('data-action') === 'farewell') {
           if (data.farewell?.href) {

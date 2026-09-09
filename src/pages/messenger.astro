@@ -1881,6 +1881,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
   import { initPerformanceGovernor } from '../lib/perf-governor';
   import { sendMissive } from '../lib/contact';
   import { soundEngine } from '../lib/sound-engine';
+  import { recordMilestone } from '../store/questlog';
 
   function initMessengerPage() {
     initPerformanceGovernor();
@@ -2403,6 +2404,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
       function launchArena() {
         soundEngine.playWoodClink();
         soundEngine.duckAmbient(true);
+        recordMilestone('feat_transceiver');
         const proj = TRANSCEIVER_PROJECTS[currentProjectIndex];
         if (!proj) return;
 
@@ -2552,6 +2554,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
           const receiptGmailLink = document.getElementById('receipt-gmail-link') as HTMLAnchorElement | null;
 
           if (composerView && receiptView) {
+            recordMilestone('feat_raven_missive');
             composerView.classList.add('hidden');
             receiptView.classList.remove('hidden');
 
