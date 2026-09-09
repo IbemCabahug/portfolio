@@ -1537,7 +1537,7 @@ const sceneObjects = [
   import { initPerformanceGovernor } from '../../lib/perf-governor';
   import { soundEngine } from '../../lib/sound-engine';
   import { recordMilestone } from '../../store/questlog';
-  import { getSound } from '../../store/preferences';
+  import { getSound, setSound } from '../../store/preferences';
 
   function initTavernPage() {
     initPerformanceGovernor();
@@ -1830,6 +1830,9 @@ const sceneObjects = [
 
       try {
         beerSynthCtx = new AudioCtx();
+        if (beerSynthCtx.state === 'suspended') {
+          beerSynthCtx.resume();
+        }
         const ctx = beerSynthCtx;
         const now = ctx.currentTime;
 
@@ -2017,28 +2020,30 @@ const sceneObjects = [
         dialogBeer.classList.add('opacity-100', 'pointer-events-auto');
       });
 
-      // Audio handling: Try MP3 first, fallback to procedural Web Audio
-      if (getSound() === 'on') {
-        try {
-          const testAudio = new Audio('/audio/beer.mp3');
-          testAudio.volume = 0.85;
-          const playPromise = testAudio.play();
-          if (playPromise) {
-            playPromise.then(() => {
-              beerAudio = testAudio;
-              if (audioStatusEl) audioStatusEl.textContent = '🎵 Playing studio recording';
-            }).catch(() => {
-              playProceduralBeerMelody();
-              if (audioStatusEl) audioStatusEl.textContent = '🎵 Playing acoustic tavern melody';
-            });
-          } else {
+      // Automatically activate sound if currently muted so the easter egg's musical purpose is achieved
+      if (getSound() !== 'on') {
+        setSound('on');
+      }
+
+      // Audio handling: Try MP3 first (from /public/audio/beer.mp3), fallback to procedural Web Audio
+      try {
+        const testAudio = new Audio('/audio/beer.mp3');
+        testAudio.volume = 0.9;
+        testAudio.preload = 'auto';
+        const playPromise = testAudio.play();
+        if (playPromise) {
+          playPromise.then(() => {
+            beerAudio = testAudio;
+            if (audioStatusEl) audioStatusEl.textContent = '🎵 Playing studio recording';
+          }).catch(() => {
             playProceduralBeerMelody();
-          }
-        } catch (e) {
+            if (audioStatusEl) audioStatusEl.textContent = '🎵 Playing acoustic tavern melody';
+          });
+        } else {
           playProceduralBeerMelody();
         }
-      } else {
-        if (audioStatusEl) audioStatusEl.textContent = '🔈 Sound is muted';
+      } catch (e) {
+        playProceduralBeerMelody();
       }
 
       // Lyric sequence schedule
@@ -2102,15 +2107,20 @@ const sceneObjects = [
       beerTimerIds.push(hideTimer);
     }
 
-    triggerBeer?.addEventListener('click', (e) => {
+    function handleBeerTrigger(e: Event) {
       e.preventDefault();
+      // Auto turn on sound on user interaction
+      if (getSound() !== 'on') {
+        setSound('on');
+      }
+      soundEngine.init();
       openBeerBlackout();
-    });
+    }
 
-    narrowBeer?.addEventListener('click', (e) => {
-      e.preventDefault();
-      openBeerBlackout();
-    });
+    triggerBeer?.addEventListener('click', handleBeerTrigger);
+    triggerBeer?.addEventListener('touchend', handleBeerTrigger, { passive: false });
+
+    narrowBeer?.addEventListener('click', handleBeerTrigger);
 
     btnCloseBeer?.addEventListener('click', (e) => {
       e.stopPropagation();
