@@ -18,6 +18,7 @@ const DEFAULT_ROUTES = [
   '/simple',
   '/resume',
   '/tavern',
+  '/tavern/archivist',
   '/quests',
   '/quests/arcanetyper',
   '/messenger',

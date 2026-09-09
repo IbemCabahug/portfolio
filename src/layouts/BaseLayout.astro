@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import ThemeInit from '../components/ThemeInit.astro';
+import SiteHeader from '../components/SiteHeader.astro';
 import { ClientRouter } from 'astro:transitions';
 
 interface Props {
@@ -38,9 +39,9 @@ const sitemapUrl = siteUrl ? new URL('/sitemap-index.xml', siteUrl).href : '/sit
   <body>
     <a href="#main-content">Skip to content</a>
     {!hideDefaultNav && (
-      <header class="no-print print:hidden bg-[var(--wood-deep)] text-[var(--parchment)] border-b border-[var(--brass)] sticky top-0 z-30 shadow-md">
-        <div class="max-w-6xl mx-auto px-4 py-1.5 sm:py-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-          {Astro.url.pathname.startsWith('/simple') ? (
+      Astro.url.pathname.startsWith('/simple') ? (
+        <header class="no-print print:hidden bg-[var(--wood-deep)] text-[var(--parchment)] border-b border-[var(--brass)] sticky top-0 z-30 shadow-md">
+          <div class="max-w-6xl mx-auto px-4 py-1.5 sm:py-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
             <div class="w-full flex flex-wrap items-center justify-between gap-2">
               <div class="flex items-center gap-2">
                 <a
@@ -109,107 +110,11 @@ const sitemapUrl = siteUrl ? new URL('/sitemap-index.xml', siteUrl).href : '/sit
                 </ul>
               </nav>
             </div>
-          ) : (
-            <div class="w-full flex flex-wrap items-center justify-between gap-2">
-              <div class="flex items-center gap-2">
-                <a
-                  href="/"
-                  class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[var(--candle)] hover:text-white transition-colors min-h-[44px] px-2 focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
-                  title="Return to Home / Entrance"
-                >
-                  <span class="font-serif tracking-wide">Ibem's Tavern</span>
-                </a>
-                <span class="text-xs font-semibold px-2 py-0.5 rounded bg-[#140c05] border border-[var(--brass)] text-[var(--candle)]">
-                  {Astro.url.pathname.startsWith('/resume') ? 'Resume' : Astro.url.pathname.startsWith('/about') ? 'About' : 'Navigation'}
-                </span>
-              </div>
-
-              <div class="flex items-center gap-1.5 sm:gap-2.5">
-                <nav aria-label="Main Navigation" class="flex items-center">
-                  <ul class="flex items-center gap-1 text-xs font-semibold">
-                    <li>
-                      <a
-                        href="/"
-                        class={`inline-flex items-center min-h-[44px] px-2.5 py-1 rounded transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)] ${Astro.url.pathname === '/' ? 'text-[var(--candle)] bg-[var(--brass)]/20 font-bold' : 'text-[var(--parchment)] hover:text-[var(--candle)] hover:bg-[var(--brass)]/20'}`}
-                      >
-                        Home
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="/about"
-                        class={`inline-flex items-center min-h-[44px] px-2.5 py-1 rounded transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)] ${Astro.url.pathname.startsWith('/about') ? 'text-[var(--candle)] bg-[var(--brass)]/20 font-bold' : 'text-[var(--parchment)] hover:text-[var(--candle)] hover:bg-[var(--brass)]/20'}`}
-                      >
-                        About
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="/resume"
-                        class={`inline-flex items-center min-h-[44px] px-2.5 py-1 rounded transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)] ${Astro.url.pathname.startsWith('/resume') ? 'text-[var(--candle)] bg-[var(--brass)]/20 font-bold' : 'text-[var(--parchment)] hover:text-[var(--candle)] hover:bg-[var(--brass)]/20'}`}
-                      >
-                        Resume
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="/quests"
-                        class={`inline-flex items-center min-h-[44px] px-2.5 py-1 rounded transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)] ${Astro.url.pathname.startsWith('/quests') ? 'text-[var(--candle)] bg-[var(--brass)]/20 font-bold' : 'text-[var(--parchment)] hover:text-[var(--candle)] hover:bg-[var(--brass)]/20'}`}
-                        title="Quest Board"
-                      >
-                        Quest Board
-                      </a>
-                    </li>
-                  </ul>
-                </nav>
-
-                <a
-                  href="/simple"
-                  class="hidden sm:inline-flex items-center min-h-[44px] px-2.5 py-1 rounded border border-[var(--brass)] text-[var(--candle)] hover:bg-[var(--brass)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)] text-xs font-bold"
-                  title="Switch to Field Ledger (Simple Mode)"
-                >
-                  Field Ledger &rarr;
-                </a>
-
-                {/* Chambers & Site Menu Dropdown */}
-                <details class="relative group">
-                  <summary
-                    class="flex items-center justify-center min-h-[44px] px-2.5 py-1 text-xs font-semibold rounded border border-[var(--brass)]/70 bg-[#1e1208] text-[var(--candle)] cursor-pointer hover:bg-black hover:border-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] list-none select-none transition-colors"
-                    aria-label="Toggle site chambers and navigation menu"
-                  >
-                    <span class="flex items-center gap-1.5">
-                      <svg class="w-3.5 h-3.5 text-[var(--brass)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="3" y1="12" x2="21" y2="12"></line>
-                        <line x1="3" y1="6" x2="21" y2="6"></line>
-                        <line x1="3" y1="18" x2="21" y2="18"></line>
-                      </svg>
-                      <span class="hidden sm:inline">Menu</span>
-                    </span>
-                  </summary>
-                  <ul class="absolute right-0 top-full mt-1 w-52 p-2 rounded-md bg-[var(--wood-deep)] border-2 border-[var(--brass)] text-xs font-semibold shadow-2xl z-50 flex flex-col gap-0.5">
-                    <li class="px-2 py-1 text-[10px] uppercase tracking-widest text-[var(--brass)] font-extrabold border-b border-[var(--brass)]/30 mb-1">
-                      Tavern Chambers
-                    </li>
-                    <li><a href="/tavern" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Main Tavern</a></li>
-                    <li><a href="/tavern/skills" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Adventurer's Badge</a></li>
-                    <li><a href="/tavern/npc" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Tavern Regular</a></li>
-                    <li><a href="/quests" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Quest Board</a></li>
-                    <li><a href="/messenger" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Messenger's Corner</a></li>
-                    <li class="border-t border-[var(--brass)]/30 my-1"></li>
-                    <li class="px-2 py-1 text-[10px] uppercase tracking-widest text-[var(--brass)] font-extrabold border-b border-[var(--brass)]/30 mb-1">
-                      Portfolio Records
-                    </li>
-                    <li><a href="/" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Home / Entrance</a></li>
-                    <li><a href="/about" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">About Nhovem</a></li>
-                    <li><a href="/resume" class="flex items-center min-h-[44px] px-2 rounded text-[var(--candle)] font-bold hover:bg-[var(--brass)]/20">Resume</a></li>
-                    <li><a href="/simple" class="flex items-center min-h-[44px] px-2 rounded text-[var(--parchment)]/80 hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Field Ledger</a></li>
-                  </ul>
-                </details>
-              </div>
-            </div>
-          )}
-        </div>
-      </header>
+          </div>
+        </header>
+      ) : (
+        <SiteHeader />
+      )
     )}
     <main id="main-content" tabindex="-1">
       <slot />

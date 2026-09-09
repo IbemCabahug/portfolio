@@ -1,0 +1,257 @@
+---
+import PreferenceControls from './PreferenceControls.astro';
+import QuestLog from './QuestLog.astro';
+import ThematicIcon from './icons/ThematicIcon.astro';
+
+interface Props {
+  currentLocation?: string;
+  isTavernHud?: boolean;
+  showContextualControls?: boolean;
+}
+
+const {
+  currentLocation,
+  isTavernHud = false,
+  showContextualControls = isTavernHud,
+} = Astro.props;
+
+const pathname = Astro.url.pathname;
+
+// Determine badge label
+let badgeLabel = currentLocation;
+if (!badgeLabel) {
+  if (pathname === '/' || pathname === '') badgeLabel = 'Entrance';
+  else if (pathname === '/tavern') badgeLabel = 'Main Tavern';
+  else if (pathname === '/tavern/skills') badgeLabel = "Adventurer's Badge";
+  else if (pathname === '/tavern/npc') badgeLabel = 'Tavern Regular';
+  else if (pathname === '/tavern/archivist') badgeLabel = 'The Archivist';
+  else if (pathname.startsWith('/quests')) badgeLabel = 'Quest Board';
+  else if (pathname.startsWith('/messenger')) badgeLabel = "Messenger's Corner";
+  else if (pathname.startsWith('/about')) badgeLabel = 'About';
+  else if (pathname.startsWith('/resume')) badgeLabel = 'Resume';
+  else badgeLabel = 'Portfolio';
+}
+
+// 4 Primary Global Navigation Links (Tavern removed as requested, since upper-left brand acts as Tavern button)
+const navLinks = [
+  { href: '/', label: 'Home', active: pathname === '/' },
+  { href: '/about', label: 'About', active: pathname.startsWith('/about') },
+  { href: '/resume', label: 'Resume', active: pathname.startsWith('/resume') },
+  { href: '/quests', label: 'Quest Board', active: pathname.startsWith('/quests') },
+];
+---
+
+<header
+  class={`site-header no-print print:hidden bg-[var(--wood-deep)] text-[var(--parchment)] border-b border-[var(--brass)] h-12 sticky top-0 z-40 shadow-md flex items-center justify-between px-2 sm:px-4 shrink-0 select-none ${isTavernHud ? 'tavern-hud' : ''}`}
+  id="site-header"
+>
+  {/* ZONE 1: Dedicated Tavern Navigation & Chamber Badge (Left) */}
+  <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+    <a
+      href="/tavern"
+      class="flex items-center gap-1.5 h-8 text-xs sm:text-sm font-bold text-[var(--candle)] hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+      title="Return to Main Tavern Room"
+    >
+      <span class="font-serif tracking-wide text-sm sm:text-base">Ibem's Tavern</span>
+    </a>
+    <span
+      class="hidden sm:inline-flex items-center text-[11px] font-semibold px-2 py-0.5 rounded bg-[#1e1208] border border-[var(--brass)]/60 text-[var(--candle)]"
+      id="header-chamber-badge"
+    >
+      {badgeLabel}
+    </span>
+  </div>
+
+  {/* ZONE 2: Contextual Controls (Middle / Swapped Secondary Area — appears ONLY on pages where relevant) */}
+  {showContextualControls && (
+    <div class="contextual-controls flex items-center gap-1.5 sm:gap-2 shrink-0">
+      <QuestLog />
+      <PreferenceControls />
+      <a
+        href="/simple"
+        class="hidden 2xl:inline-flex items-center gap-1.5 h-8 px-2.5 sm:px-3 text-xs font-semibold rounded-md border border-[var(--brass)] bg-[#1e1208] text-[var(--parchment)] hover:border-[var(--candle)] hover:text-[var(--candle)] hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] whitespace-nowrap shadow-xs"
+        title="High-contrast, zero-JS text edition (Field Ledger)"
+      >
+        <ThematicIcon name="scroll" class="w-3.5 h-3.5 text-[var(--candle)] shrink-0" />
+        <span>Field Ledger</span>
+      </a>
+    </div>
+  )}
+
+  {/* ZONE 3: The Stable / Global Navigation Layer (Right — Home | About | Resume | Quest Board | Menu) */}
+  <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+    <nav aria-label="Main Navigation" class="hidden md:flex items-center gap-1 text-xs font-semibold">
+      {navLinks.map((link) => (
+        <a
+          href={link.href}
+          class={`relative flex items-center h-8 px-2.5 rounded transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)] ${
+            link.active
+              ? 'text-[var(--candle)] font-bold active-nav-link'
+              : 'text-[var(--parchment)]/80 hover:text-[var(--candle)] hover:bg-[var(--brass)]/10'
+          }`}
+          aria-current={link.active ? 'page' : undefined}
+        >
+          <span>{link.label}</span>
+          {link.active && (
+            <span
+              class="active-ember-bar absolute bottom-0 left-1/2 -translate-x-1/2 w-4 sm:w-5 h-[2px] rounded-full bg-[var(--candle)] shadow-[0_0_8px_var(--candle)] pointer-events-none"
+              aria-hidden="true"
+            />
+          )}
+        </a>
+      ))}
+    </nav>
+
+    {/* Chambers & Site Menu Dropdown */}
+    <details class="relative group" id="site-menu-dropdown">
+      <summary
+        class="flex items-center justify-center h-8 px-2.5 text-xs font-semibold rounded-md border border-[var(--brass)] bg-[#1e1208] text-[var(--candle)] cursor-pointer hover:bg-black hover:border-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] list-none select-none transition-colors shadow-xs"
+        aria-label="Toggle site chambers and navigation menu"
+      >
+        <span class="flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-[var(--brass)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+          <span class="hidden sm:inline">Menu</span>
+        </span>
+      </summary>
+      <ul class="absolute right-0 top-full mt-1 w-52 p-2 rounded-md bg-[var(--wood-deep)] border-2 border-[var(--brass)] text-xs font-semibold shadow-2xl z-50 flex flex-col gap-0.5">
+        <li class="px-2 py-1 text-[10px] uppercase tracking-widest text-[var(--brass)] font-extrabold border-b border-[var(--brass)]/30 mb-1">
+          Tavern Chambers
+        </li>
+        <li><a href="/tavern" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Main Tavern</a></li>
+        <li><a href="/tavern/skills" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Adventurer's Badge</a></li>
+        <li><a href="/tavern/npc" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Tavern Regular</a></li>
+        <li><a href="/tavern/archivist" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">The Archivist</a></li>
+        <li><a href="/quests" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Quest Board</a></li>
+        <li><a href="/messenger" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Messenger's Corner</a></li>
+        <li class="border-t border-[var(--brass)]/30 my-1"></li>
+        <li class="px-2 py-1 text-[10px] uppercase tracking-widest text-[var(--brass)] font-extrabold border-b border-[var(--brass)]/30 mb-1">
+          Portfolio Records
+        </li>
+        <li><a href="/" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Home / Entrance</a></li>
+        <li><a href="/about" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">About Nhovem</a></li>
+        <li><a href="/resume" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Resume</a></li>
+        <li><a href="/simple" class="flex items-center min-h-[44px] px-2 rounded text-[var(--parchment)]/80 hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Field Ledger (0-JS)</a></li>
+        <li class="border-t border-[var(--brass)]/30 my-1"></li>
+        <li>
+          <button
+            type="button"
+            id="menu-toggle-fullscreen"
+            class="w-full flex items-center justify-between min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)] text-left cursor-pointer transition-colors text-xs text-[var(--parchment)]"
+          >
+            <span class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-[var(--brass)] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+              </svg>
+              <span id="fullscreen-btn-text">Enter Fullscreen</span>
+            </span>
+            <span class="text-[10px] font-mono text-[var(--brass)]/80">⛶</span>
+          </button>
+        </li>
+      </ul>
+    </details>
+  </div>
+</header>
+
+<script>
+  function initHeaderControls() {
+    const fsBtn = document.getElementById('menu-toggle-fullscreen');
+    const fsText = document.getElementById('fullscreen-btn-text');
+
+    function updateFsState() {
+      if (document.fullscreenElement) {
+        if (fsText) fsText.textContent = 'Exit Fullscreen';
+      } else {
+        if (fsText) fsText.textContent = 'Enter Fullscreen';
+      }
+    }
+
+    if (fsBtn && !(fsBtn as any).__bound) {
+      (fsBtn as any).__bound = true;
+      fsBtn.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+      });
+    }
+
+    document.addEventListener('fullscreenchange', updateFsState);
+    updateFsState();
+
+    // Close menu dropdown when clicking outside
+    const menuDropdown = document.getElementById('site-menu-dropdown') as HTMLDetailsElement | null;
+    if (menuDropdown) {
+      document.addEventListener('click', (e) => {
+        if (!menuDropdown.contains(e.target as Node)) {
+          menuDropdown.open = false;
+        }
+      });
+    }
+  }
+
+  document.addEventListener('astro:page-load', initHeaderControls);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHeaderControls);
+  } else {
+    initHeaderControls();
+  }
+</script>
+
+<style>
+  :root {
+    --hud-height: 48px;
+  }
+
+  .site-header {
+    height: var(--hud-height);
+  }
+
+  @media (max-height: 500px), (max-width: 860px) {
+    :root {
+      --hud-height: 40px;
+    }
+    .site-header {
+      height: var(--hud-height) !important;
+      min-height: var(--hud-height) !important;
+    }
+    .site-header a[href="/simple"] {
+      display: none !important;
+    }
+    .site-header details summary {
+      min-height: 34px !important;
+      padding-left: 8px !important;
+      padding-right: 8px !important;
+    }
+  }
+
+  /* Fullscreen: completely remove the header */
+  :global(:fullscreen) .site-header,
+  :global(:-webkit-full-screen) .site-header {
+    display: none !important;
+  }
+
+  .active-nav-link {
+    text-shadow: 0 0 10px rgba(255, 228, 160, 0.45);
+  }
+
+  @media (pointer: coarse) {
+    .site-header nav a,
+    .site-header details summary {
+      position: relative;
+    }
+    .site-header nav a::after,
+    .site-header details summary::after {
+      content: '';
+      position: absolute;
+      top: -8px;
+      bottom: -8px;
+      left: -4px;
+      right: -4px;
+    }
+  }
+</style>
