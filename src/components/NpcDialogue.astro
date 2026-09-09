@@ -49,7 +49,7 @@ const {
   closeLabel = "Close Dialogue (Esc)",
   closeHref = "/tavern",
   mode = "modal",
-  showCloseIcon = true,
+  showCloseIcon = false,
   stackId,
   repliesId,
   class: className = ""
@@ -290,6 +290,33 @@ const TitleTag = isModal ? 'h2' : 'h1';
     list-style: none;
     margin: 0;
     padding: 0;
+  }
+
+  /* Graceful farewell concluding & fade effects */
+  .dialogue-stack,
+  .npc-dialogue-portrait {
+    transition: opacity 0.2s ease-out;
+  }
+  .dialogue-concluding-fade .dialogue-stack,
+  .dialogue-concluding-fade .npc-dialogue-portrait {
+    opacity: 0 !important;
+  }
+  .dialogue-replies.replies-concluding {
+    pointer-events: none;
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dialogue-stack,
+    .npc-dialogue-portrait,
+    .dialogue-replies.replies-concluding {
+      transition: none !important;
+    }
+  }
+  html[data-motion="reduced"] .dialogue-stack,
+  html[data-motion="reduced"] .npc-dialogue-portrait,
+  html[data-motion="reduced"] .dialogue-replies.replies-concluding {
+    transition: none !important;
   }
 
   .replies-header {
@@ -711,6 +738,47 @@ const TitleTag = isModal ? 'h2' : 'h1';
       let typingDone = true;
       let finishTyping: (() => void) | null = null;
 
+      let isFarewellActive = false;
+      let farewellTimer: number | null = null;
+
+      function clearFarewellTimer() {
+        if (farewellTimer !== null) {
+          clearTimeout(farewellTimer);
+          farewellTimer = null;
+        }
+      }
+
+      function executeClose() {
+        clearFarewellTimer();
+        isFarewellActive = false;
+        container.classList.remove('dialogue-concluding-fade');
+        if (repliesList) repliesList.classList.remove('replies-concluding');
+        const closeBtn = container.querySelector<HTMLButtonElement>('.close-panel-btn[data-action="close"]');
+        if (closeBtn) {
+          closeBtn.click();
+        }
+      }
+
+      function triggerFarewellAutoClose(skipped: boolean) {
+        clearFarewellTimer();
+        // Comfortable reading buffer: 800ms if skipped, 1200ms if finished typing naturally or reduced motion
+        const lingerMs = skipped ? 800 : 1200;
+
+        farewellTimer = window.setTimeout(() => {
+          const isReduced = document.documentElement.dataset.motion === 'reduced' ||
+            (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+          if (!isReduced) {
+            container.classList.add('dialogue-concluding-fade');
+            farewellTimer = window.setTimeout(() => {
+              executeClose();
+            }, 200);
+          } else {
+            executeClose();
+          }
+        }, lingerMs);
+      }
+
       function stopTyping() {
         if (typeTimer !== null) {
           clearTimeout(typeTimer);
@@ -718,7 +786,7 @@ const TitleTag = isModal ? 'h2' : 'h1';
         }
       }
 
-      function renderProse(html: string) {
+      function renderProse(html: string, onSettle?: (skipped: boolean) => void) {
         if (!prose) return;
         stopTyping();
         finishTyping = null;
@@ -727,23 +795,24 @@ const TitleTag = isModal ? 'h2' : 'h1';
         temp.innerHTML = html;
         const plain = (temp.textContent || '').replace(/\s+/g, ' ').trim();
 
-        const settle = () => {
+        const settle = (skipped = false) => {
           stopTyping();
           finishTyping = null;
           prose.innerHTML = html;
           typingDone = true;
           if (announce) announce.textContent = plain;
+          if (onSettle) onSettle(skipped);
         };
 
         const isReduced = document.documentElement.dataset.motion === 'reduced' ||
           (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
         if (isReduced) {
-          settle();
+          settle(false);
           return;
         }
 
         typingDone = false;
-        finishTyping = settle;
+        finishTyping = () => settle(true);
 
         prose.innerHTML = html;
 
@@ -770,7 +839,7 @@ const TitleTag = isModal ? 'h2' : 'h1';
         }
 
         if (!runs.length) {
-          settle();
+          settle(false);
           return;
         }
 
@@ -787,7 +856,7 @@ const TitleTag = isModal ? 'h2' : 'h1';
             ci = 0;
           }
           if (ri >= runs.length) {
-            settle();
+            settle(false);
             return;
           }
           typeTimer = window.setTimeout(step, TYPE_MS * (PAUSE_AFTER[ch] ?? 1));
@@ -795,24 +864,32 @@ const TitleTag = isModal ? 'h2' : 'h1';
         typeTimer = window.setTimeout(step, TYPE_MS);
       }
 
-      // Tap / Click band to instantly complete speech
+      // Tap / Click band to instantly complete speech (or accelerate farewell close if already typed)
       if (band) {
         band.addEventListener('click', (e) => {
           const target = e.target as HTMLElement;
           if (target && (target.closest('button') || target.closest('a'))) return;
-          if (!typingDone && finishTyping) finishTyping();
+          if (!typingDone && finishTyping) {
+            finishTyping();
+          } else if (isFarewellActive && typingDone && farewellTimer !== null) {
+            executeClose();
+          }
         });
       }
 
-      // Space / Enter to complete speech
+      // Space / Enter to complete speech (or accelerate farewell close if already typed)
       document.addEventListener('keydown', (e) => {
         if (container.hidden) return;
-        if (typingDone || !finishTyping) return;
         const target = e.target as HTMLElement;
         if (target && (target.tagName === 'BUTTON' || target.tagName === 'A')) return;
         if (e.key === ' ' || e.key === 'Spacebar' || e.key === 'Enter') {
-          e.preventDefault();
-          finishTyping();
+          if (!typingDone && finishTyping) {
+            e.preventDefault();
+            finishTyping();
+          } else if (isFarewellActive && typingDone && farewellTimer !== null) {
+            e.preventDefault();
+            executeClose();
+          }
         }
       });
 
@@ -887,7 +964,16 @@ const TitleTag = isModal ? 'h2' : 'h1';
             return;
           }
           if (data.farewell?.answer) {
-            renderProse(`<p>${data.farewell.answer}</p>`);
+            btn.classList.add('reply-visited');
+            isFarewellActive = true;
+            if (repliesList) {
+              repliesList.classList.add('replies-concluding');
+            }
+            renderProse(`<p>${data.farewell.answer}</p>`, (skipped) => {
+              triggerFarewellAutoClose(skipped);
+            });
+          } else {
+            executeClose();
           }
           prose.focus();
           return;
@@ -948,6 +1034,10 @@ const TitleTag = isModal ? 'h2' : 'h1';
 
       // Expose reset and control methods for modals
       (container as any).__resetDialogue = (animate = true) => {
+        clearFarewellTimer();
+        isFarewellActive = false;
+        container.classList.remove('dialogue-concluding-fade');
+        if (repliesList) repliesList.classList.remove('replies-concluding');
         stopTyping();
         restoreTopLevelReplies();
         const introHtml = (data.beats || []).map((b: string) => `<p>${b}</p>`).join('');
@@ -964,6 +1054,10 @@ const TitleTag = isModal ? 'h2' : 'h1';
       };
 
       (container as any).__stopDialogue = () => {
+        clearFarewellTimer();
+        isFarewellActive = false;
+        container.classList.remove('dialogue-concluding-fade');
+        if (repliesList) repliesList.classList.remove('replies-concluding');
         stopTyping();
         typingDone = true;
         finishTyping = null;
