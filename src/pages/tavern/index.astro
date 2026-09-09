@@ -237,22 +237,21 @@ const sceneObjects = [
         type="button"
         id="trigger-beer"
         class="scene-object scene-hotspot beer-bottle-hotspot"
-        aria-label="Inspect the Red Horse Litro on the bar counter"
+        aria-label="Inspect the mysterious bottle on the bar counter"
         aria-haspopup="dialog"
         aria-expanded="false"
         aria-controls="dialog-beer-blackout"
-        style="left: 60.5%; bottom: 42.0%; width: 1.35%; z-index: 3;"
+        style="left: 60.5%; bottom: 44.5%; width: 1.35%; z-index: 3;"
       >
         <img
           src="/art/red-horse-litro.webp"
           width="62"
           height="197"
-          alt="Red Horse Litro (Extra Strong)"
+          alt=""
           loading="lazy"
           decoding="async"
           class="beer-bottle-sprite"
         />
-        <span class="scene-tooltip" data-placement="top">Red Horse Litro</span>
       </button>
 
       <!-- Papers Hotspots -->
@@ -304,7 +303,7 @@ const sceneObjects = [
     <a href="/tavern/skills" id="narrow-skills" class="narrow-link">View Skills</a>
     <a href="/quests" id="narrow-questboard" class="narrow-link">Go to the Quest Board</a>
     <a href="/messenger" class="narrow-link">Go to Messenger's Corner</a>
-    <button type="button" class="narrow-link" id="narrow-beer">🍺 Red Horse Litro (Senti)</button>
+    <button type="button" class="narrow-link" id="narrow-beer">🍺 An ice-cold bottle on the counter</button>
   </div>
 
   <!-- Global Modal Backdrop -->
@@ -505,64 +504,40 @@ const sceneObjects = [
     </div>
   </div>
 
-  <!-- Red Horse Senti Blackout Easter Egg Overlay -->
+  <!-- Red Horse Senti Easter Egg White Screen Overlay -->
   <div
     id="dialog-beer-blackout"
-    class="beer-blackout-overlay fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black text-center p-6 select-none opacity-0 pointer-events-none transition-opacity duration-300"
+    class="beer-white-overlay fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white text-center p-6 select-none opacity-0 pointer-events-none cursor-pointer transition-opacity duration-200"
     role="dialog"
     aria-modal="true"
-    aria-label="Senti sa Tavern - Red Horse Beer Easter Egg"
+    aria-label="Senti Beer Lyrics"
     hidden
   >
-    <!-- Background Vignette -->
-    <div class="beer-vignette absolute inset-0 pointer-events-none" aria-hidden="true"></div>
+    <!-- White Flash Burst Layer -->
+    <div id="beer-flash" class="absolute inset-0 bg-white pointer-events-none z-30 opacity-0" aria-hidden="true"></div>
 
-    <!-- Center Cinematic Stage -->
-    <div class="beer-stage relative z-10 max-w-2xl mx-auto flex flex-col items-center px-4">
-      <!-- Faint Warm Crimson Heartbreak Aura -->
-      <div class="beer-aura mb-6 flex items-center justify-center" aria-hidden="true">
-        <div class="w-20 h-20 rounded-full bg-red-600/25 blur-xl animate-pulse"></div>
-        <img
-          src="/art/red-horse-litro.webp"
-          alt="Red Horse Litro"
-          width="62"
-          height="197"
-          class="w-14 h-auto max-h-44 object-contain drop-shadow-[0_0_25px_rgba(239,68,68,0.7)] animate-bounce-slow"
-        />
-      </div>
-
-      <!-- Tag / Subtitle -->
-      <p class="beer-subtext font-mono text-xs uppercase tracking-[0.3em] text-red-400 font-bold mb-4 opacity-0 transition-opacity duration-700">
-        🍺 ITO ANG TAMA • RED HORSE LITRO 🍺
-      </p>
-
-      <!-- Active Animated Lyric Line -->
-      <div class="beer-lyrics-container min-h-[90px] flex items-center justify-center px-2">
+    <!-- Center Cinematic Stage (Pure Lyrics) -->
+    <div class="beer-stage relative z-10 max-w-3xl mx-auto flex flex-col items-center justify-center px-4 py-8 pointer-events-none">
+      <div class="beer-lyrics-container min-h-[120px] flex items-center justify-center px-4">
         <h2
           id="beer-active-lyric"
-          class="beer-lyric-text text-xl sm:text-3xl md:text-4xl font-serif font-extrabold text-[#fef3c7] leading-relaxed tracking-wide drop-shadow-[0_2px_12px_rgba(245,158,11,0.4)]"
+          class="beer-lyric-text text-2xl sm:text-4xl md:text-5xl font-serif italic font-semibold text-stone-900 leading-relaxed tracking-wide select-none"
         >
           ...
         </h2>
       </div>
-
-      <!-- Artist & Song Attribution -->
-      <p class="beer-artist-attribution mt-6 text-xs text-stone-400 font-mono tracking-wider opacity-0 transition-opacity duration-1000">
-        "Beer" — The Itchyworms
-      </p>
     </div>
 
-    <!-- Bottom HUD Dismiss Prompt -->
-    <div class="beer-hud-prompt absolute bottom-8 inset-x-0 flex flex-col items-center gap-2 z-20">
-      <button
-        type="button"
-        id="btn-close-beer-blackout"
-        class="px-5 py-2 rounded-full border border-stone-700 bg-stone-900/80 text-stone-300 hover:text-white hover:border-red-500/80 hover:bg-stone-800 text-xs font-mono uppercase tracking-widest transition-all shadow-lg flex items-center gap-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-red-500"
-      >
-        <span>Press <kbd class="px-1.5 py-0.5 rounded bg-stone-800 border border-stone-600 text-amber-300 text-[10px]">ESC</kbd> or click anywhere to sober up (Balik sa Tavern)</span>
-      </button>
-      <span id="beer-audio-status" class="text-[11px] text-stone-500 font-mono"></span>
-    </div>
+    <!-- Screen-Reader Accessible Dismiss (Visually Hidden) -->
+    <button
+      type="button"
+      id="btn-close-beer-blackout"
+      class="sr-only"
+      aria-label="Return to the tavern"
+    >
+      Return to Tavern
+    </button>
+    <span id="beer-audio-status" class="sr-only" aria-live="polite"></span>
   </div>
 </TavernLayout>
 
@@ -1531,32 +1506,30 @@ const sceneObjects = [
     transform: scale(1.1) translateY(-2px);
   }
 
-  /* Red Horse Senti Blackout Overlay */
-  .beer-blackout-overlay {
-    background-color: #000000;
-    transition: opacity 0.35s ease-in-out;
+  /* Red Horse Senti White Screen Overlay */
+  .beer-white-overlay {
+    background-color: #ffffff;
+    transition: opacity 0.25s ease-in-out;
   }
-  .beer-blackout-overlay:not([hidden]) {
+  .beer-white-overlay:not([hidden]) {
     opacity: 1;
     pointer-events: auto;
   }
-  .beer-vignette {
-    background: radial-gradient(circle at 50% 50%, rgba(220, 38, 38, 0.06) 0%, rgba(0, 0, 0, 0.95) 70%, #000000 100%);
+  .beer-flash-burst {
+    animation: flashBurstAnim 0.35s ease-out forwards;
+  }
+  @keyframes flashBurstAnim {
+    0% { opacity: 0; }
+    40% { opacity: 1; }
+    100% { opacity: 0; }
   }
   .beer-lyric-text {
-    transition: opacity 0.35s ease, transform 0.35s ease;
-    text-shadow: 0 0 24px rgba(245, 158, 11, 0.6), 0 0 48px rgba(220, 38, 38, 0.4);
+    transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    color: #1c1917;
   }
   .beer-lyric-text.lyric-switching {
     opacity: 0;
-    transform: translateY(8px) scale(0.97);
-  }
-  @keyframes floatSlow {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-6px); }
-  }
-  .animate-bounce-slow {
-    animation: floatSlow 3s ease-in-out infinite;
+    transform: translateY(10px) scale(0.98);
   }
 </style>
 
@@ -1830,8 +1803,7 @@ const sceneObjects = [
     const narrowBeer = document.getElementById('narrow-beer');
     const dialogBeer = document.getElementById('dialog-beer-blackout');
     const lyricEl = document.getElementById('beer-active-lyric');
-    const subtextEl = dialogBeer?.querySelector('.beer-subtext');
-    const artistEl = dialogBeer?.querySelector('.beer-artist-attribution');
+    const flashEl = document.getElementById('beer-flash');
     const btnCloseBeer = document.getElementById('btn-close-beer-blackout');
     const audioStatusEl = document.getElementById('beer-audio-status');
 
@@ -2031,9 +2003,15 @@ const sceneObjects = [
       // Duck tavern ambient sound
       soundEngine.duckAmbient(true);
 
-      // Show blackout overlay
+      // Show white overlay with initial flash
       dialogBeer.hidden = false;
       dialogBeer.setAttribute('aria-hidden', 'false');
+      if (flashEl) {
+        flashEl.classList.add('beer-flash-burst');
+        setTimeout(() => {
+          flashEl?.classList.remove('beer-flash-burst');
+        }, 400);
+      }
       requestAnimationFrame(() => {
         dialogBeer.classList.remove('opacity-0', 'pointer-events-none');
         dialogBeer.classList.add('opacity-100', 'pointer-events-auto');
@@ -2060,15 +2038,8 @@ const sceneObjects = [
           playProceduralBeerMelody();
         }
       } else {
-        if (audioStatusEl) audioStatusEl.textContent = '🔈 Sound is muted (toggle ON in header controls)';
+        if (audioStatusEl) audioStatusEl.textContent = '🔈 Sound is muted';
       }
-
-      // Schedule subtitles and artist fade-in
-      const subTimer = window.setTimeout(() => {
-        if (subtextEl) subtextEl.classList.remove('opacity-0');
-        if (artistEl) artistEl.classList.remove('opacity-0');
-      }, 700);
-      beerTimerIds.push(subTimer);
 
       // Lyric sequence schedule
       const LYRIC_TIMINGS = [
@@ -2077,7 +2048,7 @@ const sceneObjects = [
         { time: 8000, text: "Bawat patak, anong sarap..." },
         { time: 12000, text: "Ano ba talagang mas gusto ko..." },
         { time: 16000, text: "Ang beer na 'to... o ang pag-ibig mo?" },
-        { time: 22000, text: "🍺 Ito ang tama. (Senti hour complete)" }
+        { time: 22000, text: "Ito ang tama." }
       ];
 
       LYRIC_TIMINGS.forEach(({ time, text }) => {
@@ -2087,7 +2058,7 @@ const sceneObjects = [
         beerTimerIds.push(tid);
       });
 
-      // Auto-sober up at 27s
+      // Auto-exit at 27s
       const endTimer = window.setTimeout(() => {
         if (isBeerActive) closeBeerBlackout();
       }, 27000);
@@ -2125,11 +2096,9 @@ const sceneObjects = [
       const hideTimer = window.setTimeout(() => {
         dialogBeer.hidden = true;
         dialogBeer.setAttribute('aria-hidden', 'true');
-        if (subtextEl) subtextEl.classList.add('opacity-0');
-        if (artistEl) artistEl.classList.add('opacity-0');
         if (lyricEl) lyricEl.textContent = '...';
         triggerBeer?.focus({ preventScroll: true });
-      }, 350);
+      }, 300);
       beerTimerIds.push(hideTimer);
     }
 
@@ -2148,10 +2117,8 @@ const sceneObjects = [
       closeBeerBlackout();
     });
 
-    dialogBeer?.addEventListener('click', (e) => {
-      if (e.target === dialogBeer || (e.target as HTMLElement).classList.contains('beer-stage') || (e.target as HTMLElement).classList.contains('beer-vignette')) {
-        closeBeerBlackout();
-      }
+    dialogBeer?.addEventListener('click', () => {
+      closeBeerBlackout();
     });
 
     document.addEventListener('keydown', (e) => {
