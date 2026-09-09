@@ -2402,6 +2402,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
 
       function launchArena() {
         soundEngine.playWoodClink();
+        soundEngine.duckAmbient(true);
         const proj = TRANSCEIVER_PROJECTS[currentProjectIndex];
         if (!proj) return;
 
@@ -2433,6 +2434,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
 
       function unloadArena() {
         soundEngine.playWoodClink();
+        soundEngine.duckAmbient(false);
         frameContainer.innerHTML = '';
         frameContainer.classList.add('hidden');
         activeControls.classList.add('hidden');

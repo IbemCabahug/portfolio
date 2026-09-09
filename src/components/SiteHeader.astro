@@ -63,11 +63,13 @@ const navLinks = [
     </span>
   </div>
 
-  {/* ZONE 2: Contextual Controls (Middle / Swapped Secondary Area — appears ONLY on pages where relevant) */}
-  {showContextualControls && (
-    <div class="contextual-controls flex items-center gap-1.5 sm:gap-2 shrink-0">
-      <QuestLog />
+  {/* ZONE 2: Global Controls & Tavern Preferences (Center) */}
+  <div class="contextual-controls flex items-center gap-1.5 sm:gap-2 shrink-0">
+    {showContextualControls && <QuestLog />}
+    <div class="hidden sm:flex items-center">
       <PreferenceControls />
+    </div>
+    {showContextualControls && (
       <a
         href="/simple"
         class="hidden 2xl:inline-flex items-center gap-1.5 h-8 px-2.5 sm:px-3 text-xs font-semibold rounded-md border border-[var(--brass)] bg-[#1e1208] text-[var(--parchment)] hover:border-[var(--candle)] hover:text-[var(--candle)] hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] whitespace-nowrap shadow-xs"
@@ -76,8 +78,8 @@ const navLinks = [
         <ThematicIcon name="scroll" class="w-3.5 h-3.5 text-[var(--candle)] shrink-0" />
         <span>Field Ledger</span>
       </a>
-    </div>
-  )}
+    )}
+  </div>
 
   {/* ZONE 3: The Stable / Global Navigation Layer (Right — Home | About | Resume | Quest Board | Menu) */}
   <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
@@ -118,7 +120,7 @@ const navLinks = [
           <span class="hidden sm:inline">Menu</span>
         </span>
       </summary>
-      <ul class="absolute right-0 top-full mt-1 w-52 p-2 rounded-md bg-[var(--wood-deep)] border-2 border-[var(--brass)] text-xs font-semibold shadow-2xl z-50 flex flex-col gap-0.5">
+      <ul class="absolute right-0 top-full mt-1 w-56 p-2 rounded-md bg-[var(--wood-deep)] border-2 border-[var(--brass)] text-xs font-semibold shadow-2xl z-50 flex flex-col gap-0.5">
         <li class="px-2 py-1 text-[10px] uppercase tracking-widest text-[var(--brass)] font-extrabold border-b border-[var(--brass)]/30 mb-1">
           Tavern Chambers
         </li>
@@ -138,6 +140,23 @@ const navLinks = [
         <li><a href="/tales" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Field Dispatches (Tales)</a></li>
         <li><a href="/simple" class="flex items-center min-h-[44px] px-2 rounded text-[var(--parchment)]/80 hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Field Ledger (0-JS)</a></li>
         <li class="border-t border-[var(--brass)]/30 my-1"></li>
+        <li class="px-2 py-1 text-[10px] uppercase tracking-widest text-[var(--brass)] font-extrabold border-b border-[var(--brass)]/30 mb-1">
+          Atmosphere & Controls
+        </li>
+        <li>
+          <button
+            type="button"
+            id="menu-toggle-sound"
+            class="w-full flex items-center justify-between min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)] text-left cursor-pointer transition-colors text-xs text-[var(--parchment)]"
+            aria-label="Toggle tavern hearth ambient soundscape"
+          >
+            <span class="flex items-center gap-2">
+              <span id="menu-sound-icon" class="text-sm">🔈</span>
+              <span id="menu-sound-text">Tavern Sound: Off</span>
+            </span>
+            <span id="menu-sound-badge" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/40 text-stone-400">Muted</span>
+          </button>
+        </li>
         <li>
           <button
             type="button"
@@ -159,7 +178,12 @@ const navLinks = [
 </header>
 
 <script>
+  import { getSound, setSound, subscribePreferences } from '../store/preferences';
+  import { soundEngine } from '../lib/sound-engine';
+
   function initHeaderControls() {
+    soundEngine.init();
+
     const fsBtn = document.getElementById('menu-toggle-fullscreen');
     const fsText = document.getElementById('fullscreen-btn-text');
 
@@ -184,6 +208,41 @@ const navLinks = [
 
     document.addEventListener('fullscreenchange', updateFsState);
     updateFsState();
+
+    // Mobile menu sound toggle
+    const soundBtn = document.getElementById('menu-toggle-sound');
+    const soundIcon = document.getElementById('menu-sound-icon');
+    const soundText = document.getElementById('menu-sound-text');
+    const soundBadge = document.getElementById('menu-sound-badge');
+
+    function updateMenuSoundState() {
+      const isSoundOn = getSound() === 'on';
+      if (soundIcon) soundIcon.textContent = isSoundOn ? '🔥' : '🔈';
+      if (soundText) soundText.textContent = isSoundOn ? 'Tavern Sound: Active' : 'Tavern Sound: Muted';
+      if (soundBadge) {
+        soundBadge.textContent = isSoundOn ? 'Active' : 'Muted';
+        soundBadge.className = isSoundOn
+          ? 'text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/60 text-emerald-400 font-bold'
+          : 'text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/40 text-stone-400';
+      }
+    }
+
+    if (soundBtn && !(soundBtn as any).__bound) {
+      (soundBtn as any).__bound = true;
+      soundBtn.addEventListener('click', () => {
+        const next = getSound() === 'on' ? 'off' : 'on';
+        if (next === 'on') {
+          soundEngine.enable();
+          soundEngine.playWoodClink();
+        } else {
+          soundEngine.disable();
+        }
+        setSound(next);
+      });
+    }
+
+    subscribePreferences(updateMenuSoundState);
+    updateMenuSoundState();
 
     // Close menu dropdown when clicking outside
     const menuDropdown = document.getElementById('site-menu-dropdown') as HTMLDetailsElement | null;

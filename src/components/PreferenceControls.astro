@@ -1,11 +1,12 @@
 ---
 ---
-<div class="preference-pod flex items-center h-8 rounded-md border border-[var(--brass)] bg-[#1e1208] text-xs shadow-xs overflow-hidden">
+<div class="preference-pod flex items-center h-8 rounded-md border border-[var(--brass)] bg-[#1e1208] text-xs shadow-xs overflow-hidden" role="group" aria-label="Display and sound preferences">
   <button
     id="toggle-motion"
     type="button"
     class="px-2.5 h-full font-semibold text-[var(--parchment)] hover:text-[var(--candle)] hover:bg-[var(--brass)]/20 focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-[-2px] flex items-center justify-center whitespace-nowrap transition-colors cursor-pointer"
     aria-pressed="false"
+    title="Toggle animations (Full / Reduced)"
   >
     Motion: Full
   </button>
@@ -15,6 +16,7 @@
     type="button"
     class="px-2.5 h-full font-semibold text-[var(--parchment)] hover:text-[var(--candle)] hover:bg-[var(--brass)]/20 focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-[-2px] flex items-center justify-center whitespace-nowrap transition-colors cursor-pointer"
     aria-pressed="false"
+    title="Toggle tavern hearth ambient soundscape"
   >
     Sound: Off
   </button>
@@ -40,8 +42,17 @@
       }
       
       if (btnSound) {
-        btnSound.textContent = sound === 'on' ? 'Sound: On' : 'Sound: Off';
-        btnSound.setAttribute('aria-pressed', sound === 'on' ? 'true' : 'false');
+        if (sound === 'on') {
+          btnSound.innerHTML = `<span class="inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" aria-hidden="true"></span><span>Sound: On</span></span>`;
+          btnSound.classList.add('sound-active');
+          btnSound.setAttribute('aria-pressed', 'true');
+          btnSound.setAttribute('title', 'Tavern hearth ambient soundscape active. Click to mute.');
+        } else {
+          btnSound.innerHTML = `<span>Sound: Off</span>`;
+          btnSound.classList.remove('sound-active');
+          btnSound.setAttribute('aria-pressed', 'false');
+          btnSound.setAttribute('title', 'Tavern sound muted. Click to enable hearth soundscape.');
+        }
       }
     }
 
@@ -75,13 +86,28 @@
       btnMotion.setAttribute('aria-pressed', motion === 'reduced' ? 'true' : 'false');
     }
     if (btnSound) {
-      btnSound.textContent = sound === 'on' ? 'Sound: On' : 'Sound: Off';
-      btnSound.setAttribute('aria-pressed', sound === 'on' ? 'true' : 'false');
+      if (sound === 'on') {
+        btnSound.innerHTML = `<span class="inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" aria-hidden="true"></span><span>Sound: On</span></span>`;
+        btnSound.classList.add('sound-active');
+        btnSound.setAttribute('aria-pressed', 'true');
+        btnSound.setAttribute('title', 'Tavern hearth ambient soundscape active. Click to mute.');
+      } else {
+        btnSound.innerHTML = `<span>Sound: Off</span>`;
+        btnSound.classList.remove('sound-active');
+        btnSound.setAttribute('aria-pressed', 'false');
+        btnSound.setAttribute('title', 'Tavern sound muted. Click to enable hearth soundscape.');
+      }
     }
   });
 </script>
 
 <style>
+  #toggle-sound.sound-active {
+    color: var(--candle);
+    background: rgba(201, 168, 76, 0.2);
+    text-shadow: 0 0 8px rgba(255, 228, 160, 0.6);
+  }
+
   @media (max-height: 500px), (max-width: 860px) {
     .preference-pod {
       height: 28px;
