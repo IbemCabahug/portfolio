@@ -3,6 +3,8 @@ import TavernLayout from '../../layouts/TavernLayout.astro';
 import { getCollection, render } from 'astro:content';
 import ThematicIcon from '../../components/icons/ThematicIcon.astro';
 import InteractiveEmbed from '../../components/InteractiveEmbed.astro';
+import BitsAttendanceSimulator from '../../components/simulators/BitsAttendanceSimulator.astro';
+import MimicVaultSimulator from '../../components/simulators/MimicVaultSimulator.astro';
 import { getProjectTelemetry } from '../../lib/github';
 
 export async function getStaticPaths() {
@@ -156,8 +158,16 @@ const telemetry = await getProjectTelemetry(entry.data.sourceUrl);
         ) : null}
       </header>
 
-      {entry.data.allowFraming && entry.data.liveUrl && (
+      {entry.data.slug === 'arcanetyper' && entry.data.allowFraming && entry.data.liveUrl && (
         <InteractiveEmbed liveUrl={entry.data.liveUrl} title={entry.data.title} />
+      )}
+
+      {entry.data.slug === 'bits' && (
+        <BitsAttendanceSimulator />
+      )}
+
+      {entry.data.slug === 'mimic' && (
+        <MimicVaultSimulator />
       )}
 
       <div class="quest-case-study prose max-w-none text-[var(--ink)]">

@@ -1,0 +1,394 @@
+---
+import ThematicIcon from '../icons/ThematicIcon.astro';
+---
+
+<div class="bits-simulator-card my-8 p-5 sm:p-7 rounded-xl border-2 border-[var(--brass)] bg-[#180e06] text-[var(--parchment)] shadow-2xl">
+  {/* Header */}
+  <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-5 border-b border-[var(--brass)]/40">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-lg bg-[#2b180a] border border-[var(--brass)] flex items-center justify-center shrink-0 shadow">
+        <ThematicIcon name="terminal" class="w-5 h-5 text-[var(--candle)]" />
+      </div>
+      <div>
+        <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-[var(--brass)]">Interactive Engine Simulator</span>
+        <h3 class="text-base sm:text-xl font-bold font-serif text-[var(--candle)]">
+          Biometric Punch & Overtime Derivation
+        </h3>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 text-xs font-mono">
+      <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" id="bits-status-dot"></span>
+      <span class="text-emerald-300 font-semibold" id="bits-status-text">ZKTeco Hardware Feed Active</span>
+    </div>
+  </div>
+
+  <p class="text-xs sm:text-sm text-[var(--parchment)]/85 mb-5 leading-relaxed">
+    Select an operational scenario below to test the disambiguation state machine and relational derivation rules built for the BITS production platform.
+  </p>
+
+  {/* Scenario Selector Buttons */}
+  <div class="mb-6">
+    <label class="block text-xs uppercase tracking-wider font-mono font-bold text-[var(--brass)] mb-2.5">
+      Select Scenario to Simulate:
+    </label>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2" id="bits-scenario-buttons">
+      <button
+        type="button"
+        class="scenario-btn active-scenario flex flex-col items-start p-2.5 rounded border border-[var(--brass)] bg-[#2b190c] hover:bg-[#38200e] text-left transition-all cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+        data-scenario="standard"
+      >
+        <span class="text-[11px] font-bold text-[var(--candle)]">1. Standard Day Shift</span>
+        <span class="text-[10px] text-stone-300 font-mono">08:00 AM – 05:00 PM</span>
+      </button>
+
+      <button
+        type="button"
+        class="scenario-btn flex flex-col items-start p-2.5 rounded border border-[var(--brass)]/60 bg-[#1e1208] hover:bg-[#38200e] text-left transition-all cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+        data-scenario="double_scan"
+      >
+        <span class="text-[11px] font-bold text-[var(--candle)]">2. Accidental Double-Tap</span>
+        <span class="text-[10px] text-stone-300 font-mono">08:00 AM & 08:01 AM</span>
+      </button>
+
+      <button
+        type="button"
+        class="scenario-btn flex flex-col items-start p-2.5 rounded border border-[var(--brass)]/60 bg-[#1e1208] hover:bg-[#38200e] text-left transition-all cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+        data-scenario="overtime"
+      >
+        <span class="text-[11px] font-bold text-[var(--candle)]">3. Approved Overtime</span>
+        <span class="text-[10px] text-stone-300 font-mono">4th Scan at 08:30 PM</span>
+      </button>
+
+      <button
+        type="button"
+        class="scenario-btn flex flex-col items-start p-2.5 rounded border border-[var(--brass)]/60 bg-[#1e1208] hover:bg-[#38200e] text-left transition-all cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+        data-scenario="overnight"
+      >
+        <span class="text-[11px] font-bold text-[var(--candle)]">4. Midnight Rollover</span>
+        <span class="text-[10px] text-stone-300 font-mono">10:00 PM – 06:00 AM</span>
+      </button>
+
+      <button
+        type="button"
+        class="scenario-btn flex flex-col items-start p-2.5 rounded border border-[var(--brass)]/60 bg-[#1e1208] hover:bg-[#38200e] text-left transition-all cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+        data-scenario="tardiness"
+      >
+        <span class="text-[11px] font-bold text-[var(--candle)]">5. Late & Undertime</span>
+        <span class="text-[10px] text-stone-300 font-mono">08:45 AM – 04:15 PM</span>
+      </button>
+    </div>
+  </div>
+
+  {/* Live Derivation Visualizer Box */}
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-5">
+    {/* Column 1: Hardware Scan Stream */}
+    <div class="p-4 rounded-lg bg-[#140b04] border border-[var(--brass)]/50 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-[var(--brass)]/30 text-xs font-mono font-bold text-[var(--candle)]">
+          <span class="flex items-center gap-1.5">
+            <ThematicIcon name="terminal" class="w-3.5 h-3.5 text-[var(--brass)]" />
+            <span>Raw Biometric Scans</span>
+          </span>
+          <span class="text-[10px] text-stone-400" id="bits-punch-count">2 Punches</span>
+        </div>
+        <div class="space-y-2 text-xs font-mono" id="bits-punches-list">
+          {/* Punches injected by JS */}
+        </div>
+      </div>
+      <div class="mt-3 pt-2 border-t border-[var(--brass)]/20 text-[10px] text-stone-400 font-mono">
+        Hardware: ZKTeco SilkID-200 · Device ID: DEV-DANAO-01
+      </div>
+    </div>
+
+    {/* Column 2: State Machine Decision Engine */}
+    <div class="p-4 rounded-lg bg-[#140b04] border border-[var(--brass)]/50 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-[var(--brass)]/30 text-xs font-mono font-bold text-[var(--candle)]">
+          <span class="flex items-center gap-1.5">
+            <ThematicIcon name="code" class="w-3.5 h-3.5 text-[var(--brass)]" />
+            <span>Classification Logic</span>
+          </span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-900/60 text-amber-200 font-semibold" id="bits-rule-badge">
+            Standard Shift Matrix
+          </span>
+        </div>
+        <div class="text-xs font-sans text-stone-200 leading-relaxed" id="bits-rule-explanation">
+          {/* Explanation injected by JS */}
+        </div>
+      </div>
+      <div class="mt-3 pt-2 border-t border-[var(--brass)]/20 text-[10px] text-stone-400 font-mono">
+        Classification: Deterministic Event Sourcing Pipeline
+      </div>
+    </div>
+
+    {/* Column 3: Derived Payroll State */}
+    <div class="p-4 rounded-lg bg-[#140b04] border border-[var(--brass)]/50 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-[var(--brass)]/30 text-xs font-mono font-bold text-[var(--candle)]">
+          <span class="flex items-center gap-1.5">
+            <ThematicIcon name="ledger" class="w-3.5 h-3.5 text-[var(--brass)]" />
+            <span>PostgreSQL Derived State</span>
+          </span>
+          <span class="text-[10px] font-bold text-emerald-400" id="bits-payroll-status">
+            ON_TIME
+          </span>
+        </div>
+        <div class="grid grid-cols-2 gap-2 text-xs font-mono" id="bits-metrics-grid">
+          <div class="p-2 rounded bg-[#201206] border border-[var(--brass)]/30">
+            <span class="text-[10px] text-stone-400 block">Regular Hours</span>
+            <strong class="text-sm text-[var(--candle)] font-bold" id="bits-metric-reg">8.0 hrs</strong>
+          </div>
+          <div class="p-2 rounded bg-[#201206] border border-[var(--brass)]/30">
+            <span class="text-[10px] text-stone-400 block">Approved Overtime</span>
+            <strong class="text-sm text-amber-300 font-bold" id="bits-metric-ot">0.0 hrs</strong>
+          </div>
+          <div class="p-2 rounded bg-[#201206] border border-[var(--brass)]/30">
+            <span class="text-[10px] text-stone-400 block">Tardiness (Late)</span>
+            <strong class="text-sm text-stone-200 font-bold" id="bits-metric-tardy">0 mins</strong>
+          </div>
+          <div class="p-2 rounded bg-[#201206] border border-[var(--brass)]/30">
+            <span class="text-[10px] text-stone-400 block">Undertime</span>
+            <strong class="text-sm text-stone-200 font-bold" id="bits-metric-undertime">0 mins</strong>
+          </div>
+        </div>
+      </div>
+      <div class="mt-3 pt-2 border-t border-[var(--brass)]/20 text-[10px] text-stone-400 font-mono">
+        Target Table: daily_attendance · ID: REC-9042
+      </div>
+    </div>
+  </div>
+
+  {/* Relational Table View Tabs */}
+  <div class="p-3 sm:p-4 rounded-lg bg-[#100803] border border-[var(--brass)]/40 font-mono text-xs">
+    <div class="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-[var(--brass)]/20 text-[11px]">
+      <span class="text-[var(--brass)] font-bold">SQL Relational Event Trace:</span>
+      <span class="text-stone-400" id="bits-table-indicator">Table: biometric_punches &bull; 2 rows</span>
+    </div>
+    <div class="overflow-x-auto text-[11px] text-stone-300" id="bits-sql-trace">
+      {/* Table code preview injected by JS */}
+    </div>
+  </div>
+</div>
+
+<script>
+  type ScenarioKey = 'standard' | 'double_scan' | 'overtime' | 'overnight' | 'tardiness';
+
+  interface ScenarioData {
+    statusDotClass: string;
+    statusText: string;
+    punchCount: string;
+    punches: Array<{ time: string; action: string; tag: string; tagClass: string }>;
+    ruleBadge: string;
+    explanation: string;
+    payrollStatus: string;
+    statusColorClass: string;
+    regularHours: string;
+    overtimeHours: string;
+    tardiness: string;
+    undertime: string;
+    tableIndicator: string;
+    sqlTrace: string;
+  }
+
+  const SCENARIOS: Record<ScenarioKey, ScenarioData> = {
+    standard: {
+      statusDotClass: 'bg-emerald-400',
+      statusText: 'Valid Shift Cycle Completed',
+      punchCount: '2 Punches Ingested',
+      punches: [
+        { time: '2026-09-08 07:55:12', action: 'Scan #1 (Morning Arrival)', tag: 'SHIFT_IN', tagClass: 'bg-emerald-900/60 text-emerald-200 border-emerald-600/50' },
+        { time: '2026-09-08 17:02:44', action: 'Scan #2 (Evening Departure)', tag: 'SHIFT_OUT', tagClass: 'bg-emerald-900/60 text-emerald-200 border-emerald-600/50' },
+      ],
+      ruleBadge: 'Standard Day Matrix (08:00–17:00)',
+      explanation: 'First scan at 07:55 AM falls comfortably inside the 15-minute grace window. Second scan at 05:02 PM fulfills the 8-hour requirement. Regular shift closed with zero tardiness.',
+      payrollStatus: 'ON_TIME',
+      statusColorClass: 'text-emerald-400',
+      regularHours: '8.0 hrs',
+      overtimeHours: '0.0 hrs',
+      tardiness: '0 mins',
+      undertime: '0 mins',
+      tableIndicator: 'daily_attendance · Shift Validated · 8.0 Regular Hours',
+      sqlTrace: `SELECT id, employee_id, logical_date, regular_hours, tardiness_minutes, undertime_minutes\nFROM daily_attendance WHERE employee_id = 104 AND logical_date = '2026-09-08';\n-- Results: id=9042 | reg_hours=8.0 | tardiness=0 | undertime=0 | status='VERIFIED'`,
+    },
+    double_scan: {
+      statusDotClass: 'bg-amber-400',
+      statusText: 'Hardware Bounce Filtered (60s Lockout)',
+      punchCount: '3 Punches (1 Suppressed)',
+      punches: [
+        { time: '2026-09-08 07:58:10', action: 'Scan #1 (First Fingerprint)', tag: 'SHIFT_IN', tagClass: 'bg-emerald-900/60 text-emerald-200 border-emerald-600/50' },
+        { time: '2026-09-08 07:58:34', action: 'Scan #2 (Panic Repeat Tap)', tag: 'DEDUPLICATED', tagClass: 'bg-amber-900/60 text-amber-200 border-amber-600/50' },
+        { time: '2026-09-08 17:00:15', action: 'Scan #3 (Departure Check-out)', tag: 'SHIFT_OUT', tagClass: 'bg-emerald-900/60 text-emerald-200 border-emerald-600/50' },
+      ],
+      ruleBadge: 'De-Duplication Window (Δt < 60s)',
+      explanation: 'Employee scanned twice within 24 seconds because the optical reader beep was delayed. The engine identifies consecutive punches within the 60s threshold, suppresses the second scan, and prevents duplicate key database errors.',
+      payrollStatus: 'DEDUPLICATED',
+      statusColorClass: 'text-amber-400',
+      regularHours: '8.0 hrs',
+      overtimeHours: '0.0 hrs',
+      tardiness: '0 mins',
+      undertime: '0 mins',
+      tableIndicator: 'biometric_punches · 1 Scan Flagged IS_DUPLICATE=true',
+      sqlTrace: `UPDATE biometric_punches\nSET is_duplicate = true, suppression_reason = 'INTERVAL_LESS_THAN_60S'\nWHERE id = 48201;\n-- Note: Hardware raw punch preserved in audit log without polluting daily_attendance!`,
+    },
+    overtime: {
+      statusDotClass: 'bg-purple-400',
+      statusText: '4th Scan Routed to Overtime Claim',
+      punchCount: '4 Punches (2 Shifts Correlated)',
+      punches: [
+        { time: '2026-09-08 07:56:00', action: 'Scan #1 (Morning Shift In)', tag: 'SHIFT_IN', tagClass: 'bg-emerald-900/60 text-emerald-200 border-emerald-600/50' },
+        { time: '2026-09-08 17:01:20', action: 'Scan #2 (Regular Shift Out)', tag: 'SHIFT_OUT', tagClass: 'bg-emerald-900/60 text-emerald-200 border-emerald-600/50' },
+        { time: '2026-09-08 17:30:00', action: 'Scan #3 (Approved OT Start)', tag: 'OT_START', tagClass: 'bg-purple-900/60 text-purple-200 border-purple-600/50' },
+        { time: '2026-09-08 20:30:15', action: 'Scan #4 (Overtime Checkout)', tag: 'OT_END', tagClass: 'bg-purple-900/60 text-purple-200 border-purple-600/50' },
+      ],
+      ruleBadge: 'Overtime Routing Engine (Active Voucher)',
+      explanation: 'Critical edge case solved: The regular shift was closed at 05:01 PM. When Scans #3 and #4 arrived, instead of overwriting regular check-out (which would destroy proof of regular hours), the engine routed the punches to the approved 3-hour overtime claim table.',
+      payrollStatus: 'OVERTIME_LOGGED',
+      statusColorClass: 'text-purple-400',
+      regularHours: '8.0 hrs',
+      overtimeHours: '3.0 hrs',
+      tardiness: '0 mins',
+      undertime: '0 mins',
+      tableIndicator: 'overtime_claims · Claim ID: OT-104-0908 · 3.0 OT Hours',
+      sqlTrace: `INSERT INTO overtime_claims (attendance_id, voucher_id, ot_start, ot_end, approved_hours)\nVALUES (9042, 'VOUCH-331', '2026-09-08 17:30:00', '2026-09-08 20:30:15', 3.0)\nON CONFLICT (voucher_id) DO UPDATE SET ot_end = EXCLUDED.ot_end;`,
+    },
+    overnight: {
+      statusDotClass: 'bg-blue-400',
+      statusText: 'Midnight Rollover Anchored to Monday',
+      punchCount: '2 Punches Across 2 Calendar Days',
+      punches: [
+        { time: '2026-09-08 21:55:00 (Mon)', action: 'Scan #1 (Night Check-in)', tag: 'SHIFT_IN', tagClass: 'bg-blue-900/60 text-blue-200 border-blue-600/50' },
+        { time: '2026-09-09 06:05:22 (Tue)', action: 'Scan #2 (Morning Check-out)', tag: 'SHIFT_OUT', tagClass: 'bg-blue-900/60 text-blue-200 border-blue-600/50' },
+      ],
+      ruleBadge: 'Overnight Shift Window (22:00–06:00)',
+      explanation: 'Night shift spans across midnight. Tuesday morning scan at 06:05 AM is dynamically resolved to Monday logical work date (2026-09-08). Eliminates false "abandoned shift" alerts on Monday and false "missing check-in" alerts on Tuesday.',
+      payrollStatus: 'NIGHT_SHIFT_OK',
+      statusColorClass: 'text-blue-400',
+      regularHours: '8.0 hrs',
+      overtimeHours: '0.0 hrs',
+      tardiness: '0 mins',
+      undertime: '0 mins',
+      tableIndicator: 'daily_attendance · Logical Date: 2026-09-08 (Spanning Tuesday)',
+      sqlTrace: `-- Resolve logical work date for punch at 2026-09-09 06:05:22:\nSELECT calculate_logical_work_date('2026-09-09 06:05:22'::timestamp, 'SHIFT_NIGHT');\n-- Returns: '2026-09-08' -> Successfully paired with Monday evening punch!`,
+    },
+    tardiness: {
+      statusDotClass: 'bg-rose-400',
+      statusText: 'Late Arrival & Undertime Calculated',
+      punchCount: '2 Punches with Penalty Derivations',
+      punches: [
+        { time: '2026-09-08 08:45:10', action: 'Scan #1 (Late Arrival)', tag: 'LATE_IN', tagClass: 'bg-rose-900/60 text-rose-200 border-rose-600/50' },
+        { time: '2026-09-08 16:15:30', action: 'Scan #2 (Early Departure)', tag: 'UNDERTIME_OUT', tagClass: 'bg-rose-900/60 text-rose-200 border-rose-600/50' },
+      ],
+      ruleBadge: 'Grace Threshold (15 Mins Exceeded)',
+      explanation: 'Employee arrived at 08:45 AM (45 minutes past nominal start, exceeding the 15-minute grace period). Employee departed early at 04:15 PM (45 minutes prior to 05:00 PM). Total penalty: 45 min tardiness and 45 min undertime.',
+      payrollStatus: 'TARDY & UNDERTIME',
+      statusColorClass: 'text-rose-400',
+      regularHours: '6.5 hrs',
+      overtimeHours: '0.0 hrs',
+      tardiness: '45 mins',
+      undertime: '45 mins',
+      tableIndicator: 'daily_attendance · Penalties: -45m Tardy, -45m Undertime',
+      sqlTrace: `UPDATE daily_attendance\nSET regular_hours = 6.5, tardiness_minutes = 45, undertime_minutes = 45, status = 'PENALTY_APPLIED'\nWHERE employee_id = 104 AND logical_date = '2026-09-08';`,
+    },
+  };
+
+  function initBitsSimulator() {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.scenario-btn');
+    const statusDot = document.getElementById('bits-status-dot');
+    const statusText = document.getElementById('bits-status-text');
+    const punchCount = document.getElementById('bits-punch-count');
+    const punchesList = document.getElementById('bits-punches-list');
+    const ruleBadge = document.getElementById('bits-rule-badge');
+    const ruleExplanation = document.getElementById('bits-rule-explanation');
+    const payrollStatus = document.getElementById('bits-payroll-status');
+    const metricReg = document.getElementById('bits-metric-reg');
+    const metricOt = document.getElementById('bits-metric-ot');
+    const metricTardy = document.getElementById('bits-metric-tardy');
+    const metricUndertime = document.getElementById('bits-metric-undertime');
+    const tableIndicator = document.getElementById('bits-table-indicator');
+    const sqlTrace = document.getElementById('bits-sql-trace');
+
+    function applyScenario(key: ScenarioKey) {
+      const data = SCENARIOS[key];
+      if (!data) return;
+
+      // Update button visual active states
+      buttons.forEach((btn) => {
+        const isCurrent = btn.getAttribute('data-scenario') === key;
+        if (isCurrent) {
+          btn.classList.add('active-scenario', 'bg-[#2b190c]', 'border-[var(--brass)]');
+          btn.classList.remove('bg-[#1e1208]', 'border-[var(--brass)]/60');
+        } else {
+          btn.classList.remove('active-scenario', 'bg-[#2b190c]', 'border-[var(--brass)]');
+          btn.classList.add('bg-[#1e1208]', 'border-[var(--brass)]/60');
+        }
+      });
+
+      // Update status dot & text
+      if (statusDot) statusDot.className = `inline-block w-2.5 h-2.5 rounded-full ${data.statusDotClass} animate-pulse`;
+      if (statusText) statusText.textContent = data.statusText;
+      if (punchCount) punchCount.textContent = data.punchCount;
+
+      // Ingest punches list
+      if (punchesList) {
+        punchesList.innerHTML = data.punches
+          .map(
+            (p) => `
+            <div class="p-2 rounded bg-[#201206] border border-[var(--brass)]/30 flex items-center justify-between gap-1">
+              <div>
+                <span class="text-[10px] text-stone-400 block">${p.time}</span>
+                <span class="text-[11px] text-stone-200 font-bold">${p.action}</span>
+              </div>
+              <span class="text-[9px] px-1.5 py-0.5 rounded border font-mono font-bold ${p.tagClass}">${p.tag}</span>
+            </div>
+          `
+          )
+          .join('');
+      }
+
+      // Update rule explanation
+      if (ruleBadge) ruleBadge.textContent = data.ruleBadge;
+      if (ruleExplanation) ruleExplanation.textContent = data.explanation;
+
+      // Update metrics & status
+      if (payrollStatus) {
+        payrollStatus.textContent = data.payrollStatus;
+        payrollStatus.className = `text-[10px] font-bold ${data.statusColorClass}`;
+      }
+      if (metricReg) metricReg.textContent = data.regularHours;
+      if (metricOt) metricOt.textContent = data.overtimeHours;
+      if (metricTardy) metricTardy.textContent = data.tardiness;
+      if (metricUndertime) metricUndertime.textContent = data.undertime;
+
+      // Update SQL Trace preview
+      if (tableIndicator) tableIndicator.textContent = data.tableIndicator;
+      if (sqlTrace) {
+        sqlTrace.innerHTML = `<pre class="p-2 rounded bg-black/50 text-stone-300 font-mono text-[10px] sm:text-[11px] whitespace-pre-wrap">${data.sqlTrace}</pre>`;
+      }
+    }
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const scenarioKey = btn.getAttribute('data-scenario') as ScenarioKey;
+        if (scenarioKey) applyScenario(scenarioKey);
+      });
+    });
+
+    // Default to standard scenario
+    applyScenario('standard');
+  }
+
+  // Initialize on load or Astro page transitions
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initBitsSimulator);
+  } else {
+    initBitsSimulator();
+  }
+  document.addEventListener('astro:page-load', initBitsSimulator);
+</script>
+
+<style>
+  .scenario-btn.active-scenario {
+    box-shadow: 0 0 10px rgba(213, 128, 59, 0.35);
+    border-color: var(--candle, #ffe4a0) !important;
+  }
+</style>

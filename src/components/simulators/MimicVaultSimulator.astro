@@ -1,0 +1,329 @@
+---
+import ThematicIcon from '../icons/ThematicIcon.astro';
+---
+
+<div class="mimic-simulator-card my-8 p-5 sm:p-7 rounded-xl border-2 border-emerald-700/60 bg-[#09120e] text-emerald-100 shadow-2xl">
+  {/* Header */}
+  <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-5 border-b border-emerald-800/50">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-lg bg-[#112219] border border-emerald-600/60 flex items-center justify-center shrink-0 shadow">
+        <ThematicIcon name="swords" class="w-5 h-5 text-emerald-400" />
+      </div>
+      <div>
+        <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-emerald-400">Interactive Security Sandbox</span>
+        <h3 class="text-base sm:text-xl font-bold font-serif text-emerald-200">
+          On-Device AES-256-GCM Vault Pipeline
+        </h3>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 text-xs font-mono">
+      <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+      <span class="text-emerald-300 font-semibold">WebCrypto Engine Active</span>
+    </div>
+  </div>
+
+  <p class="text-xs sm:text-sm text-emerald-200/85 mb-5 leading-relaxed">
+    Test Mimic's actual cryptographic pipeline live in your browser. This sandbox executes real <strong>PBKDF2 key derivation</strong> and authenticated <strong>AES-256-GCM encryption</strong> using <code class="px-1.5 py-0.5 rounded bg-emerald-950/80 border border-emerald-800/60 font-mono text-emerald-300">window.crypto.subtle</code> with zero network calls.
+  </p>
+
+  {/* Network Air-Gap Assurance Banner */}
+  <div class="mb-6 p-3 rounded-lg bg-[#0e1c15] border border-emerald-700/40 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+    <div class="flex items-center gap-2 text-emerald-300">
+      <svg class="w-4 h-4 text-emerald-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+      </svg>
+      <span>Air-Gapped Android Architecture: <strong class="text-emerald-200">No INTERNET Permission</strong></span>
+    </div>
+    <span class="px-2 py-0.5 rounded bg-emerald-900/60 text-emerald-300 font-bold text-[10px]">
+      📡 Outbound Packets: 0
+    </span>
+  </div>
+
+  {/* Interactive Step 1: Input Plaintext & Passphrase */}
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+    {/* Plaintext Note */}
+    <div class="flex flex-col gap-1.5">
+      <label for="mimic-plaintext-input" class="text-xs uppercase font-mono font-bold text-emerald-300">
+        1. Plaintext Secret Note:
+      </label>
+      <textarea
+        id="mimic-plaintext-input"
+        rows="3"
+        class="w-full p-3 rounded-lg bg-[#112219] border border-emerald-700/60 text-emerald-100 text-xs font-mono focus:border-emerald-400 focus:outline-none transition-colors"
+      >Classified maritime cargo manifest: Vessel AV-Cebu-09 carrying private company inventory records.</textarea>
+    </div>
+
+    {/* Master Passphrase & Encrypt Button */}
+    <div class="flex flex-col justify-between gap-3">
+      <div>
+        <label for="mimic-passphrase-input" class="text-xs uppercase font-mono font-bold text-emerald-300 block mb-1.5">
+          2. Master Passphrase:
+        </label>
+        <input
+          type="text"
+          id="mimic-passphrase-input"
+          value="ScribeVault#2026"
+          class="w-full p-2.5 rounded-lg bg-[#112219] border border-emerald-700/60 text-emerald-100 text-xs font-mono focus:border-emerald-400 focus:outline-none transition-colors"
+        />
+      </div>
+
+      <button
+        type="button"
+        id="mimic-encrypt-btn"
+        class="w-full flex items-center justify-center gap-2 min-h-[44px] px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-black font-bold text-xs sm:text-sm transition-colors cursor-pointer shadow-lg"
+      >
+        <span>🔒 Execute AES-256-GCM Encryption</span>
+      </button>
+    </div>
+  </div>
+
+  {/* Interactive Step 2: Live Cryptographic Stream */}
+  <div class="mb-5 p-4 rounded-lg bg-[#070e0b] border border-emerald-800/70 font-mono text-xs space-y-3">
+    <div class="flex items-center justify-between pb-2 border-b border-emerald-900/60 text-[11px]">
+      <span class="text-emerald-400 font-bold">Cryptographic Artifacts (Live RAM State):</span>
+      <span class="text-emerald-500" id="mimic-crypto-timestamp">Ready</span>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px]">
+      <div class="p-2.5 rounded bg-[#0f1d16] border border-emerald-800/40">
+        <span class="text-stone-400 block mb-1">Hardware-Unique Salt (256-bit):</span>
+        <span class="text-emerald-300 break-all" id="mimic-salt-display">Generating...</span>
+      </div>
+      <div class="p-2.5 rounded bg-[#0f1d16] border border-emerald-800/40">
+        <span class="text-stone-400 block mb-1">Random Nonce / IV (96-bit):</span>
+        <span class="text-emerald-300 break-all" id="mimic-iv-display">Generating...</span>
+      </div>
+    </div>
+
+    <div class="p-2.5 rounded bg-[#0f1d16] border border-emerald-800/40">
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-stone-400">Authenticated Ciphertext + 128-bit Auth Tag (Base64):</span>
+        <span class="text-[10px] text-emerald-400 font-bold" id="mimic-cipher-bytes">0 bytes</span>
+      </div>
+      <div class="text-emerald-200 break-all text-[11px] max-h-20 overflow-y-auto" id="mimic-ciphertext-display">
+        Waiting for encryption trigger...
+      </div>
+    </div>
+  </div>
+
+  {/* Interactive Step 3: Decryption Verification Tester */}
+  <div class="p-4 rounded-lg bg-[#112219] border border-emerald-700/60">
+    <label class="block text-xs uppercase font-mono font-bold text-emerald-300 mb-2">
+      3. Test Vault Decryption & Tamper Verification:
+    </label>
+    <div class="flex flex-col sm:flex-row gap-3 items-stretch">
+      <input
+        type="text"
+        id="mimic-decrypt-input"
+        placeholder="Enter passphrase to test decryption..."
+        value="ScribeVault#2026"
+        class="flex-1 p-2.5 rounded-lg bg-[#09120e] border border-emerald-700/60 text-emerald-100 text-xs font-mono focus:border-emerald-400 focus:outline-none transition-colors"
+      />
+      <button
+        type="button"
+        id="mimic-decrypt-btn"
+        class="min-h-[44px] px-5 py-2 rounded-lg bg-[#1c3528] hover:bg-[#254636] border border-emerald-500/60 text-emerald-200 font-bold text-xs font-mono transition-colors cursor-pointer shrink-0 flex items-center justify-center gap-1.5"
+      >
+        <span>🔓 Decrypt Vault Blob</span>
+      </button>
+      <button
+        type="button"
+        id="mimic-tamper-btn"
+        class="min-h-[44px] px-3.5 py-2 rounded-lg bg-rose-950/60 hover:bg-rose-900/80 border border-rose-600/50 text-rose-200 font-bold text-xs font-mono transition-colors cursor-pointer shrink-0"
+        title="Simulate entering the wrong password to test GCM authentication rejection"
+      >
+        <span>Simulate Bad Key</span>
+      </button>
+    </div>
+
+    {/* Decryption Status Banner */}
+    <div class="mt-3 p-3 rounded-lg hidden text-xs font-mono" id="mimic-decrypt-result">
+      {/* Result dynamically injected */}
+    </div>
+  </div>
+</div>
+
+<script>
+  function initMimicSimulator() {
+    const plaintextInput = document.getElementById('mimic-plaintext-input') as HTMLTextAreaElement | null;
+    const passphraseInput = document.getElementById('mimic-passphrase-input') as HTMLInputElement | null;
+    const encryptBtn = document.getElementById('mimic-encrypt-btn');
+    const decryptInput = document.getElementById('mimic-decrypt-input') as HTMLInputElement | null;
+    const decryptBtn = document.getElementById('mimic-decrypt-btn');
+    const tamperBtn = document.getElementById('mimic-tamper-btn');
+
+    const saltDisplay = document.getElementById('mimic-salt-display');
+    const ivDisplay = document.getElementById('mimic-iv-display');
+    const cipherDisplay = document.getElementById('mimic-ciphertext-display');
+    const cipherBytes = document.getElementById('mimic-cipher-bytes');
+    const cryptoTimestamp = document.getElementById('mimic-crypto-timestamp');
+    const decryptResult = document.getElementById('mimic-decrypt-result');
+
+    // In-memory encrypted vault payload
+    let currentSalt: Uint8Array | null = null;
+    let currentIv: Uint8Array | null = null;
+    let currentCiphertextBuffer: ArrayBuffer | null = null;
+
+    function bufferToHex(buffer: ArrayBuffer | Uint8Array): string {
+      const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+      return Array.from(bytes)
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('');
+    }
+
+    function bufferToBase64(buffer: ArrayBuffer): string {
+      const bytes = new Uint8Array(buffer);
+      let binary = '';
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return btoa(binary);
+    }
+
+    async function deriveKey(passphrase: string, salt: Uint8Array): Promise<CryptoKey> {
+      const enc = new TextEncoder();
+      const keyMaterial = await window.crypto.subtle.importKey(
+        'raw',
+        enc.encode(passphrase),
+        { name: 'PBKDF2' },
+        false,
+        ['deriveKey']
+      );
+
+      return window.crypto.subtle.deriveKey(
+        {
+          name: 'PBKDF2',
+          salt: salt as BufferSource,
+          iterations: 100000,
+          hash: 'SHA-256',
+        },
+        keyMaterial,
+        { name: 'AES-GCM', length: 256 },
+        false,
+        ['encrypt', 'decrypt']
+      );
+    }
+
+    async function handleEncrypt() {
+      if (!plaintextInput || !passphraseInput) return;
+      const text = plaintextInput.value.trim() || 'Empty note';
+      const pass = passphraseInput.value.trim() || 'Passphrase';
+
+      try {
+        if (encryptBtn) {
+          encryptBtn.textContent = '⏳ Deriving PBKDF2 (100k rounds)...';
+        }
+
+        // 1. Generate random salt and IV
+        currentSalt = window.crypto.getRandomValues(new Uint8Array(16));
+        currentIv = window.crypto.getRandomValues(new Uint8Array(12));
+
+        // 2. Derive key
+        const key = await deriveKey(pass, currentSalt);
+
+        // 3. Encrypt via AES-GCM
+        const enc = new TextEncoder();
+        currentCiphertextBuffer = await window.crypto.subtle.encrypt(
+          {
+            name: 'AES-GCM',
+            iv: currentIv as BufferSource,
+            tagLength: 128,
+          },
+          key,
+          enc.encode(text)
+        );
+
+        // Update UI
+        if (saltDisplay) saltDisplay.textContent = bufferToHex(currentSalt);
+        if (ivDisplay) ivDisplay.textContent = bufferToHex(currentIv);
+        if (cipherDisplay) cipherDisplay.textContent = bufferToBase64(currentCiphertextBuffer);
+        if (cipherBytes) cipherBytes.textContent = `${currentCiphertextBuffer.byteLength} bytes`;
+        if (cryptoTimestamp) cryptoTimestamp.textContent = `Encrypted at ${new Date().toLocaleTimeString()}`;
+
+        // Reset decrypt result
+        if (decryptResult) {
+          decryptResult.className = 'mt-3 p-3 rounded-lg text-xs font-mono bg-emerald-950/70 border border-emerald-600/60 text-emerald-200 block';
+          decryptResult.innerHTML = `<strong>Vault Blob Sealed</strong>: Encrypted with 256-bit symmetric key. Type passphrase above and click "Decrypt" to test verification.`;
+        }
+      } catch (err: any) {
+        if (decryptResult) {
+          decryptResult.className = 'mt-3 p-3 rounded-lg text-xs font-mono bg-rose-950/70 border border-rose-600/60 text-rose-200 block';
+          decryptResult.textContent = `Encryption Error: ${err?.message || err}`;
+        }
+      } finally {
+        if (encryptBtn) {
+          encryptBtn.textContent = '🔒 Execute AES-256-GCM Encryption';
+        }
+      }
+    }
+
+    async function handleDecrypt(testPass: string) {
+      if (!currentSalt || !currentIv || !currentCiphertextBuffer || !decryptResult) {
+        if (decryptResult) {
+          decryptResult.className = 'mt-3 p-3 rounded-lg text-xs font-mono bg-amber-950/70 border border-amber-600/60 text-amber-200 block';
+          decryptResult.textContent = 'Please encrypt a message first before testing decryption!';
+        }
+        return;
+      }
+
+      try {
+        if (decryptBtn) decryptBtn.textContent = '⏳ Decrypting...';
+
+        const key = await deriveKey(testPass, currentSalt);
+        const decryptedBuffer = await window.crypto.subtle.decrypt(
+          {
+            name: 'AES-GCM',
+            iv: currentIv as BufferSource,
+            tagLength: 128,
+          },
+          key,
+          currentCiphertextBuffer
+        );
+
+        const dec = new TextDecoder();
+        const decryptedText = dec.decode(decryptedBuffer);
+
+        decryptResult.className = 'mt-3 p-3 rounded-lg text-xs font-mono bg-emerald-950/80 border border-emerald-500 text-emerald-100 block shadow-inner';
+        decryptResult.innerHTML = `
+          <div class="flex items-center gap-2 font-bold text-emerald-300 pb-1 mb-1 border-b border-emerald-700/40">
+            <span>✓ AES-GCM Authentication Tag Verified (Decryption Successful)</span>
+          </div>
+          <p class="text-stone-200 font-sans mt-1"><strong>Decrypted Plaintext:</strong> "${decryptedText}"</p>
+        `;
+      } catch (err) {
+        decryptResult.className = 'mt-3 p-3 rounded-lg text-xs font-mono bg-rose-950/80 border border-rose-500 text-rose-100 block shadow-inner';
+        decryptResult.innerHTML = `
+          <div class="flex items-center gap-2 font-bold text-rose-300 pb-1 mb-1 border-b border-rose-700/40">
+            <span>✕ Cryptographic Failure: Authentication Tag Mismatch</span>
+          </div>
+          <p class="text-rose-200 mt-1">Passphrase "${testPass}" generated an invalid AES key. GCM detected corrupted/unauthorized cipher data and immediately rejected decryption without leaking any bytes.</p>
+        `;
+      } finally {
+        if (decryptBtn) decryptBtn.textContent = '🔓 Decrypt Vault Blob';
+      }
+    }
+
+    encryptBtn?.addEventListener('click', handleEncrypt);
+
+    decryptBtn?.addEventListener('click', () => {
+      const pass = decryptInput?.value.trim() || '';
+      handleDecrypt(pass);
+    });
+
+    tamperBtn?.addEventListener('click', () => {
+      if (decryptInput) decryptInput.value = 'WrongPassword#999';
+      handleDecrypt('WrongPassword#999');
+    });
+
+    // Auto-run initial encryption so the recruiter sees ready-to-test state
+    handleEncrypt();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMimicSimulator);
+  } else {
+    initMimicSimulator();
+  }
+  document.addEventListener('astro:page-load', initMimicSimulator);
+</script>
