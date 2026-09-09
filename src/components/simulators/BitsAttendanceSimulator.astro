@@ -1,30 +1,47 @@
 ---
 import ThematicIcon from '../icons/ThematicIcon.astro';
+
+export interface Props {
+  compact?: boolean;
+}
+
+const { compact = false } = Astro.props;
 ---
 
-<div class="bits-simulator-card my-8 p-5 sm:p-7 rounded-xl border-2 border-[var(--brass)] bg-[#180e06] text-[var(--parchment)] shadow-2xl">
-  {/* Header */}
-  <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-5 border-b border-[var(--brass)]/40">
-    <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-lg bg-[#2b180a] border border-[var(--brass)] flex items-center justify-center shrink-0 shadow">
-        <ThematicIcon name="terminal" class="w-5 h-5 text-[var(--candle)]" />
+<div class={`bits-simulator-card ${compact ? 'my-0 p-3 sm:p-4 border-0 bg-transparent shadow-none' : 'my-8 p-5 sm:p-7 rounded-xl border-2 border-[var(--brass)] bg-[#180e06] shadow-2xl'} text-[var(--parchment)]`}>
+  {compact ? (
+    <div class="flex items-center justify-between gap-3 pb-2.5 mb-3 border-b border-[var(--brass)]/40 text-xs font-mono">
+      <div class="flex items-center gap-2">
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" id="bits-status-dot"></span>
+        <span class="text-emerald-300 font-bold text-xs" id="bits-status-text">ZKTeco Hardware Feed Active // Biometric Telemetry</span>
       </div>
-      <div>
-        <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-[var(--brass)]">Interactive Engine Simulator</span>
-        <h3 class="text-base sm:text-xl font-bold font-serif text-[var(--candle)]">
-          Biometric Punch & Overtime Derivation
-        </h3>
+      <span class="text-[var(--brass)] text-[10px] hidden sm:inline px-2 py-0.5 rounded bg-black/60 border border-[var(--brass)]/40">Event Sourcing Pipeline</span>
+    </div>
+  ) : (
+    <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-5 border-b border-[var(--brass)]/40">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-[#2b180a] border border-[var(--brass)] flex items-center justify-center shrink-0 shadow">
+          <ThematicIcon name="terminal" class="w-5 h-5 text-[var(--candle)]" />
+        </div>
+        <div>
+          <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-[var(--brass)]">Interactive Engine Simulator</span>
+          <h3 class="text-base sm:text-xl font-bold font-serif text-[var(--candle)]">
+            Biometric Punch & Overtime Derivation
+          </h3>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 text-xs font-mono">
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" id="bits-status-dot"></span>
+        <span class="text-emerald-300 font-semibold" id="bits-status-text">ZKTeco Hardware Feed Active</span>
       </div>
     </div>
-    <div class="flex items-center gap-2 text-xs font-mono">
-      <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" id="bits-status-dot"></span>
-      <span class="text-emerald-300 font-semibold" id="bits-status-text">ZKTeco Hardware Feed Active</span>
-    </div>
-  </div>
+  )}
 
-  <p class="text-xs sm:text-sm text-[var(--parchment)]/85 mb-5 leading-relaxed">
-    Select an operational scenario below to test the disambiguation state machine and relational derivation rules built for the BITS production platform.
-  </p>
+  {!compact && (
+    <p class="text-xs sm:text-sm text-[var(--parchment)]/85 mb-5 leading-relaxed">
+      Select an operational scenario below to test the disambiguation state machine and relational derivation rules built for the BITS production platform.
+    </p>
+  )}
 
   {/* Scenario Selector Buttons */}
   <div class="mb-6">

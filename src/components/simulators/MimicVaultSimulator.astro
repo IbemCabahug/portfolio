@@ -1,5 +1,11 @@
 ---
 import ThematicIcon from '../icons/ThematicIcon.astro';
+
+export interface Props {
+  compact?: boolean;
+}
+
+const { compact = false } = Astro.props;
 ---
 
 <style>
@@ -50,50 +56,64 @@ import ThematicIcon from '../icons/ThematicIcon.astro';
   }
 </style>
 
-<div class="mimic-simulator-card my-8 p-3 sm:p-7 rounded-2xl border-2 border-purple-900/60 bg-[#080a0f] text-stone-100 shadow-2xl font-inter">
-  {/* Header & Journey Stepper Hub */}
-  <div class="flex flex-wrap items-center justify-between gap-4 pb-4 mb-5 border-b border-purple-900/40">
-    <div class="flex items-center gap-3">
-      <div class="w-11 h-11 rounded-xl bg-[#161a26] border border-purple-600/50 flex items-center justify-center shrink-0 shadow-md">
-        <ThematicIcon name="swords" class="w-6 h-6 text-purple-400" />
+<div class={`mimic-simulator-card ${compact ? 'my-0 p-2 sm:p-4 border-0 bg-transparent shadow-none' : 'my-8 p-3 sm:p-7 rounded-2xl border-2 border-purple-900/60 bg-[#080a0f] shadow-2xl'} text-stone-100 font-inter`}>
+  {compact && (
+    <div class="flex items-center justify-between gap-3 pb-2.5 mb-3 border-b border-purple-900/40 text-xs font-mono">
+      <div class="flex items-center gap-2">
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="text-purple-300 font-bold text-xs">Mimic Mobile Sandbox // Android Flutter Architecture</span>
       </div>
-      <div>
-        <div class="flex items-center gap-2">
-          <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-purple-400">Android Application Sandbox</span>
-          <span class="px-2 py-0.5 rounded-full bg-purple-950 border border-purple-700 text-[10px] font-mono text-purple-300">Live Flutter Architecture</span>
+      <span class="text-amber-300 font-bold text-[11px] px-2 py-0.5 rounded bg-purple-950/80 border border-purple-800">AES-256-GCM Air-Gapped</span>
+    </div>
+  )}
+
+  {!compact && (
+    <>
+      {/* Header & Journey Stepper Hub */}
+      <div class="flex flex-wrap items-center justify-between gap-4 pb-4 mb-5 border-b border-purple-900/40">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-xl bg-[#161a26] border border-purple-600/50 flex items-center justify-center shrink-0 shadow-md">
+            <ThematicIcon name="swords" class="w-6 h-6 text-purple-400" />
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-purple-400">Android Application Sandbox</span>
+              <span class="px-2 py-0.5 rounded-full bg-purple-950 border border-purple-700 text-[10px] font-mono text-purple-300">Live Flutter Architecture</span>
+            </div>
+            <h3 class="text-lg sm:text-2xl font-bold font-serif text-amber-100">
+              Mimic Mobile Experience Simulator
+            </h3>
+          </div>
         </div>
-        <h3 class="text-lg sm:text-2xl font-bold font-serif text-amber-100">
-          Mimic Mobile Experience Simulator
-        </h3>
-      </div>
-    </div>
 
-    {/* Live Status Indicators */}
-    <div class="flex items-center gap-2 text-xs font-mono">
-      <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-      <span class="text-stone-300">Air-Gapped (0 Outbound)</span>
-    </div>
-  </div>
-
-  {/* Project Demonstration Clarification Statement */}
-  <div class="mb-5 p-3.5 sm:p-4 rounded-xl bg-[#131722] border border-amber-500/40 text-xs text-stone-300 flex items-start gap-3 shadow-sm">
-    <div class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 mt-0.5 text-sm font-bold select-none">
-      ℹ️
-    </div>
-    <div class="space-y-1">
-      <div class="flex flex-wrap items-center gap-2">
-        <strong class="text-amber-200 uppercase font-mono tracking-wider text-[11px]">Portfolio Project Flow Demonstration</strong>
-        <span class="px-2 py-0.5 rounded bg-amber-950/80 border border-amber-700/60 text-amber-300 text-[10px] font-mono">Web Reproduction</span>
+        {/* Live Status Indicators */}
+        <div class="flex items-center gap-2 text-xs font-mono">
+          <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-stone-300">Air-Gapped (0 Outbound)</span>
+        </div>
       </div>
-      <p class="leading-relaxed text-[11.5px] text-stone-300/95">
-        <strong>Clarification for portfolio viewers and prospective Mimic users:</strong> This interactive simulator is a <em>web-based demonstration copy</em> created to illustrate the visual design, end-to-end user flow, and cryptographic architecture of the <strong>Mimic</strong> project. It allows reviewers to experience how the application behaves in practice directly within the browser. It is <strong>not</strong> the standalone Android production release and does not store personal device files.
+
+      {/* Project Demonstration Clarification Statement */}
+      <div class="mb-5 p-3.5 sm:p-4 rounded-xl bg-[#131722] border border-amber-500/40 text-xs text-stone-300 flex items-start gap-3 shadow-sm">
+        <div class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 mt-0.5 text-sm font-bold select-none">
+          ℹ️
+        </div>
+        <div class="space-y-1">
+          <div class="flex flex-wrap items-center gap-2">
+            <strong class="text-amber-200 uppercase font-mono tracking-wider text-[11px]">Portfolio Project Flow Demonstration</strong>
+            <span class="px-2 py-0.5 rounded bg-amber-950/80 border border-amber-700/60 text-amber-300 text-[10px] font-mono">Web Reproduction</span>
+          </div>
+          <p class="leading-relaxed text-[11.5px] text-stone-300/95">
+            <strong>Clarification for portfolio viewers and prospective Mimic users:</strong> This interactive simulator is a <em>web-based demonstration copy</em> created to illustrate the visual design, end-to-end user flow, and cryptographic architecture of the <strong>Mimic</strong> project. It allows reviewers to experience how the application behaves in practice directly within the browser. It is <strong>not</strong> the standalone Android production release and does not store personal device files.
+          </p>
+        </div>
+      </div>
+
+      <p class="text-xs sm:text-sm text-stone-300 mb-4 leading-relaxed">
+        Experience the <strong>complete end-to-end user journey</strong> of Mimic exactly as built in Flutter: from first-time setup and the horror party game facade, to the secret 3-tap gesture trigger, AES-256-GCM encrypted document vault, privacy settings, and BIP-39 recovery.
       </p>
-    </div>
-  </div>
-
-  <p class="text-xs sm:text-sm text-stone-300 mb-4 leading-relaxed">
-    Experience the <strong>complete end-to-end user journey</strong> of Mimic exactly as built in Flutter: from first-time setup and the horror party game facade, to the secret 3-tap gesture trigger, AES-256-GCM encrypted document vault, privacy settings, and BIP-39 recovery.
-  </p>
+    </>
+  )}
 
   {/* Recruiter Journey Stepper Navigation */}
   <div class="mb-6 p-2 rounded-xl bg-[#0f1420] border border-purple-900/40 shadow-inner">
