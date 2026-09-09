@@ -1,7 +1,7 @@
 ---
 title: "BITS — Biometric Integrated Tracking System"
 slug: "bits"
-role: "Project Contributor"
+role: "Backend & Attendance Engine Developer (OJT Team of 8)"
 status: "Shipped"
 stack: ["Next.js", "TypeScript", "Express.js", "PostgreSQL"]
 featured: true
@@ -20,7 +20,7 @@ The system features:
 - **25 Relational Database Models**: Normalised PostgreSQL schema tracking departments, flexible shift matrices, approval hierarchies, biometric device logs, and immutable audit trails.
 - **Team Scale**: Built collaboratively by an 8-person engineering team over a 6-month development lifecycle.
 
-> **Production Deployment**: Replaced manual spreadsheet timekeeping and paper overtime forms with an automated, auditable, hardware-integrated pipeline.
+> **Production Deployment**: Replaced manual spreadsheet timekeeping and paper overtime forms with an automated, auditable, hardware-integrated pipeline across Avega Bros. Integrated Shipping Corp. terminal branches.
 
 ---
 
@@ -69,6 +69,19 @@ async function processPunchLog(punch: BiometricPunch, employeeShift: ShiftAssign
 - If an approved Overtime Request exists for the employee on that date, punches following shift closure are routed into a dedicated `OvertimeSession` record.
 - If no approval exists, the punch is marked as an "Unscheduled / Unassigned Event", preventing data corruption while prompting the supervisor for resolution.
 
+<figure class="my-6">
+  <img 
+    src="/art/projects/bits-audit-portal.webp" 
+    alt="BITS Biometric Event Stream and Audit Log Portal displaying real-time ZKTeco punch events with 60-second debounce filtering and overtime window routing."
+    class="w-full rounded-lg border border-[var(--brass)] shadow-md"
+    loading="lazy"
+    decoding="async"
+  />
+  <figcaption class="text-center text-xs text-stone-600 dark:text-stone-400 mt-2 italic">
+    <strong>Figure 1:</strong> Production Biometric Event Stream & Audit Log. Displays real-time physical ZKTeco hardware telemetry (fingerprint and facial recognition) evaluated by the disambiguation state machine. Notice how rapid repeated scans within 60 seconds are intercepted with <code>60s Debounce</code>, while post-shift punches matching approved overtime windows are automatically tagged with <code>Routed to OT</code> without mutating regular shift records.
+  </figcaption>
+</figure>
+
 ### 2. Midnight Boundary & Split-Shift Normalization
 A frequent point of failure in attendance software occurs when a shift begins on one calendar day and terminates on the next (e.g. 10:00 PM to 06:00 AM). 
 
@@ -76,11 +89,37 @@ A frequent point of failure in attendance software occurs when a shift begins on
 - **Algorithm Fix**: Shifted query boundaries from calendar dates to **dynamic shift windows** (from 2 hours before scheduled shift start to 4 hours post-shift). Punches falling into this sliding window are bound to the parent shift ID regardless of calendar rollover.
 - **Night Differential Derivation**: Automated the extraction of hours worked between 10:00 PM and 06:00 AM to calculate statutory night differential compensation accurately.
 
+<figure class="my-6">
+  <img 
+    src="/art/projects/bits-matrix-dashboard.webp" 
+    alt="BITS Multi-Branch Attendance and Shift Matrix Dashboard showing hourly punch distribution with highlighted Night Differential Zone from 22:00 to 06:00."
+    class="w-full rounded-lg border border-[var(--brass)] shadow-md"
+    loading="lazy"
+    decoding="async"
+  />
+  <figcaption class="text-center text-xs text-stone-600 dark:text-stone-400 mt-2 italic">
+    <strong>Figure 2:</strong> Multi-Branch Attendance & Shift Matrix Dashboard. Real-time telemetry monitoring 142 on-duty personnel across shipping terminals. Note the purple-banded Night Differential Zone (22:00 – 06:00) with dynamic hourly distribution tracking, preventing calendar-boundary split-shift anomalies.
+  </figcaption>
+</figure>
+
 ### 3. ACID Batch Operations for Department Approvals
 When a department supervisor approves 50 overtime requests simultaneously before a payroll cutoff, partial failures (e.g., one employee having a conflicting schedule lock) can cause dangerous discrepancies between the approval logs and the final payroll ledger.
 
 - Implemented **PostgreSQL Serializable Transactions** wrapped in Express service layers.
 - If any validation rule fails within a batch payload, the entire transaction rolls back cleanly with detailed error reporting, ensuring zero orphaned financial records.
+
+<figure class="my-6">
+  <img 
+    src="/art/projects/bits-reconciliation-portal.webp" 
+    alt="BITS Supervisor Overtime Reconciliation and ACID Batch Approval Portal showing pending batches, split-shift auto-binding, and SERIALIZABLE isolation level badge."
+    class="w-full rounded-lg border border-[var(--brass)] shadow-md"
+    loading="lazy"
+    decoding="async"
+  />
+  <figcaption class="text-center text-xs text-stone-600 dark:text-stone-400 mt-2 italic">
+    <strong>Figure 3:</strong> Supervisor Overtime Reconciliation & ACID Batch Approval Portal. Department supervisors reviewing derived overtime and night differential records prior to payroll lock. Notice the <code>Isolation Level: SERIALIZABLE</code> enforcement badge and the 1-click <code>[ACID Batch Approve]</code> action executing within atomic PostgreSQL transaction blocks.
+  </figcaption>
+</figure>
 
 | Challenge | Initial Symptom | Implemented Solution | Result |
 | :--- | :--- | :--- | :--- |

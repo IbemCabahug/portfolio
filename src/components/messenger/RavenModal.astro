@@ -1,0 +1,210 @@
+---
+interface Props {
+  mailAddress: string;
+}
+
+const { mailAddress } = Astro.props;
+---
+
+<div
+  id="dialog-raven"
+  class="tavern-panel"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="raven-dialog-title"
+  hidden
+>
+  <div class="panel-header flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <span class="panel-badge-icon" aria-hidden="true">
+        <svg class="w-7 h-7 text-[var(--brass)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/>
+          <line x1="16" y1="8" x2="2" y2="22"/>
+          <line x1="17.5" y1="15" x2="9" y2="15"/>
+        </svg>
+      </span>
+      <div>
+        <span class="text-xs uppercase font-extrabold tracking-widest text-[var(--ember)]">Priority Dispatch</span>
+        <h2 id="raven-dialog-title" class="text-xl sm:text-2xl font-bold text-[var(--candle)]">Send Word with the Raven</h2>
+      </div>
+    </div>
+  </div>
+
+  <!-- Composer View -->
+  <div id="raven-composer-view" class="panel-body space-y-3">
+    <p class="text-xs sm:text-sm text-[var(--parchment)]/90 leading-relaxed">
+      Inscribe your dispatch below. Selecting a missive category provides a structured template, and sealing the message routes it directly to Nhovem's console.
+    </p>
+
+    <!-- Template Categories (GitHub Issue Style) -->
+    <div>
+      <span class="block text-xs uppercase tracking-wider text-[var(--brass)] font-semibold mb-1.5">Select Dispatch Template</span>
+      <div class="grid grid-cols-3 gap-1.5" role="radiogroup" aria-label="Missive template selection">
+        <button
+          type="button"
+          class="template-pill active"
+          data-template="quest"
+          data-prefix="[Quest Offer]"
+          data-subject="Frontend / Web Project Inquiry"
+          data-placeholder="Describe the quest, target timeline, technology stack, and how you'd like to collaborate..."
+        >
+          📜 Quest Offer
+        </button>
+        <button
+          type="button"
+          class="template-pill"
+          data-template="role"
+          data-prefix="[Guild Recruitment]"
+          data-subject="Junior Developer Role Opportunity"
+          data-placeholder="Share details about the junior developer role, team structure, remote/hybrid requirements, and company mission..."
+        >
+          ⚔️ Recruitment
+        </button>
+        <button
+          type="button"
+          class="template-pill"
+          data-template="general"
+          data-prefix="[Tavern Greetings]"
+          data-subject="Greetings from a Fellow Traveler"
+          data-placeholder="Share your thoughts on the portfolio, say hello, or connect with Nhovem..."
+        >
+          🍺 Tavern Chat
+        </button>
+      </div>
+    </div>
+
+    <!-- Form Fields -->
+    <form id="desktop-raven-form" class="space-y-2.5">
+      <input type="checkbox" name="botcheck" id="desktop-botcheck" class="hidden" style="display:none !important;position:absolute;left:-9999px;" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <div id="desktop-raven-error" class="hidden text-xs text-red-400 bg-red-900/30 border border-red-500/50 rounded px-3 py-2" role="alert"></div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <div>
+          <label for="desktop-sender-name" class="block text-xs text-[var(--parchment)]/80 font-medium mb-1">Your Name / Call-Sign <span class="text-[var(--ember)]">*</span></label>
+          <input
+            type="text"
+            id="desktop-sender-name"
+            name="senderName"
+            required
+            placeholder="e.g. Robin of the North"
+            class="tavern-input w-full px-3 py-1.5 text-xs sm:text-sm rounded bg-black/40 border border-[var(--brass)]/40 text-[var(--candle)] focus:border-[var(--candle)] focus:outline-none transition-colors"
+          />
+        </div>
+        <div>
+          <label for="desktop-sender-email" class="block text-xs text-[var(--parchment)]/80 font-medium mb-1">Your Return Address (Email) <span class="text-[var(--ember)]">*</span></label>
+          <input
+            type="email"
+            id="desktop-sender-email"
+            name="senderEmail"
+            required
+            placeholder="e.g. traveler@guild.com"
+            class="tavern-input w-full px-3 py-1.5 text-xs sm:text-sm rounded bg-black/40 border border-[var(--brass)]/40 text-[var(--candle)] focus:border-[var(--candle)] focus:outline-none transition-colors"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label for="desktop-missive-subject" class="block text-xs text-[var(--parchment)]/80 font-medium mb-1">Missive Title / Subject <span class="text-[var(--ember)]">*</span></label>
+        <input
+          type="text"
+          id="desktop-missive-subject"
+          name="subject"
+          required
+          value="[Quest Offer] Frontend / Web Project Inquiry"
+          class="tavern-input w-full px-3 py-1.5 text-xs sm:text-sm rounded bg-black/40 border border-[var(--brass)]/40 text-[var(--candle)] focus:border-[var(--candle)] focus:outline-none transition-colors"
+        />
+      </div>
+
+      <div>
+        <label for="desktop-missive-body" class="block text-xs text-[var(--parchment)]/80 font-medium mb-1">Sealed Message <span class="text-[var(--ember)]">*</span></label>
+        <textarea
+          id="desktop-missive-body"
+          name="message"
+          required
+          rows="3"
+          placeholder="Describe the quest, target timeline, technology stack, and how you'd like to collaborate..."
+          class="tavern-input w-full px-3 py-2 text-xs sm:text-sm rounded bg-black/40 border border-[var(--brass)]/40 text-[var(--candle)] focus:border-[var(--candle)] focus:outline-none transition-colors resize-none"
+        ></textarea>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between text-[11px] text-[var(--parchment)]/70 pt-0.5">
+        <span>Destination: <strong class="text-[var(--candle)] font-mono">{mailAddress}</strong></span>
+        <span>Turnaround: 24–48 hours</span>
+      </div>
+
+      <div class="panel-actions pt-2 flex flex-wrap items-center justify-between gap-3">
+        <button
+          type="submit"
+          class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-sm rounded hover:bg-[var(--candle)] transition-colors shadow-md cursor-pointer"
+        >
+          Seal & Dispatch Raven &rarr;
+        </button>
+        <button
+          type="button"
+          class="close-panel-btn inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-xs sm:text-sm rounded hover:bg-[var(--candle)] transition-colors cursor-pointer ml-auto"
+        >
+          Return to Roost (Esc)
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Dispatch Receipt / Confirmation View (Hidden by default) -->
+  <div id="raven-receipt-view" class="panel-body space-y-3 hidden" aria-live="polite">
+    <div class="p-4 rounded bg-emerald-950/40 border border-emerald-500/40 text-center space-y-1.5">
+      <span class="inline-flex items-center justify-center w-11 h-11 rounded-full bg-emerald-500/20 text-emerald-400 mx-auto" aria-hidden="true">
+        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/>
+          <line x1="16" y1="8" x2="2" y2="22"/>
+          <line x1="17.5" y1="15" x2="9" y2="15"/>
+        </svg>
+      </span>
+      <h3 class="text-base sm:text-lg font-bold text-emerald-400" id="receipt-heading">The Raven Takes Wing!</h3>
+      <p class="text-xs text-[var(--parchment)]/90 max-w-md mx-auto" id="receipt-desc">
+        Your missive has been prepared and routed to your email client. A copy of your sealed message is inscribed below for your records:
+      </p>
+    </div>
+
+    <div class="p-3 rounded bg-black/40 border border-[var(--brass)]/30 font-mono text-xs text-[var(--parchment)]/90 space-y-1">
+      <div class="text-[var(--brass)] font-bold mb-1 border-b border-[var(--brass)]/20 pb-1">DISPATCH RECORD</div>
+      <p><strong class="text-[var(--candle)]">To:</strong> {mailAddress}</p>
+      <p><strong class="text-[var(--candle)]">Subject:</strong> <span id="receipt-subject"></span></p>
+      <p><strong class="text-[var(--candle)]">From:</strong> <span id="receipt-from"></span></p>
+      <div class="mt-2 pt-2 border-t border-[var(--brass)]/20 whitespace-pre-wrap" id="receipt-body"></div>
+    </div>
+
+    <div class="panel-actions pt-2 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          id="receipt-copy-btn"
+          class="inline-flex items-center justify-center min-h-[44px] px-4 py-2 bg-[var(--wood-deep)] text-[var(--candle)] border border-[var(--brass)] font-bold text-xs sm:text-sm rounded hover:bg-black transition-colors cursor-pointer"
+        >
+          Copy Formatted Missive
+        </button>
+        <a
+          id="receipt-gmail-link"
+          href={`https://mail.google.com/mail/?view=cm&fs=1&to=${mailAddress}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center justify-center min-h-[44px] px-4 py-2 bg-[var(--wood-deep)] text-[var(--candle)] border border-[var(--brass)] font-bold text-xs sm:text-sm rounded hover:bg-black transition-colors"
+        >
+          Open in Gmail Webmail &rarr;
+        </a>
+        <button
+          type="button"
+          id="receipt-reset-btn"
+          class="min-h-[44px] px-3 py-2 text-xs sm:text-sm text-[var(--candle)]/80 hover:text-[var(--candle)] hover:underline cursor-pointer"
+        >
+          Write Another Missive
+        </button>
+      </div>
+
+      <button
+        type="button"
+        class="close-panel-btn inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-xs sm:text-sm rounded hover:bg-[var(--candle)] transition-colors cursor-pointer ml-auto"
+      >
+        Return to Roost (Esc)
+      </button>
+    </div>
+  </div>
+</div>

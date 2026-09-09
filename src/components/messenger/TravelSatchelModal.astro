@@ -1,0 +1,98 @@
+---
+// Travel Satchel Modal: Field Expedition Gear, Logistics & Dialects
+interface Props {
+  profile?: {
+    availability?: string;
+    location?: string;
+  };
+}
+
+const { profile } = Astro.props;
+---
+
+<div
+  id="dialog-satchel"
+  class="tavern-panel"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="satchel-dialog-title"
+  hidden
+>
+  <div class="panel-header">
+    <div class="flex items-center gap-3">
+      <span class="panel-badge-icon" aria-hidden="true">
+        <svg class="w-7 h-7 text-[var(--brass)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+        </svg>
+      </span>
+      <div>
+        <span class="text-xs uppercase font-extrabold tracking-widest text-[var(--ember)]">Field Satchel</span>
+        <h2 id="satchel-dialog-title" class="text-xl sm:text-2xl font-bold text-[var(--candle)]">Expedition Gear & Logistics</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel-body space-y-2.5">
+    <p class="text-xs sm:text-sm text-[var(--parchment)]/90 leading-relaxed">
+      Packed and prepared for campaigns across realms. The courier's field gear answers all operational, geographic, and collaboration parameters for prospective employers:
+    </p>
+
+    <div class="space-y-2 text-xs sm:text-sm">
+      <!-- Compartment 1: Quest Status -->
+      <div class="p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40">
+        <div class="flex items-center justify-between mb-0.5">
+          <span class="text-[var(--brass)] font-semibold text-xs uppercase tracking-wider">1. Field Pass & Quest Readiness</span>
+          <span class="inline-flex items-center gap-1.5 text-emerald-400 font-bold text-xs">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+            {profile?.availability || 'Open to junior developer roles'}
+          </span>
+        </div>
+        <p class="text-[11px] text-[var(--parchment)]/80">Immediate deployment readiness for junior developer roles, frontend contracts, and software development teams.</p>
+      </div>
+
+      <!-- Compartment 2: Realm Station & Timezone -->
+      <div class="p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40">
+        <div class="flex items-center justify-between mb-0.5">
+          <span class="text-[var(--brass)] font-semibold text-xs uppercase tracking-wider">2. Wayfarer's Compass (Coordinates)</span>
+          <span class="text-[var(--candle)] font-bold text-xs">{profile?.location || 'Philippines'} (UTC+8)</span>
+        </div>
+        <p class="text-[11px] text-[var(--parchment)]/80">Stationed in the Philippines with flexible asynchronous and synchronous overlap for teams across APAC, EMEA, and the Americas.</p>
+      </div>
+
+      <!-- Compartment 3: Deployment Modalities -->
+      <div class="p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40">
+        <div class="flex items-center justify-between mb-0.5">
+          <span class="text-[var(--brass)] font-semibold text-xs uppercase tracking-wider">3. Transit Waybill (Deployment Radius)</span>
+          <span class="text-[var(--candle)] font-bold text-xs">Remote Worldwide</span>
+        </div>
+        <p class="text-[11px] text-[var(--parchment)]/80">Equipped for self-directed remote execution, distributed git workflows, and open to hybrid or relocation opportunities.</p>
+      </div>
+
+      <!-- Compartment 4: Spoken Dialects -->
+      <div class="p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40">
+        <div class="flex items-center justify-between mb-0.5">
+          <span class="text-[var(--brass)] font-semibold text-xs uppercase tracking-wider">4. Expedition Dialects (Languages)</span>
+          <span class="text-[var(--candle)] font-bold text-xs">English &bull; Filipino &bull; Cebuano</span>
+        </div>
+        <p class="text-[11px] text-[var(--parchment)]/80">English (Professional working proficiency), Filipino (Fluent), and Cebuano (Native) for clear technical documentation and real-time team meetings.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel-actions flex flex-wrap items-center justify-between gap-3 pt-3">
+    <button
+      type="button"
+      id="satchel-dispatch-btn"
+      class="inline-flex items-center justify-center min-h-[44px] px-5 py-2 bg-[var(--wood-deep)] text-[var(--candle)] border border-[var(--brass)] font-bold text-xs sm:text-sm rounded hover:bg-black hover:border-[var(--candle)] transition-colors shadow-md cursor-pointer"
+    >
+      Send Message with the Raven &rarr;
+    </button>
+    <button
+      type="button"
+      class="close-panel-btn inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-xs sm:text-sm rounded hover:bg-[var(--candle)] transition-colors cursor-pointer ml-auto"
+    >
+      Close Satchel (Esc)
+    </button>
+  </div>
+</div>

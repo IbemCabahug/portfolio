@@ -1,0 +1,238 @@
+---
+// Mobile & No-JS Fallback: Tactile Guild Dispatch Slips Stack
+interface Props {
+  mailAddress: string;
+  githubUrl: string;
+  profile?: {
+    availability?: string;
+    location?: string;
+  };
+}
+
+const { mailAddress, githubUrl, profile } = Astro.props;
+---
+
+<section class="narrow-dispatch-stack px-4 max-w-3xl mx-auto space-y-6" aria-label="Dispatch Channels List">
+  <!-- Active Courier Raven flying illustration for mobile -->
+  <div class="text-center mb-6">
+    <div class="relative inline-block mb-3">
+      <div class="absolute -inset-4 bg-[radial-gradient(ellipse_at_center,rgba(213,128,59,0.2)_0%,transparent_70%)] rounded-full blur-md pointer-events-none" aria-hidden="true"></div>
+      <img
+        src="/art/raven-delivering-letter-388.webp"
+        srcset="/art/raven-delivering-letter-388.webp 388w, /art/raven-delivering-letter-776.webp 776w"
+        sizes="(max-width: 640px) 240px, 320px"
+        width="320"
+        height="119"
+        alt="A sleek black messenger raven in flight carrying a sealed parchment letter in its beak"
+        class="relative mx-auto w-56 sm:w-64 h-auto drop-shadow-[0_12px_24px_rgba(0,0,0,0.85)]"
+        loading="lazy"
+      />
+    </div>
+  </div>
+
+  <!-- 1. Direct Electronic Dispatch (Interactive Form on Mobile) -->
+  <article class="dispatch-slip bg-[var(--parchment)] text-[var(--ink)] p-6 sm:p-7 rounded-lg border-2 border-[var(--brass)] shadow-2xl relative overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(0,0,0,0.6)]">
+    <div class="corner-bracket top-left" aria-hidden="true"></div>
+    <div class="corner-bracket top-right" aria-hidden="true"></div>
+
+    <div class="space-y-4">
+      <div class="flex flex-wrap items-center gap-2 mb-1">
+        <span class="text-xs uppercase font-extrabold tracking-widest text-[var(--ember)] bg-[var(--wood-deep)]/10 px-2 py-0.5 rounded border border-[var(--ember)]/30">
+          Priority Dispatch
+        </span>
+        <span class="text-xs text-[var(--ink)]/70 font-mono">
+          Electronic Messenger Raven
+        </span>
+      </div>
+
+      <h2 class="text-2xl font-bold text-[var(--ink)] mb-1 flex items-center gap-2">
+        <span>Send Word via the Raven</span>
+      </h2>
+
+      <p class="text-sm text-[var(--ink)]/85 leading-relaxed">
+        Inscribe your missive below. Choosing a dispatch category will pre-fill a structured template to send directly to Nhovem's console.
+      </p>
+
+      <!-- Mobile Form -->
+      <form id="mobile-raven-form" class="space-y-3 pt-2">
+        <input type="checkbox" name="botcheck" id="mobile-botcheck" class="hidden" style="display:none !important;position:absolute;left:-9999px;" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <div id="mobile-raven-error" class="hidden text-xs text-red-700 bg-red-100 border border-red-300 rounded px-3 py-2" role="alert"></div>
+        <div>
+          <span class="block text-xs uppercase tracking-wider text-[var(--ink)] font-bold mb-1">Dispatch Category</span>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button type="button" class="mobile-template-pill active" data-template="quest" data-prefix="[Quest Offer]" data-subject="Frontend / Web Project Inquiry" data-placeholder="Describe the quest, target timeline, and technology stack...">📜 Quest Offer</button>
+            <button type="button" class="mobile-template-pill" data-template="role" data-prefix="[Guild Recruitment]" data-subject="Junior Developer Role Opportunity" data-placeholder="Share details about the junior developer role, team structure, and location...">⚔️ Recruitment</button>
+            <button type="button" class="mobile-template-pill" data-template="general" data-prefix="[Tavern Greetings]" data-subject="Greetings from a Fellow Traveler" data-placeholder="Say hello or share feedback on the portfolio...">🍺 Tavern Chat</button>
+          </div>
+        </div>
+
+        <div>
+          <label for="mobile-sender-name" class="block text-xs font-bold text-[var(--ink)] mb-1">Your Name <span class="text-[var(--ember)]">*</span></label>
+          <input type="text" id="mobile-sender-name" required placeholder="e.g. Robin of the North" class="w-full px-3 py-2 text-sm rounded bg-[var(--wood-deep)]/10 border border-[var(--brass)]/50 text-[var(--ink)] focus:outline-2 focus:outline-[var(--brass)]" />
+        </div>
+
+        <div>
+          <label for="mobile-sender-email" class="block text-xs font-bold text-[var(--ink)] mb-1">Your Email <span class="text-[var(--ember)]">*</span></label>
+          <input type="email" id="mobile-sender-email" required placeholder="e.g. traveler@guild.com" class="w-full px-3 py-2 text-sm rounded bg-[var(--wood-deep)]/10 border border-[var(--brass)]/50 text-[var(--ink)] focus:outline-2 focus:outline-[var(--brass)]" />
+        </div>
+
+        <div>
+          <label for="mobile-missive-subject" class="block text-xs font-bold text-[var(--ink)] mb-1">Subject <span class="text-[var(--ember)]">*</span></label>
+          <input type="text" id="mobile-missive-subject" required value="[Quest Offer] Frontend / Web Project Inquiry" class="w-full px-3 py-2 text-sm rounded bg-[var(--wood-deep)]/10 border border-[var(--brass)]/50 text-[var(--ink)] focus:outline-2 focus:outline-[var(--brass)]" />
+        </div>
+
+        <div>
+          <label for="mobile-missive-body" class="block text-xs font-bold text-[var(--ink)] mb-1">Message <span class="text-[var(--ember)]">*</span></label>
+          <textarea id="mobile-missive-body" required rows="3" placeholder="Describe the quest, target timeline, and technology stack..." class="w-full px-3 py-2 text-sm rounded bg-[var(--wood-deep)]/10 border border-[var(--brass)]/50 text-[var(--ink)] focus:outline-2 focus:outline-[var(--brass)] resize-none"></textarea>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-2.5 pt-1">
+          <button
+            type="submit"
+            class="inline-flex items-center justify-center min-h-[44px] px-6 py-2.5 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded border border-[var(--brass)] hover:bg-black transition-colors cursor-pointer text-center shadow-md flex-1"
+          >
+            Seal & Dispatch Raven &rarr;
+          </button>
+        </div>
+      </form>
+
+      <!-- Direct address copy fallback -->
+      <div class="pt-2 border-t border-[var(--brass)]/30 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <span>Direct address: <strong class="select-all font-mono" id="mobile-email-address">{mailAddress}</strong></span>
+        <button
+          type="button"
+          id="mobile-copy-email-btn"
+          class="px-2.5 py-1 bg-[var(--wood-deep)] text-[var(--candle)] rounded hover:bg-black transition-colors text-xs font-bold cursor-pointer"
+        >
+          Copy Address
+        </button>
+        <span id="mobile-copy-status" class="text-xs text-green-700 font-bold hidden">Copied!</span>
+      </div>
+    </div>
+  </article>
+
+  <!-- 2. Guild Code Archives (GitHub) -->
+  <article class="dispatch-slip bg-[var(--parchment)] text-[var(--ink)] p-6 sm:p-7 rounded-lg border-2 border-[var(--brass)] shadow-2xl relative overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(0,0,0,0.6)]">
+    <div class="corner-bracket top-left" aria-hidden="true"></div>
+    <div class="corner-bracket top-right" aria-hidden="true"></div>
+
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-5">
+      <div class="flex-1 pr-2">
+        <div class="flex flex-wrap items-center gap-2 mb-2">
+          <span class="text-xs uppercase font-extrabold tracking-widest text-[var(--ember)] bg-[var(--wood-deep)]/10 px-2 py-0.5 rounded border border-[var(--ember)]/30">
+            Guild Archives
+          </span>
+          <span class="text-xs text-[var(--ink)]/70 font-mono">
+            Verified Codebase Repositories
+          </span>
+        </div>
+
+        <h2 class="text-2xl font-bold text-[var(--ink)] mb-1">
+          GitHub Code Archive
+        </h2>
+
+        <p class="text-sm sm:text-base text-[var(--ink)]/85 mb-2 leading-relaxed">
+          Inspect complete source repositories, production commits, TypeScript architectures, and active software projects.
+        </p>
+
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-xs text-[var(--ink)]/70 font-mono">
+            Profile: github.com/IbemCabahug
+          </span>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 mt-2 pt-2 border-t border-[var(--brass)]/20 text-xs font-mono text-[var(--ink)]/80">
+          <span class="inline-flex items-center gap-1 font-bold text-[#633a0e]">
+            <span>● 2 Active Repositories Synced</span>
+          </span>
+          <span>•</span>
+          <span class="text-stone-700 font-semibold">🔒 1 Device Vault</span>
+        </div>
+      </div>
+
+      <div class="w-full md:w-auto shrink-0">
+        <a
+          href={githubUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center justify-center min-h-[44px] px-6 py-2.5 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded border border-[var(--brass)] hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 whitespace-nowrap text-center shadow-md w-full md:w-auto"
+        >
+          Inspect GitHub &rarr;
+        </a>
+      </div>
+    </div>
+  </article>
+
+  <!-- 3. Formal Guild Dossier (Resume) -->
+  <article class="dispatch-slip bg-[var(--parchment)] text-[var(--ink)] p-6 sm:p-7 rounded-lg border-2 border-[var(--brass)] shadow-2xl relative overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(0,0,0,0.6)]">
+    <div class="corner-bracket top-left" aria-hidden="true"></div>
+    <div class="corner-bracket top-right" aria-hidden="true"></div>
+
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-5">
+      <div class="flex-1 pr-2">
+        <div class="flex flex-wrap items-center gap-2 mb-2">
+          <span class="text-xs uppercase font-extrabold tracking-widest text-[var(--ember)] bg-[var(--wood-deep)]/10 px-2 py-0.5 rounded border border-[var(--ember)]/30">
+            Master Ledger
+          </span>
+          <span class="text-xs text-[var(--ink)]/70 font-mono">
+            Curriculum Vitae
+          </span>
+        </div>
+
+        <h2 class="text-2xl font-bold text-[var(--ink)] mb-1">
+          Bachelor of Industrial Technology, Major in Computer Technology
+        </h2>
+
+        <p class="text-sm sm:text-base text-[var(--ink)]/85 mb-2 leading-relaxed">
+          Cebu Technological University – Danao Campus &bull; Academic Distinction &bull; Dean's Lister &bull; Backend & Attendance Engine Developer for biometric systems.
+        </p>
+
+        <span class="text-xs text-[var(--ink)]/70 font-mono">
+          Available in styled web and printable formats
+        </span>
+      </div>
+
+      <div class="w-full md:w-auto shrink-0 flex flex-col sm:flex-row gap-2">
+        <a
+          href="/resume"
+          class="inline-flex items-center justify-center min-h-[44px] px-6 py-2.5 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded border border-[var(--brass)] hover:bg-black transition-colors whitespace-nowrap text-center shadow-md"
+        >
+          View Full Resume &rarr;
+        </a>
+        <a
+          href="/resume.pdf"
+          download
+          class="inline-flex items-center justify-center min-h-[44px] px-4 py-2.5 bg-[var(--wood-deep)]/10 text-[var(--ink)] font-bold text-sm rounded border border-[var(--brass)]/60 hover:bg-[var(--wood-deep)]/20 transition-colors whitespace-nowrap text-center"
+        >
+          PDF &darr;
+        </a>
+      </div>
+    </div>
+  </article>
+
+  <!-- 4. Roost Attendant Status -->
+  {profile && (
+    <div class="p-5 rounded-lg border border-[var(--brass)]/40 bg-[var(--wood-deep)]/60 text-[var(--parchment)] text-sm leading-relaxed text-center shadow-inner">
+      <p class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+        <span class="inline-flex items-center gap-1.5 text-[var(--candle)] font-semibold">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+          Availability: {profile.availability}
+        </span>
+        <span class="text-[var(--parchment)]/50">&bull;</span>
+        <span>Stationed in: <strong class="text-[var(--parchment)]">{profile.location}</strong> (UTC+8)</span>
+        <span class="text-[var(--parchment)]/50">&bull;</span>
+        <span class="text-[var(--parchment)]/80">Open to Remote & Worldwide Roles</span>
+      </p>
+    </div>
+  )}
+
+  <!-- 5. Physical Return to Main Tavern -->
+  <div class="pt-4 text-center">
+    <a
+      href="/tavern"
+      class="inline-flex items-center justify-center min-h-[44px] px-8 py-3 border-2 border-[var(--brass)] bg-[var(--wood-deep)]/80 text-[var(--parchment)] font-bold text-base rounded-md hover:bg-[var(--parchment)] hover:text-[var(--wood-deep)] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[var(--candle)] shadow-lg hover:shadow-[0_0_15px_rgba(213,128,59,0.4)]"
+    >
+      &larr; Step back through the Archway to Main Tavern
+    </a>
+  </div>
+</section>

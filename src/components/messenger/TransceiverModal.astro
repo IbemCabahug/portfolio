@@ -1,0 +1,159 @@
+---
+// Arcane Transceiver Interactive Chamber Modal
+---
+
+<div
+  id="dialog-machine"
+  class="tavern-panel transceiver-viewport-modal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="machine-dialog-title"
+  hidden
+>
+  <div class="panel-header flex items-center justify-between">
+    <div class="flex items-center gap-2.5">
+      <span class="panel-badge-icon" aria-hidden="true">
+        <svg class="w-6 h-6 text-[var(--brass)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+      </span>
+      <div>
+        <span id="transceiver-subtitle" class="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-[var(--ember)]">Arcane Transmission</span>
+        <h2 id="machine-dialog-title" class="text-lg sm:text-xl font-bold text-[var(--candle)] leading-tight">The Arcane Transceiver — Live Trial</h2>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      class="close-panel-btn inline-flex items-center justify-center min-h-[36px] px-3 py-1 rounded bg-black/40 hover:bg-black text-[var(--candle)] border border-[var(--brass)]/50 text-xs font-bold transition-colors cursor-pointer"
+      title="Close Transceiver (Esc)"
+      aria-label="Close Transceiver"
+    >
+      <span>✕ Close</span>
+    </button>
+  </div>
+
+  <div class="panel-body flex-1 min-h-0 flex flex-col gap-2.5 overflow-hidden">
+    <!-- Transceiver Top Chamber Control Bar -->
+    <div class="px-3 py-1.5 rounded bg-[var(--wood-deep)] border border-[var(--brass)]/60 flex items-center justify-between gap-2 shrink-0">
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/60 text-emerald-400 font-mono text-[10px] sm:text-xs font-bold">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true"></span>
+          <span>Signal Synchronized</span>
+        </span>
+        <span id="transceiver-version-text" class="text-[11px] font-mono text-[var(--parchment)]/70 hidden sm:inline">
+          ArcaneTyper v2.2.6
+        </span>
+      </div>
+
+      <div id="transceiver-active-controls" class="hidden items-center gap-2">
+        <button
+          type="button"
+          id="transceiver-fullscreen-btn"
+          class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-black/50 border border-[var(--brass)] text-[var(--candle)] font-mono text-xs hover:bg-black transition-colors cursor-pointer min-h-[32px]"
+          title="Toggle Fullscreen"
+        >
+          <span>⛶</span>
+          <span class="hidden sm:inline">Fullscreen</span>
+        </button>
+
+        <button
+          type="button"
+          id="transceiver-unload-btn"
+          class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-red-950/70 border border-red-500/50 text-red-200 font-bold text-xs hover:bg-red-900 transition-colors cursor-pointer min-h-[32px]"
+          title="Disengage demo and free memory"
+        >
+          <span>✕</span>
+          <span>Disengage</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Resting View: Dynamic Project Preview with Navigation -->
+    <div id="transceiver-resting-view" class="flex-1 min-h-0 w-full rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/40 flex flex-col items-center justify-center text-center overflow-hidden relative">
+      <!-- Left Navigation Arrow -->
+      <button
+        type="button"
+        id="transceiver-prev-btn"
+        class="transceiver-nav-arrow transceiver-nav-prev"
+        aria-label="Previous project simulation"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+
+      <!-- Right Navigation Arrow -->
+      <button
+        type="button"
+        id="transceiver-next-btn"
+        class="transceiver-nav-arrow transceiver-nav-next"
+        aria-label="Next project simulation"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+          <polyline points="9 6 15 12 9 18"/>
+        </svg>
+      </button>
+
+      <!-- Dynamic Content Container (populated by JS) -->
+      <div id="transceiver-project-content" class="p-4 sm:p-6 space-y-4 w-full max-w-xl mx-auto transceiver-content-fade">
+        <p id="transceiver-description" class="text-xs sm:text-sm text-[var(--parchment)]/90 leading-relaxed">
+          <!-- Populated by JS -->
+        </p>
+        <div id="transceiver-badges" class="flex flex-wrap justify-center gap-1.5 pt-1">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-center gap-3 pt-2 pb-3 px-4">
+        <button
+          type="button"
+          id="transceiver-launch-btn"
+          class="inline-flex items-center gap-2 min-h-[44px] px-6 py-2.5 rounded-md bg-[var(--brass)] text-black font-bold text-xs sm:text-sm hover:bg-[var(--candle)] transition-all shadow-lg hover:shadow-[0_0_15px_rgba(218,165,32,0.4)] cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+        >
+          <svg class="w-4 h-4 text-black" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+          <span id="transceiver-launch-label">Engage Arcane Typer Trial</span>
+        </button>
+
+        <a
+          id="transceiver-standalone-link"
+          href="https://arcane-typer.vercel.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 min-h-[44px] px-5 py-2.5 rounded-md border border-[var(--brass)] text-[var(--candle)] font-bold text-xs sm:text-sm hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+        >
+          <span id="transceiver-standalone-label">Launch in Standalone Window</span>
+        </a>
+
+        <a
+          id="transceiver-dossier-link"
+          href="/quests/arcanetyper"
+          class="inline-flex items-center gap-2 min-h-[44px] px-5 py-2.5 rounded-md border border-[var(--brass)]/50 text-[var(--candle)]/80 font-bold text-xs sm:text-sm hover:bg-black/50 hover:text-[var(--candle)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+        >
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+          <span>View Full Dossier</span>
+        </a>
+      </div>
+
+      <!-- Carousel Indicator Dots -->
+      <div id="transceiver-indicators" class="flex justify-center gap-2 pb-3" aria-label="Project navigation indicators">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- Active Iframe Container: Full Viewport Scaled Arena -->
+    <div
+      id="transceiver-frame-container"
+      class="flex-1 min-h-0 w-full bg-black rounded border border-[var(--brass)]/50 hidden relative overflow-hidden shadow-2xl"
+    >
+      <!-- Dynamically scaled iframe inserted on click -->
+    </div>
+  </div>
+</div>
