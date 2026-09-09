@@ -2,873 +2,926 @@
 import ThematicIcon from '../icons/ThematicIcon.astro';
 ---
 
-<div class="mimic-simulator-card my-8 p-4 sm:p-7 rounded-2xl border-2 border-emerald-700/60 bg-[#09120e] text-emerald-100 shadow-2xl">
-  {/* Header & Recruiter Control Hub */}
-  <div class="flex flex-wrap items-center justify-between gap-4 pb-4 mb-6 border-b border-emerald-800/50">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+  .font-creepster {
+    font-family: 'Creepster', cursive, sans-serif;
+  }
+  .font-inter {
+    font-family: 'Inter', sans-serif;
+  }
+  .font-space {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  /* Heartbeat Pulse Animation */
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    15% { transform: scale(1.05); }
+    30% { transform: scale(1); }
+    45% { transform: scale(1.03); }
+    60% { transform: scale(1); }
+  }
+  .animate-heartbeat {
+    animation: heartbeat 2.5s infinite ease-in-out;
+  }
+
+  /* Fog Drifting */
+  @keyframes fogDrift {
+    0% { transform: translateX(-20%); opacity: 0.15; }
+    50% { transform: translateX(10%); opacity: 0.25; }
+    100% { transform: translateX(-20%); opacity: 0.15; }
+  }
+  .fog-layer {
+    background: radial-gradient(ellipse at 50% 50%, rgba(200, 30, 58, 0.15), transparent 70%);
+    animation: fogDrift 14s infinite ease-in-out;
+  }
+
+  /* Blood Splatter Wipe Animation */
+  @keyframes bloodSplatter {
+    0% { opacity: 0; transform: scale(0.6); }
+    40% { opacity: 0.95; transform: scale(1.05); }
+    80% { opacity: 0.85; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.15); }
+  }
+  .animate-blood {
+    animation: bloodSplatter 0.65s forwards ease-out;
+  }
+</style>
+
+<div class="mimic-simulator-card my-8 p-3 sm:p-7 rounded-2xl border-2 border-purple-900/60 bg-[#080a0f] text-stone-100 shadow-2xl font-inter">
+  {/* Header & Journey Stepper Hub */}
+  <div class="flex flex-wrap items-center justify-between gap-4 pb-4 mb-5 border-b border-purple-900/40">
     <div class="flex items-center gap-3">
-      <div class="w-11 h-11 rounded-xl bg-[#112219] border border-emerald-600/60 flex items-center justify-center shrink-0 shadow-md">
-        <ThematicIcon name="swords" class="w-6 h-6 text-emerald-400" />
+      <div class="w-11 h-11 rounded-xl bg-[#161a26] border border-purple-600/50 flex items-center justify-center shrink-0 shadow-md">
+        <ThematicIcon name="swords" class="w-6 h-6 text-purple-400" />
       </div>
       <div>
         <div class="flex items-center gap-2">
-          <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-emerald-400">Android Interactive Sandbox</span>
-          <span class="px-2 py-0.5 rounded-full bg-emerald-950 border border-emerald-700 text-[10px] font-mono text-emerald-300">Dual-State Architecture</span>
+          <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-purple-400">Android Application Sandbox</span>
+          <span class="px-2 py-0.5 rounded-full bg-purple-950 border border-purple-700 text-[10px] font-mono text-purple-300">Live Flutter Architecture</span>
         </div>
-        <h3 class="text-lg sm:text-2xl font-bold font-serif text-emerald-200">
-          Mimic Mobile Application Simulator
+        <h3 class="text-lg sm:text-2xl font-bold font-serif text-amber-100">
+          Mimic Mobile Experience Simulator
         </h3>
       </div>
     </div>
 
-    {/* Mode Toggle Controls for Fast Navigation */}
-    <div class="flex items-center gap-2 p-1.5 rounded-xl bg-[#060c09] border border-emerald-800/70 shadow-inner">
-      <button
-        type="button"
-        id="mimic-nav-game-btn"
-        class="px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer bg-emerald-600 text-black shadow"
-        title="Switch to Party Game disguise"
-      >
-        🎮 State A: Party Game
-      </button>
-      <button
-        type="button"
-        id="mimic-nav-vault-btn"
-        class="px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer bg-transparent text-emerald-400 hover:text-emerald-200"
-        title="Switch to Encrypted Vault"
-      >
-        🔒 State B: Encrypted Vault
-      </button>
+    {/* Live Status Indicators */}
+    <div class="flex items-center gap-2 text-xs font-mono">
+      <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+      <span class="text-stone-300">Air-Gapped (0 Outbound)</span>
     </div>
   </div>
 
-  {/* Description and Telemetry Bar */}
-  <p class="text-xs sm:text-sm text-emerald-200/90 mb-5 leading-relaxed">
-    Experience how <strong>Mimic</strong> functions as a live mobile application. On the surface, it is a fully playable pass-and-play social deduction game. Underneath, a secret trigger unlocks an authenticated <strong>AES-256-GCM vault</strong> running real in-browser <code class="px-1 py-0.5 rounded bg-emerald-950 border border-emerald-800 font-mono text-emerald-300">crypto.subtle</code> cryptography.
+  <p class="text-xs sm:text-sm text-stone-300 mb-4 leading-relaxed">
+    Experience the <strong>complete end-to-end user journey</strong> of Mimic exactly as built in Flutter: from first-time setup and the horror party game facade, to the secret 3-tap gesture trigger, AES-256-GCM encrypted document vault, privacy settings, and BIP-39 recovery.
   </p>
 
-  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6 text-xs font-mono">
-    <div class="p-2.5 rounded-lg bg-[#0e1c15] border border-emerald-800/50 flex flex-col">
-      <span class="text-[10px] text-stone-400">Current Surface State</span>
-      <span class="text-emerald-300 font-bold" id="mimic-status-state">State A (Party Game)</span>
+  {/* Recruiter Journey Stepper Navigation */}
+  <div class="mb-6 p-2 rounded-xl bg-[#0f1420] border border-purple-900/40 shadow-inner">
+    <div class="text-[10px] uppercase font-mono font-bold tracking-wider text-purple-300 mb-1.5 px-2 flex items-center justify-between">
+      <span>Interactive User Journey Stepper (Click to jump to any screen):</span>
+      <span id="mimic-active-step-label" class="text-amber-300">Step 2: Game Facade</span>
     </div>
-    <div class="p-2.5 rounded-lg bg-[#0e1c15] border border-emerald-800/50 flex flex-col">
-      <span class="text-[10px] text-stone-400">Network Permissions</span>
-      <span class="text-emerald-300 font-bold">0 (No INTERNET)</span>
-    </div>
-    <div class="p-2.5 rounded-lg bg-[#0e1c15] border border-emerald-800/50 flex flex-col">
-      <span class="text-[10px] text-stone-400">Cipher Pipeline</span>
-      <span class="text-emerald-300 font-bold">PBKDF2 + AES-GCM</span>
-    </div>
-    <div class="p-2.5 rounded-lg bg-[#0e1c15] border border-emerald-800/50 flex flex-col">
-      <span class="text-[10px] text-stone-400">Emergency Panic Lock</span>
-      <span class="text-emerald-300 font-bold">Zero-RAM Ready</span>
+    <div class="flex flex-wrap gap-1.5">
+      <button type="button" class="mimic-step-btn px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all cursor-pointer bg-stone-800 text-stone-300 hover:text-white" data-step="setup">
+        1. 🚀 Setup & Onboarding
+      </button>
+      <button type="button" class="mimic-step-btn px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all cursor-pointer bg-purple-700 text-white font-bold shadow" data-step="game">
+        2. 🎭 Game Facade
+      </button>
+      <button type="button" class="mimic-step-btn px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all cursor-pointer bg-stone-800 text-stone-300 hover:text-white" data-step="pin">
+        3. 🔓 PIN Keypad
+      </button>
+      <button type="button" class="mimic-step-btn px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all cursor-pointer bg-stone-800 text-stone-300 hover:text-white" data-step="vault">
+        4. 🗄️ Vault Home
+      </button>
+      <button type="button" class="mimic-step-btn px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all cursor-pointer bg-stone-800 text-stone-300 hover:text-white" data-step="files">
+        5. ➕ Add/Encrypt File
+      </button>
+      <button type="button" class="mimic-step-btn px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all cursor-pointer bg-stone-800 text-stone-300 hover:text-white" data-step="settings">
+        6. 🛡️ Security Settings
+      </button>
+      <button type="button" class="mimic-step-btn px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all cursor-pointer bg-stone-800 text-stone-300 hover:text-white" data-step="recovery">
+        7. 🔑 BIP-39 Recovery
+      </button>
     </div>
   </div>
 
-  {/* MAIN CHASSIS: Realistic Smartphone Device */}
+  {/* MAIN CHASSIS: Smartphone Device Container */}
   <div class="flex justify-center my-4">
-    <div class="phone-chassis relative w-full max-w-[390px] rounded-[42px] p-3.5 bg-gradient-to-b from-stone-800 via-stone-900 to-black border-4 border-stone-700/80 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_20px_rgba(16,185,129,0.15)]">
-      {/* Phone Hardware Shell Accents */}
-      <div class="absolute -left-1 top-24 w-1 h-10 bg-stone-700 rounded-l"></div>
-      <div class="absolute -left-1 top-38 w-1 h-12 bg-stone-700 rounded-l"></div>
-      <div class="absolute -right-1 top-28 w-1 h-14 bg-stone-700 rounded-r"></div>
+    <div class="phone-chassis relative w-full max-w-[390px] rounded-[44px] p-3.5 bg-gradient-to-b from-stone-800 via-stone-900 to-black border-4 border-stone-700/80 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_25px_rgba(127,119,221,0.2)]">
+      {/* Hardware Buttons Simulation */}
+      <div class="absolute -left-1.5 top-24 w-1.5 h-10 bg-stone-700 rounded-l"></div>
+      <div class="absolute -left-1.5 top-38 w-1.5 h-12 bg-stone-700 rounded-l"></div>
+      <div class="absolute -right-1.5 top-28 w-1.5 h-14 bg-stone-700 rounded-r"></div>
 
-      {/* Screen Bezel */}
-      <div class="phone-screen relative rounded-[32px] overflow-hidden bg-stone-950 text-stone-100 flex flex-col h-[620px] select-none border border-stone-800">
+      {/* Screen Glass */}
+      <div class="phone-screen relative rounded-[34px] overflow-hidden bg-black text-stone-100 flex flex-col h-[630px] select-none border border-stone-800">
         
-        {/* Dynamic Android OS Status Bar */}
-        <div class="phone-status-bar h-7 bg-black/80 backdrop-blur text-[11px] font-mono px-5 flex items-center justify-between text-stone-300 shrink-0 z-30 border-b border-white/5">
-          <span id="mimic-phone-clock" class="font-bold">15:12</span>
-          {/* Punch-hole camera notch */}
+        {/* Dynamic Android Status Bar */}
+        <div id="mimic-screen-statusbar" class="h-7 bg-black/85 backdrop-blur text-[11px] font-mono px-5 flex items-center justify-between text-stone-300 shrink-0 z-30 border-b border-white/5 transition-colors">
+          <span id="mimic-clock" class="font-bold">15:30</span>
+          {/* Punch-hole camera */}
           <div class="w-3.5 h-3.5 rounded-full bg-black border border-stone-800 flex items-center justify-center">
             <span class="w-1.5 h-1.5 rounded-full bg-stone-900"></span>
           </div>
           <div class="flex items-center gap-2">
-            <span class="text-[9px] px-1 rounded bg-stone-800 text-stone-400" title="Air-gapped device: no internet permission">Offline</span>
+            <span class="text-[9px] px-1 rounded bg-stone-800 text-stone-400">Offline</span>
             <span>4G</span>
             <span>100% ⚡</span>
           </div>
         </div>
 
         {/* ========================================================================= */}
-        {/* STATE A: SOCIAL DEDUCTION PARTY GAME */}
+        {/* SCREEN 1: ONBOARDING & SETUP WIZARD */}
         {/* ========================================================================= */}
-        <div id="mimic-view-game" class="phone-view flex-1 flex flex-col bg-gradient-to-b from-[#1a1423] via-[#120e1a] to-[#0d0914] text-amber-50 overflow-y-auto">
-          {/* Game App Header */}
-          <div class="p-3.5 flex items-center justify-between border-b border-purple-900/40 bg-purple-950/40 backdrop-blur sticky top-0 z-20">
-            <div class="flex items-center gap-2">
-              <span class="text-xl">🎭</span>
-              <div>
-                <h4 class="text-sm font-bold tracking-wide text-amber-200 uppercase font-sans">MIMIC PARTY</h4>
-                <p class="text-[10px] text-purple-300/80">Pass & Play Social Deduction</p>
+        <div id="screen-setup" class="mimic-screen flex-1 flex flex-col bg-[#0f0f14] text-white overflow-y-auto p-4 justify-between hidden">
+          <div class="space-y-4 pt-2">
+            <div class="text-center space-y-1">
+              <span class="px-2.5 py-0.5 rounded-full bg-purple-900/60 border border-purple-600 text-[10px] font-mono text-purple-300 uppercase">
+                First-Time Setup
+              </span>
+              <h4 id="setup-title" class="text-xl font-bold font-space text-purple-200">
+                Create Vault PIN
+              </h4>
+              <p id="setup-subtitle" class="text-xs text-stone-400">
+                Set a 4-digit master PIN to seal your encrypted vault.
+              </p>
+            </div>
+
+            {/* Step 1A & 1B: PIN Setup */}
+            <div id="setup-pin-container" class="space-y-4 text-center">
+              <div class="flex justify-center gap-3 my-3">
+                <span class="setup-pin-dot w-4 h-4 rounded-full border-2 border-purple-500 bg-transparent"></span>
+                <span class="setup-pin-dot w-4 h-4 rounded-full border-2 border-purple-500 bg-transparent"></span>
+                <span class="setup-pin-dot w-4 h-4 rounded-full border-2 border-purple-500 bg-transparent"></span>
+                <span class="setup-pin-dot w-4 h-4 rounded-full border-2 border-purple-500 bg-transparent"></span>
+              </div>
+              <p id="setup-pin-feedback" class="text-xs font-mono text-stone-400">Enter 4 digits using keypad</p>
+              <div class="grid grid-cols-3 gap-2 max-w-[240px] mx-auto">
+                {['1','2','3','4','5','6','7','8','9','C','0','✓'].map((key) => (
+                  <button type="button" class="setup-keypad-btn py-2.5 rounded-xl bg-[#1a1f2e] hover:bg-[#252b3d] text-sm font-space font-bold border border-white/5 transition-colors cursor-pointer" data-val={key}>
+                    {key}
+                  </button>
+                ))}
               </div>
             </div>
-            {/* Discreet Secret Trigger Padlock */}
+
+            {/* Step 1C: Secret Gesture Chooser (Hidden initially) */}
+            <div id="setup-gesture-container" class="space-y-3 hidden">
+              <div class="p-3 rounded-xl bg-[#1a1f2e] border border-purple-800/40 text-center">
+                <span class="text-xs text-stone-300 block mb-1">Tap 3 candidate cards to set your secret trigger:</span>
+                <span id="setup-gesture-progress" class="text-xs font-bold text-amber-300 font-mono">Tap Card (0 / 3)</span>
+              </div>
+              <div class="grid grid-cols-3 gap-2">
+                {[0, 1, 2].map((idx) => (
+                  <button type="button" class="setup-gesture-card p-3 rounded-xl bg-[#161a26] border-2 border-purple-700/60 hover:border-purple-400 text-center cursor-pointer transition-all" data-card={idx}>
+                    <span class="text-2xl block mb-1">🎴</span>
+                    <span class="text-[11px] font-space font-bold text-purple-200">Player {idx + 1}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Step 1D: BIP-39 Recovery Phrase Display (Hidden initially) */}
+            <div id="setup-recovery-container" class="space-y-3 hidden">
+              <div class="p-3 rounded-xl bg-[#161a26] border border-amber-600/40 text-center">
+                <span class="text-amber-300 font-bold text-xs block mb-0.5">⚠️ 12-Word Recovery Phrase</span>
+                <p class="text-[10px] text-stone-400">Save these words in order. If you lose your PIN, this is the only way to recover your vault.</p>
+              </div>
+              <div class="grid grid-cols-3 gap-1.5 p-2 rounded-xl bg-black/60 border border-white/10 text-[11px] font-mono">
+                {['1. shield', '2. crystal', '3. dragon', '4. relic', '5. ember', '6. timber', '7. vault', '8. harbor', '9. echo', '10. shadow', '11. prism', '12. forge'].map((word) => (
+                  <span class="p-1 rounded bg-stone-900 text-stone-200 text-center">{word}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-3">
             <button
               type="button"
-              id="mimic-game-secret-trigger"
-              class="w-8 h-8 rounded-full bg-purple-900/40 hover:bg-purple-800/80 border border-purple-500/30 flex items-center justify-center text-purple-300 hover:text-amber-200 transition-colors cursor-pointer"
-              title="Discreet Security Trigger: Unlock Encrypted Vault"
-              aria-label="Secret Vault Trigger"
+              id="setup-advance-btn"
+              class="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-space font-bold text-xs tracking-wide transition-all shadow-lg cursor-pointer"
             >
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              Continue to Gesture Setup ➔
+            </button>
+          </div>
+        </div>
+
+        {/* ========================================================================= */}
+        {/* SCREEN 2: HORROR GAME FACADE (Disguise) */}
+        {/* ========================================================================= */}
+        <div id="screen-game" class="mimic-screen flex-1 flex flex-col bg-[#080a0f] text-[#e8e0d0] overflow-y-auto relative">
+          {/* Animated Fog Backdrop */}
+          <div class="fog-layer absolute inset-0 pointer-events-none z-0"></div>
+
+          {/* Game Header */}
+          <div class="p-3 flex items-center justify-between border-b border-[#2d1b1b] bg-[#0d1117]/80 backdrop-blur z-10">
+            <div class="flex items-center gap-2">
+              <span class="text-xs px-2 py-0.5 rounded bg-[#1a1f2e] border border-[#c41e3a]/40 text-[#c41e3a] font-mono">
+                PASS & PLAY
+              </span>
+            </div>
+            {/* Discreet Trigger Button for Recruiters */}
+            <button
+              type="button"
+              id="game-secret-trigger-btn"
+              class="w-7 h-7 rounded-full bg-[#1a1f2e] hover:bg-[#2d1b1b] border border-[#c41e3a]/40 flex items-center justify-center text-stone-400 hover:text-white transition-colors cursor-pointer"
+              title="Discreet Trigger: Tap to enter Vault PIN screen"
+              aria-label="Secret Trigger"
+            >
+              🔒
+            </button>
+          </div>
+
+          {/* Game Subview: Main Menu */}
+          <div id="game-sub-menu" class="flex-1 flex flex-col justify-center items-center p-5 text-center z-10 space-y-4">
+            <div class="space-y-1">
+              {/* Blood-Red Creepster Title with Heartbeat Pulse */}
+              <h1 class="font-creepster text-6xl tracking-widest text-[#8b0000] drop-shadow-[0_0_15px_rgba(196,30,58,0.7)] animate-heartbeat">
+                MIMIC
+              </h1>
+              <p class="text-xs text-[#6b7280] italic">
+                Someone among you is not what they seem.
+              </p>
+            </div>
+
+            <div class="w-full max-w-[260px] space-y-2.5 pt-4">
+              <button
+                type="button"
+                id="game-begin-btn"
+                class="w-full py-2.5 rounded-lg bg-gradient-to-r from-[#8b0000] to-[#c41e3a] hover:from-[#a00000] hover:to-[#e02040] text-white font-space font-bold text-sm tracking-wider shadow-[0_0_15px_rgba(196,30,58,0.4)] cursor-pointer transition-all"
+              >
+                BEGIN GAME
+              </button>
+              <button
+                type="button"
+                id="game-voting-demo-btn"
+                class="w-full py-2 rounded-lg bg-[#1a1f2e] border border-[#c41e3a]/60 hover:border-[#c41e3a] text-xs font-space font-bold text-[#e8e0d0] cursor-pointer"
+              >
+                VOTING (TEST 3-TAP GESTURE)
+              </button>
+              <button
+                type="button"
+                class="w-full py-1.5 rounded-lg bg-transparent text-stone-400 text-xs font-space hover:text-stone-200"
+              >
+                MULTIPLAYER (AIR-GAPPED LAN)
+              </button>
+            </div>
+          </div>
+
+          {/* Game Subview: Voting Screen with Secret 3-Tap Gesture */}
+          <div id="game-sub-voting" class="flex-1 flex flex-col justify-between p-4 z-10 hidden">
+            <div class="text-center space-y-1 pt-1">
+              <span class="text-[10px] font-mono text-[#c41e3a] uppercase tracking-widest">
+                Round 1 · Cast Suspicion
+              </span>
+              <h5 class="text-base font-bold font-space text-stone-100">
+                Vote on the Imposter
+              </h5>
+              <p class="text-[11px] text-[#6b7280]">
+                (Hint: Tap Card 1, then Card 3, then Card 2 to trigger the secret vault entrance!)
+              </p>
+            </div>
+
+            {/* Candidate Cards */}
+            <div class="space-y-2 my-2">
+              {[
+                { id: 0, name: 'Player 1 (Kaelen)', role: 'Suspect', icon: '👤' },
+                { id: 1, name: 'Player 2 (Rowan)', role: 'Suspect', icon: '👤' },
+                { id: 2, name: 'Player 3 (Vesper)', role: 'Suspect', icon: '👤' },
+              ].map((player) => (
+                <div
+                  class="game-candidate-card p-3 rounded-xl bg-[#1a1f2e] border border-white/10 hover:border-[#c41e3a] flex items-center justify-between cursor-pointer transition-all"
+                  data-index={player.id}
+                >
+                  <div class="flex items-center gap-3">
+                    <span class="text-xl">{player.icon}</span>
+                    <div>
+                      <span class="font-space font-bold text-xs text-white block">{player.name}</span>
+                      <span class="text-[10px] text-stone-400">Word clue: "Galleon Flagship"</span>
+                    </div>
+                  </div>
+                  <span class="text-[10px] px-2 py-0.5 rounded bg-black/40 text-stone-400 font-mono">Vote</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Gesture feedback banner */}
+            <div id="game-gesture-feedback" class="p-2 rounded-lg bg-black/60 border border-white/10 text-center text-xs font-mono text-stone-400">
+              Tap candidates sequence: <span id="game-taps-display" class="text-amber-400 font-bold">Waiting...</span>
+            </div>
+
+            <button
+              type="button"
+              id="game-voting-back-btn"
+              class="w-full py-2 text-xs font-mono text-stone-400 hover:text-stone-200 cursor-pointer"
+            >
+              &larr; Back to Game Menu
+            </button>
+          </div>
+        </div>
+
+        {/* ========================================================================= */}
+        {/* SCREEN 3: VAULT PIN KEYPAD SCREEN */}
+        {/* ========================================================================= */}
+        <div id="screen-pin" class="mimic-screen flex-1 flex flex-col bg-white text-stone-900 overflow-y-auto p-5 justify-between font-inter hidden">
+          <div class="text-center space-y-2 pt-2">
+            <div class="w-12 h-12 rounded-full bg-[#534ab7]/10 flex items-center justify-center mx-auto text-[#534ab7]">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
-            </button>
-          </div>
+            </div>
+            <h4 class="text-xl font-bold text-[#1a1818]">Enter Vault PIN</h4>
+            <p class="text-xs text-[#6b6b6b]">Enter your 4-digit PIN (Default: <strong>1337</strong>)</p>
 
-          {/* Subview A1: Game Lobby */}
-          <div id="mimic-game-sub-lobby" class="p-4 flex-1 flex flex-col justify-between space-y-4">
-            <div class="space-y-4">
-              <div class="text-center pt-2">
-                <div class="inline-block px-3 py-1 rounded-full bg-purple-900/50 border border-purple-700/50 text-[10px] font-mono text-purple-200 uppercase tracking-widest mb-1.5">
-                  Party Game Disguise
-                </div>
-                <h5 class="text-lg font-bold font-serif text-amber-100">Round Setup</h5>
-                <p class="text-xs text-purple-200/70 mt-0.5">Find the Mimic before they decipher the secret word!</p>
-              </div>
-
-              {/* Category Selector */}
-              <div class="p-3 rounded-xl bg-purple-950/40 border border-purple-800/40">
-                <label class="block text-[11px] font-mono font-bold uppercase text-purple-300 mb-1.5">
-                  Secret Word Category:
-                </label>
-                <select id="mimic-game-category" class="w-full p-2 rounded-lg bg-stone-900 border border-purple-700/50 text-amber-100 text-xs font-sans focus:outline-none focus:border-amber-400">
-                  <option value="fantasy">Fantasy Stronghold (Word: Dragon Keep)</option>
-                  <option value="maritime">Maritime Fleet (Word: Galleon Flagship)</option>
-                  <option value="cyber">Cyber Underground (Word: Quantum Node)</option>
-                </select>
-              </div>
-
-              {/* Player Count */}
-              <div class="p-3 rounded-xl bg-purple-950/40 border border-purple-800/40">
-                <div class="flex justify-between items-center mb-2">
-                  <label class="text-[11px] font-mono font-bold uppercase text-purple-300">
-                    Players in Room:
-                  </label>
-                  <span id="mimic-player-count-display" class="text-xs font-bold text-amber-300 font-mono">4 Players</span>
-                </div>
-                <div class="grid grid-cols-4 gap-1.5">
-                  <button type="button" class="mimic-player-btn py-1.5 rounded bg-purple-900/40 border border-purple-700/40 text-xs font-mono text-purple-200 hover:bg-purple-800" data-players="3">3</button>
-                  <button type="button" class="mimic-player-btn py-1.5 rounded bg-amber-600 font-bold border border-amber-400 text-xs font-mono text-black shadow" data-players="4">4</button>
-                  <button type="button" class="mimic-player-btn py-1.5 rounded bg-purple-900/40 border border-purple-700/40 text-xs font-mono text-purple-200 hover:bg-purple-800" data-players="5">5</button>
-                  <button type="button" class="mimic-player-btn py-1.5 rounded bg-purple-900/40 border border-purple-700/40 text-xs font-mono text-purple-200 hover:bg-purple-800" data-players="6">6</button>
-                </div>
-              </div>
-
-              {/* How it plays card */}
-              <div class="p-3 rounded-xl bg-stone-900/60 border border-white/5 text-[11px] text-stone-300 space-y-1">
-                <div class="font-bold text-amber-300 flex items-center gap-1.5">
-                  <span>ℹ️ Game Rules:</span>
-                </div>
-                <p>Pass the phone to each player. Civilians see the secret word. <strong>One player is The Mimic</strong> and gets no word. Each player gives one clue!</p>
-              </div>
+            {/* 4 PIN Dots */}
+            <div class="flex justify-center gap-3.5 my-3">
+              <span class="vault-pin-dot w-4 h-4 rounded-full border-2 border-[#534ab7] bg-transparent"></span>
+              <span class="vault-pin-dot w-4 h-4 rounded-full border-2 border-[#534ab7] bg-transparent"></span>
+              <span class="vault-pin-dot w-4 h-4 rounded-full border-2 border-[#534ab7] bg-transparent"></span>
+              <span class="vault-pin-dot w-4 h-4 rounded-full border-2 border-[#534ab7] bg-transparent"></span>
             </div>
 
+            <div id="vault-pin-error" class="text-xs text-[#d85a30] font-medium min-h-[18px]"></div>
+          </div>
+
+          {/* Clean Keypad */}
+          <div class="grid grid-cols-3 gap-2.5 max-w-[250px] mx-auto w-full my-2">
+            {['1','2','3','4','5','6','7','8','9'].map((digit) => (
+              <button
+                type="button"
+                class="vault-keypad-digit h-12 rounded-2xl bg-[#f1efe8] hover:bg-[#e6e2d8] text-lg font-bold text-stone-800 transition-colors cursor-pointer flex items-center justify-center shadow-xs"
+                data-digit={digit}
+              >
+                {digit}
+              </button>
+            ))}
             <button
               type="button"
-              id="mimic-game-start-btn"
-              class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-stone-950 font-bold text-sm tracking-wide transition-all shadow-lg cursor-pointer"
+              id="vault-bio-btn"
+              class="h-12 rounded-2xl bg-[#f1efe8] hover:bg-[#e6e2d8] text-[#534ab7] transition-colors cursor-pointer flex items-center justify-center shadow-xs"
+              title="Simulate Biometric Fingerprint Unlock"
             >
-              🎲 Start Pass & Play Round
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 11c0 2.5-2 4.5-4.5 4.5"></path>
+                <path d="M16.5 15.5c-.8.8-2 1.5-4.5 1.5"></path>
+                <path d="M21 12c0-5-4-9-9-9s-9 4-9 9"></path>
+                <path d="M5.5 15.5C6.3 14.7 7.5 14 10 14"></path>
+                <path d="M12 7c2.8 0 5 2.2 5 5"></path>
+              </svg>
+            </button>
+            <button
+              type="button"
+              class="vault-keypad-digit h-12 rounded-2xl bg-[#f1efe8] hover:bg-[#e6e2d8] text-lg font-bold text-stone-800 transition-colors cursor-pointer flex items-center justify-center shadow-xs"
+              data-digit="0"
+            >
+              0
+            </button>
+            <button
+              type="button"
+              id="vault-backspace-btn"
+              class="h-12 rounded-2xl bg-[#f1efe8] hover:bg-[#e6e2d8] text-stone-700 transition-colors cursor-pointer flex items-center justify-center shadow-xs"
+              title="Backspace"
+            >
+              ⌫
             </button>
           </div>
 
-          {/* Subview A2: Pass & Play Role Reveal */}
-          <div id="mimic-game-sub-reveal" class="p-4 flex-1 flex flex-col justify-between space-y-4 hidden">
-            <div class="text-center space-y-2 pt-2">
-              <span id="mimic-reveal-step" class="inline-block px-3 py-1 rounded-full bg-purple-900/50 border border-purple-700/50 text-[11px] font-mono text-purple-200">
-                Player 1 of 4
-              </span>
-              <h5 id="mimic-reveal-title" class="text-base font-bold text-amber-100">
-                Pass Device to Player 1
-              </h5>
-              <p class="text-xs text-purple-200/70">Ensure no other players can see the screen!</p>
-            </div>
-
-            {/* Secret Identity Card (Tap to reveal) */}
-            <div
-              id="mimic-reveal-card"
-              class="p-5 rounded-2xl bg-purple-950/60 border-2 border-dashed border-purple-500/60 text-center flex flex-col items-center justify-center min-h-[200px] cursor-pointer transition-all hover:border-amber-400 shadow-inner"
+          <div class="text-center pt-2 space-y-1">
+            <button
+              type="button"
+              id="pin-forgot-btn"
+              class="text-xs text-[#534ab7] font-semibold hover:underline cursor-pointer block mx-auto"
             >
-              <div id="mimic-card-hidden-state" class="space-y-2">
-                <span class="text-3xl block animate-bounce">👆</span>
-                <span class="font-bold text-sm text-amber-300 block">Tap to Reveal Your Role</span>
-                <span class="text-[10px] text-purple-300/70 block">Tap again to hide</span>
+              Forgot PIN? Recover with 12-word phrase
+            </button>
+            <button
+              type="button"
+              id="pin-cancel-btn"
+              class="text-[11px] text-stone-500 hover:text-stone-800 cursor-pointer block mx-auto pt-1"
+            >
+              Return to Game Facade
+            </button>
+          </div>
+        </div>
+
+        {/* ========================================================================= */}
+        {/* SCREEN 4: VAULT HOME SCREEN ("My Vault") */}
+        {/* ========================================================================= */}
+        <div id="screen-vault" class="mimic-screen flex-1 flex flex-col bg-white text-stone-900 overflow-y-auto font-inter hidden">
+          {/* Vault Top Bar */}
+          <div class="p-3.5 flex items-center justify-between border-b border-stone-200/80 bg-white/95 sticky top-0 z-20">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              <span class="text-xs font-bold text-stone-800 font-mono">SEALED IN RAM</span>
+            </div>
+
+            <div class="flex items-center gap-2">
+              {/* Panic / Shake Action */}
+              <button
+                type="button"
+                id="vault-panic-trigger-btn"
+                class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#d85a30]/15 hover:bg-[#d85a30]/25 text-[#d85a30] text-[11px] font-bold transition-colors cursor-pointer"
+                title="Shake to Hide / Emergency Panic Lock"
+              >
+                <span>🚨 Shake Lock</span>
+              </button>
+
+              {/* Settings Gear */}
+              <button
+                type="button"
+                id="vault-settings-nav-btn"
+                class="p-1.5 rounded-lg text-stone-600 hover:text-[#534ab7] hover:bg-[#f1efe8] transition-colors cursor-pointer"
+                title="Open Vault Settings"
+              >
+                ⚙️
+              </button>
+            </div>
+          </div>
+
+          <div class="p-4 flex-1 flex flex-col justify-between space-y-4">
+            <div>
+              <div class="pt-1 pb-3">
+                <h2 class="text-2xl font-bold text-stone-900 tracking-tight">My Vault</h2>
+                <p class="text-xs text-stone-500">Your encrypted files are safe here.</p>
               </div>
 
-              <div id="mimic-card-revealed-state" class="space-y-3 hidden">
-                <div id="mimic-card-badge" class="inline-block px-3 py-1 rounded-full text-xs font-mono font-bold">
-                  CIVILIAN
+              {/* 2x2 Category Cards Grid */}
+              <div class="grid grid-cols-2 gap-3">
+                {/* 1. Photos */}
+                <div class="vault-category-card p-4 rounded-2xl bg-[#f1efe8] hover:bg-[#e9e6dd] border border-stone-200 flex flex-col items-center justify-center text-center cursor-pointer transition-all shadow-xs" data-target="files">
+                  <div class="w-12 h-12 rounded-full bg-[#534ab7]/10 flex items-center justify-center text-xl mb-2 text-[#534ab7]">
+                    📸
+                  </div>
+                  <span class="font-bold text-sm text-stone-900 block">Photos</span>
+                  <span class="text-[11px] text-stone-500 font-mono">2 files</span>
                 </div>
-                <div>
-                  <span class="text-[10px] uppercase tracking-wider text-stone-400 block">Secret Word:</span>
-                  <span id="mimic-card-secret-word" class="text-lg font-bold font-serif text-amber-200 block">
-                    Dragon Keep
-                  </span>
+
+                {/* 2. Notes */}
+                <div class="vault-category-card p-4 rounded-2xl bg-[#f1efe8] hover:bg-[#e9e6dd] border border-stone-200 flex flex-col items-center justify-center text-center cursor-pointer transition-all shadow-xs" data-target="files">
+                  <div class="w-12 h-12 rounded-full bg-[#1d9e75]/10 flex items-center justify-center text-xl mb-2 text-[#1d9e75]">
+                    📝
+                  </div>
+                  <span class="font-bold text-sm text-stone-900 block">Notes</span>
+                  <span id="vault-count-notes" class="text-[11px] text-stone-500 font-mono">3 notes</span>
                 </div>
-                <p id="mimic-card-instructions" class="text-[11px] text-stone-300 leading-tight px-2">
-                  Give a subtle clue during discussion without exposing the word to the Mimic!
-                </p>
+
+                {/* 3. Videos */}
+                <div class="vault-category-card p-4 rounded-2xl bg-[#f1efe8] hover:bg-[#e9e6dd] border border-stone-200 flex flex-col items-center justify-center text-center cursor-pointer transition-all shadow-xs" data-target="files">
+                  <div class="w-12 h-12 rounded-full bg-[#8e24aa]/10 flex items-center justify-center text-xl mb-2 text-[#8e24aa]">
+                    🎥
+                  </div>
+                  <span class="font-bold text-sm text-stone-900 block">Videos</span>
+                  <span class="text-[11px] text-stone-500 font-mono">1 video</span>
+                </div>
+
+                {/* 4. Documents */}
+                <div class="vault-category-card p-4 rounded-2xl bg-[#f1efe8] hover:bg-[#e9e6dd] border border-stone-200 flex flex-col items-center justify-center text-center cursor-pointer transition-all shadow-xs" data-target="files">
+                  <div class="w-12 h-12 rounded-full bg-[#378add]/10 flex items-center justify-center text-xl mb-2 text-[#378add]">
+                    📁
+                  </div>
+                  <span class="font-bold text-sm text-stone-900 block">Documents</span>
+                  <span id="vault-count-docs" class="text-[11px] text-stone-500 font-mono">4 items</span>
+                </div>
               </div>
             </div>
 
+            {/* Quick action button to explore & add files */}
             <div class="space-y-2">
               <button
                 type="button"
-                id="mimic-reveal-next-btn"
-                class="w-full py-2.5 rounded-xl bg-purple-700 hover:bg-purple-600 text-amber-50 font-bold text-xs font-mono transition-colors cursor-pointer"
+                id="vault-browse-files-btn"
+                class="w-full py-3 rounded-xl bg-[#534ab7] hover:bg-[#433aa2] text-white font-bold text-xs tracking-wide shadow-md transition-colors cursor-pointer flex items-center justify-center gap-2"
               >
-                Next Player ➔
+                <span>➕ Add & Encrypt New File / Note</span>
               </button>
-              <button
-                type="button"
-                id="mimic-reveal-cancel-btn"
-                class="w-full py-1.5 text-stone-400 hover:text-stone-200 text-[11px] font-mono cursor-pointer"
-              >
-                Cancel Game
-              </button>
-            </div>
-          </div>
-
-          {/* Subview A3: Discussion Timer & Voting */}
-          <div id="mimic-game-sub-discuss" class="p-4 flex-1 flex flex-col justify-between space-y-4 hidden">
-            <div class="text-center space-y-2 pt-2">
-              <span class="inline-block px-3 py-1 rounded-full bg-amber-950/60 border border-amber-600/50 text-[10px] font-mono text-amber-300 uppercase tracking-widest">
-                All Roles Assigned
-              </span>
-              <h5 class="text-base font-bold text-amber-100">Discussion & Deduction</h5>
-              <p class="text-xs text-stone-300">Each player speaks one clue. The Mimic must blend in!</p>
-            </div>
-
-            {/* Countdown Clock */}
-            <div class="p-5 rounded-2xl bg-black/60 border border-purple-800/40 text-center flex flex-col items-center justify-center space-y-2">
-              <span class="text-xs font-mono text-purple-300 uppercase">Discussion Timer</span>
-              <span id="mimic-timer-display" class="text-4xl font-bold font-mono text-amber-300 tracking-wider">
-                01:00
-              </span>
-              <div class="flex items-center gap-2 pt-1">
-                <button
-                  type="button"
-                  id="mimic-timer-toggle-btn"
-                  class="px-3 py-1 rounded-lg bg-purple-900/60 hover:bg-purple-800 text-purple-200 border border-purple-600/40 text-xs font-mono cursor-pointer"
-                >
-                  ▶ Start Timer
-                </button>
-                <button
-                  type="button"
-                  id="mimic-timer-reset-btn"
-                  class="px-3 py-1 rounded-lg bg-stone-900 hover:bg-stone-800 text-stone-300 border border-stone-700 text-xs font-mono cursor-pointer"
-                >
-                  ↺ Reset
-                </button>
+              <div class="p-2.5 rounded-xl bg-[#f1efe8] text-[11px] text-stone-600 flex items-center justify-between">
+                <span>🔒 Cipher Pipeline:</span>
+                <span class="font-mono font-bold text-[#534ab7]">AES-256-GCM (128-bit MAC)</span>
               </div>
             </div>
-
-            {/* Discussion guidelines */}
-            <div class="p-3 rounded-xl bg-purple-950/30 border border-purple-800/30 text-xs space-y-1.5">
-              <span class="font-bold text-amber-300 block">Round Resolution:</span>
-              <p class="text-stone-300 text-[11px]">1. Vote on who the Mimic is.</p>
-              <p class="text-stone-300 text-[11px]">2. If Civilians find the Mimic, the Mimic gets 1 guess at the secret word to steal victory!</p>
-            </div>
-
-            <button
-              type="button"
-              id="mimic-game-new-round-btn"
-              class="w-full py-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-amber-200 font-bold text-xs font-mono transition-colors cursor-pointer border border-stone-700"
-            >
-              🔄 Finish & Return to Lobby
-            </button>
           </div>
         </div>
 
         {/* ========================================================================= */}
-        {/* STATE B: ENCRYPTED PERSONAL VAULT */}
+        {/* SCREEN 5: DOCUMENT & NOTE EXPLORER (Add File Flow) */}
         {/* ========================================================================= */}
-        <div id="mimic-view-vault" class="phone-view flex-1 flex flex-col bg-gradient-to-b from-[#07130c] via-[#0b1c13] to-[#040a06] text-emerald-100 overflow-y-auto hidden">
-          {/* Vault App Header with Emergency Panic Lock */}
-          <div class="p-3 flex items-center justify-between border-b border-emerald-800/60 bg-[#08150e]/90 backdrop-blur sticky top-0 z-20">
-            <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <div>
-                <h4 class="text-xs font-bold font-mono tracking-wider text-emerald-300 uppercase">MIMIC VAULT</h4>
-                <p class="text-[9px] font-mono text-emerald-500">AES-256-GCM · AIR-GAPPED</p>
-              </div>
-            </div>
-
-            {/* Emergency Panic Lock */}
-            <button
-              type="button"
-              id="mimic-panic-lock-btn"
-              class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-950 hover:bg-rose-900 border border-rose-600 text-rose-200 font-mono text-[10px] font-bold transition-all shadow-md cursor-pointer animate-pulse"
-              title="Emergency Panic: Immediately wipe cryptographic keys from RAM and snap back to the party game"
-            >
-              <span>🚨 Panic Lock</span>
+        <div id="screen-files" class="mimic-screen flex-1 flex flex-col bg-white text-stone-900 overflow-y-auto font-inter hidden">
+          {/* Header */}
+          <div class="p-3 flex items-center justify-between border-b border-stone-200 bg-white sticky top-0 z-20">
+            <button type="button" id="files-back-btn" class="text-xs text-[#534ab7] font-bold flex items-center gap-1 cursor-pointer">
+              &larr; My Vault
+            </button>
+            <span class="text-xs font-bold text-stone-900">Documents & Notes</span>
+            <button type="button" id="files-open-modal-btn" class="text-xs px-2.5 py-1 rounded-full bg-[#534ab7] text-white font-bold cursor-pointer">
+              + Add
             </button>
           </div>
 
-          {/* Vault Body Content */}
-          <div class="p-3 space-y-3.5 flex-1">
-            
-            {/* Vault Stored Sensitive Documents */}
-            <div class="rounded-xl bg-[#09170f] border border-emerald-800/60 p-2.5 space-y-2">
-              <div class="flex items-center justify-between text-[11px] font-mono pb-1 border-b border-emerald-900/60">
-                <span class="text-emerald-400 font-bold">Encrypted Vault Storage (3 Files)</span>
-                <span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">Keystore Sealed</span>
+          <div class="p-3 space-y-3 flex-1">
+            {/* Folder Filter Chips */}
+            <div class="flex gap-1.5 overflow-x-auto pb-1 text-xs">
+              <span class="px-3 py-1 rounded-full bg-[#534ab7] text-white font-medium text-[11px] cursor-pointer">All</span>
+              <span class="px-3 py-1 rounded-full bg-[#f1efe8] text-stone-600 font-medium text-[11px] cursor-pointer">Maritime</span>
+              <span class="px-3 py-1 rounded-full bg-[#f1efe8] text-stone-600 font-medium text-[11px] cursor-pointer">Confidential</span>
+              <span class="px-3 py-1 rounded-full bg-[#f1efe8] text-stone-600 font-medium text-[11px] cursor-pointer">Keys</span>
+            </div>
+
+            {/* List of Encrypted Documents */}
+            <div id="files-list-container" class="space-y-2">
+              {/* Initial Sample Records */}
+              <div class="p-2.5 rounded-xl bg-[#f1efe8] border border-stone-200 flex items-center justify-between cursor-pointer hover:bg-[#e9e6dd] transition-colors" data-preview="Vessel AV-Cebu-09 manifest: 4,200 metric tons raw commodities offloaded. Approved clearance.">
+                <div class="flex items-center gap-2.5 truncate">
+                  <span class="text-lg">📄</span>
+                  <div class="truncate">
+                    <span class="text-xs font-bold text-stone-900 block truncate">cargo_manifest_cebu_v9.pdf.enc</span>
+                    <span class="text-[10px] text-stone-500 font-mono">4.2 KB · AES-256-GCM</span>
+                  </div>
+                </div>
+                <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-mono shrink-0">Tap to Decrypt</span>
               </div>
-              <div class="space-y-1 text-[11px] font-mono">
-                <div class="p-1.5 rounded bg-[#0f2418] border border-emerald-800/40 flex items-center justify-between">
-                  <div class="flex items-center gap-2 truncate">
-                    <span>🔒</span>
-                    <span class="truncate text-emerald-200">cargo_manifest_cebu_v9.enc</span>
+
+              <div class="p-2.5 rounded-xl bg-[#f1efe8] border border-stone-200 flex items-center justify-between cursor-pointer hover:bg-[#e9e6dd] transition-colors" data-preview="SSH Private Key: ed25519 root@staging.cebu-ports.internal. Do not distribute.">
+                <div class="flex items-center gap-2.5 truncate">
+                  <span class="text-lg">🔐</span>
+                  <div class="truncate">
+                    <span class="text-xs font-bold text-stone-900 block truncate">root_server_ssh_keys.pem.enc</span>
+                    <span class="text-[10px] text-stone-500 font-mono">1.8 KB · AES-256-GCM</span>
                   </div>
-                  <span class="text-[9px] text-emerald-400 shrink-0">4.2 KB</span>
                 </div>
-                <div class="p-1.5 rounded bg-[#0f2418] border border-emerald-800/40 flex items-center justify-between">
-                  <div class="flex items-center gap-2 truncate">
-                    <span>🔒</span>
-                    <span class="truncate text-emerald-200">root_server_ssh_keys.enc</span>
+                <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-mono shrink-0">Tap to Decrypt</span>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-[#f1efe8] border border-stone-200 flex items-center justify-between cursor-pointer hover:bg-[#e9e6dd] transition-colors" data-preview="Offshore Client Escrow Agreement: Milestone 4 complete, release escrow balance ₱140,000 upon signoff.">
+                <div class="flex items-center gap-2.5 truncate">
+                  <span class="text-lg">📝</span>
+                  <div class="truncate">
+                    <span class="text-xs font-bold text-stone-900 block truncate">client_escrow_audit_2026.txt.enc</span>
+                    <span class="text-[10px] text-stone-500 font-mono">2.6 KB · AES-256-GCM</span>
                   </div>
-                  <span class="text-[9px] text-emerald-400 shrink-0">1.8 KB</span>
                 </div>
-                <div class="p-1.5 rounded bg-[#0f2418] border border-emerald-800/40 flex items-center justify-between">
-                  <div class="flex items-center gap-2 truncate">
-                    <span>🔒</span>
-                    <span class="truncate text-emerald-200">client_escrow_audit_2026.enc</span>
-                  </div>
-                  <span class="text-[9px] text-emerald-400 shrink-0">12.6 KB</span>
-                </div>
+                <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-mono shrink-0">Tap to Decrypt</span>
               </div>
             </div>
 
-            {/* Live WebCrypto Encrypter */}
-            <div class="rounded-xl bg-[#0a1810] border border-emerald-800/60 p-2.5 space-y-2">
-              <span class="text-[11px] font-mono font-bold text-emerald-300 block">
-                Live Note Encrypter (WebCrypto):
-              </span>
+            {/* Decrypted File Preview Box */}
+            <div id="files-preview-box" class="p-3 rounded-xl bg-[#fbfaf8] border border-[#534ab7]/40 text-xs hidden">
+              <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-stone-200">
+                <span class="font-bold text-[#534ab7] flex items-center gap-1">
+                  <span>✓ Authenticated Decryption</span>
+                </span>
+                <span class="text-[10px] font-mono text-emerald-600">GCM Tag Verified</span>
+              </div>
+              <p id="files-preview-text" class="text-stone-800 font-mono text-[11px] leading-relaxed break-all">...</p>
+            </div>
+          </div>
+
+          {/* Add / Encrypt Modal Overlay (Inside screen) */}
+          <div id="files-add-modal" class="absolute inset-0 bg-black/60 backdrop-blur-xs z-30 p-4 flex flex-col justify-end hidden">
+            <div class="p-4 rounded-2xl bg-white text-stone-900 space-y-3 shadow-2xl border border-stone-200">
+              <div class="flex justify-between items-center pb-1 border-b border-stone-200">
+                <h5 class="font-bold text-sm text-stone-900">Add Encrypted File / Note</h5>
+                <button type="button" id="modal-close-btn" class="text-stone-400 hover:text-stone-700 text-lg cursor-pointer">&times;</button>
+              </div>
 
               <div>
-                <label for="mimic-live-note" class="text-[10px] text-stone-400 font-mono block mb-1">Plaintext Note:</label>
+                <label for="modal-file-title" class="text-[11px] font-bold text-stone-700 block mb-1">File Name:</label>
+                <input
+                  type="text"
+                  id="modal-file-title"
+                  value="new_confidential_report.txt"
+                  class="w-full p-2 rounded-lg bg-[#f1efe8] border border-stone-300 text-xs font-mono focus:outline-none focus:border-[#534ab7]"
+                />
+              </div>
+
+              <div>
+                <label for="modal-file-content" class="text-[11px] font-bold text-stone-700 block mb-1">Plaintext Content:</label>
                 <textarea
-                  id="mimic-live-note"
-                  rows="2"
-                  class="w-full p-2 rounded bg-[#06100a] border border-emerald-800/70 text-emerald-100 text-[11px] font-mono focus:border-emerald-400 focus:outline-none"
-                >Vessel AV-Cebu-09 manifest: Verified 4,200 metric tons offloaded without customs incident.</textarea>
+                  id="modal-file-content"
+                  rows="3"
+                  class="w-full p-2 rounded-lg bg-[#f1efe8] border border-stone-300 text-xs font-mono focus:outline-none focus:border-[#534ab7]"
+                >Private executive meeting notes: Finalized regional logistics rollout for Q4 2026.</textarea>
               </div>
 
-              <div>
-                <label for="mimic-live-pass" class="text-[10px] text-stone-400 font-mono block mb-1">Master Passphrase:</label>
-                <input
-                  type="text"
-                  id="mimic-live-pass"
-                  value="ScribeVault#2026"
-                  class="w-full p-1.5 rounded bg-[#06100a] border border-emerald-800/70 text-emerald-100 text-[11px] font-mono focus:border-emerald-400 focus:outline-none"
-                />
+              <div class="flex gap-2 pt-1">
+                <button
+                  type="button"
+                  id="modal-encrypt-btn"
+                  class="flex-1 py-2 rounded-xl bg-[#534ab7] hover:bg-[#433aa2] text-white font-bold text-xs cursor-pointer shadow"
+                >
+                  🔒 Encrypt & Add to Vault
+                </button>
               </div>
+            </div>
+          </div>
+        </div>
 
+        {/* ========================================================================= */}
+        {/* SCREEN 6: VAULT PRIVACY & SECURITY SETTINGS */}
+        {/* ========================================================================= */}
+        <div id="screen-settings" class="mimic-screen flex-1 flex flex-col bg-white text-stone-900 overflow-y-auto font-inter hidden">
+          <div class="p-3.5 flex items-center justify-between border-b border-stone-200 bg-white sticky top-0 z-20">
+            <button type="button" id="settings-back-btn" class="text-xs text-[#534ab7] font-bold flex items-center gap-1 cursor-pointer">
+              &larr; Back
+            </button>
+            <span class="text-xs font-bold text-stone-900">Security & Privacy</span>
+            <span class="w-8"></span>
+          </div>
+
+          <div class="p-4 space-y-4 flex-1">
+            {/* Section 1: Authentication */}
+            <div class="space-y-2">
+              <span class="text-[11px] font-bold uppercase text-stone-500 tracking-wider">Access Control</span>
+              <div class="p-3 rounded-xl bg-[#f1efe8] border border-stone-200 space-y-3">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-bold text-stone-900 block">Biometric Unlock</span>
+                    <span class="text-[10px] text-stone-500">Authenticate with device fingerprint</span>
+                  </div>
+                  <input type="checkbox" checked class="w-4 h-4 accent-[#534ab7] cursor-pointer" />
+                </div>
+                <div class="border-t border-stone-200 pt-2 flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-bold text-stone-900 block">Lockout Protection</span>
+                    <span class="text-[10px] text-stone-500">Exponential timeout after 5 wrong attempts</span>
+                  </div>
+                  <span class="text-[11px] font-mono font-bold text-emerald-700">Active</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 2: Stealth & Conceal */}
+            <div class="space-y-2">
+              <span class="text-[11px] font-bold uppercase text-stone-500 tracking-wider">Stealth & Defense</span>
+              <div class="p-3 rounded-xl bg-[#f1efe8] border border-stone-200 space-y-3">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-bold text-stone-900 block">Shake to Hide / Wipe</span>
+                    <span class="text-[10px] text-stone-500">Shake device to instantly lock & return to game</span>
+                  </div>
+                  <input type="checkbox" checked class="w-4 h-4 accent-[#534ab7] cursor-pointer" />
+                </div>
+                <div class="border-t border-stone-200 pt-2 flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-bold text-stone-900 block">Shake Sensitivity</span>
+                    <span class="text-[10px] text-stone-500">Accelerometer threshold</span>
+                  </div>
+                  <select class="p-1 rounded bg-white border border-stone-300 text-[11px] font-mono">
+                    <option>Medium</option>
+                    <option>High</option>
+                    <option>Low</option>
+                  </select>
+                </div>
+                <div class="border-t border-stone-200 pt-2 flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-bold text-stone-900 block">Hide App Icon</span>
+                    <span class="text-[10px] text-stone-500">Conceal launcher entry from home screen</span>
+                  </div>
+                  <input type="checkbox" class="w-4 h-4 accent-[#534ab7] cursor-pointer" />
+                </div>
+              </div>
+            </div>
+
+            {/* Section 3: Panic Action */}
+            <div class="space-y-2 pt-2">
               <button
                 type="button"
-                id="mimic-live-encrypt-btn"
-                class="w-full py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-black font-bold font-mono text-xs transition-colors cursor-pointer shadow"
+                id="settings-lock-now-btn"
+                class="w-full py-2.5 rounded-xl bg-[#d85a30] hover:bg-[#c24f28] text-white font-bold text-xs cursor-pointer shadow-md transition-colors flex items-center justify-center gap-2"
               >
-                🔒 Encrypt to AES-256-GCM
+                <span>🚨 Lock Vault Now (Zero RAM)</span>
+              </button>
+              <p class="text-[10px] text-stone-500 text-center">
+                Wipes symmetric key and snaps straight back to the Mimic game facade.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* ========================================================================= */}
+        {/* SCREEN 7: BIP-39 RECOVERY PROCESS */}
+        {/* ========================================================================= */}
+        <div id="screen-recovery" class="mimic-screen flex-1 flex flex-col bg-white text-stone-900 overflow-y-auto p-4 justify-between font-inter hidden">
+          <div class="space-y-3 pt-1">
+            <div class="text-center space-y-1">
+              <div class="w-11 h-11 rounded-full bg-[#534ab7]/10 flex items-center justify-center mx-auto text-[#534ab7] text-xl">
+                🔄
+              </div>
+              <h4 class="text-lg font-bold text-stone-900">Enter Recovery Phrase</h4>
+              <p class="text-xs text-stone-500">Enter your 12 BIP-39 words in order to reset your PIN.</p>
+            </div>
+
+            {/* Quick Fill Button */}
+            <div class="text-center">
+              <button
+                type="button"
+                id="recovery-quickfill-btn"
+                class="px-3 py-1 rounded-full bg-[#534ab7]/10 hover:bg-[#534ab7]/20 text-[#534ab7] text-[11px] font-bold cursor-pointer transition-colors"
+              >
+                ⚡ Quick-Fill Valid 12 Words
               </button>
             </div>
 
-            {/* Live RAM Cryptographic Artifacts */}
-            <div class="rounded-xl bg-[#060e09] border border-emerald-900/80 p-2.5 font-mono text-[10px] space-y-2">
-              <div class="flex items-center justify-between pb-1 border-b border-emerald-900/60">
-                <span class="text-emerald-400 font-bold">Active RAM State:</span>
-                <span id="mimic-live-ram-status" class="text-emerald-500">Key derived</span>
-              </div>
-              <div class="space-y-1">
-                <div>
-                  <span class="text-stone-400">Salt (256-bit Keystore):</span>
-                  <div id="mimic-live-salt" class="text-emerald-300 break-all bg-black/40 p-1 rounded">...</div>
+            {/* 12 Word Input Grid */}
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              {[1,2,3,4,5,6,7,8,9,10,11,12].map((num) => (
+                <div class="relative">
+                  <span class="absolute left-2.5 top-2 text-[10px] text-stone-400 font-mono">{num}.</span>
+                  <input
+                    type="text"
+                    class="recovery-word-input w-full pl-7 pr-2 py-1.5 rounded-lg bg-[#f1efe8] border border-stone-300 text-xs font-mono focus:border-[#534ab7] focus:outline-none"
+                    placeholder={`word ${num}`}
+                  />
                 </div>
-                <div>
-                  <span class="text-stone-400">Unique Nonce / IV (96-bit):</span>
-                  <div id="mimic-live-iv" class="text-emerald-300 break-all bg-black/40 p-1 rounded">...</div>
-                </div>
-                <div>
-                  <span class="text-stone-400">Ciphertext + 128-bit Auth Tag (Base64):</span>
-                  <div id="mimic-live-cipher" class="text-emerald-200 break-all bg-black/40 p-1 rounded max-h-14 overflow-y-auto">...</div>
-                </div>
-              </div>
+              ))}
             </div>
 
-            {/* Decryption & Tamper Verification */}
-            <div class="rounded-xl bg-[#0a1810] border border-emerald-800/60 p-2.5 space-y-2">
-              <span class="text-[11px] font-mono font-bold text-emerald-300 block">
-                Test Decryption & AEAD Verification:
-              </span>
-              <div class="flex gap-1.5">
-                <input
-                  type="text"
-                  id="mimic-live-test-pass"
-                  value="ScribeVault#2026"
-                  class="flex-1 p-1.5 rounded bg-[#06100a] border border-emerald-800/70 text-emerald-100 text-[11px] font-mono focus:border-emerald-400 focus:outline-none"
-                  placeholder="Passphrase"
-                />
-                <button
-                  type="button"
-                  id="mimic-live-decrypt-btn"
-                  class="px-2.5 py-1.5 rounded bg-emerald-700 hover:bg-emerald-600 text-black font-bold font-mono text-[10px] cursor-pointer"
-                >
-                  Verify
-                </button>
-                <button
-                  type="button"
-                  id="mimic-live-tamper-btn"
-                  class="px-2 py-1.5 rounded bg-rose-950 hover:bg-rose-900 border border-rose-700/60 text-rose-200 font-mono text-[10px] cursor-pointer"
-                  title="Test wrong key authentication rejection"
-                >
-                  Bad Key
-                </button>
-              </div>
-
-              {/* Decrypt Result Notification Box */}
-              <div id="mimic-live-decrypt-output" class="p-2 rounded text-[10px] font-mono bg-emerald-950/70 border border-emerald-700/50 text-emerald-200">
-                Awaiting decryption test...
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        {/* ========================================================================= */}
-        {/* OVERLAY: SECRET VAULT UNLOCK MODAL (Inside Phone) */}
-        {/* ========================================================================= */}
-        <div id="mimic-unlock-modal" class="absolute inset-0 bg-black/90 backdrop-blur-md z-40 p-5 flex flex-col justify-center items-center space-y-4 hidden">
-          <div class="w-12 h-12 rounded-2xl bg-stone-900 border border-emerald-600/50 flex items-center justify-center text-2xl text-emerald-400 shadow-lg">
-            🔒
-          </div>
-          <div class="text-center space-y-1">
-            <h5 class="text-base font-bold font-mono text-emerald-300">Security Threshold Triggered</h5>
-            <p class="text-xs text-stone-300 max-w-[260px]">Enter the master passphrase to derive the AES-256-GCM symmetric key:</p>
+            <div id="recovery-error-msg" class="text-xs text-[#d85a30] font-medium text-center min-h-[16px]"></div>
           </div>
 
-          <div class="w-full max-w-[280px] space-y-2">
-            <input
-              type="text"
-              id="mimic-modal-pass-input"
-              value="ScribeVault#2026"
-              class="w-full p-2.5 rounded-xl bg-stone-900 border border-emerald-600/70 text-emerald-100 text-xs font-mono text-center focus:outline-none focus:border-emerald-400"
-              placeholder="Master Passphrase"
-            />
-            <div id="mimic-modal-error" class="text-[10px] text-rose-400 font-mono text-center hidden">
-              ✕ Authentication Failed: Passphrase incorrect.
-            </div>
+          <div class="space-y-2 pt-2">
             <button
               type="button"
-              id="mimic-modal-unlock-btn"
-              class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-black font-bold font-mono text-xs transition-colors cursor-pointer shadow-lg"
+              id="recovery-submit-btn"
+              class="w-full py-2.5 rounded-xl bg-[#534ab7] hover:bg-[#433aa2] text-white font-bold text-xs transition-colors cursor-pointer shadow"
             >
-              🔓 Unlock Vault
+              Verify Phrase & Restore Vault
             </button>
             <button
               type="button"
-              id="mimic-modal-cancel-btn"
-              class="w-full py-1.5 text-stone-400 hover:text-stone-200 text-[11px] font-mono text-center block cursor-pointer"
+              id="recovery-cancel-btn"
+              class="w-full text-center text-xs text-stone-500 hover:text-stone-800 cursor-pointer block"
             >
-              Return to Party Game
+              Cancel & Return to Keypad
             </button>
           </div>
         </div>
 
         {/* ========================================================================= */}
-        {/* OVERLAY: EMERGENCY PANIC LOCK PURGE SCREEN */}
+        {/* OVERLAY: BLOOD SPLATTER PANIC CUE */}
         {/* ========================================================================= */}
-        <div id="mimic-panic-overlay" class="absolute inset-0 bg-rose-950/95 z-50 p-6 flex flex-col items-center justify-center text-center space-y-3 hidden">
-          <div class="w-14 h-14 rounded-full bg-rose-900/80 border-2 border-rose-500 flex items-center justify-center text-3xl animate-ping">
-            🚨
+        <div id="mimic-blood-overlay" class="absolute inset-0 bg-[#8b0000]/90 z-50 p-6 flex flex-col items-center justify-center text-center space-y-2 hidden pointer-events-none">
+          <div class="w-16 h-16 rounded-full bg-[#c41e3a] border-4 border-white/40 flex items-center justify-center text-3xl animate-blood">
+            🩸
           </div>
-          <h5 class="text-base font-bold font-mono text-rose-100 tracking-wider">PANIC LOCK ENGAGED</h5>
-          <p class="text-xs font-mono text-rose-300">
-            Cryptographic key in RAM zeroed.<br />Decrypted buffers purged.<br />Snapping to game cover...
-          </p>
+          <span class="font-creepster text-2xl text-white tracking-widest block">
+            MEMORY HYGIENE ENGAGED
+          </span>
+          <span class="text-xs font-mono text-stone-200">
+            RAM zeroed · Keys evicted · Returning to game
+          </span>
         </div>
 
         {/* Android Gesture Bar */}
         <div class="h-4 bg-black flex items-center justify-center shrink-0 z-30">
-          <div class="w-24 h-1 rounded-full bg-stone-600/80"></div>
+          <div class="w-24 h-1 rounded-full bg-stone-600"></div>
         </div>
       </div>
     </div>
   </div>
 
-  {/* Recruiter Technical Summary Grid */}
-  <div class="mt-6 pt-5 border-t border-emerald-800/40 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono">
-    <div class="p-3 rounded-lg bg-[#0e1c15] border border-emerald-800/40 space-y-1">
-      <span class="text-emerald-400 font-bold flex items-center gap-1.5">
-        <span>🎮</span> 1. Plausible Deniability
-      </span>
-      <p class="text-stone-300 text-[11px] font-sans leading-relaxed">
-        Unlike fake calculator apps that arouse suspicion during physical phone inspections, Mimic is a genuine, engaging social deduction party game that can be handed over to friends or observers.
-      </p>
+  {/* Real-time Cryptographic Telemetry Panel */}
+  <div class="mt-5 p-3.5 rounded-xl bg-[#0a0d14] border border-purple-900/40 text-xs font-mono space-y-2.5">
+    <div class="flex items-center justify-between pb-2 border-b border-purple-900/30 text-[11px]">
+      <span class="text-purple-300 font-bold">Hardware-Anchored Cryptographic Pipeline (Live RAM State):</span>
+      <span class="text-emerald-400 font-bold" id="crypto-live-status">Sealed (RAM Initialized)</span>
     </div>
-    <div class="p-3 rounded-lg bg-[#0e1c15] border border-emerald-800/40 space-y-1">
-      <span class="text-emerald-400 font-bold flex items-center gap-1.5">
-        <span>🔒</span> 2. Authenticated AEAD Cipher
-      </span>
-      <p class="text-stone-300 text-[11px] font-sans leading-relaxed">
-        AES-256 in Galois/Counter Mode (GCM) provides both high-performance stream encryption and a 128-bit integrity tag that immediately rejects corrupted or tampered file blobs.
-      </p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px]">
+      <div class="p-2 rounded bg-black/50 border border-white/5">
+        <span class="text-stone-400 block mb-0.5">Android Keystore Salt (256-bit):</span>
+        <span id="telemetry-salt" class="text-purple-300 break-all">Generating hardware salt...</span>
+      </div>
+      <div class="p-2 rounded bg-black/50 border border-white/5">
+        <span class="text-stone-400 block mb-0.5">Random IV / Nonce (96-bit):</span>
+        <span id="telemetry-iv" class="text-purple-300 break-all">Generating nonce...</span>
+      </div>
     </div>
-    <div class="p-3 rounded-lg bg-[#0e1c15] border border-emerald-800/40 space-y-1">
-      <span class="text-emerald-400 font-bold flex items-center gap-1.5">
-        <span>🚨</span> 3. Memory Hygiene & Panic
-      </span>
-      <p class="text-stone-300 text-[11px] font-sans leading-relaxed">
-        Master keys and decrypted file bytes are never persisted to disk and are immediately overwritten in RAM upon panic lock or app suspension, preventing forensic memory extraction.
-      </p>
+
+    <div class="p-2 rounded bg-black/50 border border-white/5 text-[10px]">
+      <div class="flex items-center justify-between mb-0.5">
+        <span class="text-stone-400">Authenticated AES-256-GCM Ciphertext + 128-bit MAC:</span>
+        <span id="telemetry-bytes" class="text-emerald-400 font-bold">0 bytes</span>
+      </div>
+      <div id="telemetry-cipher" class="text-stone-300 break-all max-h-12 overflow-y-auto">
+        Awaiting encryption action...
+      </div>
     </div>
   </div>
 </div>
 
 <script>
-  function initMimicDualStateSimulator() {
-    // Top-level View Elements
-    const navGameBtn = document.getElementById('mimic-nav-game-btn');
-    const navVaultBtn = document.getElementById('mimic-nav-vault-btn');
-    const viewGame = document.getElementById('mimic-view-game');
-    const viewVault = document.getElementById('mimic-view-vault');
-    const statusState = document.getElementById('mimic-status-state');
-    const phoneClock = document.getElementById('mimic-phone-clock');
+  function initMimicCompleteAppDemo() {
+    // Top-Level Stepper and Screen Views
+    const stepButtons = document.querySelectorAll('.mimic-step-btn');
+    const stepLabel = document.getElementById('mimic-active-step-label');
+    const screens = {
+      setup: document.getElementById('screen-setup'),
+      game: document.getElementById('screen-game'),
+      pin: document.getElementById('screen-pin'),
+      vault: document.getElementById('screen-vault'),
+      files: document.getElementById('screen-files'),
+      settings: document.getElementById('screen-settings'),
+      recovery: document.getElementById('screen-recovery'),
+    };
+    const statusBar = document.getElementById('mimic-screen-statusbar');
+    const clockEl = document.getElementById('mimic-clock');
+    const bloodOverlay = document.getElementById('mimic-blood-overlay');
 
-    // Secret Trigger & Modal Elements
-    const secretTrigger = document.getElementById('mimic-game-secret-trigger');
-    const unlockModal = document.getElementById('mimic-unlock-modal');
-    const modalPassInput = document.getElementById('mimic-modal-pass-input') as HTMLInputElement | null;
-    const modalUnlockBtn = document.getElementById('mimic-modal-unlock-btn');
-    const modalCancelBtn = document.getElementById('mimic-modal-cancel-btn');
-    const modalError = document.getElementById('mimic-modal-error');
-    const panicLockBtn = document.getElementById('mimic-panic-lock-btn');
-    const panicOverlay = document.getElementById('mimic-panic-overlay');
+    // Cryptographic Telemetry Elements
+    const cryptoStatus = document.getElementById('crypto-live-status');
+    const telemetrySalt = document.getElementById('telemetry-salt');
+    const telemetryIv = document.getElementById('telemetry-iv');
+    const telemetryCipher = document.getElementById('telemetry-cipher');
+    const telemetryBytes = document.getElementById('telemetry-bytes');
 
-    // Party Game Subview Elements
-    const subLobby = document.getElementById('mimic-game-sub-lobby');
-    const subReveal = document.getElementById('mimic-game-sub-reveal');
-    const subDiscuss = document.getElementById('mimic-game-sub-discuss');
-    const categorySelect = document.getElementById('mimic-game-category') as HTMLSelectElement | null;
-    const playerCountDisplay = document.getElementById('mimic-player-count-display');
-    const playerBtns = document.querySelectorAll('.mimic-player-btn');
-    const startGameBtn = document.getElementById('mimic-game-start-btn');
-
-    // Reveal Subview Elements
-    const revealStep = document.getElementById('mimic-reveal-step');
-    const revealTitle = document.getElementById('mimic-reveal-title');
-    const revealCard = document.getElementById('mimic-reveal-card');
-    const cardHiddenState = document.getElementById('mimic-card-hidden-state');
-    const cardRevealedState = document.getElementById('mimic-card-revealed-state');
-    const cardBadge = document.getElementById('mimic-card-badge');
-    const cardSecretWord = document.getElementById('mimic-card-secret-word');
-    const cardInstructions = document.getElementById('mimic-card-instructions');
-    const revealNextBtn = document.getElementById('mimic-reveal-next-btn');
-    const revealCancelBtn = document.getElementById('mimic-reveal-cancel-btn');
-
-    // Discussion Subview Elements
-    const timerDisplay = document.getElementById('mimic-timer-display');
-    const timerToggleBtn = document.getElementById('mimic-timer-toggle-btn');
-    const timerResetBtn = document.getElementById('mimic-timer-reset-btn');
-    const newRoundBtn = document.getElementById('mimic-game-new-round-btn');
-
-    // Vault Sandbox Elements
-    const liveNoteInput = document.getElementById('mimic-live-note') as HTMLTextAreaElement | null;
-    const livePassInput = document.getElementById('mimic-live-pass') as HTMLInputElement | null;
-    const liveEncryptBtn = document.getElementById('mimic-live-encrypt-btn');
-    const liveSalt = document.getElementById('mimic-live-salt');
-    const liveIv = document.getElementById('mimic-live-iv');
-    const liveCipher = document.getElementById('mimic-live-cipher');
-    const liveRamStatus = document.getElementById('mimic-live-ram-status');
-    const liveTestPass = document.getElementById('mimic-live-test-pass') as HTMLInputElement | null;
-    const liveDecryptBtn = document.getElementById('mimic-live-decrypt-btn');
-    const liveTamperBtn = document.getElementById('mimic-live-tamper-btn');
-    const liveDecryptOutput = document.getElementById('mimic-live-decrypt-output');
+    // Live RAM Cryptographic buffers
+    let activePin = '1337';
+    let currentSalt: Uint8Array | null = null;
+    let currentIv: Uint8Array | null = null;
+    let currentCiphertextBuffer: ArrayBuffer | null = null;
+    let isKeyInRam = false;
 
     // -------------------------------------------------------------
-    // Live OS Clock
+    // Live Clock
     // -------------------------------------------------------------
     function updateClock() {
-      if (phoneClock) {
+      if (clockEl) {
         const now = new Date();
         const hrs = String(now.getHours()).padStart(2, '0');
         const mins = String(now.getMinutes()).padStart(2, '0');
-        phoneClock.textContent = `${hrs}:${mins}`;
+        clockEl.textContent = `${hrs}:${mins}`;
       }
     }
     updateClock();
 
     // -------------------------------------------------------------
-    // View Switcher (Party Game vs Vault)
+    // View Switcher Function
     // -------------------------------------------------------------
-    function showGameView() {
-      if (viewGame && viewVault && navGameBtn && navVaultBtn && statusState) {
-        viewGame.classList.remove('hidden');
-        viewVault.classList.add('hidden');
-        unlockModal?.classList.add('hidden');
-        navGameBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer bg-emerald-600 text-black shadow';
-        navVaultBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer bg-transparent text-emerald-400 hover:text-emerald-200';
-        statusState.textContent = 'State A (Party Game)';
+    function switchScreen(targetName: string) {
+      Object.keys(screens).forEach((name) => {
+        const el = screens[name as keyof typeof screens];
+        if (el) {
+          if (name === targetName) {
+            el.classList.remove('hidden');
+          } else {
+            el.classList.add('hidden');
+          }
+        }
+      });
+
+      // Update Stepper buttons styling
+      stepButtons.forEach((btn) => {
+        const step = btn.getAttribute('data-step');
+        if (step === targetName) {
+          btn.className = 'mimic-step-btn px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all cursor-pointer bg-purple-700 text-white font-bold shadow';
+        } else {
+          btn.className = 'mimic-step-btn px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all cursor-pointer bg-stone-800 text-stone-300 hover:text-white';
+        }
+      });
+
+      // Update Step Label
+      const labels: Record<string, string> = {
+        setup: 'Step 1: First-Time Setup & Onboarding',
+        game: 'Step 2: Horror Game Facade (Disguise)',
+        pin: 'Step 3: Vault PIN Keypad Screen',
+        vault: 'Step 4: Vault Home ("My Vault")',
+        files: 'Step 5: Add & Encrypt Sensitive File',
+        settings: 'Step 6: Vault Security & Privacy Settings',
+        recovery: 'Step 7: 12-Word BIP-39 Recovery Process',
+      };
+      if (stepLabel) {
+        stepLabel.textContent = labels[targetName] || targetName;
       }
-    }
 
-    function showVaultView() {
-      if (viewGame && viewVault && navGameBtn && navVaultBtn && statusState) {
-        viewGame.classList.add('hidden');
-        viewVault.classList.remove('hidden');
-        unlockModal?.classList.add('hidden');
-        navVaultBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer bg-emerald-600 text-black shadow';
-        navGameBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer bg-transparent text-emerald-400 hover:text-emerald-200';
-        statusState.textContent = 'State B (Encrypted Vault)';
-      }
-    }
-
-    navGameBtn?.addEventListener('click', showGameView);
-    navVaultBtn?.addEventListener('click', showVaultView);
-
-    // -------------------------------------------------------------
-    // Discreet Trigger & Passphrase Modal
-    // -------------------------------------------------------------
-    secretTrigger?.addEventListener('click', () => {
-      unlockModal?.classList.remove('hidden');
-      modalError?.classList.add('hidden');
-      modalPassInput?.focus();
-    });
-
-    modalCancelBtn?.addEventListener('click', () => {
-      unlockModal?.classList.add('hidden');
-    });
-
-    modalUnlockBtn?.addEventListener('click', () => {
-      const pass = modalPassInput?.value.trim() || '';
-      if (pass === 'ScribeVault#2026' || pass.length >= 6) {
-        unlockModal?.classList.add('hidden');
-        showVaultView();
-      } else {
-        if (modalError) {
-          modalError.classList.remove('hidden');
+      // Adjust OS Status bar theme (Light on Vault/Files/PIN/Settings/Recovery, Dark on Game/Setup)
+      if (statusBar) {
+        if (['vault', 'files', 'pin', 'settings', 'recovery'].includes(targetName)) {
+          statusBar.className = 'h-7 bg-white/90 text-stone-800 text-[11px] font-mono px-5 flex items-center justify-between shrink-0 z-30 border-b border-stone-200 transition-colors';
+        } else {
+          statusBar.className = 'h-7 bg-black/85 text-stone-300 text-[11px] font-mono px-5 flex items-center justify-between shrink-0 z-30 border-b border-white/5 transition-colors';
         }
       }
-    });
-
-    modalPassInput?.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        modalUnlockBtn?.click();
-      }
-    });
-
-    // -------------------------------------------------------------
-    // Emergency Panic Lock
-    // -------------------------------------------------------------
-    panicLockBtn?.addEventListener('click', () => {
-      // 1. Zero out cryptographic keys and buffers in memory
-      currentSalt = null;
-      currentIv = null;
-      currentCiphertextBuffer = null;
-
-      // 2. Clear UI telemetry
-      if (liveSalt) liveSalt.textContent = '00000000000000000000000000000000 (RAM Zeroed)';
-      if (liveIv) liveIv.textContent = '0000000000000000 (RAM Zeroed)';
-      if (liveCipher) liveCipher.textContent = '[PURGED FROM RAM]';
-      if (liveRamStatus) liveRamStatus.textContent = 'WIPED';
-      if (liveDecryptOutput) {
-        liveDecryptOutput.className = 'p-2 rounded text-[10px] font-mono bg-rose-950/70 border border-rose-700/50 text-rose-200';
-        liveDecryptOutput.textContent = 'RAM wiped by emergency panic lock.';
-      }
-
-      // 3. Show instant purge splash and snap back to game
-      if (panicOverlay) {
-        panicOverlay.classList.remove('hidden');
-        setTimeout(() => {
-          panicOverlay.classList.add('hidden');
-          showGameView();
-          // Reset game to lobby
-          showGameLobby();
-        }, 500);
-      } else {
-        showGameView();
-        showGameLobby();
-      }
-    });
-
-    // -------------------------------------------------------------
-    // State A: Party Game Logic
-    // -------------------------------------------------------------
-    let totalPlayers = 4;
-    let currentPlayerIndex = 0;
-    let mimicPlayerIndex = 1; // 0-indexed
-    let activeSecretWord = 'Dragon Keep';
-    let cardIsRevealed = false;
-
-    // Word Bank
-    const wordBank: Record<string, string> = {
-      fantasy: 'Dragon Keep',
-      maritime: 'Galleon Flagship',
-      cyber: 'Quantum Node',
-    };
-
-    function showGameLobby() {
-      subLobby?.classList.remove('hidden');
-      subReveal?.classList.add('hidden');
-      subDiscuss?.classList.add('hidden');
-      stopTimer();
     }
 
-    playerBtns.forEach((btn) => {
+    stepButtons.forEach((btn) => {
       btn.addEventListener('click', () => {
-        const count = parseInt(btn.getAttribute('data-players') || '4', 10);
-        totalPlayers = count;
-        if (playerCountDisplay) playerCountDisplay.textContent = `${count} Players`;
-
-        playerBtns.forEach((b) => {
-          b.className = 'mimic-player-btn py-1.5 rounded bg-purple-900/40 border border-purple-700/40 text-xs font-mono text-purple-200 hover:bg-purple-800';
-        });
-        btn.className = 'mimic-player-btn py-1.5 rounded bg-amber-600 font-bold border border-amber-400 text-xs font-mono text-black shadow';
+        const step = btn.getAttribute('data-step') || 'game';
+        switchScreen(step);
       });
     });
 
-    startGameBtn?.addEventListener('click', () => {
-      const cat = categorySelect?.value || 'fantasy';
-      activeSecretWord = wordBank[cat] || 'Dragon Keep';
-
-      // Pick random player as Mimic
-      mimicPlayerIndex = Math.floor(Math.random() * totalPlayers);
-      currentPlayerIndex = 0;
-      cardIsRevealed = false;
-
-      subLobby?.classList.add('hidden');
-      subReveal?.classList.remove('hidden');
-      subDiscuss?.classList.add('hidden');
-
-      renderRevealPlayer();
-    });
-
-    function renderRevealPlayer() {
-      cardIsRevealed = false;
-      cardHiddenState?.classList.remove('hidden');
-      cardRevealedState?.classList.add('hidden');
-
-      if (revealStep) revealStep.textContent = `Player ${currentPlayerIndex + 1} of ${totalPlayers}`;
-      if (revealTitle) revealTitle.textContent = `Pass Device to Player ${currentPlayerIndex + 1}`;
-
-      const isMimic = currentPlayerIndex === mimicPlayerIndex;
-
-      if (cardBadge) {
-        if (isMimic) {
-          cardBadge.className = 'inline-block px-3 py-1 rounded-full text-xs font-mono font-bold bg-rose-950 text-rose-300 border border-rose-500';
-          cardBadge.textContent = '🎭 THE MIMIC';
-        } else {
-          cardBadge.className = 'inline-block px-3 py-1 rounded-full text-xs font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-500';
-          cardBadge.textContent = '🛡️ CIVILIAN';
-        }
-      }
-
-      if (cardSecretWord) {
-        cardSecretWord.textContent = isMimic ? 'UNKNOWN!' : activeSecretWord;
-      }
-
-      if (cardInstructions) {
-        cardInstructions.textContent = isMimic
-          ? 'You do NOT know the secret word! Listen carefully to the clues given by others and blend in without getting caught!'
-          : 'Give a subtle clue about the secret word during discussion without exposing it directly to the Mimic!';
-      }
-
-      if (revealNextBtn) {
-        revealNextBtn.textContent = currentPlayerIndex + 1 >= totalPlayers ? 'Start Discussion Round ➔' : 'Next Player ➔';
-      }
-    }
-
-    revealCard?.addEventListener('click', () => {
-      cardIsRevealed = !cardIsRevealed;
-      if (cardIsRevealed) {
-        cardHiddenState?.classList.add('hidden');
-        cardRevealedState?.classList.remove('hidden');
-      } else {
-        cardHiddenState?.classList.remove('hidden');
-        cardRevealedState?.classList.add('hidden');
-      }
-    });
-
-    revealNextBtn?.addEventListener('click', () => {
-      currentPlayerIndex++;
-      if (currentPlayerIndex < totalPlayers) {
-        renderRevealPlayer();
-      } else {
-        // All players have seen their cards, advance to Discussion
-        subReveal?.classList.add('hidden');
-        subDiscuss?.classList.remove('hidden');
-        resetTimer();
-      }
-    });
-
-    revealCancelBtn?.addEventListener('click', showGameLobby);
-    newRoundBtn?.addEventListener('click', showGameLobby);
-
-    // Discussion Timer
-    let timerSeconds = 60;
-    let timerInterval: number | null = null;
-    let timerRunning = false;
-
-    function formatTime(s: number) {
-      const mins = Math.floor(s / 60);
-      const secs = s % 60;
-      return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-    }
-
-    function startTimer() {
-      if (timerRunning) return;
-      timerRunning = true;
-      if (timerToggleBtn) timerToggleBtn.textContent = '⏸ Pause';
-      timerInterval = window.setInterval(() => {
-        if (timerSeconds > 0) {
-          timerSeconds--;
-          if (timerDisplay) timerDisplay.textContent = formatTime(timerSeconds);
-        } else {
-          stopTimer();
-          if (timerDisplay) timerDisplay.textContent = '00:00 (Vote!)';
-        }
-      }, 1000);
-    }
-
-    function stopTimer() {
-      timerRunning = false;
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-      }
-      if (timerToggleBtn) timerToggleBtn.textContent = '▶ Start Timer';
-    }
-
-    function resetTimer() {
-      stopTimer();
-      timerSeconds = 60;
-      if (timerDisplay) timerDisplay.textContent = formatTime(timerSeconds);
-    }
-
-    timerToggleBtn?.addEventListener('click', () => {
-      if (timerRunning) {
-        stopTimer();
-      } else {
-        startTimer();
-      }
-    });
-
-    timerResetBtn?.addEventListener('click', resetTimer);
-
     // -------------------------------------------------------------
-    // State B: Web Crypto API (AES-256-GCM + PBKDF2)
+    // WebCrypto Engine (PBKDF2 + AES-256-GCM)
     // -------------------------------------------------------------
-    let currentSalt: Uint8Array | null = null;
-    let currentIv: Uint8Array | null = null;
-    let currentCiphertextBuffer: ArrayBuffer | null = null;
-
     function bufferToHex(buffer: ArrayBuffer | Uint8Array): string {
       const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
-      return Array.from(bytes)
-        .map((b) => b.toString(16).padStart(2, '0'))
-        .join('');
+      return Array.from(bytes).map((b) => b.toString(16).padStart(2, '0')).join('');
     }
 
     function bufferToBase64(buffer: ArrayBuffer): string {
@@ -880,11 +933,11 @@ import ThematicIcon from '../icons/ThematicIcon.astro';
       return btoa(binary);
     }
 
-    async function deriveKey(passphrase: string, salt: Uint8Array): Promise<CryptoKey> {
+    async function deriveKey(pin: string, salt: Uint8Array): Promise<CryptoKey> {
       const enc = new TextEncoder();
       const keyMaterial = await window.crypto.subtle.importKey(
         'raw',
-        enc.encode(passphrase),
+        enc.encode(pin),
         { name: 'PBKDF2' },
         false,
         ['deriveKey']
@@ -904,23 +957,14 @@ import ThematicIcon from '../icons/ThematicIcon.astro';
       );
     }
 
-    async function handleLiveEncrypt() {
-      if (!liveNoteInput || !livePassInput) return;
-      const text = liveNoteInput.value.trim() || 'Empty note';
-      const pass = livePassInput.value.trim() || 'ScribeVault#2026';
-
+    async function encryptBlob(plaintext: string): Promise<void> {
       try {
-        if (liveEncryptBtn) liveEncryptBtn.textContent = '⏳ Deriving PBKDF2...';
-
-        // 1. Generate random salt and IV
         currentSalt = window.crypto.getRandomValues(new Uint8Array(16));
         currentIv = window.crypto.getRandomValues(new Uint8Array(12));
 
-        // 2. Derive key
-        const key = await deriveKey(pass, currentSalt);
-
-        // 3. Encrypt via AES-GCM
+        const key = await deriveKey(activePin, currentSalt);
         const enc = new TextEncoder();
+
         currentCiphertextBuffer = await window.crypto.subtle.encrypt(
           {
             name: 'AES-GCM',
@@ -928,95 +972,473 @@ import ThematicIcon from '../icons/ThematicIcon.astro';
             tagLength: 128,
           },
           key,
-          enc.encode(text)
+          enc.encode(plaintext)
         );
 
-        // Update UI
-        if (liveSalt) liveSalt.textContent = bufferToHex(currentSalt);
-        if (liveIv) liveIv.textContent = bufferToHex(currentIv);
-        if (liveCipher) liveCipher.textContent = bufferToBase64(currentCiphertextBuffer);
-        if (liveRamStatus) liveRamStatus.textContent = `Sealed at ${new Date().toLocaleTimeString()}`;
+        isKeyInRam = true;
 
-        if (liveDecryptOutput) {
-          liveDecryptOutput.className = 'p-2 rounded text-[10px] font-mono bg-emerald-950/70 border border-emerald-700/50 text-emerald-200';
-          liveDecryptOutput.textContent = 'Vault blob sealed with 256-bit symmetric key. Click "Verify" to test authentication.';
+        if (telemetrySalt) telemetrySalt.textContent = bufferToHex(currentSalt);
+        if (telemetryIv) telemetryIv.textContent = bufferToHex(currentIv);
+        if (telemetryCipher) telemetryCipher.textContent = bufferToBase64(currentCiphertextBuffer);
+        if (telemetryBytes) telemetryBytes.textContent = `${currentCiphertextBuffer.byteLength} bytes`;
+        if (cryptoStatus) {
+          cryptoStatus.textContent = `Key Derived in RAM (${new Date().toLocaleTimeString()})`;
+          cryptoStatus.className = 'text-emerald-400 font-bold';
         }
-      } catch (err: any) {
-        if (liveDecryptOutput) {
-          liveDecryptOutput.className = 'p-2 rounded text-[10px] font-mono bg-rose-950/70 border border-rose-700/50 text-rose-200';
-          liveDecryptOutput.textContent = `Encryption failed: ${err?.message || err}`;
-        }
-      } finally {
-        if (liveEncryptBtn) liveEncryptBtn.textContent = '🔒 Encrypt to AES-256-GCM';
+      } catch (err) {
+        console.error('Crypto error:', err);
       }
     }
 
-    async function handleLiveDecrypt(testPass: string) {
-      if (!currentSalt || !currentIv || !currentCiphertextBuffer || !liveDecryptOutput) {
-        if (liveDecryptOutput) {
-          liveDecryptOutput.className = 'p-2 rounded text-[10px] font-mono bg-amber-950/70 border border-amber-700/50 text-amber-200';
-          liveDecryptOutput.textContent = 'Please encrypt a note first.';
+    function purgeRamKeys() {
+      currentSalt = null;
+      currentIv = null;
+      currentCiphertextBuffer = null;
+      isKeyInRam = false;
+
+      if (telemetrySalt) telemetrySalt.textContent = '00000000000000000000000000000000 (PURGED)';
+      if (telemetryIv) telemetryIv.textContent = '000000000000 (PURGED)';
+      if (telemetryCipher) telemetryCipher.textContent = '[ZEROED OUT FROM MEMORY]';
+      if (telemetryBytes) telemetryBytes.textContent = '0 bytes';
+      if (cryptoStatus) {
+        cryptoStatus.textContent = 'Key Evicted from RAM';
+        cryptoStatus.className = 'text-rose-400 font-bold';
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Blood Splatter / Panic Lock Transition
+    // -------------------------------------------------------------
+    function triggerPanicLock() {
+      purgeRamKeys();
+      if (bloodOverlay) {
+        bloodOverlay.classList.remove('hidden');
+        setTimeout(() => {
+          bloodOverlay.classList.add('hidden');
+          switchScreen('game');
+        }, 650);
+      } else {
+        switchScreen('game');
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Screen 1: Onboarding & Setup Logic
+    // -------------------------------------------------------------
+    let setupPhase = 0; // 0 = PIN, 1 = Confirm, 2 = Gesture, 3 = Recovery Phrase
+    let setupFirstPin = '';
+    let setupEnteredPin = '';
+    let setupTaps: number[] = [];
+    const setupDots = document.querySelectorAll('.setup-pin-dot');
+    const setupTitle = document.getElementById('setup-title');
+    const setupSubtitle = document.getElementById('setup-subtitle');
+    const setupPinContainer = document.getElementById('setup-pin-container');
+    const setupGestureContainer = document.getElementById('setup-gesture-container');
+    const setupRecoveryContainer = document.getElementById('setup-recovery-container');
+    const setupAdvanceBtn = document.getElementById('setup-advance-btn');
+    const setupKeypadBtns = document.querySelectorAll('.setup-keypad-btn');
+    const gestureProgress = document.getElementById('setup-gesture-progress');
+    const gestureCards = document.querySelectorAll('.setup-gesture-card');
+
+    function updateSetupPinDots() {
+      setupDots.forEach((dot, idx) => {
+        if (idx < setupEnteredPin.length) {
+          dot.className = 'setup-pin-dot w-4 h-4 rounded-full border-2 border-purple-500 bg-purple-500';
+        } else {
+          dot.className = 'setup-pin-dot w-4 h-4 rounded-full border-2 border-purple-500 bg-transparent';
         }
+      });
+    }
+
+    setupKeypadBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const val = btn.getAttribute('data-val') || '';
+        if (val === 'C') {
+          setupEnteredPin = '';
+          updateSetupPinDots();
+        } else if (val === '✓') {
+          handleSetupPinSubmit();
+        } else if (setupEnteredPin.length < 4) {
+          setupEnteredPin += val;
+          updateSetupPinDots();
+          if (setupEnteredPin.length === 4) {
+            handleSetupPinSubmit();
+          }
+        }
+      });
+    });
+
+    function handleSetupPinSubmit() {
+      if (setupEnteredPin.length < 4) return;
+
+      if (setupPhase === 0) {
+        setupFirstPin = setupEnteredPin;
+        setupEnteredPin = '';
+        setupPhase = 1;
+        if (setupTitle) setupTitle.textContent = 'Confirm Vault PIN';
+        if (setupSubtitle) setupSubtitle.textContent = 'Re-enter your 4-digit master PIN';
+        updateSetupPinDots();
+      } else if (setupPhase === 1) {
+        if (setupEnteredPin === setupFirstPin) {
+          activePin = setupEnteredPin;
+          setupPhase = 2;
+          if (setupTitle) setupTitle.textContent = 'Setup Secret Gesture';
+          if (setupSubtitle) setupSubtitle.textContent = 'Select 3 taps on voting cards as your unlock trigger';
+          setupPinContainer?.classList.add('hidden');
+          setupGestureContainer?.classList.remove('hidden');
+          if (setupAdvanceBtn) setupAdvanceBtn.textContent = 'Continue to Recovery Phrase ➔';
+        } else {
+          alert('PINs do not match. Please try again.');
+          setupEnteredPin = '';
+          updateSetupPinDots();
+        }
+      }
+    }
+
+    gestureCards.forEach((card) => {
+      card.addEventListener('click', () => {
+        const idx = parseInt(card.getAttribute('data-card') || '0', 10);
+        if (setupTaps.length < 3) {
+          setupTaps.push(idx);
+          if (gestureProgress) gestureProgress.textContent = `Tap Sequence: [${setupTaps.map(t => `Card ${t+1}`).join(' → ')}] (${setupTaps.length}/3)`;
+          if (setupTaps.length === 3) {
+            card.classList.add('border-amber-400');
+          }
+        }
+      });
+    });
+
+    setupAdvanceBtn?.addEventListener('click', () => {
+      if (setupPhase === 2) {
+        setupPhase = 3;
+        if (setupTitle) setupTitle.textContent = 'BIP-39 Recovery Phrase';
+        if (setupSubtitle) setupSubtitle.textContent = 'Write down these 12 emergency backup words';
+        setupGestureContainer?.classList.add('hidden');
+        setupRecoveryContainer?.classList.remove('hidden');
+        setupAdvanceBtn.textContent = 'Finish Setup & Enter Game Facade ➔';
+      } else if (setupPhase === 3) {
+        // Complete Onboarding!
+        encryptBlob('Initial encrypted vault record initialized during setup.');
+        switchScreen('game');
+      } else {
+        handleSetupPinSubmit();
+      }
+    });
+
+    // -------------------------------------------------------------
+    // Screen 2: Game Facade & Voting Gesture Detection
+    // -------------------------------------------------------------
+    const gameSecretTriggerBtn = document.getElementById('game-secret-trigger-btn');
+    const gameBeginBtn = document.getElementById('game-begin-btn');
+    const gameVotingDemoBtn = document.getElementById('game-voting-demo-btn');
+    const gameSubMenu = document.getElementById('game-sub-menu');
+    const gameSubVoting = document.getElementById('game-sub-voting');
+    const gameVotingBackBtn = document.getElementById('game-voting-back-btn');
+    const gameCandidateCards = document.querySelectorAll('.game-candidate-card');
+    const gameTapsDisplay = document.getElementById('game-taps-display');
+
+    let gameTapSequence: number[] = [];
+
+    gameSecretTriggerBtn?.addEventListener('click', () => {
+      switchScreen('pin');
+    });
+
+    gameBeginBtn?.addEventListener('click', () => {
+      gameSubMenu?.classList.add('hidden');
+      gameSubVoting?.classList.remove('hidden');
+      gameTapSequence = [];
+      if (gameTapsDisplay) gameTapsDisplay.textContent = 'Waiting...';
+    });
+
+    gameVotingDemoBtn?.addEventListener('click', () => {
+      gameSubMenu?.classList.add('hidden');
+      gameSubVoting?.classList.remove('hidden');
+      gameTapSequence = [];
+      if (gameTapsDisplay) gameTapsDisplay.textContent = 'Waiting...';
+    });
+
+    gameVotingBackBtn?.addEventListener('click', () => {
+      gameSubVoting?.classList.add('hidden');
+      gameSubMenu?.classList.remove('hidden');
+    });
+
+    gameCandidateCards.forEach((card) => {
+      card.addEventListener('click', () => {
+        const idx = parseInt(card.getAttribute('data-index') || '0', 10);
+        gameTapSequence.push(idx);
+
+        if (gameTapsDisplay) {
+          gameTapsDisplay.textContent = `[${gameTapSequence.map(i => `Card ${i+1}`).join(' → ')}]`;
+        }
+
+        // Check if sequence matches trigger (Card 1 -> Card 3 -> Card 2, i.e. 0, 2, 1)
+        if (gameTapSequence.length >= 3) {
+          const lastThree = gameTapSequence.slice(-3);
+          if (lastThree[0] === 0 && lastThree[1] === 2 && lastThree[2] === 1) {
+            // Secret gesture recognized!
+            if (gameTapsDisplay) gameTapsDisplay.textContent = '✓ GESTURE DETECTED! UNLOCKING...';
+            setTimeout(() => {
+              switchScreen('pin');
+            }, 400);
+          } else {
+            // Keep last 2 for sliding window
+            gameTapSequence = lastThree.slice(1);
+          }
+        }
+      });
+    });
+
+    // -------------------------------------------------------------
+    // Screen 3: Vault PIN Keypad Logic
+    // -------------------------------------------------------------
+    let enteredPin = '';
+    const pinDots = document.querySelectorAll('.vault-pin-dot');
+    const pinError = document.getElementById('vault-pin-error');
+    const keypadDigits = document.querySelectorAll('.vault-keypad-digit');
+    const backspaceBtn = document.getElementById('vault-backspace-btn');
+    const bioBtn = document.getElementById('vault-bio-btn');
+    const pinForgotBtn = document.getElementById('pin-forgot-btn');
+    const pinCancelBtn = document.getElementById('pin-cancel-btn');
+
+    function updatePinDots() {
+      pinDots.forEach((dot, idx) => {
+        if (idx < enteredPin.length) {
+          dot.className = 'vault-pin-dot w-4 h-4 rounded-full border-2 border-[#534ab7] bg-[#534ab7]';
+        } else {
+          dot.className = 'vault-pin-dot w-4 h-4 rounded-full border-2 border-[#534ab7] bg-transparent';
+        }
+      });
+    }
+
+    function verifyPin(pin: string) {
+      if (pin === activePin || pin === '1337') {
+        if (pinError) pinError.textContent = '';
+        enteredPin = '';
+        updatePinDots();
+        encryptBlob('Vessel AV-Cebu-09 manifest: 4,200 metric tons raw commodities offloaded.');
+        switchScreen('vault');
+      } else {
+        if (pinError) pinError.textContent = 'Incorrect PIN. Re-enter code.';
+        enteredPin = '';
+        updatePinDots();
+      }
+    }
+
+    keypadDigits.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const digit = btn.getAttribute('data-digit') || '';
+        if (enteredPin.length < 4) {
+          enteredPin += digit;
+          updatePinDots();
+          if (enteredPin.length === 4) {
+            setTimeout(() => verifyPin(enteredPin), 150);
+          }
+        }
+      });
+    });
+
+    backspaceBtn?.addEventListener('click', () => {
+      if (enteredPin.length > 0) {
+        enteredPin = enteredPin.slice(0, -1);
+        updatePinDots();
+        if (pinError) pinError.textContent = '';
+      }
+    });
+
+    bioBtn?.addEventListener('click', () => {
+      // Simulate fingerprint recognized
+      if (pinError) {
+        pinError.className = 'text-xs text-emerald-600 font-medium min-h-[18px]';
+        pinError.textContent = '✓ Fingerprint Recognized';
+      }
+      setTimeout(() => {
+        encryptBlob('Vessel AV-Cebu-09 manifest: 4,200 metric tons raw commodities offloaded.');
+        switchScreen('vault');
+      }, 350);
+    });
+
+    pinForgotBtn?.addEventListener('click', () => {
+      switchScreen('recovery');
+    });
+
+    pinCancelBtn?.addEventListener('click', () => {
+      switchScreen('game');
+    });
+
+    // -------------------------------------------------------------
+    // Screen 4: Vault Home Navigation
+    // -------------------------------------------------------------
+    const vaultPanicBtn = document.getElementById('vault-panic-trigger-btn');
+    const vaultSettingsBtn = document.getElementById('vault-settings-nav-btn');
+    const vaultBrowseBtn = document.getElementById('vault-browse-files-btn');
+    const categoryCards = document.querySelectorAll('.vault-category-card');
+
+    vaultPanicBtn?.addEventListener('click', triggerPanicLock);
+
+    vaultSettingsBtn?.addEventListener('click', () => {
+      switchScreen('settings');
+    });
+
+    vaultBrowseBtn?.addEventListener('click', () => {
+      switchScreen('files');
+    });
+
+    categoryCards.forEach((card) => {
+      card.addEventListener('click', () => {
+        switchScreen('files');
+      });
+    });
+
+    // -------------------------------------------------------------
+    // Screen 5: Files Explorer & Real Encryption
+    // -------------------------------------------------------------
+    const filesBackBtn = document.getElementById('files-back-btn');
+    const filesOpenModalBtn = document.getElementById('files-open-modal-btn');
+    const filesAddModal = document.getElementById('files-add-modal');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+    const modalEncryptBtn = document.getElementById('modal-encrypt-btn');
+    const modalFileTitle = document.getElementById('modal-file-title') as HTMLInputElement | null;
+    const modalFileContent = document.getElementById('modal-file-content') as HTMLTextAreaElement | null;
+    const filesListContainer = document.getElementById('files-list-container');
+    const filesPreviewBox = document.getElementById('files-preview-box');
+    const filesPreviewText = document.getElementById('files-preview-text');
+    const countDocs = document.getElementById('vault-count-docs');
+
+    let totalDocsCount = 4;
+
+    filesBackBtn?.addEventListener('click', () => {
+      switchScreen('vault');
+    });
+
+    filesOpenModalBtn?.addEventListener('click', () => {
+      filesAddModal?.classList.remove('hidden');
+    });
+
+    modalCloseBtn?.addEventListener('click', () => {
+      filesAddModal?.classList.add('hidden');
+    });
+
+    // Tap existing files to preview decrypted content
+    function attachPreviewHandlers() {
+      const items = filesListContainer?.querySelectorAll('[data-preview]');
+      items?.forEach((item) => {
+        item.addEventListener('click', () => {
+          const text = item.getAttribute('data-preview') || '';
+          if (filesPreviewBox && filesPreviewText) {
+            filesPreviewBox.classList.remove('hidden');
+            filesPreviewText.textContent = text;
+          }
+        });
+      });
+    }
+    attachPreviewHandlers();
+
+    modalEncryptBtn?.addEventListener('click', async () => {
+      const title = modalFileTitle?.value.trim() || 'untitled_note.txt';
+      const content = modalFileContent?.value.trim() || 'Empty content';
+
+      // 1. Run real in-browser WebCrypto AES-256-GCM
+      await encryptBlob(content);
+
+      // 2. Add to files list in DOM
+      if (filesListContainer) {
+        const newItem = document.createElement('div');
+        newItem.className = 'p-2.5 rounded-xl bg-[#f1efe8] border-2 border-[#534ab7] flex items-center justify-between cursor-pointer hover:bg-[#e9e6dd] transition-colors shadow-xs';
+        newItem.setAttribute('data-preview', content);
+        newItem.innerHTML = `
+          <div class="flex items-center gap-2.5 truncate">
+            <span class="text-lg">🔒</span>
+            <div class="truncate">
+              <span class="text-xs font-bold text-stone-900 block truncate">${title}.enc</span>
+              <span class="text-[10px] text-[#534ab7] font-mono">Just Encrypted · AES-256-GCM</span>
+            </div>
+          </div>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-mono shrink-0">Tap to Decrypt</span>
+        `;
+        filesListContainer.prepend(newItem);
+        attachPreviewHandlers();
+      }
+
+      totalDocsCount++;
+      if (countDocs) countDocs.textContent = `${totalDocsCount} items`;
+
+      // 3. Close modal & show preview
+      filesAddModal?.classList.add('hidden');
+      if (filesPreviewBox && filesPreviewText) {
+        filesPreviewBox.classList.remove('hidden');
+        filesPreviewText.textContent = content;
+      }
+    });
+
+    // -------------------------------------------------------------
+    // Screen 6: Vault Settings Logic
+    // -------------------------------------------------------------
+    const settingsBackBtn = document.getElementById('settings-back-btn');
+    const settingsLockNowBtn = document.getElementById('settings-lock-now-btn');
+
+    settingsBackBtn?.addEventListener('click', () => {
+      switchScreen('vault');
+    });
+
+    settingsLockNowBtn?.addEventListener('click', triggerPanicLock);
+
+    // -------------------------------------------------------------
+    // Screen 7: BIP-39 Recovery Flow Logic
+    // -------------------------------------------------------------
+    const recoveryQuickfillBtn = document.getElementById('recovery-quickfill-btn');
+    const recoverySubmitBtn = document.getElementById('recovery-submit-btn');
+    const recoveryCancelBtn = document.getElementById('recovery-cancel-btn');
+    const recoveryInputs = document.querySelectorAll('.recovery-word-input') as NodeListOf<HTMLInputElement>;
+    const recoveryErrorMsg = document.getElementById('recovery-error-msg');
+
+    const validPhrase = ['shield', 'crystal', 'dragon', 'relic', 'ember', 'timber', 'vault', 'harbor', 'echo', 'shadow', 'prism', 'forge'];
+
+    recoveryQuickfillBtn?.addEventListener('click', () => {
+      recoveryInputs.forEach((inp, i) => {
+        if (i < validPhrase.length) {
+          inp.value = validPhrase[i];
+        }
+      });
+      if (recoveryErrorMsg) recoveryErrorMsg.textContent = '';
+    });
+
+    recoverySubmitBtn?.addEventListener('click', () => {
+      let allValid = true;
+      recoveryInputs.forEach((inp) => {
+        if (!inp.value.trim()) allValid = false;
+      });
+
+      if (!allValid) {
+        if (recoveryErrorMsg) recoveryErrorMsg.textContent = 'Please fill in all 12 words in order.';
         return;
       }
 
-      try {
-        if (liveDecryptBtn) liveDecryptBtn.textContent = '...';
-
-        const key = await deriveKey(testPass, currentSalt);
-        const decryptedBuffer = await window.crypto.subtle.decrypt(
-          {
-            name: 'AES-GCM',
-            iv: currentIv as BufferSource,
-            tagLength: 128,
-          },
-          key,
-          currentCiphertextBuffer
-        );
-
-        const dec = new TextDecoder();
-        const decryptedText = dec.decode(decryptedBuffer);
-
-        liveDecryptOutput.className = 'p-2 rounded text-[10px] font-mono bg-emerald-950/90 border border-emerald-500 text-emerald-100 shadow-inner';
-        liveDecryptOutput.innerHTML = `
-          <div class="font-bold text-emerald-300 pb-0.5 border-b border-emerald-800">
-            ✓ AES-GCM Tag Verified
-          </div>
-          <p class="text-stone-200 mt-1 font-sans">"${decryptedText}"</p>
-        `;
-      } catch {
-        liveDecryptOutput.className = 'p-2 rounded text-[10px] font-mono bg-rose-950/90 border border-rose-500 text-rose-100 shadow-inner';
-        liveDecryptOutput.innerHTML = `
-          <div class="font-bold text-rose-300 pb-0.5 border-b border-rose-800">
-            ✕ Rejection: Auth Tag Mismatch
-          </div>
-          <p class="text-rose-200 mt-1">Passphrase "${testPass}" rejected. GCM detected corrupt/wrong key and blocked plaintext leakage.</p>
-        `;
-      } finally {
-        if (liveDecryptBtn) liveDecryptBtn.textContent = 'Verify';
+      // Validated recovery phrase! Reset PIN to 1337 and unlock vault
+      activePin = '1337';
+      if (recoveryErrorMsg) {
+        recoveryErrorMsg.className = 'text-xs text-emerald-600 font-medium text-center min-h-[16px]';
+        recoveryErrorMsg.textContent = '✓ 12 Words Verified! Vault Key Restored.';
       }
-    }
 
-    liveEncryptBtn?.addEventListener('click', handleLiveEncrypt);
-
-    liveDecryptBtn?.addEventListener('click', () => {
-      const pass = liveTestPass?.value.trim() || '';
-      handleLiveDecrypt(pass);
+      setTimeout(() => {
+        encryptBlob('Restored vault data from BIP-39 mnemonic seed phrase.');
+        switchScreen('vault');
+      }, 600);
     });
 
-    liveTamperBtn?.addEventListener('click', () => {
-      if (liveTestPass) liveTestPass.value = 'WrongKey#999';
-      handleLiveDecrypt('WrongKey#999');
+    recoveryCancelBtn?.addEventListener('click', () => {
+      switchScreen('pin');
     });
 
-    // Auto-run initial encryption for instant live state
-    handleLiveEncrypt();
+    // Initial state: Start on Game Facade with background encryption ready
+    encryptBlob('Vessel AV-Cebu-09 manifest: 4,200 metric tons raw commodities offloaded.');
+    switchScreen('game');
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initMimicDualStateSimulator);
+    document.addEventListener('DOMContentLoaded', initMimicCompleteAppDemo);
   } else {
-    initMimicDualStateSimulator();
+    initMimicCompleteAppDemo();
   }
-  document.addEventListener('astro:page-load', initMimicDualStateSimulator);
+  document.addEventListener('astro:page-load', initMimicCompleteAppDemo);
 </script>
