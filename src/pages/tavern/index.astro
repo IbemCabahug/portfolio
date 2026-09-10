@@ -504,10 +504,10 @@ const sceneObjects = [
     </div>
   </div>
 
-  <!-- Red Horse Senti Easter Egg White Screen Overlay -->
+  <!-- Red Horse Senti Easter Egg Black Screen Overlay -->
   <div
     id="dialog-beer-blackout"
-    class="beer-white-overlay fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white text-center p-6 select-none opacity-0 pointer-events-none cursor-pointer transition-opacity duration-200"
+    class="beer-blackout-overlay fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black text-center p-6 select-none opacity-0 pointer-events-none cursor-pointer transition-opacity duration-300"
     role="dialog"
     aria-modal="true"
     aria-label="Senti Beer Lyrics"
@@ -516,15 +516,32 @@ const sceneObjects = [
     <!-- White Flash Burst Layer -->
     <div id="beer-flash" class="absolute inset-0 bg-white pointer-events-none z-30 opacity-0" aria-hidden="true"></div>
 
-    <!-- Center Cinematic Stage (Pure Lyrics) -->
-    <div class="beer-stage relative z-10 max-w-3xl mx-auto flex flex-col items-center justify-center px-4 py-8 pointer-events-none">
-      <div class="beer-lyrics-container min-h-[120px] flex items-center justify-center px-4">
+    <!-- Center Cinematic Stage (Pure Lyrics & Outro Image) -->
+    <div class="beer-stage relative z-10 max-w-4xl mx-auto flex flex-col items-center justify-center px-4 py-8 pointer-events-none w-full">
+      <div id="beer-lyrics-box" class="beer-lyrics-container min-h-[120px] flex items-center justify-center px-4 transition-opacity duration-300">
         <h2
           id="beer-active-lyric"
           class="beer-lyric-text text-xl sm:text-3xl md:text-4xl leading-relaxed tracking-tight select-none"
-        >
-          ...
-        </h2>
+        ></h2>
+      </div>
+
+      <!-- Outro Image Container (Pure Image, No Subtitle / Lyrics) -->
+      <div
+        id="beer-outro-container"
+        class="beer-outro-container hidden flex flex-col items-center justify-center pointer-events-none"
+      >
+        <div class="beer-outro-card relative flex flex-col items-center justify-center">
+          <img
+            id="beer-outro-img"
+            src="/images/beer-outro.png"
+            alt="Cold beer toast outro"
+            width="445"
+            height="449"
+            class="beer-outro-img relative z-10 object-contain rounded-2xl select-none"
+            loading="eager"
+            decoding="async"
+          />
+        </div>
       </div>
     </div>
 
@@ -1508,32 +1525,66 @@ const sceneObjects = [
     transform: scale(1.1) translateY(-2px);
   }
 
-  /* Red Horse Senti White Screen Overlay */
-  .beer-white-overlay {
-    background-color: #ffffff;
-    transition: opacity 0.25s ease-in-out;
+  /* Red Horse Senti Black Screen Overlay */
+  .beer-blackout-overlay {
+    background-color: #000000;
+    transition: opacity 0.3s ease-in-out;
   }
-  .beer-white-overlay:not([hidden]) {
+  .beer-blackout-overlay:not([hidden]) {
     opacity: 1;
     pointer-events: auto;
   }
   .beer-flash-burst {
-    animation: flashBurstAnim 0.35s ease-out forwards;
+    animation: flashBurstAnim 0.45s ease-out forwards;
   }
   @keyframes flashBurstAnim {
     0% { opacity: 0; }
-    40% { opacity: 1; }
+    25% { opacity: 1; }
     100% { opacity: 0; }
   }
   .beer-lyric-text {
     font-family: 'Courier Prime', 'Courier New', Courier, monospace;
     font-weight: 700;
-    color: #1a1818;
-    transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.45), 0 0 40px rgba(255, 255, 255, 0.2);
+    transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .beer-lyric-text.lyric-switching {
     opacity: 0;
-    transform: translateY(10px) scale(0.98);
+    transform: translateY(8px) scale(0.98);
+  }
+  .beer-outro-container {
+    opacity: 0;
+    transform: scale(0.94);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+  }
+  .beer-outro-container.outro-visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .beer-outro-container.outro-fading-out {
+    opacity: 0;
+    transform: scale(0.96);
+    transition: opacity 0.9s ease-out, transform 0.9s ease-out;
+  }
+  .beer-lyrics-container.hidden {
+    display: none !important;
+  }
+  .beer-outro-container.hidden {
+    display: none !important;
+  }
+  .beer-outro-card {
+    max-width: min(88vw, 445px);
+    max-height: 75vh;
+  }
+  .beer-outro-img {
+    width: 100%;
+    height: auto;
+    max-height: 65vh;
+    aspect-ratio: 445 / 449;
+    border-radius: 1rem;
+    box-shadow: none;
   }
 </style>
 
@@ -1806,24 +1857,82 @@ const sceneObjects = [
     const triggerBeer = document.getElementById('trigger-beer');
     const narrowBeer = document.getElementById('narrow-beer');
     const dialogBeer = document.getElementById('dialog-beer-blackout');
+    const lyricsBoxEl = document.getElementById('beer-lyrics-box');
     const lyricEl = document.getElementById('beer-active-lyric');
+    const outroContainerEl = document.getElementById('beer-outro-container');
     const flashEl = document.getElementById('beer-flash');
     const btnCloseBeer = document.getElementById('btn-close-beer-blackout');
     const audioStatusEl = document.getElementById('beer-audio-status');
 
     let beerAudio: HTMLAudioElement | null = null;
     let beerTimerIds: number[] = [];
+    let beerAnimFrameId: number | null = null;
     let isBeerActive = false;
     let beerSynthCtx: AudioContext | null = null;
     let synthActiveNodes: (AudioNode | number)[] = [];
 
-    function setLyric(text: string) {
+    function showOutro() {
+      if (!isBeerActive) return;
+      if (lyricEl) {
+        lyricEl.textContent = '';
+      }
+      if (lyricsBoxEl) {
+        lyricsBoxEl.classList.add('opacity-0', 'pointer-events-none', 'hidden');
+        lyricsBoxEl.style.display = 'none';
+      }
+      if (outroContainerEl) {
+        outroContainerEl.style.display = 'flex';
+        outroContainerEl.style.transition = '';
+        outroContainerEl.style.opacity = '';
+        outroContainerEl.style.transform = '';
+        outroContainerEl.classList.remove('hidden', 'outro-fading-out');
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (!isBeerActive) return;
+            outroContainerEl?.classList.add('outro-visible');
+          });
+        });
+      }
+    }
+
+    function resetLyricsAndOutro() {
+      if (lyricEl) lyricEl.textContent = '';
+      if (lyricsBoxEl) {
+        lyricsBoxEl.style.display = '';
+        lyricsBoxEl.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+      }
+      if (outroContainerEl) {
+        outroContainerEl.style.transition = '';
+        outroContainerEl.style.opacity = '';
+        outroContainerEl.style.transform = '';
+        outroContainerEl.style.display = 'none';
+        outroContainerEl.classList.remove('outro-visible', 'outro-fading-out');
+        outroContainerEl.classList.add('hidden');
+      }
+    }
+
+    function setLyric(text: string, immediate = false) {
       if (!lyricEl) return;
-      lyricEl.classList.add('lyric-switching');
-      const timer = window.setTimeout(() => {
+      if (lyricsBoxEl) {
+        lyricsBoxEl.style.display = '';
+        lyricsBoxEl.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+      }
+      if (outroContainerEl) {
+        outroContainerEl.style.display = 'none';
+        outroContainerEl.classList.remove('outro-visible', 'outro-fading-out');
+        outroContainerEl.classList.add('hidden');
+      }
+      if (immediate || !lyricEl.textContent || lyricEl.textContent === '...') {
         lyricEl.textContent = text;
         lyricEl.classList.remove('lyric-switching');
-      }, 250);
+        return;
+      }
+      lyricEl.classList.add('lyric-switching');
+      const timer = window.setTimeout(() => {
+        if (!isBeerActive) return;
+        lyricEl.textContent = text;
+        lyricEl.classList.remove('lyric-switching');
+      }, 120);
       beerTimerIds.push(timer);
     }
 
@@ -1838,147 +1947,300 @@ const sceneObjects = [
           beerSynthCtx.resume();
         }
         const ctx = beerSynthCtx;
-        const now = ctx.currentTime;
+        const now = ctx.currentTime + 0.04;
 
+        // Master output & warm acoustic room simulation
         const master = ctx.createGain();
         master.gain.setValueAtTime(0.001, now);
-        master.gain.linearRampToValueAtTime(0.26, now + 0.3);
+        master.gain.linearRampToValueAtTime(0.28, now + 0.25);
         master.connect(ctx.destination);
         synthActiveNodes.push(master);
 
-        const reverbFilter = ctx.createBiquadFilter();
-        reverbFilter.type = 'lowpass';
-        reverbFilter.frequency.setValueAtTime(2600, now);
-        reverbFilter.connect(master);
+        // Acoustic body warmth filter (peaking filter for wooden soundboard resonance)
+        const bodyResonance = ctx.createBiquadFilter();
+        bodyResonance.type = 'peaking';
+        bodyResonance.frequency.setValueAtTime(220, now);
+        bodyResonance.Q.setValueAtTime(2.2, now);
+        bodyResonance.gain.setValueAtTime(3.5, now);
+        bodyResonance.connect(master);
 
+        // Warm high-cut filter for natural nylon/steel string character
+        const acousticWarmth = ctx.createBiquadFilter();
+        acousticWarmth.type = 'lowpass';
+        acousticWarmth.frequency.setValueAtTime(3200, now);
+        acousticWarmth.connect(bodyResonance);
+
+        // Vocal presence filter
+        const vocalPresence = ctx.createBiquadFilter();
+        vocalPresence.type = 'peaking';
+        vocalPresence.frequency.setValueAtTime(1400, now);
+        vocalPresence.Q.setValueAtTime(1.8, now);
+        vocalPresence.gain.setValueAtTime(2.0, now);
+        vocalPresence.connect(master);
+
+        // Note frequencies for authentic Key of G Major
         const N = {
-          D3: 146.83, Fs3: 185.00, G3: 196.00, A3: 220.00, B3: 246.94,
-          Cs4: 277.18, D4: 293.66, E4: 329.63, Fs4: 369.99, G4: 392.00,
-          A4: 440.00, B4: 493.88, Cs5: 554.37, D5: 587.33, E5: 659.25
+          G2: 98.00, A2: 110.00, B2: 123.47, C3: 130.81, D3: 146.83, E3: 164.81, Fs3: 185.00, G3: 196.00,
+          A3: 220.00, B3: 246.94, C4: 261.63, Cs4: 277.18, D4: 293.66, Ds4: 311.13, E4: 329.63,
+          Fs4: 369.99, G4: 392.00, A4: 440.00, B4: 493.88, C5: 523.25, Cs5: 554.37, D5: 587.33,
+          Ds5: 622.25, E5: 659.25, Fs5: 739.99, G5: 783.99, A5: 880.00, B5: 987.77
         };
 
-        function pluckChord(timeOffset: number, freqs: number[]) {
-          freqs.forEach((freq, idx) => {
-            const strumTime = now + timeOffset + (idx * 0.035);
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
+        const BPM = 72;
+        const BEAT = 60 / BPM; // ~0.8333s per beat
 
+        function pluckChord(timeOffset: number, freqs: number[], isSustained = false) {
+          freqs.forEach((freq, idx) => {
+            const strumTime = now + timeOffset + (idx * 0.032);
+            const osc = ctx.createOscillator();
+            const pluckSnap = ctx.createOscillator();
+            const gain = ctx.createGain();
+            const snapGain = ctx.createGain();
+
+            // Main string body
             osc.type = 'triangle';
             osc.frequency.setValueAtTime(freq, strumTime);
 
+            // Initial pick contact transient
+            pluckSnap.type = 'sawtooth';
+            pluckSnap.frequency.setValueAtTime(freq, strumTime);
+
+            const duration = isSustained ? 3.6 : 2.4;
+
             gain.gain.setValueAtTime(0.0001, strumTime);
-            gain.gain.linearRampToValueAtTime(0.11, strumTime + 0.012);
-            gain.gain.exponentialRampToValueAtTime(0.0001, strumTime + 2.2);
+            gain.gain.linearRampToValueAtTime(0.12, strumTime + 0.008);
+            gain.gain.exponentialRampToValueAtTime(0.05, strumTime + 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.0001, strumTime + duration);
+
+            snapGain.gain.setValueAtTime(0.04, strumTime);
+            snapGain.gain.exponentialRampToValueAtTime(0.0001, strumTime + 0.04);
 
             osc.connect(gain);
-            gain.connect(reverbFilter);
+            pluckSnap.connect(snapGain);
+            gain.connect(acousticWarmth);
+            snapGain.connect(acousticWarmth);
 
             osc.start(strumTime);
-            osc.stop(strumTime + 2.3);
-            synthActiveNodes.push(osc, gain);
+            pluckSnap.start(strumTime);
+            osc.stop(strumTime + duration + 0.05);
+            pluckSnap.stop(strumTime + 0.05);
+            synthActiveNodes.push(osc, pluckSnap, gain, snapGain);
           });
         }
 
         function playMelodyNote(timeOffset: number, freq: number, duration: number) {
           const startTime = now + timeOffset;
           const osc = ctx.createOscillator();
+          const harmonic = ctx.createOscillator();
           const vibrato = ctx.createOscillator();
           const vibratoGain = ctx.createGain();
-          const gain = ctx.createGain();
+          const mainGain = ctx.createGain();
+          const harmGain = ctx.createGain();
 
           osc.type = 'sine';
           osc.frequency.setValueAtTime(freq, startTime);
 
-          vibrato.frequency.setValueAtTime(4.8, startTime);
+          harmonic.type = 'triangle';
+          harmonic.frequency.setValueAtTime(freq * 2, startTime);
+
+          // Humanized expressive vocal vibrato blooming after 120ms
+          vibrato.frequency.setValueAtTime(5.2, startTime);
           vibratoGain.gain.setValueAtTime(0, startTime);
-          vibratoGain.gain.linearRampToValueAtTime(3.5, startTime + 0.25);
+          vibratoGain.gain.setValueAtTime(0, startTime + Math.min(0.15, duration * 0.35));
+          vibratoGain.gain.linearRampToValueAtTime(4.2, startTime + Math.min(0.35, duration * 0.7));
           vibrato.connect(osc.frequency);
 
-          gain.gain.setValueAtTime(0.0001, startTime);
-          gain.gain.linearRampToValueAtTime(0.14, startTime + 0.04);
-          gain.gain.setValueAtTime(0.12, startTime + duration - 0.06);
-          gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+          // Soft vocal envelope
+          mainGain.gain.setValueAtTime(0.0001, startTime);
+          mainGain.gain.linearRampToValueAtTime(0.16, startTime + 0.035);
+          mainGain.gain.setValueAtTime(0.14, startTime + duration - 0.06);
+          mainGain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
 
-          osc.connect(gain);
-          gain.connect(reverbFilter);
+          harmGain.gain.setValueAtTime(0.0001, startTime);
+          harmGain.gain.linearRampToValueAtTime(0.03, startTime + 0.035);
+          harmGain.gain.setValueAtTime(0.02, startTime + duration - 0.06);
+          harmGain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+          osc.connect(mainGain);
+          harmonic.connect(harmGain);
+          mainGain.connect(vocalPresence);
+          harmGain.connect(vocalPresence);
 
           vibrato.start(startTime);
           osc.start(startTime);
+          harmonic.start(startTime);
           vibrato.stop(startTime + duration + 0.05);
           osc.stop(startTime + duration + 0.05);
-          synthActiveNodes.push(osc, vibrato, gain);
+          harmonic.stop(startTime + duration + 0.05);
+          synthActiveNodes.push(osc, harmonic, vibrato, vibratoGain, mainGain, harmGain);
         }
 
-        // Chords (Key of D: D - F#m - G - A)
-        pluckChord(0.0, [N.D3, N.A3, N.Fs4, N.D5]);
-        pluckChord(2.0, [N.A3, N.D4, N.Fs4]);
-        pluckChord(4.0, [N.Fs3, N.Cs4, N.Fs4, N.A4]);
-        pluckChord(6.0, [N.Cs4, N.Fs4, N.A4]);
-        pluckChord(8.0, [N.G3, N.D4, N.G4, N.B4]);
-        pluckChord(10.0, [N.D4, N.G4, N.B4]);
-        pluckChord(12.0, [N.A3, N.E4, N.A4, N.Cs5]);
-        pluckChord(14.0, [N.E4, N.A4, N.Cs5]);
-        pluckChord(16.0, [N.D3, N.A3, N.Fs4, N.D5]);
-        pluckChord(18.0, [N.Fs3, N.Cs4, N.A4]);
-        pluckChord(20.0, [N.G3, N.D4, N.B4]);
-        pluckChord(22.0, [N.A3, N.E4, N.Cs5]);
-        pluckChord(23.5, [N.D3, N.Fs3, N.A3, N.D4, N.Fs4, N.D5]);
+        function playSoftThump(timeOffset: number) {
+          const t = now + timeOffset;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(65, t);
+          osc.frequency.exponentialRampToValueAtTime(35, t + 0.08);
+          gain.gain.setValueAtTime(0.06, t);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.08);
+          osc.connect(gain);
+          gain.connect(master);
+          osc.start(t);
+          osc.stop(t + 0.09);
+          synthActiveNodes.push(osc, gain);
+        }
 
-        // Vocal melody notes
-        playMelodyNote(0.2, N.Fs4, 0.45);
-        playMelodyNote(0.7, N.G4, 0.35);
-        playMelodyNote(1.1, N.A4, 0.55);
-        playMelodyNote(1.7, N.A4, 0.4);
-        playMelodyNote(2.2, N.Fs4, 0.4);
-        playMelodyNote(2.7, N.E4, 0.8);
+        function playBottleClink(timeOffset: number) {
+          const t = now + timeOffset;
+          const osc1 = ctx.createOscillator();
+          const osc2 = ctx.createOscillator();
+          const gain = ctx.createGain();
 
-        playMelodyNote(4.0, N.Fs4, 0.35);
-        playMelodyNote(4.4, N.G4, 0.35);
-        playMelodyNote(4.8, N.A4, 0.45);
-        playMelodyNote(5.3, N.B4, 0.4);
-        playMelodyNote(5.8, N.A4, 0.4);
-        playMelodyNote(6.3, N.G4, 0.4);
-        playMelodyNote(6.8, N.Fs4, 0.7);
+          osc1.type = 'sine';
+          osc1.frequency.setValueAtTime(2780, t);
+          osc2.type = 'sine';
+          osc2.frequency.setValueAtTime(3920, t);
 
-        playMelodyNote(8.0, N.E4, 0.35);
-        playMelodyNote(8.4, N.Fs4, 0.35);
-        playMelodyNote(8.8, N.G4, 0.45);
-        playMelodyNote(9.3, N.G4, 0.35);
-        playMelodyNote(9.7, N.Fs4, 0.35);
-        playMelodyNote(10.2, N.E4, 0.7);
+          gain.gain.setValueAtTime(0.07, t);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
 
-        playMelodyNote(12.0, N.G4, 0.35);
-        playMelodyNote(12.4, N.A4, 0.35);
-        playMelodyNote(12.8, N.B4, 0.4);
-        playMelodyNote(13.3, N.B4, 0.35);
-        playMelodyNote(13.7, N.A4, 0.35);
-        playMelodyNote(14.1, N.G4, 0.35);
-        playMelodyNote(14.5, N.Fs4, 0.4);
-        playMelodyNote(15.0, N.E4, 0.8);
+          osc1.connect(gain);
+          osc2.connect(gain);
+          gain.connect(master);
 
-        playMelodyNote(16.0, N.Fs4, 0.35);
-        playMelodyNote(16.4, N.A4, 0.35);
-        playMelodyNote(16.8, N.D5, 0.55);
-        playMelodyNote(17.4, N.D5, 0.4);
-        playMelodyNote(17.9, N.Cs5, 0.35);
-        playMelodyNote(18.3, N.B4, 0.4);
-        playMelodyNote(18.8, N.A4, 0.8);
+          osc1.start(t);
+          osc2.start(t);
+          osc1.stop(t + 0.3);
+          osc2.stop(t + 0.3);
+          synthActiveNodes.push(osc1, osc2, gain);
+        }
 
-        playMelodyNote(20.0, N.G4, 0.35);
-        playMelodyNote(20.4, N.A4, 0.35);
-        playMelodyNote(20.8, N.B4, 0.4);
-        playMelodyNote(21.3, N.B4, 0.35);
-        playMelodyNote(21.7, N.A4, 0.35);
-        playMelodyNote(22.1, N.G4, 0.35);
-        playMelodyNote(22.5, N.A4, 0.4);
-        playMelodyNote(23.0, N.Fs4, 0.8);
+        // ── Authentic Chorus Chords: G Major (C - G - Em - Bm ...) ──
+        // Measure 1: C -> G
+        pluckChord(0.0 * BEAT, [N.C3, N.G3, N.C4, N.E4, N.G4]);
+        pluckChord(1.0 * BEAT, [N.G3, N.C4, N.E4]);
+        pluckChord(2.0 * BEAT, [N.G2, N.D3, N.G3, N.B3, N.D4]);
+        pluckChord(3.0 * BEAT, [N.D3, N.G3, N.B3]);
 
-        playMelodyNote(23.8, N.E4, 0.35);
-        playMelodyNote(24.2, N.Fs4, 0.35);
-        playMelodyNote(24.6, N.G4, 0.45);
-        playMelodyNote(25.1, N.Fs4, 0.35);
-        playMelodyNote(25.5, N.E4, 0.4);
-        playMelodyNote(26.0, N.D4, 1.4);
+        // Measure 2: Em -> Bm
+        pluckChord(4.0 * BEAT, [N.E3, N.B3, N.E4, N.G4]);
+        pluckChord(5.0 * BEAT, [N.B3, N.E4, N.G4]);
+        pluckChord(6.0 * BEAT, [N.B2, N.Fs3, N.B3, N.D4, N.Fs4]);
+        pluckChord(7.0 * BEAT, [N.Fs3, N.B3, N.D4]);
+
+        // Measure 3: C -> G
+        pluckChord(8.0 * BEAT, [N.C3, N.G3, N.C4, N.E4, N.G4]);
+        pluckChord(9.0 * BEAT, [N.G3, N.C4, N.E4]);
+        pluckChord(10.0 * BEAT, [N.G2, N.D3, N.G3, N.B3, N.D4]);
+        pluckChord(11.0 * BEAT, [N.D3, N.G3, N.B3]);
+
+        // Measure 4: Em -> Bm
+        pluckChord(12.0 * BEAT, [N.E3, N.B3, N.E4, N.G4]);
+        pluckChord(13.0 * BEAT, [N.B3, N.E4, N.G4]);
+        pluckChord(14.0 * BEAT, [N.B2, N.Fs3, N.B3, N.D4, N.Fs4]);
+        pluckChord(15.0 * BEAT, [N.Fs3, N.B3, N.D4]);
+
+        // Measure 5: C -> B7
+        pluckChord(16.0 * BEAT, [N.C3, N.G3, N.C4, N.E4, N.G4]);
+        pluckChord(17.0 * BEAT, [N.G3, N.C4, N.E4]);
+        pluckChord(18.0 * BEAT, [N.B2, N.Ds4, N.Fs4, N.A4, N.B4]);
+        pluckChord(19.0 * BEAT, [N.Fs3, N.Ds4, N.Fs4, N.A4]);
+
+        // Measure 6: Em -> Em/D -> A7
+        pluckChord(20.0 * BEAT, [N.E3, N.B3, N.E4, N.G4]);
+        pluckChord(21.0 * BEAT, [N.D3, N.B3, N.E4, N.G4]); // Em/D bass walkdown
+        pluckChord(22.0 * BEAT, [N.A2, N.E3, N.G3, N.Cs4, N.E4]); // A7
+        pluckChord(23.0 * BEAT, [N.E3, N.G3, N.Cs4]);
+
+        // Measure 7: Am -> D7
+        pluckChord(24.0 * BEAT, [N.A2, N.E3, N.A3, N.C4, N.E4]);
+        pluckChord(25.0 * BEAT, [N.E3, N.A3, N.C4]);
+        pluckChord(26.0 * BEAT, [N.D3, N.A3, N.C4, N.Fs4]);
+        pluckChord(27.0 * BEAT, [N.A3, N.C4, N.Fs4]);
+
+        // Measure 8: G Major resolution
+        pluckChord(28.0 * BEAT, [N.G2, N.D3, N.G3, N.B3, N.D4, N.G4], true);
+        pluckChord(30.0 * BEAT, [N.D3, N.G3, N.B3, N.D4]);
+        pluckChord(31.0 * BEAT, [N.G2, N.D3, N.G3, N.B3, N.G4], true);
+
+        // Soft rhythmic boot-thumps on downbeats
+        [0, 4, 8, 12, 16, 20, 24, 28].forEach(b => playSoftThump(b * BEAT));
+
+        // ── Note-by-Note Authentic Vocal Melody ─────────────────────
+        // Measure 1: "I-bu-hos na ang beer"
+        playMelodyNote(0.0 * BEAT, N.B4, 0.35);
+        playMelodyNote(0.45 * BEAT, N.C5, 0.35);
+        playMelodyNote(0.9 * BEAT, N.D5, 0.45);
+        playMelodyNote(1.4 * BEAT, N.E5, 0.38);
+        playMelodyNote(1.85 * BEAT, N.C5, 0.38);
+        playMelodyNote(2.3 * BEAT, N.B4, 1.25);
+
+        // Measure 2: "Sa a-king la-la-mu-nan"
+        playMelodyNote(4.0 * BEAT, N.B4, 0.32);
+        playMelodyNote(4.4 * BEAT, N.D5, 0.32);
+        playMelodyNote(4.8 * BEAT, N.Fs5, 0.40);
+        playMelodyNote(5.3 * BEAT, N.G5, 0.35);
+        playMelodyNote(5.75 * BEAT, N.Fs5, 0.35);
+        playMelodyNote(6.2 * BEAT, N.E5, 0.35);
+        playMelodyNote(6.65 * BEAT, N.D5, 0.95);
+
+        // Measure 3: "U-pang ma-lu-nod na ang"
+        playMelodyNote(8.0 * BEAT, N.B4, 0.35);
+        playMelodyNote(8.45 * BEAT, N.C5, 0.35);
+        playMelodyNote(8.9 * BEAT, N.D5, 0.45);
+        playMelodyNote(9.4 * BEAT, N.E5, 0.38);
+        playMelodyNote(9.85 * BEAT, N.C5, 0.38);
+        playMelodyNote(10.3 * BEAT, N.B4, 0.50);
+        playMelodyNote(10.9 * BEAT, N.A4, 0.65);
+
+        // Measure 4: "Pu-so kong na-hi-hi-ra-pan"
+        playMelodyNote(12.0 * BEAT, N.B4, 0.32);
+        playMelodyNote(12.4 * BEAT, N.D5, 0.32);
+        playMelodyNote(12.8 * BEAT, N.Fs5, 0.40);
+        playMelodyNote(13.3 * BEAT, N.G5, 0.35);
+        playMelodyNote(13.75 * BEAT, N.Fs5, 0.35);
+        playMelodyNote(14.2 * BEAT, N.E5, 0.35);
+        playMelodyNote(14.65 * BEAT, N.D5, 0.35);
+        playMelodyNote(15.1 * BEAT, N.B4, 0.85);
+
+        // Measure 5: "Ba-wat pa-tak, a-nong sa-rap"
+        playMelodyNote(16.0 * BEAT, N.G4, 0.32);
+        playMelodyNote(16.35 * BEAT, N.D5, 0.35);
+        playMelodyNote(16.75 * BEAT, N.E5, 0.35);
+        playMelodyNote(17.15 * BEAT, N.E5, 0.55);
+        playMelodyNote(18.0 * BEAT, N.A4, 0.32);
+        playMelodyNote(18.35 * BEAT, N.E5, 0.35);
+        playMelodyNote(18.75 * BEAT, N.Fs5, 0.38);
+        playMelodyNote(19.2 * BEAT, N.Fs5, 0.60);
+
+        // Measure 6: "A-no ba ta-la-gang mas gus-to ko"
+        playMelodyNote(20.0 * BEAT, N.B4, 0.28);
+        playMelodyNote(20.32 * BEAT, N.D5, 0.28);
+        playMelodyNote(20.65 * BEAT, N.G5, 0.35);
+        playMelodyNote(21.05 * BEAT, N.Fs5, 0.28);
+        playMelodyNote(21.38 * BEAT, N.E5, 0.28);
+        playMelodyNote(21.72 * BEAT, N.D5, 0.32);
+        playMelodyNote(22.1 * BEAT, N.E5, 0.28);
+        playMelodyNote(22.45 * BEAT, N.Fs5, 0.28);
+        playMelodyNote(22.8 * BEAT, N.G5, 0.35);
+        playMelodyNote(23.2 * BEAT, N.A5, 0.85);
+
+        // Measures 7 & 8: "Ang beer na 'to, o ang pag-i-big mo"
+        playMelodyNote(24.0 * BEAT, N.G4, 0.30);
+        playMelodyNote(24.35 * BEAT, N.B4, 0.40);
+        playMelodyNote(24.8 * BEAT, N.C5, 0.35);
+        playMelodyNote(25.2 * BEAT, N.B4, 0.55);
+        playMelodyNote(26.0 * BEAT, N.A4, 0.32);
+        playMelodyNote(26.35 * BEAT, N.G4, 0.32);
+        playMelodyNote(26.7 * BEAT, N.Fs4, 0.32);
+        playMelodyNote(27.05 * BEAT, N.A4, 0.35);
+        playMelodyNote(27.45 * BEAT, N.C5, 0.38);
+        playMelodyNote(27.9 * BEAT, N.B4, 0.70);
+        playMelodyNote(28.7 * BEAT, N.G4, 1.85);
+
+        // Cold amber bottle toast clink before "Ito ang tama"
+        playBottleClink(31.6 * BEAT);
       } catch (e) {}
     }
 
@@ -2000,6 +2262,137 @@ const sceneObjects = [
       }
     }
 
+    interface LyricCue {
+      time: number;
+      text?: string;
+      isOutro?: boolean;
+    }
+
+    const LYRIC_CUES: LyricCue[] = [
+      { time: 0.10, text: "Ibuhos na ang beer" },
+      { time: 4.00, text: "Sa aking lalamunan" },
+      { time: 11.50, text: "Upang malunod na ang" },
+      { time: 16.50, text: "Puso kong nahihirapan" },
+      { time: 22.60, text: "Bawat patak, anong sarap" },
+      { time: 27.60, text: "Ano ba talagang mas gusto ko" },
+      { time: 34.30, isOutro: true }
+    ];
+
+    function startAudioAndLyrics() {
+      if (!isBeerActive) return;
+
+      let lyricsStarted = false;
+      let currentCueIdx = -1;
+
+      function syncLyricsLoop(getTimeSec: () => number, getSongDuration: () => number) {
+        if (!isBeerActive) return;
+
+        const currentSec = getTimeSec();
+        const songDuration = getSongDuration();
+
+        // Determine which lyric cue should currently be active
+        let activeIdx = -1;
+        for (let i = LYRIC_CUES.length - 1; i >= 0; i--) {
+          if (currentSec >= LYRIC_CUES[i].time) {
+            activeIdx = i;
+            break;
+          }
+        }
+
+        if (activeIdx !== -1 && activeIdx !== currentCueIdx) {
+          currentCueIdx = activeIdx;
+          const cue = LYRIC_CUES[activeIdx];
+          if (cue.isOutro) {
+            showOutro();
+          } else if (cue.text) {
+            setLyric(cue.text, activeIdx === 0);
+          }
+        }
+
+        // Gradually fade out outro image while song is still playing so it finishes exactly when song ends
+        const FADE_OUT_DURATION = 4.2; // 4.2s gradual fade matching the ending chords and resolution
+        const fadeStartTime = Math.max(35.2, songDuration - FADE_OUT_DURATION);
+
+        if (outroContainerEl && currentSec >= fadeStartTime) {
+          outroContainerEl.style.transition = 'none';
+          const progress = Math.min(1, Math.max(0, (currentSec - fadeStartTime) / (songDuration - fadeStartTime)));
+          // Smooth cosine ease-in-out S-curve for natural, gradual dissolution
+          const easeProgress = 0.5 - 0.5 * Math.cos(progress * Math.PI);
+          const opacity = Math.max(0, Math.min(1, 1 - easeProgress));
+          outroContainerEl.style.opacity = opacity.toFixed(4);
+          outroContainerEl.style.transform = `scale(${(1 - 0.03 * easeProgress).toFixed(4)})`;
+        }
+
+        // Auto-close when song finishes naturally and fade-out is complete
+        if (currentSec >= songDuration + 0.35) {
+          closeBeerBlackout();
+          return;
+        }
+
+        beerAnimFrameId = requestAnimationFrame(() => syncLyricsLoop(getTimeSec, getSongDuration));
+      }
+
+      function launchWithAudio(audioEl: HTMLAudioElement) {
+        if (lyricsStarted || !isBeerActive) return;
+        lyricsStarted = true;
+        beerAudio = audioEl;
+        (window as any).__beerAudio = audioEl;
+        if (audioStatusEl) audioStatusEl.textContent = '🎵 Playing studio recording';
+        syncLyricsLoop(
+          () => audioEl.currentTime,
+          () => (audioEl.duration && !isNaN(audioEl.duration) ? audioEl.duration : 42.48)
+        );
+      }
+
+      function launchWithSynth() {
+        if (lyricsStarted || !isBeerActive) return;
+        lyricsStarted = true;
+        playProceduralBeerMelody();
+        if (audioStatusEl) audioStatusEl.textContent = '🎵 Playing acoustic tavern melody';
+        const startTime = performance.now();
+        syncLyricsLoop(
+          () => (performance.now() - startTime) / 1000,
+          () => 40.0
+        );
+      }
+
+      try {
+        const testAudio = new Audio('/audio/beer.mp3');
+        testAudio.volume = 0.92;
+        testAudio.preload = 'auto';
+
+        testAudio.addEventListener('playing', () => {
+          launchWithAudio(testAudio);
+        }, { once: true });
+
+        testAudio.addEventListener('ended', () => {
+          if (isBeerActive) {
+            // When song ends, ensure opacity is 0 and close smoothly after brief silence
+            if (outroContainerEl) {
+              outroContainerEl.style.opacity = '0';
+            }
+            const endTimer = window.setTimeout(() => {
+              if (isBeerActive) closeBeerBlackout();
+            }, 300);
+            beerTimerIds.push(endTimer);
+          }
+        }, { once: true });
+
+        const playPromise = testAudio.play();
+        if (playPromise) {
+          playPromise.then(() => {
+            launchWithAudio(testAudio);
+          }).catch(() => {
+            launchWithSynth();
+          });
+        } else {
+          launchWithSynth();
+        }
+      } catch (e) {
+        launchWithSynth();
+      }
+    }
+
     function openBeerBlackout() {
       if (!dialogBeer || isBeerActive) return;
       isBeerActive = true;
@@ -2010,68 +2403,37 @@ const sceneObjects = [
       // Duck tavern ambient sound
       soundEngine.duckAmbient(true);
 
-      // Show white overlay with initial flash
+      // Automatically activate sound if currently muted so the musical purpose is achieved
+      if (getSound() !== 'on') {
+        setSound('on');
+      }
+
+      // Initial clean state: reset lyrics and outro
+      resetLyricsAndOutro();
+
+      // Show black screen overlay
       dialogBeer.hidden = false;
       dialogBeer.setAttribute('aria-hidden', 'false');
-      if (flashEl) {
-        flashEl.classList.add('beer-flash-burst');
-        setTimeout(() => {
-          flashEl?.classList.remove('beer-flash-burst');
-        }, 400);
-      }
       requestAnimationFrame(() => {
         dialogBeer.classList.remove('opacity-0', 'pointer-events-none');
         dialogBeer.classList.add('opacity-100', 'pointer-events-auto');
       });
 
-      // Automatically activate sound if currently muted so the easter egg's musical purpose is achieved
-      if (getSound() !== 'on') {
-        setSound('on');
+      // 1. Fire bright white flash burst immediately
+      if (flashEl) {
+        flashEl.classList.add('beer-flash-burst');
+        const flashTid = window.setTimeout(() => {
+          flashEl?.classList.remove('beer-flash-burst');
+        }, 460);
+        beerTimerIds.push(flashTid);
       }
 
-      // Audio handling: Try MP3 first (from /public/audio/beer.mp3), fallback to procedural Web Audio
-      try {
-        const testAudio = new Audio('/audio/beer.mp3');
-        testAudio.volume = 0.9;
-        testAudio.preload = 'auto';
-        const playPromise = testAudio.play();
-        if (playPromise) {
-          playPromise.then(() => {
-            beerAudio = testAudio;
-            if (audioStatusEl) audioStatusEl.textContent = '🎵 Playing studio recording';
-          }).catch(() => {
-            playProceduralBeerMelody();
-            if (audioStatusEl) audioStatusEl.textContent = '🎵 Playing acoustic tavern melody';
-          });
-        } else {
-          playProceduralBeerMelody();
-        }
-      } catch (e) {
-        playProceduralBeerMelody();
-      }
-
-      // Lyric sequence schedule
-      const LYRIC_TIMINGS = [
-        { time: 100, text: "Ibuhos na ang beer sa aking lalamunan..." },
-        { time: 4000, text: "Upang malunod na ang puso kong nahihirapan..." },
-        { time: 8000, text: "Bawat patak, anong sarap..." },
-        { time: 12000, text: "Ano ba talagang mas gusto ko..." },
-        { time: 16000, text: "Ang beer na 'to... o ang pag-ibig mo?" },
-        { time: 22000, text: "Ito ang tama." }
-      ];
-
-      LYRIC_TIMINGS.forEach(({ time, text }) => {
-        const tid = window.setTimeout(() => {
-          if (isBeerActive) setLyric(text);
-        }, time);
-        beerTimerIds.push(tid);
-      });
-
-      // Auto-exit at 27s
-      const endTimer = window.setTimeout(() => {
-        if (isBeerActive) closeBeerBlackout();
-      }, 27000);
-      beerTimerIds.push(endTimer);
+      // 2. Wait at least 1 second after flash in pitch black void (450ms flash + 1000ms pause = 1450ms)
+      const startTid = window.setTimeout(() => {
+        if (!isBeerActive) return;
+        startAudioAndLyrics();
+      }, 1450);
+      beerTimerIds.push(startTid);
 
       // Focus close button for keyboard accessibility
       btnCloseBeer?.focus({ preventScroll: true });
@@ -2080,6 +2442,12 @@ const sceneObjects = [
     function closeBeerBlackout() {
       if (!dialogBeer || !isBeerActive) return;
       isBeerActive = false;
+
+      // Cancel sync animation frame
+      if (beerAnimFrameId !== null) {
+        cancelAnimationFrame(beerAnimFrameId);
+        beerAnimFrameId = null;
+      }
 
       // Stop audio
       if (beerAudio) {
@@ -2105,7 +2473,7 @@ const sceneObjects = [
       const hideTimer = window.setTimeout(() => {
         dialogBeer.hidden = true;
         dialogBeer.setAttribute('aria-hidden', 'true');
-        if (lyricEl) lyricEl.textContent = '...';
+        resetLyricsAndOutro();
         triggerBeer?.focus({ preventScroll: true });
       }, 300);
       beerTimerIds.push(hideTimer);

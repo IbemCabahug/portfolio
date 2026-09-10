@@ -83,9 +83,34 @@ export async function createDistServer({ root = 'dist', port = 4321, quiet = fal
       return
     }
     const body = await readFile(file)
+    const mime = TYPES[extname(file).toLowerCase()] ?? 'application/octet-stream'
+    const rangeHeader = req.headers.range
+
+    if (rangeHeader && req.method === 'GET') {
+      const match = /bytes=(\d+)-(\d*)/.exec(rangeHeader)
+      if (match) {
+        const start = parseInt(match[1], 10)
+        const end = match[2] ? parseInt(match[2], 10) : body.length - 1
+        if (start < body.length && end < body.length && start <= end) {
+          const chunk = body.subarray(start, end + 1)
+          res.writeHead(206, {
+            'content-type': mime,
+            'content-range': `bytes ${start}-${end}/${body.length}`,
+            'accept-ranges': 'bytes',
+            'content-length': chunk.length,
+            'cache-control': 'no-store',
+          })
+          res.end(chunk)
+          if (!quiet) console.log('206 ' + req.url + ` (${start}-${end})`)
+          return
+        }
+      }
+    }
+
     res.writeHead(200, {
-      'content-type': TYPES[extname(file).toLowerCase()] ?? 'application/octet-stream',
+      'content-type': mime,
       'content-length': body.length,
+      'accept-ranges': 'bytes',
       // no-store so a probe can never measure a cached copy of a previous build.
       'cache-control': 'no-store',
     })
