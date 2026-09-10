@@ -593,15 +593,31 @@ const totalCount = JOURNAL_MILESTONES.length;
       toast.style.transform = 'translateX(100%)';
       toast.style.opacity = '0';
 
-      const icon = milestone.category === 'feat' ? '⚔️' : '📜';
-      toast.innerHTML = `
-        <span class="text-xl shrink-0">${icon}</span>
-        <div class="truncate">
-          <span class="text-[10px] uppercase font-bold text-[var(--candle)] tracking-wider block leading-none">Milestone Inscribed</span>
-          <span class="text-xs font-bold text-white block truncate">${milestone.title}</span>
-          <span class="text-[10px] text-stone-300 block truncate">${milestone.tagline}</span>
-        </div>
-      `;
+      const iconSpan = document.createElement('span');
+      iconSpan.className = 'text-xl shrink-0';
+      iconSpan.textContent = milestone.category === 'feat' ? '⚔️' : '📜';
+
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'truncate';
+
+      const labelSpan = document.createElement('span');
+      labelSpan.className = 'text-[10px] uppercase font-bold text-[var(--candle)] tracking-wider block leading-none';
+      labelSpan.textContent = 'Milestone Inscribed';
+
+      const titleSpan = document.createElement('span');
+      titleSpan.className = 'text-xs font-bold text-white block truncate';
+      titleSpan.textContent = milestone.title;
+
+      const taglineSpan = document.createElement('span');
+      taglineSpan.className = 'text-[10px] text-stone-300 block truncate';
+      taglineSpan.textContent = milestone.tagline;
+
+      contentDiv.appendChild(labelSpan);
+      contentDiv.appendChild(titleSpan);
+      contentDiv.appendChild(taglineSpan);
+
+      toast.appendChild(iconSpan);
+      toast.appendChild(contentDiv);
 
       container.appendChild(toast);
 

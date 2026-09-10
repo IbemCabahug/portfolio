@@ -35,6 +35,24 @@ export async function sendMissive(payload: MissivePayload): Promise<MissiveResul
   // Check for configured access key or use direct dispatch
   const accessKey = import.meta.env.PUBLIC_WEB3FORMS_KEY || '';
 
+  // Client-side rate limiting (60s cooldown to prevent API exhaustion)
+  const RATE_LIMIT_KEY = 'wayfarer_last_missive_ts';
+  const COOLDOWN_SECONDS = 60;
+
+  if (typeof window !== 'undefined' && window.localStorage) {
+    const lastSent = Number(localStorage.getItem(RATE_LIMIT_KEY) || 0);
+    const elapsedSeconds = Math.floor((Date.now() - lastSent) / 1000);
+    if (elapsedSeconds < COOLDOWN_SECONDS) {
+      const waitTime = COOLDOWN_SECONDS - elapsedSeconds;
+      return {
+        success: false,
+        message: `The messenger raven is resting. Please wait ${waitTime}s before sending another missive.`,
+        fallbackMailto,
+        fallbackGmailUrl,
+      };
+    }
+  }
+
   if (!accessKey) {
     // If no API key configured yet, return fallback instructions
     return {
@@ -64,6 +82,11 @@ export async function sendMissive(payload: MissivePayload): Promise<MissiveResul
     const data = await response.json();
 
     if (response.ok && data.success) {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        try {
+          localStorage.setItem(RATE_LIMIT_KEY, String(Date.now()));
+        } catch {}
+      }
       return {
         success: true,
         message: 'Your missive has successfully reached Nhovem’s console.',

@@ -182,7 +182,7 @@ const TitleTag = isModal ? 'h2' : 'h1';
       replies,
       farewell,
       mode
-    })}
+    }).replace(/</g, '\\u003c')}
   />
 </div>
 
