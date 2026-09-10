@@ -647,6 +647,83 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
     }
   }
 
+  /* Dedicated Mobile Portrait Chamber (Adaptive Dual-Orientation Mode) */
+  @media (max-width: 600px) and (orientation: portrait) {
+    #dialog-machine.transceiver-viewport-modal {
+      width: 98vw;
+      max-width: 98vw;
+      height: 98dvh;
+      max-height: 98dvh;
+      padding: 8px 8px;
+      gap: 5px;
+      border-radius: 8px;
+    }
+    #dialog-machine .panel-header {
+      padding-bottom: 4px;
+    }
+    #dialog-machine .panel-header h2 {
+      font-size: 0.95rem;
+      line-height: 1.2;
+    }
+    #dialog-machine .panel-badge-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+    #dialog-machine .close-panel-btn {
+      min-height: 28px;
+      padding: 2px 8px;
+      font-size: 11px;
+    }
+    #dialog-machine .panel-body {
+      gap: 5px;
+    }
+    #dialog-machine #transceiver-resting-view {
+      padding: 10px 8px;
+      gap: 6px;
+    }
+    #dialog-machine #transceiver-project-content {
+      padding: 4px 6px;
+      gap: 4px;
+    }
+    #dialog-machine #transceiver-description {
+      font-size: 0.75rem;
+      line-height: 1.35;
+    }
+    #dialog-machine #transceiver-resting-view button,
+    #dialog-machine #transceiver-resting-view a {
+      min-height: 38px;
+      padding: 6px 14px;
+      font-size: 12px;
+    }
+  }
+
+  /* Mobile Orientation Hint Pills */
+  @media (max-width: 600px) and (orientation: portrait),
+         (max-height: 500px) and (orientation: landscape) {
+    #transceiver-orientation-hint {
+      display: flex !important;
+    }
+  }
+  @media (max-height: 500px) and (orientation: landscape) {
+    .transceiver-hint-landscape {
+      display: inline-flex !important;
+    }
+    .transceiver-hint-portrait {
+      display: none !important;
+    }
+    #dialog-machine #transceiver-version-text {
+      display: none !important;
+    }
+  }
+  @media (max-width: 600px) and (orientation: portrait) {
+    .transceiver-hint-landscape {
+      display: none !important;
+    }
+    .transceiver-hint-portrait {
+      display: inline-flex !important;
+    }
+  }
+
   /* Short landscape screens (<= 500px height in landscape) */
   @media (max-height: 500px) and (orientation: landscape) {
     .tavern-panel {
@@ -1684,17 +1761,63 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
 
           const baseW = proj.baseWidth || 800;
           const baseH = proj.baseHeight || 600;
-          const scale = Math.min(cw / baseW, ch / baseH);
 
-          iframe.style.width = `${baseW}px`;
-          iframe.style.height = `${baseH}px`;
-          iframe.style.position = 'absolute';
-          iframe.style.left = '50%';
-          iframe.style.top = '50%';
-          iframe.style.transform = `translate(-50%, -50%) scale(${scale})`;
-          iframe.style.transformOrigin = 'center center';
+          // Adaptive Mobile Portrait Dual-Screen Mode (Solution #1)
+          const isPortraitMobile = (window.matchMedia('(orientation: portrait)').matches || ch > cw) && cw <= 600;
+
+          if (isPortraitMobile) {
+            // Reserve top half for game canvas and bottom half for native soft keyboard
+            const scale = Math.min(cw / baseW, (ch * 0.54) / baseH);
+            iframe.style.width = `${baseW}px`;
+            iframe.style.height = `${baseH}px`;
+            iframe.style.position = 'absolute';
+            iframe.style.left = '50%';
+            iframe.style.top = '0px';
+            iframe.style.transform = `translateX(-50%) scale(${scale})`;
+            iframe.style.transformOrigin = 'top center';
+
+            // Manage atmospheric typing helper tray in bottom half
+            let tray = frameContainer.querySelector('#transceiver-portrait-tray') as HTMLElement | null;
+            if (!tray) {
+              tray = document.createElement('div');
+              tray.id = 'transceiver-portrait-tray';
+              tray.className = 'absolute inset-x-0 bottom-0 flex flex-col items-center justify-center p-3 text-center pointer-events-none z-10';
+              tray.innerHTML = `
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--wood-deep)]/90 border border-[var(--brass)]/60 text-[var(--candle)] text-[11px] font-mono shadow-md">
+                  <span>⌨️</span>
+                  <span class="font-bold">Portrait Typing Arena Active</span>
+                </div>
+                <p class="text-[10px] text-[var(--parchment)]/70 mt-1 max-w-xs font-mono">
+                  Tap canvas above to engage native keyboard without blocking words
+                </p>
+              `;
+              frameContainer.appendChild(tray);
+            }
+            const renderedH = Math.ceil(baseH * scale);
+            tray.style.top = `${renderedH}px`;
+            tray.style.display = 'flex';
+          } else {
+            // Standard centered desktop / landscape scaling
+            const scale = Math.min(cw / baseW, ch / baseH);
+            iframe.style.width = `${baseW}px`;
+            iframe.style.height = `${baseH}px`;
+            iframe.style.position = 'absolute';
+            iframe.style.left = '50%';
+            iframe.style.top = '50%';
+            iframe.style.transform = `translate(-50%, -50%) scale(${scale})`;
+            iframe.style.transformOrigin = 'center center';
+
+            const tray = frameContainer.querySelector('#transceiver-portrait-tray') as HTMLElement | null;
+            if (tray) {
+              tray.style.display = 'none';
+            }
+          }
         } else {
           // Responsive mode for BITS & Mimic
+          const tray = frameContainer.querySelector('#transceiver-portrait-tray') as HTMLElement | null;
+          if (tray) {
+            tray.style.display = 'none';
+          }
           iframe.style.width = '100%';
           iframe.style.height = '100%';
           iframe.style.position = 'relative';
@@ -1812,6 +1935,27 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
       });
       resizeObserver.observe(frameContainer);
       window.addEventListener('resize', fitArena);
+      window.addEventListener('orientationchange', () => {
+        setTimeout(fitArena, 100);
+        setTimeout(fitArena, 300);
+      });
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', fitArena);
+      }
+
+      // Bind direct mobile dispatch stack triggers
+      const mobileTriggers = document.querySelectorAll<HTMLElement>('.mobile-transceiver-trigger');
+      mobileTriggers.forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const pIdx = parseInt(btn.dataset.projectIndex || '0', 10);
+          if (machineDialog) {
+            openDialog(machineDialog, btn);
+            setProject(pIdx);
+            launchArena();
+          }
+        });
+      });
 
       launchBtn.addEventListener('click', launchArena);
       if (unloadBtn) unloadBtn.addEventListener('click', unloadArena);

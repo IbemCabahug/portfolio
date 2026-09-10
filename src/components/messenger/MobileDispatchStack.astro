@@ -111,7 +111,87 @@ const { mailAddress, githubUrl, profile } = Astro.props;
     </div>
   </article>
 
-  <!-- 2. Guild Code Archives (GitHub) -->
+  <!-- 2. Interactive Chamber (The Arcane Transceiver) -->
+  <article class="dispatch-slip bg-[var(--parchment)] text-[var(--ink)] p-6 sm:p-7 rounded-lg border-2 border-[var(--brass)] shadow-2xl relative overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(0,0,0,0.6)]">
+    <div class="corner-bracket top-left" aria-hidden="true"></div>
+    <div class="corner-bracket top-right" aria-hidden="true"></div>
+
+    <div class="space-y-4">
+      <div class="flex flex-wrap items-center gap-2 mb-1">
+        <span class="text-xs uppercase font-extrabold tracking-widest text-[var(--ember)] bg-[var(--wood-deep)]/10 px-2 py-0.5 rounded border border-[var(--ember)]/30">
+          Interactive Chamber
+        </span>
+        <span class="text-xs text-[var(--ink)]/70 font-mono">
+          Adaptive Dual-Orientation Simulators
+        </span>
+      </div>
+
+      <h2 class="text-2xl font-bold text-[var(--ink)] mb-1 flex items-center gap-2">
+        <span>The Arcane Transceiver</span>
+      </h2>
+
+      <p class="text-sm text-[var(--ink)]/85 leading-relaxed">
+        Test Nhovem's live deployed engines directly on your mobile device. Features adaptive portrait dual-screen mode for Arcane Typer so your virtual keyboard opens cleanly below the game canvas without covering words.
+      </p>
+
+      <!-- Quick Simulator Launch Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+        <button
+          type="button"
+          class="mobile-transceiver-trigger inline-flex items-center justify-between p-3 rounded-md bg-[var(--wood-deep)] text-[var(--candle)] border border-[var(--brass)] hover:bg-black transition-all cursor-pointer shadow group text-left"
+          data-project-index="0"
+          aria-label="Engage Arcane Typer typing game simulation in portrait dual-screen mode"
+        >
+          <div>
+            <div class="text-xs font-bold flex items-center gap-1.5 text-[var(--candle)]">
+              <span>🎮 Arcane Typer</span>
+              <span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-mono">60fps</span>
+            </div>
+            <div class="text-[11px] text-[var(--parchment)]/75 mt-0.5">Typing defense · Portrait DS Mode</div>
+          </div>
+          <span class="text-sm text-[var(--brass)] group-hover:translate-x-0.5 transition-transform" aria-hidden="true">&rarr;</span>
+        </button>
+
+        <button
+          type="button"
+          class="mobile-transceiver-trigger inline-flex items-center justify-between p-3 rounded-md bg-[var(--wood-deep)] text-[var(--candle)] border border-[var(--brass)] hover:bg-black transition-all cursor-pointer shadow group text-left"
+          data-project-index="1"
+          aria-label="Engage BITS biometric attendance telemetry engine simulation"
+        >
+          <div>
+            <div class="text-xs font-bold flex items-center gap-1.5 text-[var(--candle)]">
+              <span>⚡ BITS Engine</span>
+              <span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono">Sync</span>
+            </div>
+            <div class="text-[11px] text-[var(--parchment)]/75 mt-0.5">Hardware attendance simulation</div>
+          </div>
+          <span class="text-sm text-[var(--brass)] group-hover:translate-x-0.5 transition-transform" aria-hidden="true">&rarr;</span>
+        </button>
+
+        <button
+          type="button"
+          class="mobile-transceiver-trigger inline-flex items-center justify-between p-3 rounded-md bg-[var(--wood-deep)] text-[var(--candle)] border border-[var(--brass)] hover:bg-black transition-all cursor-pointer shadow group text-left"
+          data-project-index="2"
+          aria-label="Engage Mimic cryptographic vault simulator"
+        >
+          <div>
+            <div class="text-xs font-bold flex items-center gap-1.5 text-[var(--candle)]">
+              <span>🔒 Mimic Vault</span>
+              <span class="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 text-[10px] font-mono">AES-256</span>
+            </div>
+            <div class="text-[11px] text-[var(--parchment)]/75 mt-0.5">Encrypted mobile app vault</div>
+          </div>
+          <span class="text-sm text-[var(--brass)] group-hover:translate-x-0.5 transition-transform" aria-hidden="true">&rarr;</span>
+        </button>
+      </div>
+
+      <div class="pt-1 text-[11px] font-mono text-[var(--ink)]/65 flex items-center gap-1.5">
+        <span>💡 Rotate between Portrait & Landscape at any time — the chamber scales dynamically.</span>
+      </div>
+    </div>
+  </article>
+
+  <!-- 3. Guild Code Archives (GitHub) -->
   <article class="dispatch-slip bg-[var(--parchment)] text-[var(--ink)] p-6 sm:p-7 rounded-lg border-2 border-[var(--brass)] shadow-2xl relative overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(0,0,0,0.6)]">
     <div class="corner-bracket top-left" aria-hidden="true"></div>
     <div class="corner-bracket top-right" aria-hidden="true"></div>
@@ -163,7 +243,7 @@ const { mailAddress, githubUrl, profile } = Astro.props;
     </div>
   </article>
 
-  <!-- 3. Formal Guild Dossier (Resume) -->
+  <!-- 4. Formal Guild Dossier (Resume) -->
   <article class="dispatch-slip bg-[var(--parchment)] text-[var(--ink)] p-6 sm:p-7 rounded-lg border-2 border-[var(--brass)] shadow-2xl relative overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(0,0,0,0.6)]">
     <div class="corner-bracket top-left" aria-hidden="true"></div>
     <div class="corner-bracket top-right" aria-hidden="true"></div>
@@ -210,7 +290,7 @@ const { mailAddress, githubUrl, profile } = Astro.props;
     </div>
   </article>
 
-  <!-- 4. Roost Attendant Status -->
+  <!-- 5. Roost Attendant Status -->
   {profile && (
     <div class="p-5 rounded-lg border border-[var(--brass)]/40 bg-[var(--wood-deep)]/60 text-[var(--parchment)] text-sm leading-relaxed text-center shadow-inner">
       <p class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
@@ -226,7 +306,7 @@ const { mailAddress, githubUrl, profile } = Astro.props;
     </div>
   )}
 
-  <!-- 5. Physical Return to Main Tavern -->
+  <!-- 6. Physical Return to Main Tavern -->
   <div class="pt-4 text-center">
     <a
       href="/tavern"
