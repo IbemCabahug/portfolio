@@ -56,6 +56,10 @@ const telemetry = await getProjectTelemetry(entry.data.sourceUrl);
                 src={entry.data.thumbnail}
                 alt={`${entry.data.title} emblem`}
                 class="w-full h-full object-contain rounded-lg"
+                width="112"
+                height="112"
+                loading="lazy"
+                decoding="async"
               />
             </div>
           )}

@@ -232,7 +232,10 @@ const featuredTales = allTales.sort((a, b) => a.data.order - b.data.order);
                       src={project.data.thumbnail}
                       alt={`${project.data.title} emblem`}
                       class="w-full h-full object-contain rounded-lg"
+                      width="80"
+                      height="80"
                       loading="lazy"
+                      decoding="async"
                     />
                   ) : (
                     <ThematicIcon name="swords" class="w-10 h-10 text-[var(--candle)]" />

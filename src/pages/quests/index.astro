@@ -56,7 +56,10 @@ const telemetryMap = new Map(projectTelemetries.map((pt) => [pt.slug, pt.telemet
                     src={project.data.thumbnail}
                     alt={`${project.data.title} emblem`}
                     class="w-full h-full object-contain rounded-lg transition-transform duration-300 group-hover:scale-105"
+                    width="128"
+                    height="128"
                     loading="lazy"
+                    decoding="async"
                   />
                 ) : (
                   <ThematicIcon name="swords" class="w-12 h-12 text-[var(--candle)]" />

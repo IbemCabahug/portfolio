@@ -440,6 +440,8 @@ const sceneObjects = [
                       src={project.data.thumbnail}
                       alt=""
                       class="w-full h-full object-contain rounded-xs"
+                      width="32"
+                      height="32"
                       loading="lazy"
                       decoding="async"
                     />
@@ -533,12 +535,12 @@ const sceneObjects = [
         <div class="beer-outro-card relative flex flex-col items-center justify-center">
           <img
             id="beer-outro-img"
-            src="/images/beer-outro.png"
+            src="/images/beer-outro.webp"
             alt="Cold beer toast outro"
             width="445"
             height="449"
             class="beer-outro-img relative z-10 object-contain rounded-2xl select-none"
-            loading="eager"
+            loading="lazy"
             decoding="async"
           />
         </div>
