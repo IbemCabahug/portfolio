@@ -35,6 +35,23 @@ const sitemapUrl = siteUrl ? new URL('/sitemap-index.xml', siteUrl).href : '/sit
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:type" content="website" />
     <slot name="head" />
+    <script is:inline>
+      // Self-XSS Console Security Warning
+      try {
+        const titleStyle = 'color: #ef4444; font-size: 32px; font-weight: 900; -webkit-text-stroke: 1px black; text-shadow: 2px 2px 0 #000; font-family: system-ui, sans-serif;';
+        const bodyStyle = 'color: #f59e0b; font-size: 14px; font-weight: 600; line-height: 1.6; font-family: system-ui, sans-serif;';
+        const subStyle = 'color: #94a3b8; font-size: 11px; font-family: monospace;';
+        
+        console.log('%c⚠️ STOP!', titleStyle);
+        console.log(
+          '%cThis browser console is intended exclusively for developers.\n' +
+          'If someone told you to copy and paste code or a script here to unlock features, trigger easter eggs, or gain admin privileges, DO NOT DO IT.\n' +
+          'This is an attack vector known as Self-XSS designed to hijack client data or execute unauthorized code.',
+          bodyStyle
+        );
+        console.log('%c🛡️ Client Security & Self-XSS Shield Active', subStyle);
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <a href="#main-content">Skip to content</a>

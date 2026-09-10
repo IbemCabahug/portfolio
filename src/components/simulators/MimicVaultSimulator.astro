@@ -571,33 +571,33 @@ const { compact = false } = Astro.props;
             {/* List of Encrypted Documents */}
             <div id="files-list-container" class="space-y-2">
               {/* Initial Sample Records */}
-              <div class="p-2.5 rounded-xl bg-[#f1efe8] border border-stone-200 flex items-center justify-between cursor-pointer hover:bg-[#e9e6dd] transition-colors" data-preview="Vessel AV-Cebu-09 manifest: 4,200 metric tons raw commodities offloaded. Approved clearance.">
+              <div class="p-2.5 rounded-xl bg-[#f1efe8] border border-stone-200 flex items-center justify-between cursor-pointer hover:bg-[#e9e6dd] transition-colors" data-preview="[Simulated Payload]: Synthetic telemetry manifest verified. SHA-256 integrity check passed. Status: Nominal.">
                 <div class="flex items-center gap-2.5 truncate">
                   <span class="text-lg">📄</span>
                   <div class="truncate">
-                    <span class="text-xs font-bold text-stone-900 block truncate">cargo_manifest_cebu_v9.pdf.enc</span>
+                    <span class="text-xs font-bold text-stone-900 block truncate">simulated_telemetry_manifest.pdf.enc</span>
                     <span class="text-[10px] text-stone-500 font-mono">4.2 KB · AES-256-GCM</span>
                   </div>
                 </div>
                 <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-mono shrink-0">Tap to Decrypt</span>
               </div>
 
-              <div class="p-2.5 rounded-xl bg-[#f1efe8] border border-stone-200 flex items-center justify-between cursor-pointer hover:bg-[#e9e6dd] transition-colors" data-preview="SSH Private Key: ed25519 root@staging.cebu-ports.internal. Do not distribute.">
+              <div class="p-2.5 rounded-xl bg-[#f1efe8] border border-stone-200 flex items-center justify-between cursor-pointer hover:bg-[#e9e6dd] transition-colors" data-preview="[Simulated Keyring]: Mock Ed25519 public test fingerprint. Demo purpose only; no actual credentials stored.">
                 <div class="flex items-center gap-2.5 truncate">
                   <span class="text-lg">🔐</span>
                   <div class="truncate">
-                    <span class="text-xs font-bold text-stone-900 block truncate">root_server_ssh_keys.pem.enc</span>
+                    <span class="text-xs font-bold text-stone-900 block truncate">mock_security_keyring.pem.enc</span>
                     <span class="text-[10px] text-stone-500 font-mono">1.8 KB · AES-256-GCM</span>
                   </div>
                 </div>
                 <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-mono shrink-0">Tap to Decrypt</span>
               </div>
 
-              <div class="p-2.5 rounded-xl bg-[#f1efe8] border border-stone-200 flex items-center justify-between cursor-pointer hover:bg-[#e9e6dd] transition-colors" data-preview="Offshore Client Escrow Agreement: Milestone 4 complete, release escrow balance ₱140,000 upon signoff.">
+              <div class="p-2.5 rounded-xl bg-[#f1efe8] border border-stone-200 flex items-center justify-between cursor-pointer hover:bg-[#e9e6dd] transition-colors" data-preview="[Simulated Vault Note]: Milestone audit documentation sample. Authenticated WebCrypto AES-256-GCM encryption demonstration.">
                 <div class="flex items-center gap-2.5 truncate">
                   <span class="text-lg">📝</span>
                   <div class="truncate">
-                    <span class="text-xs font-bold text-stone-900 block truncate">client_escrow_audit_2026.txt.enc</span>
+                    <span class="text-xs font-bold text-stone-900 block truncate">sample_vault_memo.txt.enc</span>
                     <span class="text-[10px] text-stone-500 font-mono">2.6 KB · AES-256-GCM</span>
                   </div>
                 </div>
