@@ -1,0 +1,69 @@
+{
+  "name": "Nhovem Cabahug — Web & App Developer",
+  "short_name": "Nhovem Portfolio",
+  "description": "Fantasy tavern-themed portfolio of Nhovem (Ibem) Cabahug — Full-Stack Web & App Developer.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#140c05",
+  "theme_color": "#1e1208",
+  "lang": "en",
+  "categories": ["portfolio", "developer", "games"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Main Tavern",
+      "short_name": "Tavern",
+      "description": "Step into the cozy interactive tavern",
+      "url": "/tavern",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Quest Board",
+      "short_name": "Quests",
+      "description": "Explore featured client and open-source projects",
+      "url": "/quests",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Messenger's Corner",
+      "short_name": "Messenger",
+      "description": "Dispatch a letter via raven courier or transceiver",
+      "url": "/messenger",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Field Ledger",
+      "short_name": "Ledger",
+      "description": "Access the streamlined document portfolio view",
+      "url": "/simple",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

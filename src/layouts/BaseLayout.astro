@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import ThemeInit from '../components/ThemeInit.astro';
 import SiteHeader from '../components/SiteHeader.astro';
+import PwaRegister from '../components/PwaRegister.astro';
 import { ClientRouter } from 'astro:transitions';
 
 interface Props {
@@ -34,6 +35,13 @@ const sitemapUrl = siteUrl ? new URL('/sitemap-index.xml', siteUrl).href : '/sit
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#1e1208" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Nhovem" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <slot name="head" />
     <script is:inline>
       // Self-XSS Console Security Warning
@@ -134,5 +142,6 @@ const sitemapUrl = siteUrl ? new URL('/sitemap-index.xml', siteUrl).href : '/sit
     <main id="main-content" tabindex="-1">
       <slot />
     </main>
+    {!noScript && <PwaRegister />}
   </body>
 </html>

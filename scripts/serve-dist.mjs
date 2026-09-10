@@ -38,6 +38,7 @@ const TYPES = {
   '.jpeg': 'image/jpeg',
   '.ico': 'image/x-icon',
   '.woff2': 'font/woff2',
+  '.webmanifest': 'application/manifest+json; charset=utf-8',
 }
 
 export async function createDistServer({ root = 'dist', port = 4321, quiet = false } = {}) {

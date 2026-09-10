@@ -1,0 +1,82 @@
+---
+// src/components/PwaRegister.astro
+---
+
+{/* Subtle Offline / Online Notification Toast */}
+<div
+  id="pwa-network-toast"
+  role="status"
+  aria-live="polite"
+  class="fixed bottom-4 right-4 z-50 transform translate-y-16 opacity-0 transition-all duration-300 pointer-events-none"
+>
+  <div
+    id="pwa-toast-inner"
+    class="flex items-center gap-2.5 px-3.5 py-2 rounded-lg bg-[#1a1005]/95 border border-[var(--brass)] text-[var(--parchment)] text-xs font-medium shadow-xl backdrop-blur-sm"
+  >
+    <span id="pwa-toast-dot" class="w-2 h-2 rounded-full bg-amber-400"></span>
+    <span id="pwa-toast-msg">Network status</span>
+  </div>
+</div>
+
+<script is:inline>
+  (() => {
+    // 1. Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker
+          .register('/sw.js', { scope: '/' })
+          .then((registration) => {
+            // Check for updates on load
+            registration.onupdatefound = () => {
+              const installingWorker = registration.installing;
+              if (installingWorker) {
+                installingWorker.onstatechange = () => {
+                  if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    console.log('[PWA] New version available. Refresh to activate.');
+                  }
+                };
+              }
+            };
+          })
+          .catch((error) => {
+            console.error('[PWA] Service Worker registration failed:', error);
+          });
+      });
+    }
+
+    // 2. Network Connectivity Status Handlers
+    function showNetworkToast(isOnline) {
+      const toast = document.getElementById('pwa-network-toast');
+      const msg = document.getElementById('pwa-toast-msg');
+      const dot = document.getElementById('pwa-toast-dot');
+      if (!toast || !msg || !dot) return;
+
+      if (isOnline) {
+        msg.textContent = 'Connection restored — Tavern in sync';
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+      } else {
+        msg.textContent = 'Offline mode — Cached tavern rooms available';
+        dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
+      }
+
+      toast.classList.remove('translate-y-16', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      // Auto dismiss after 3.5 seconds
+      clearTimeout(window.__pwaToastTimer);
+      window.__pwaToastTimer = setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-16', 'opacity-0');
+      }, 3500);
+    }
+
+    window.addEventListener('online', () => showNetworkToast(true));
+    window.addEventListener('offline', () => showNetworkToast(false));
+
+    // 3. Capture PWA Install Prompt (for optional custom triggers)
+    window.addEventListener('beforeinstallprompt', (e) => {
+      window.deferredPwaPrompt = e;
+      window.dispatchEvent(new CustomEvent('pwa:installable'));
+    });
+  })();
+</script>
