@@ -1,8 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import ThematicIcon from '../components/icons/ThematicIcon.astro';
 import InteractiveAvatar from '../components/InteractiveAvatar.astro';
+
+const profileEntry = await getEntry('profile', 'main');
+const profile = profileEntry?.data;
 
 const allProjects = await getCollection('projects');
 const featuredProjects = allProjects.sort((a, b) => a.data.order - b.data.order);
@@ -12,8 +15,8 @@ const featuredTales = allTales.sort((a, b) => a.data.order - b.data.order);
 ---
 
 <BaseLayout
-  title="Nhovem Cabahug — Web Developer & App Developer"
-  description="I build accessible, fast web applications with TypeScript. I develop with AI assistance, and I review, test and make the architectural decisions myself."
+  title={`${profile?.name || 'Nhovem Cabahug'} — ${profile?.title || 'Web Developer & App Developer'}`}
+  description={profile?.tagline || "I build accessible, fast web applications with TypeScript. I develop with AI assistance, and I review, test and make the architectural decisions myself."}
   hideDefaultNav={true}
 >
   <div class="min-h-screen bg-[var(--wood-deep)] text-[var(--parchment)]">
@@ -36,11 +39,11 @@ const featuredTales = allTales.sort((a, b) => a.data.order - b.data.order);
             </div>
 
             <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[var(--candle)] mb-4 drop-shadow-sm font-serif">
-              Nhovem Cabahug
+              {profile?.name || 'Nhovem Cabahug'}
             </h1>
 
             <p class="text-xl sm:text-2xl font-medium text-[var(--parchment)] mb-6 leading-snug">
-              Web Developer & App Developer
+              {profile?.title || 'Web Developer & App Developer'}
             </p>
 
             <p class="text-base sm:text-lg text-[var(--parchment)]/90 leading-relaxed mb-8 max-w-2xl">

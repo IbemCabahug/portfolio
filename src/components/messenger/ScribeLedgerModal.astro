@@ -1,5 +1,9 @@
 ---
+import { getEntry } from 'astro:content';
+
 // Scribe's Ledger Modal: Verified Academic & Professional Credentials
+const profileEntry = await getEntry('profile', 'main');
+const profile = profileEntry?.data;
 ---
 
 <div
@@ -49,7 +53,7 @@
       <!-- Title, Discipline & Training -->
       <div class="p-2.5 rounded bg-[var(--wood-deep)]/80 border border-[var(--brass)]/30 space-y-1">
         <span class="text-[var(--brass)] uppercase tracking-wider font-extrabold block">Discipline & Training</span>
-        <strong class="text-[var(--candle)] text-xs sm:text-sm block">Web Developer</strong>
+        <strong class="text-[var(--candle)] text-xs sm:text-sm block">{profile?.title || 'Web Developer & App Developer'}</strong>
         <span class="text-[var(--parchment)]/90 block font-medium">Computer Technology & Web Systems</span>
         <span class="text-[var(--parchment)]/70 block text-[11px]">Vocational: Creative Web Design (TESDA, 102 Hours)</span>
         <div class="pt-1">
