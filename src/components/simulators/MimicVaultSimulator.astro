@@ -1385,16 +1385,37 @@ const { compact = false } = Astro.props;
         const newItem = document.createElement('div');
         newItem.className = 'p-2.5 rounded-xl bg-[#f1efe8] border-2 border-[#534ab7] flex items-center justify-between cursor-pointer hover:bg-[#e9e6dd] transition-colors shadow-xs';
         newItem.setAttribute('data-preview', content);
-        newItem.innerHTML = `
-          <div class="flex items-center gap-2.5 truncate">
-            <span class="text-lg">🔒</span>
-            <div class="truncate">
-              <span class="text-xs font-bold text-stone-900 block truncate">${title}.enc</span>
-              <span class="text-[10px] text-[#534ab7] font-mono">Just Encrypted · AES-256-GCM</span>
-            </div>
-          </div>
-          <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-mono shrink-0">Tap to Decrypt</span>
-        `;
+
+        const leftCol = document.createElement('div');
+        leftCol.className = 'flex items-center gap-2.5 truncate';
+
+        const lockIcon = document.createElement('span');
+        lockIcon.className = 'text-lg';
+        lockIcon.textContent = '🔒';
+
+        const textCol = document.createElement('div');
+        textCol.className = 'truncate';
+
+        const titleSpan = document.createElement('span');
+        titleSpan.className = 'text-xs font-bold text-stone-900 block truncate';
+        titleSpan.textContent = `${title}.enc`;
+
+        const badgeSub = document.createElement('span');
+        badgeSub.className = 'text-[10px] text-[#534ab7] font-mono';
+        badgeSub.textContent = 'Just Encrypted · AES-256-GCM';
+
+        textCol.appendChild(titleSpan);
+        textCol.appendChild(badgeSub);
+        leftCol.appendChild(lockIcon);
+        leftCol.appendChild(textCol);
+
+        const decryptTag = document.createElement('span');
+        decryptTag.className = 'text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-mono shrink-0';
+        decryptTag.textContent = 'Tap to Decrypt';
+
+        newItem.appendChild(leftCol);
+        newItem.appendChild(decryptTag);
+
         filesListContainer.prepend(newItem);
         attachPreviewHandlers();
       }

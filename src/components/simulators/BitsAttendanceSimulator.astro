@@ -381,7 +381,11 @@ const { compact = false } = Astro.props;
       // Update SQL Trace preview
       if (tableIndicator) tableIndicator.textContent = data.tableIndicator;
       if (sqlTrace) {
-        sqlTrace.innerHTML = `<pre class="p-2 rounded bg-black/50 text-stone-300 font-mono text-[10px] sm:text-[11px] whitespace-pre-wrap">${data.sqlTrace}</pre>`;
+        sqlTrace.replaceChildren();
+        const pre = document.createElement('pre');
+        pre.className = 'p-2 rounded bg-black/50 text-stone-300 font-mono text-[10px] sm:text-[11px] whitespace-pre-wrap';
+        pre.textContent = data.sqlTrace;
+        sqlTrace.appendChild(pre);
       }
     }
 

@@ -2510,6 +2510,11 @@ const sceneObjects = [
         closeBeerBlackout();
       }
     });
+
+    // Teardown any playing audio, animation frames, and synthesizer contexts when navigating away
+    document.addEventListener('astro:before-swap', () => {
+      closeBeerBlackout();
+    }, { once: true });
   }
 
   document.addEventListener('astro:page-load', initTavernPage);

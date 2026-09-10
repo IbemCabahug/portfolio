@@ -25,6 +25,11 @@ export default defineConfig({
     plugins: [
       tailwindcss(),
     ],
+    server: {
+      watch: {
+        ignored: ['**/.vercel/**', '**/dist/**'],
+      },
+    },
   },
   adapter: vercel(),
 });
