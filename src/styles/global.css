@@ -146,8 +146,18 @@ html[data-perf="low"] .screen-pulse-dot,
    ========================================================================== */
 html,
 body {
+  max-width: 100%;
+  overflow-x: clip;
   scrollbar-width: thin;
   scrollbar-color: var(--brass, #a87a27) rgba(15, 10, 5, 0.85);
+}
+
+img,
+svg,
+video,
+canvas,
+iframe {
+  max-width: 100%;
 }
 
 ::-webkit-scrollbar {

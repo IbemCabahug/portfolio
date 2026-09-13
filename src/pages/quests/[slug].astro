@@ -287,10 +287,18 @@ const telemetry = await getProjectTelemetry(entry.data.sourceUrl);
     font-weight: 600;
   }
   .quest-case-study table {
-    width: 100%;
+    display: block;
+    max-width: 100%;
+    width: max-content;
+    min-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     border-collapse: collapse;
     margin: 1.5rem 0;
     font-size: 0.9rem;
+  }
+  .quest-case-study table::-webkit-scrollbar {
+    height: 6px;
   }
   .quest-case-study th,
   .quest-case-study td {

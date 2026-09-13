@@ -120,6 +120,11 @@ const isScene = location === 'tavern' || location === 'messenger';
       background-color: var(--wood-deep, #1a1005);
     }
 
+    .tavern-shell.document-layout {
+      max-width: 100vw;
+      overflow-x: clip;
+    }
+
     .tavern-shell.scene-layout .scene-wrapper {
       flex: 1 1 0;
       min-height: calc(100dvh - var(--hud-height, 48px));

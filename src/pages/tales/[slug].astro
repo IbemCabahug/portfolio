@@ -248,4 +248,30 @@ const { Content } = await render(entry);
     color: #1a0f05;
     font-weight: 700;
   }
+
+  .tales-prose table {
+    display: block;
+    max-width: 100%;
+    width: max-content;
+    min-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.9rem;
+  }
+  .tales-prose table::-webkit-scrollbar {
+    height: 6px;
+  }
+  .tales-prose th,
+  .tales-prose td {
+    padding: 0.75rem;
+    border: 1px solid rgba(139, 107, 74, 0.4);
+    text-align: left;
+  }
+  .tales-prose th {
+    background: rgba(139, 107, 74, 0.15);
+    font-weight: 700;
+    color: var(--wood-deep);
+  }
 </style>
