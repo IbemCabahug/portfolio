@@ -70,6 +70,20 @@ const { liveUrl, title } = Astro.props;
       </p>
     </div>
 
+    <!-- Mobile Portrait Orientation Notice -->
+    <div
+      id="arena-portrait-notice"
+      class="arena-portrait-notice hidden flex-col items-center gap-2 p-3.5 rounded-lg bg-[var(--wood-deep)]/90 border border-[var(--brass)]/60 text-center max-w-md mx-auto shadow-md"
+    >
+      <div class="flex items-center gap-2 text-[var(--candle)] font-serif font-bold text-xs sm:text-sm">
+        <span class="text-lg" aria-hidden="true">📱↻</span>
+        <span>Rotate to Landscape for Best Arena Experience</span>
+      </div>
+      <p class="text-[11px] text-[var(--parchment)]/80 leading-relaxed font-mono">
+        Arcane Typer's spell combat canvas is optimized for landscape orientation. Rotate your device for the full 1000×600 view, or launch below in auto-adapted view.
+      </p>
+    </div>
+
     <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
       <button
         type="button"
@@ -96,11 +110,28 @@ const { liveUrl, title } = Astro.props;
   <!-- Active State Iframe Container -->
   <div
     id="arena-frame-container"
-    class="relative w-full aspect-video min-h-[480px] sm:min-h-[580px] bg-black hidden"
+    class="relative w-full aspect-video min-h-[280px] sm:min-h-[480px] lg:min-h-[580px] bg-black hidden overflow-hidden"
   >
     <!-- Iframe inserted dynamically on click to ensure 0 KB initial payload -->
   </div>
+
+  <!-- Mobile Portrait Active Orientation Hint -->
+  <div
+    id="arena-active-portrait-hint"
+    class="hidden items-center justify-center gap-2 py-2 px-3 bg-[var(--wood-deep)] border-t border-[var(--brass)]/50 text-center text-[11px] text-[var(--candle)] font-mono"
+  >
+    <span>📱</span>
+    <span>Rotate device to landscape for full-scale typing arena</span>
+  </div>
 </section>
+
+<style>
+  @media (max-width: 640px) and (orientation: portrait) {
+    .arena-portrait-notice {
+      display: flex !important;
+    }
+  }
+</style>
 
 <script>
   function initInteractiveArena() {
@@ -111,8 +142,12 @@ const { liveUrl, title } = Astro.props;
     const activeControls = document.getElementById('arena-active-controls');
     const frameContainer = document.getElementById('arena-frame-container');
     const arenaSection = document.getElementById('interactive-arena-section');
+    const portraitNotice = document.getElementById('arena-portrait-notice');
+    const activePortraitHint = document.getElementById('arena-active-portrait-hint');
 
     if (!launchBtn || !restingView || !activeControls || !frameContainer || !arenaSection) return;
+    if (arenaSection.dataset.arenaInit === 'true') return;
+    arenaSection.dataset.arenaInit = 'true';
 
     const liveUrl = launchBtn.getAttribute('data-url');
     if (!liveUrl) return;
@@ -122,12 +157,62 @@ const { liveUrl, title } = Astro.props;
     const safeActiveControls = activeControls;
     const safeArenaSection = arenaSection;
 
+    function checkOrientation() {
+      const isPortraitMobile =
+        (window.matchMedia('(orientation: portrait)').matches || window.innerHeight > window.innerWidth) &&
+        window.innerWidth <= 640;
+
+      if (portraitNotice) {
+        if (isPortraitMobile) {
+          portraitNotice.classList.remove('hidden');
+          portraitNotice.classList.add('flex');
+        } else {
+          portraitNotice.classList.add('hidden');
+          portraitNotice.classList.remove('flex');
+        }
+      }
+
+      if (activePortraitHint && !safeFrameContainer.classList.contains('hidden')) {
+        if (isPortraitMobile) {
+          activePortraitHint.classList.remove('hidden');
+          activePortraitHint.classList.add('flex');
+        } else {
+          activePortraitHint.classList.add('hidden');
+          activePortraitHint.classList.remove('flex');
+        }
+      }
+    }
+
+    function fitArena() {
+      const iframe = safeFrameContainer.querySelector('iframe');
+      if (!iframe) return;
+
+      const cw = safeFrameContainer.clientWidth;
+      const ch = safeFrameContainer.clientHeight;
+      if (!cw || !ch) return;
+
+      // Arcane Typer native game resolution
+      const baseW = 1000;
+      const baseH = 600;
+
+      const scale = Math.min(cw / baseW, ch / baseH);
+      iframe.style.width = `${baseW}px`;
+      iframe.style.height = `${baseH}px`;
+      iframe.style.position = 'absolute';
+      iframe.style.left = '50%';
+      iframe.style.top = '50%';
+      iframe.style.transform = `translate(-50%, -50%) scale(${scale})`;
+      iframe.style.transformOrigin = 'center center';
+
+      checkOrientation();
+    }
+
     function launchArena() {
       // Create sandboxed iframe dynamically
       const iframe = document.createElement('iframe');
       iframe.src = liveUrl!;
       iframe.title = 'Interactive Live Demo of Arcane Typer';
-      iframe.className = 'w-full h-full border-0 absolute inset-0';
+      iframe.className = 'border-0 absolute';
       iframe.setAttribute('allow', 'autoplay; fullscreen');
       iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-forms');
       iframe.loading = 'eager';
@@ -140,6 +225,9 @@ const { liveUrl, title } = Astro.props;
       safeActiveControls.classList.add('flex');
       safeFrameContainer.classList.remove('hidden');
 
+      fitArena();
+      iframe.addEventListener('load', fitArena);
+
       // Scroll smoothly into view if needed
       safeArenaSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
@@ -148,9 +236,14 @@ const { liveUrl, title } = Astro.props;
       // Clean up iframe to free audio nodes, canvas memory, and execution loop
       safeFrameContainer.innerHTML = '';
       safeFrameContainer.classList.add('hidden');
+      if (activePortraitHint) {
+        activePortraitHint.classList.add('hidden');
+        activePortraitHint.classList.remove('flex');
+      }
       safeActiveControls.classList.add('hidden');
       safeActiveControls.classList.remove('flex');
       safeRestingView.classList.remove('hidden');
+      checkOrientation();
     }
 
     function toggleFullscreen() {
@@ -168,6 +261,12 @@ const { liveUrl, title } = Astro.props;
     launchBtn.addEventListener('click', launchArena);
     if (unloadBtn) unloadBtn.addEventListener('click', unloadArena);
     if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+    window.addEventListener('resize', fitArena);
+    window.addEventListener('orientationchange', fitArena);
+    document.addEventListener('fullscreenchange', fitArena);
+
+    checkOrientation();
   }
 
   if (document.readyState === 'loading') {
@@ -175,4 +274,5 @@ const { liveUrl, title } = Astro.props;
   } else {
     initInteractiveArena();
   }
+  document.addEventListener('astro:page-load', initInteractiveArena);
 </script>
