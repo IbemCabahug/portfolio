@@ -138,15 +138,6 @@ export const JOURNAL_MILESTONES: JournalMilestone[] = [
     iconName: 'raven',
     actionHint: 'Click "Send Missive" or copy the missive address in the Courier\'s Roost',
   },
-  {
-    id: 'feat_red_horse',
-    title: 'Ito ang Tama',
-    category: 'feat',
-    path: '/tavern',
-    tagline: 'Sample the ice-cold Red Horse Litro on the bar counter and embrace the senti heartbreak',
-    iconName: 'tavern',
-    actionHint: 'Inspect the amber Litro bottle resting on the tavern bar counter',
-  },
 ];
 
 const STORAGE_KEY = 'wayfarer_journal';
