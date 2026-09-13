@@ -41,16 +41,16 @@ const totalCount = JOURNAL_MILESTONES.length;
   {/* Journal Modal Tome */}
   <div
     id="journal-dialog"
-    class="journal-dialog-panel fixed z-50 overflow-y-auto bg-[#f6eee0] text-[var(--ink)] border-2 border-[var(--brass)] rounded-lg shadow-2xl transition-transform"
+    class="journal-dialog-panel fixed z-50 flex flex-col bg-[#f6eee0] text-[var(--ink)] border-2 border-[var(--brass)] rounded-lg shadow-2xl transition-transform overflow-hidden"
     style="background-image: radial-gradient(#e2d5be 1px, transparent 1px); background-size: 20px 20px;"
     role="dialog"
     aria-modal="true"
     aria-labelledby="journal-dialog-title"
     hidden
   >
-    {/* Journal Header */}
+    {/* Journal Header (Pinned at top, non-scrolling flex child) */}
     <div
-      class="journal-header sticky top-0 bg-[#f6eee0] z-20 border-b-2 border-[var(--brass)] shadow-xs rounded-t-md"
+      class="journal-header shrink-0 bg-[#f6eee0] border-b-2 border-[var(--brass)] shadow-xs p-4 sm:p-5 pb-3 sm:pb-3.5"
       style="background-image: radial-gradient(#e2d5be 1px, transparent 1px); background-size: 20px 20px;"
     >
       <div class="flex items-center justify-between gap-4">
@@ -136,7 +136,9 @@ const totalCount = JOURNAL_MILESTONES.length;
       </div>
     </div>
 
-    {/* Grandmaster Unlocked Seal (Hidden until 100%) */}
+    {/* Journal Scrollable Body */}
+    <div class="journal-body flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+      {/* Grandmaster Unlocked Seal (Hidden until 100%) */}
     <div
       id="journal-grandmaster-seal"
       class="hidden p-4 mb-6 rounded-xl bg-gradient-to-br from-[#2a1809] to-[#170c04] border-2 border-[var(--candle)] shadow-xl text-[var(--parchment)] relative overflow-hidden"
@@ -311,24 +313,21 @@ const totalCount = JOURNAL_MILESTONES.length;
       </div>
     </div>
 
-    {/* Actions Footer */}
-    <div class="pt-4 border-t-2 border-[var(--brass)] flex flex-wrap items-center justify-between gap-3">
-      <button
-        type="button"
-        id="journal-reset-btn"
-        class="text-xs font-bold text-stone-600 hover:text-stone-900 underline transition-colors cursor-pointer min-h-[44px] px-2"
-        title="Reset recorded exploration milestones in localStorage"
-      >
-        Clear Inscriptions
-      </button>
+      {/* Actions Footer */}
+      <div class="pt-4 border-t border-[var(--brass)]/40 flex items-center justify-between gap-3 text-xs">
+        <button
+          type="button"
+          id="journal-reset-btn"
+          class="font-bold text-stone-600 hover:text-stone-900 underline transition-colors cursor-pointer py-1.5"
+          title="Reset recorded exploration milestones in localStorage"
+        >
+          Clear Inscriptions
+        </button>
 
-      <button
-        type="button"
-        id="journal-close-btn"
-        class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--wood-deep)] text-[var(--candle)] border border-[var(--brass)] font-bold text-sm rounded hover:bg-black transition-colors shadow-md cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--brass)] ml-auto"
-      >
-        Close Journal (Esc)
-      </button>
+        <span class="text-[11px] text-stone-500 font-mono select-none">
+          Press Esc or ✕ to close
+        </span>
+      </div>
     </div>
   </div>
 
@@ -348,26 +347,18 @@ const totalCount = JOURNAL_MILESTONES.length;
     transform: translate(-50%, -50%);
     width: min(94vw, 860px);
     max-height: min(90dvh, 760px);
-    padding: 0 1.5rem 1.5rem 1.5rem;
-    -webkit-overflow-scrolling: touch;
+    padding: 0;
   }
 
-  .journal-header {
-    /* Extend flush to top, left, and right borders of dialog to prevent content bleed */
-    margin: 0 -1.5rem 1rem -1.5rem;
-    padding: 1.5rem 1.5rem 0.75rem 1.5rem;
+  .journal-body {
+    -webkit-overflow-scrolling: touch;
   }
 
   @media (max-width: 640px) {
     .journal-dialog-panel {
       width: 96vw;
       max-height: 94dvh;
-      padding: 0 1rem 1rem 1rem;
-    }
-
-    .journal-header {
-      margin: 0 -1rem 0.75rem -1rem;
-      padding: 1rem 1rem 0.75rem 1rem;
+      padding: 0;
     }
   }
 
@@ -404,7 +395,6 @@ const totalCount = JOURNAL_MILESTONES.length;
     const trigger = document.getElementById('trigger-quest-log');
     const backdrop = document.getElementById('journal-dialog-backdrop');
     const dialog = document.getElementById('journal-dialog');
-    const closeBtn = document.getElementById('journal-close-btn');
     const resetBtn = document.getElementById('journal-reset-btn');
     const counterBadge = document.getElementById('journal-counter-badge');
     const progressBar = document.getElementById('journal-progress-bar');
@@ -545,12 +535,13 @@ const totalCount = JOURNAL_MILESTONES.length;
       safeDialog.removeAttribute('hidden');
       safeTrigger.setAttribute('aria-expanded', 'true');
       document.body.style.overflow = 'hidden';
-      safeDialog.scrollTop = 0;
+      const scrollBody = safeDialog.querySelector('.journal-body') as HTMLElement;
+      if (scrollBody) {
+        scrollBody.scrollTop = 0;
+      }
       const headerClose = safeDialog.querySelector('.journal-header-close-btn') as HTMLElement;
       if (headerClose) {
         headerClose.focus();
-      } else if (closeBtn) {
-        closeBtn.focus();
       }
     }
 
@@ -569,7 +560,6 @@ const totalCount = JOURNAL_MILESTONES.length;
       safeTrigger.addEventListener('click', openDialog);
     }
     safeBackdrop.addEventListener('click', closeDialog);
-    closeBtn?.addEventListener('click', closeDialog);
     safeDialog.querySelector('.journal-header-close-btn')?.addEventListener('click', closeDialog);
 
     // Escape key
