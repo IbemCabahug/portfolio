@@ -7,7 +7,23 @@
  * 2. Troll & Placeholder Pattern Heuristics
  * 3. Disposable & Burner Domain Blocklist (150+ known temporary mail providers)
  * 4. Live DNS-over-HTTPS (DoH) MX Record Lookup via Google DNS (with Cloudflare fallback)
+ *
+ * Usage:
+ * - Client-side pre-flight (UX only): `validateEmail(email)` — fails open if the
+ *   visitor's browser cannot reach the DoH resolvers, so nobody is falsely blocked;
+ *   the server re-validates strictly before any message is dispatched.
+ * - Server-side authoritative gate (`src/pages/api/missive.ts`):
+ *   `validateEmail(email, { strict: true })` — DNS verification failures REJECT the
+ *   address so the MX check can never be silently skipped.
  */
+
+export interface EmailValidationOptions {
+  /**
+   * When true, live DNS verification failures reject the email instead of failing open.
+   * Mandatory for the server-side dispatch endpoint, where DoH is always reachable.
+   */
+  strict?: boolean;
+}
 
 export interface EmailValidationResult {
   valid: boolean;
@@ -231,7 +247,7 @@ export function isDisposableDomain(domain: string): boolean {
  * Resolves with Google Public DNS, with graceful fallback to Cloudflare DNS.
  * Returns true if valid or if DoH is unreachable (fail-open for network resilience).
  */
-async function verifyDomainHasMailServers(domain: string): Promise<{ active: boolean; reason?: string }> {
+async function verifyDomainHasMailServers(domain: string, strict = false): Promise<{ active: boolean; reason?: string }> {
   // Common trusted domains skip live DNS query for speed and zero latency
   const TRUSTED_PROVIDER_SUFFIXES = [
     'gmail.com',
@@ -343,10 +359,19 @@ async function verifyDomainHasMailServers(domain: string): Promise<{ active: boo
       }
     }
   } catch {
-    // Both DNS queries failed (e.g. offline or strict corporate adblocker).
-    // Fail open gracefully so legitimate visitors aren't blocked by network glitches.
+    // Both DNS queries failed (e.g. offline or a strictly blocked resolver).
   }
 
+  if (strict) {
+    // Server-side authoritative call: an unverifiable domain must NOT be let through.
+    return {
+      active: false,
+      reason: 'We could not verify this email domain right now. Please try again in a moment.',
+    };
+  }
+
+  // Client-side pre-flight only: fail open so a browser-side DoH hiccup
+  // never blocks a legitimate visitor (the server re-validates strictly).
   return { active: true };
 }
 
@@ -354,7 +379,7 @@ async function verifyDomainHasMailServers(domain: string): Promise<{ active: boo
  * Validates an email address against syntax, troll heuristics, disposable domain lists,
  * and live DNS MX records.
  */
-export async function validateEmail(rawEmail: string): Promise<EmailValidationResult> {
+export async function validateEmail(rawEmail: string, options: EmailValidationOptions = {}): Promise<EmailValidationResult> {
   const email = (rawEmail || '').trim();
 
   // 1. Empty Check
@@ -427,8 +452,10 @@ export async function validateEmail(rawEmail: string): Promise<EmailValidationRe
   }
 
   // 4. Troll / Placeholder Heuristics
+  // Any troll/placeholder username (e.g. troll, test, asdf, fake, admin, 12345)
+  // is rejected regardless of domain, so `troll@gmail.com` can no longer slip through.
   if (
-    (TROLL_LOCAL_PARTS.has(normalizedLocal) && TROLL_LOCAL_PARTS.has(domainSegments[0])) ||
+    TROLL_LOCAL_PARTS.has(normalizedLocal) ||
     (normalizedLocal === domainSegments[0] && normalizedLocal.length <= 4) ||
     normalizedDomain === 'example.com' ||
     normalizedDomain === 'test.com' ||
@@ -453,7 +480,10 @@ export async function validateEmail(rawEmail: string): Promise<EmailValidationRe
   }
 
   // 6. Live DNS MX Verification (DNS-over-HTTPS)
-  const dnsResult = await verifyDomainHasMailServers(normalizedDomain);
+  // Server-side (strict) calls fail closed when DoH is unreachable, so a troll
+  // cannot skirt the MX check by blocking the resolver (which the old client-only
+  // path did due to `connect-src` and the previous fail-open behaviour).
+  const dnsResult = await verifyDomainHasMailServers(normalizedDomain, options.strict === true);
   if (!dnsResult.active) {
     return {
       valid: false,

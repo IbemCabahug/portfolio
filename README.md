@@ -22,6 +22,7 @@ See `.env.example` for required environment variables:
 - `TURNSTILE_SECRET`
 - `PUBLIC_TURNSTILE_SITE_KEY`
 - `PUBLIC_SITE_URL`
+- `WEB3FORMS_KEY` (Web3Forms server-only access key for the Messenger Roost dispatch endpoint)
 
 ## Documentation
 
