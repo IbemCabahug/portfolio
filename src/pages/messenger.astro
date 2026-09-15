@@ -1189,6 +1189,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
 <script>
   import { initPerformanceGovernor } from '../lib/perf-governor';
   import { sendMissive } from '../lib/contact';
+  import { validateEmail } from '../lib/email-validator';
   import { soundEngine } from '../lib/sound-engine';
   import { recordMilestone } from '../store/questlog';
 
@@ -1244,6 +1245,14 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
         el.textContent = message;
         el.classList.remove('hidden');
         setTimeout(() => el.classList.add('hidden'), 8000);
+      }
+    }
+
+    function clearFormError(errorId: string) {
+      const el = document.getElementById(errorId);
+      if (el && !el.classList.contains('hidden')) {
+        el.textContent = '';
+        el.classList.add('hidden');
       }
     }
     // ── End Anti-Abuse Shield ──────────────────────────
@@ -1984,9 +1993,28 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
       const form = document.getElementById(formId) as HTMLFormElement | null;
       if (!form) return;
 
+      const emailInput = document.getElementById(emailId) as HTMLInputElement | null;
+      const errorContainerId = isDesktop ? 'desktop-raven-error' : 'mobile-raven-error';
+
+      // Inline validation: clear error on typing, validate on blur
+      if (emailInput) {
+        emailInput.addEventListener('input', () => {
+          clearFormError(errorContainerId);
+        });
+
+        emailInput.addEventListener('blur', async () => {
+          const val = emailInput.value.trim();
+          if (val) {
+            const check = await validateEmail(val);
+            if (!check.valid) {
+              showFormError(errorContainerId, check.reason || 'Please provide a valid permanent email address.');
+            }
+          }
+        });
+      }
+
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const errorContainerId = isDesktop ? 'desktop-raven-error' : 'mobile-raven-error';
 
         // Anti-abuse: honeypot check
         const honeypotId = isDesktop ? 'desktop-botcheck' : 'mobile-botcheck';
@@ -2006,6 +2034,16 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
           return;
         }
 
+        const email = (document.getElementById(emailId) as HTMLInputElement)?.value.trim() || '';
+
+        // Pre-flight email authenticity validation (syntax, burner domains, DNS MX)
+        const emailValidation = await validateEmail(email);
+        if (!emailValidation.valid) {
+          showFormError(errorContainerId, emailValidation.reason || 'Please provide a valid permanent email address.');
+          emailInput?.focus();
+          return;
+        }
+
         const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement | null;
         const originalBtnText = submitBtn ? submitBtn.textContent : '';
         if (submitBtn) {
@@ -2014,7 +2052,6 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
         }
 
         const name = (document.getElementById(nameId) as HTMLInputElement)?.value.trim() || 'Traveler';
-        const email = (document.getElementById(emailId) as HTMLInputElement)?.value.trim() || '';
         const subject = (document.getElementById(subjectId) as HTMLInputElement)?.value.trim() || 'Tavern Dispatch';
         const body = (document.getElementById(bodyId) as HTMLTextAreaElement)?.value.trim() || '';
 
@@ -2027,6 +2064,17 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
           message: body,
           botcheck: botcheckValue,
         });
+
+        // If email failed backend validation, restore submit button and show error
+        if (result.isValidationError) {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalBtnText;
+          }
+          showFormError(errorContainerId, result.message || 'Please provide a valid permanent email address.');
+          emailInput?.focus();
+          return;
+        }
 
         // Record successful send for rate limiting
         if (result.success) {

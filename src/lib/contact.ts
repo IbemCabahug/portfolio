@@ -4,6 +4,8 @@
  * via Web3Forms API, with graceful fallbacks.
  */
 
+import { validateEmail } from './email-validator';
+
 export interface MissivePayload {
   name: string;
   email: string;
@@ -17,11 +19,22 @@ export interface MissiveResult {
   message?: string;
   fallbackMailto?: string;
   fallbackGmailUrl?: string;
+  isValidationError?: boolean;
 }
 
 export const RECIPIENT_EMAIL = 'cabahugnhovem@gmail.com';
 
 export async function sendMissive(payload: MissivePayload): Promise<MissiveResult> {
+  // Validate email address (Syntax, Disposable, Domain MX)
+  const validation = await validateEmail(payload.email);
+  if (!validation.valid) {
+    return {
+      success: false,
+      message: validation.reason || 'Please provide a valid, permanent email address.',
+      isValidationError: true,
+    };
+  }
+
   const formattedBody = `Sender: ${payload.name}\nReturn Address: ${payload.email}\n\n--------------------------------------------------\n${payload.message}\n--------------------------------------------------\n(Dispatched via Ibem's Tavern Messenger Roost)`;
   
   const fallbackMailto = `mailto:${RECIPIENT_EMAIL}?subject=${encodeURIComponent(payload.subject)}&body=${encodeURIComponent(formattedBody)}`;
