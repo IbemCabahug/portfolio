@@ -75,6 +75,8 @@ interface VariantPanel {
   id: string;
   tabLabel: string;
   roleTitle: string;
+  targetRoles?: string[];
+  pdfFile: string;
   summary: string;
   experience: typeof resume.experience;
   projects: typeof resume.projects;
@@ -88,6 +90,8 @@ const variantPanels: VariantPanel[] = [
     id: 'developer',
     tabLabel: 'Developer',
     roleTitle: resume.roleTitles.developer,
+    targetRoles: resume.targetRoles?.developer,
+    pdfFile: '/Cabahug-Nhovem-Resume-Developer.pdf',
     summary: resume.summary.developer,
     experience: resume.experience,
     projects: resume.projects.map((project) => ({ ...project, bullets: project.bullets })),
@@ -98,6 +102,8 @@ const variantPanels: VariantPanel[] = [
     id: 'qa',
     tabLabel: 'QA',
     roleTitle: resume.roleTitles.qa,
+    targetRoles: resume.targetRoles?.qa,
+    pdfFile: '/Cabahug-Nhovem-Resume-QA-Tester.pdf',
     summary: resume.summary.qa,
     experience: resume.experience
       .filter((exp) => (exp.qaBullets ?? []).length > 0)
@@ -213,6 +219,8 @@ const variantPanels: VariantPanel[] = [
           aria-selected={v.id === 'developer' ? 'true' : 'false'}
           aria-controls={`panel-${v.id}`}
           data-resume-tab={v.id}
+          data-resume-pdf={v.pdfFile}
+          data-resume-variant={v.tabLabel}
           class="resume-tab"
         >
           {v.tabLabel} Resume
@@ -240,6 +248,25 @@ const variantPanels: VariantPanel[] = [
         hidden={index !== 0}
       >
         <p class="text-xl font-bold text-[#1c1917] font-serif mb-3">{v.roleTitle}</p>
+        {/*
+          ATS note: roles are rendered as `whitespace-nowrap` spans joined by
+          plain ASCII commas. Two reasons: (1) a multi-word role must never wrap
+          mid-phrase ("Junior Software Developer" split across lines breaks
+          exact-phrase matching), and (2) any line can break only at a comma,
+          between roles. Non-ASCII separators (e.g. a middle dot) are avoided
+          because sub-set embed fonts can extract them as replacement chars.
+        */}
+        {v.targetRoles && v.targetRoles.length > 0 && (
+          <p class="text-sm font-semibold text-[#78350f] mb-3">
+            Target roles:{' '}
+            {v.targetRoles.map((role, roleIndex) => (
+              <>
+                {roleIndex > 0 ? ', ' : ''}
+                <span class="whitespace-nowrap">{role}</span>
+              </>
+            ))}
+          </p>
+        )}
         <p class="text-sm leading-relaxed text-[#44403c] mb-8">{v.summary}</p>
 
         <h2 class="text-xl font-bold text-[#1c1917] font-serif mb-4 border-b border-[#e7e5e4] pb-2">Experience</h2>
@@ -249,7 +276,10 @@ const variantPanels: VariantPanel[] = [
             <article class="entry">
               <div class="flex flex-wrap items-baseline justify-between gap-x-3">
                 <h3 class="text-lg font-bold text-[#1c1917]">{exp.role}</h3>
-                <span class="text-xs font-semibold text-[#78716c]">{exp.period}{exp.hours ? ` · ${exp.hours}` : ''}</span>
+                {/* ASCII separators only: non-ASCII glyphs (en dash, middle dot)
+                    extract as replacement characters in the PDF because the
+                    sub-set embedded fonts ship no ToUnicode mapping for them. */}
+                <span class="text-xs font-semibold text-[#78716c]">{exp.period}{exp.hours ? ` | ${exp.hours}` : ''}</span>
               </div>
               <div class="font-semibold text-sm text-[#92400e] mb-2">{exp.org}</div>
               <ul class="list-disc pl-5 space-y-1 text-sm text-[#44403c]">
@@ -366,13 +396,16 @@ const variantPanels: VariantPanel[] = [
 
       <div class="flex flex-wrap justify-center w-full items-center gap-3">
         <a
-          href="/resume.pdf"
+          id="download-pdf"
+          href={variantPanels[0].pdfFile}
           download
           class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 border border-[var(--brass)] hover:border-[var(--candle)] rounded transition-colors duration-200 uppercase tracking-widest text-sm text-[var(--candle)] no-print"
         >
           Download PDF
         </a>
-        <span class="text-xs text-[var(--parchment)]/60">(Developer variant)</span>
+        <span id="download-variant" class="text-xs text-[var(--parchment)]/60">
+          ({variantPanels[0].tabLabel} variant)
+        </span>
         <button
           type="button"
           id="print-resume"
@@ -395,11 +428,14 @@ const variantPanels: VariantPanel[] = [
       // Resume variant switcher: Developer / QA. Keyboard-accessible (real
       // buttons), deep-linkable via ?role=qa, and print-aware: switching a
       // variant updates the URL so printing or saving-as-PDF captures the
-      // exact view on screen. The Download PDF button serves the pre-rendered
-      // Developer variant.
+      // exact view on screen. The Download PDF button follows the active
+      // variant (each variant has its own pre-rendered PDF).
       const tabs = Array.from(document.querySelectorAll('[data-resume-tab]'));
       const panels = Array.from(document.querySelectorAll('[data-resume-panel]'));
       if (!tabs.length || !panels.length) return;
+
+      const downloadLink = document.getElementById('download-pdf');
+      const downloadVariant = document.getElementById('download-variant');
 
       const VALID_IDS = new Set(tabs.map((tab) => tab.getAttribute('data-resume-tab')));
       const fromQuery = new URLSearchParams(window.location.search).get('role') || '';
@@ -413,6 +449,16 @@ const variantPanels: VariantPanel[] = [
         panels.forEach((panel) => {
           panel.hidden = panel.getAttribute('data-resume-panel') !== id;
         });
+
+        const activeTab = tabs.find((tab) => tab.getAttribute('data-resume-tab') === id);
+        if (activeTab) {
+          const pdfHref = activeTab.getAttribute('data-resume-pdf');
+          if (downloadLink && pdfHref) downloadLink.setAttribute('href', pdfHref);
+          if (downloadVariant) {
+            const variantLabel = activeTab.getAttribute('data-resume-variant') || id;
+            downloadVariant.textContent = `(${variantLabel} variant)`;
+          }
+        }
         if (pushUrl) {
           const url = new URL(window.location.href);
           if (id === 'developer') {

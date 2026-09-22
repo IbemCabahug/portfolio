@@ -97,6 +97,12 @@ const resume = defineCollection({
       developer: z.string(),
       qa: z.string(),
     }),
+    // ATS coverage: the headline stays honest/personal, while these list the
+    // exact standard titles recruiters and job boards search and filter by.
+    targetRoles: z.object({
+      developer: z.array(z.string()).optional(),
+      qa: z.array(z.string()).optional(),
+    }).optional(),
     summary: z.object({
       developer: z.string(),
       qa: z.string(),

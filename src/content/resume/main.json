@@ -1,7 +1,20 @@
 {
   "roleTitles": {
-    "developer": "AI-Assisted Developer",
+    "developer": "AI-Assisted Developer (Web & Android)",
     "qa": "Junior QA Tester"
+  },
+  "targetRoles": {
+    "developer": [
+      "Web Developer",
+      "Frontend Developer",
+      "Android Developer",
+      "Junior Software Developer"
+    ],
+    "qa": [
+      "Junior QA Tester",
+      "Manual QA Tester",
+      "QA Analyst"
+    ]
   },
   "summary": {
     "developer": "I build and ship web applications with an AI-assisted workflow: I write the requirements, direct AI tooling, and personally review, test, and own every line that ships. Computer Technology graduate with production experience on a biometric attendance system and a portfolio of deployed, documented projects.",
@@ -11,7 +24,7 @@
     {
       "role": "IT and Administrative Support Intern",
       "org": "Avega Bros. Integrated Shipping Corp.",
-      "period": "July 2025 – July 2026",
+      "period": "July 2025 - July 2026",
       "hours": "1,800 hours",
       "bullets": [
         "Provided technical and administrative support: troubleshooting, hardware and software installation, data entry, inventory records and document organisation.",
@@ -75,8 +88,8 @@
   "education": [
     {
       "credential": "Bachelor of Industrial Technology, Major in Computer Technology",
-      "school": "Cebu Technological University – Danao Campus",
-      "period": "August 2022 – May 2026",
+      "school": "Cebu Technological University - Danao Campus",
+      "period": "August 2022 - May 2026",
       "honors": [
         "Academic Distinction Awardee",
         "Dean's Lister"
