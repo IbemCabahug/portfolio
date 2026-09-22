@@ -10,8 +10,7 @@ const resume = resumeEntries[0].data;
 
 const skillEntries = await getCollection('skills');
 
-// Skill categories render in a role-appropriate order per resume variant.
-const DEV_SKILL_ORDER = ['Languages', 'Frameworks', 'Data', 'Tools', 'Other', 'Practices', 'QA & Testing'];
+// QA variant: skill categories render granularly, in a QA-appropriate order.
 const QA_SKILL_ORDER = ['QA & Testing', 'Practices', 'Tools', 'Languages', 'Frameworks', 'Data', 'Other'];
 
 function orderSkills(entries: typeof skillEntries, order: string[]) {
@@ -24,13 +23,67 @@ function orderSkills(entries: typeof skillEntries, order: string[]) {
   );
 }
 
-const devSkills = orderSkills(skillEntries, DEV_SKILL_ORDER);
 const qaSkills = orderSkills(skillEntries, QA_SKILL_ORDER);
+
+// Developer variant: skills are GENERALIZED into broad domains (one line each)
+// instead of per-item proficiency levels — the honest frame for skills
+// exercised by directing AI-assisted builds across web, data, mobile and tooling.
+const namesIn = (categories: string[]) =>
+  categories
+    .flatMap((category) =>
+      skillEntries.find((entry) => entry.data.category === category)?.data.items.map((item) => item.name) ?? []
+    )
+    .join(', ');
+
+interface SkillGroup {
+  label: string;
+  detail: string;
+}
+
+const devSkillGroups: SkillGroup[] = [
+  {
+    label: 'AI-Assisted Development',
+    detail:
+      'Full project lifecycle: requirements & acceptance criteria, AI direction (Antigravity IDE), code review, manual testing, and Git/GitHub deployment — I own every line that ships.',
+  },
+  {
+    label: 'Web',
+    detail: namesIn(['Languages', 'Frameworks']),
+  },
+  {
+    label: 'Data',
+    detail: namesIn(['Data']),
+  },
+  {
+    label: 'Mobile',
+    detail: 'Android (AI-assisted build and release testing)',
+  },
+  {
+    label: 'Tooling & Workflow',
+    detail: namesIn(['Tools']) + ', Agile/Kanban, debugging, technical problem-solving',
+  },
+  {
+    label: 'Support & Records',
+    detail: namesIn(['Other']),
+  },
+];
 
 // Two resume variants share one source of truth: Developer (default) and QA.
 // Each variant swaps the role title, summary, experience bullets and project
 // emphasis; education, training and languages stay shared below the panels.
-const variantPanels = [
+interface VariantPanel {
+  id: string;
+  tabLabel: string;
+  roleTitle: string;
+  summary: string;
+  experience: typeof resume.experience;
+  projects: typeof resume.projects;
+  skillsView: 'groups' | 'detailed';
+  skills?: typeof skillEntries;
+  skillGroups: SkillGroup[];
+}
+
+const variantPanels: VariantPanel[] = [
   {
     id: 'developer',
     tabLabel: 'Developer',
@@ -38,7 +91,8 @@ const variantPanels = [
     summary: resume.summary.developer,
     experience: resume.experience,
     projects: resume.projects.map((project) => ({ ...project, bullets: project.bullets })),
-    skills: devSkills,
+    skillsView: 'groups',
+    skillGroups: devSkillGroups,
   },
   {
     id: 'qa',
@@ -49,7 +103,9 @@ const variantPanels = [
       .filter((exp) => (exp.qaBullets ?? []).length > 0)
       .map((exp) => ({ ...exp, bullets: exp.qaBullets ?? [] })),
     projects: resume.projects.map((project) => ({ ...project, bullets: project.qaBullets ?? project.bullets })),
+    skillsView: 'detailed',
     skills: qaSkills,
+    skillGroups: [],
   },
 ];
 ---
@@ -86,10 +142,25 @@ const variantPanels = [
         page-break-inside: avoid;
         break-inside: avoid;
       }
+      .resume-sheet {
+        border: none !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+      }
       h1, h2, h3 {
         page-break-after: avoid;
         break-after: avoid;
       }
+    }
+
+    /* Resume document: a white "paper" sheet on the tavern background.
+       Inside the sheet we use ink-on-paper colours (stone greys plus a warm
+       amber accent) rather than tavern candle/parchment, so both resume
+       variants read like a real document and print cleanly. */
+    .resume-sheet {
+      background: #ffffff;
+      color: #44403c;
     }
 
     /* Resume variant switcher (Developer / QA) */
@@ -132,17 +203,7 @@ const variantPanels = [
       </span>
     </nav>
 
-    <header class="mb-8 border-b-2 border-[var(--brass)] pb-6">
-      <h1 class="text-3xl sm:text-4xl font-extrabold text-[var(--candle)] font-serif tracking-wide mb-3">{profile.name}</h1>
-      
-      <div class="flex flex-col gap-1 text-sm text-[var(--parchment)]/85">
-        <p class="location-indicator">Location: {profile.location}</p>
-        <p>Email: <a href={`mailto:${profile.email}`} class="underline hover:text-[var(--candle)]">{profile.email}</a></p>
-        <p>GitHub: <a href={profile.github} class="underline hover:text-[var(--candle)]" rel="noopener">github.com/IbemCabahug</a></p>
-      </div>
-    </header>
-
-    <div class="no-print mb-8 flex flex-wrap items-center gap-2" role="tablist" aria-label="Choose resume variant">
+    <div class="no-print resume-toolbar mb-4 flex flex-wrap items-center gap-2" role="tablist" aria-label="Choose resume variant">
       <span class="text-[11px] uppercase tracking-widest text-[var(--brass)] font-bold mr-1">View as:</span>
       {variantPanels.map((v) => (
         <button
@@ -159,6 +220,17 @@ const variantPanels = [
       ))}
     </div>
 
+    <article class="resume-sheet border border-[#e7e5e4] border-t-4 border-t-[#c9a227] rounded-lg shadow-xl px-6 sm:px-10 py-8 sm:py-10">
+      <header class="mb-8 border-b-2 border-[#d6d3d1] pb-6">
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-[#1c1917] font-serif tracking-wide mb-3">{profile.name}</h1>
+      
+      <div class="flex flex-col gap-1 text-sm text-[#57534e]">
+        <p class="location-indicator">Location: {profile.location}</p>
+        <p>Email: <a href={`mailto:${profile.email}`} class="underline text-[#92400e] hover:text-[#78350f]">{profile.email}</a></p>
+        <p>GitHub: <a href={profile.github} class="underline text-[#92400e] hover:text-[#78350f]" rel="noopener">github.com/IbemCabahug</a></p>
+      </div>
+    </header>
+
     {variantPanels.map((v, index) => (
       <section
         id={`panel-${v.id}`}
@@ -167,75 +239,88 @@ const variantPanels = [
         data-resume-panel={v.id}
         hidden={index !== 0}
       >
-        <p class="text-xl font-bold text-[var(--candle)] font-serif mb-3">{v.roleTitle}</p>
-        <p class="text-sm leading-relaxed text-[var(--parchment)]/90 mb-8">{v.summary}</p>
+        <p class="text-xl font-bold text-[#1c1917] font-serif mb-3">{v.roleTitle}</p>
+        <p class="text-sm leading-relaxed text-[#44403c] mb-8">{v.summary}</p>
 
-        <h2 class="text-xl font-bold text-[var(--candle)] font-serif mb-4 border-b border-[var(--brass)]/60 pb-2">Experience</h2>
+        <h2 class="text-xl font-bold text-[#1c1917] font-serif mb-4 border-b border-[#e7e5e4] pb-2">Experience</h2>
         <div class="flex flex-col gap-6 mb-8">
 
           {v.experience.map((exp) => (
             <article class="entry">
               <div class="flex flex-wrap items-baseline justify-between gap-x-3">
-                <h3 class="text-lg font-bold text-[var(--parchment)]">{exp.role}</h3>
-                <span class="text-xs font-semibold text-[var(--brass)]">{exp.period}{exp.hours ? ` · ${exp.hours}` : ''}</span>
+                <h3 class="text-lg font-bold text-[#1c1917]">{exp.role}</h3>
+                <span class="text-xs font-semibold text-[#78716c]">{exp.period}{exp.hours ? ` · ${exp.hours}` : ''}</span>
               </div>
-              <div class="font-semibold text-sm text-[var(--candle)]/90 mb-2">{exp.org}</div>
-              <ul class="list-disc pl-5 space-y-1 text-sm text-[var(--parchment)]/85">
+              <div class="font-semibold text-sm text-[#92400e] mb-2">{exp.org}</div>
+              <ul class="list-disc pl-5 space-y-1 text-sm text-[#44403c]">
                 {exp.bullets.map((bullet) => <li>{bullet}</li>)}
               </ul>
             </article>
           ))}
         </div>
 
-        <h2 class="text-xl font-bold text-[var(--candle)] font-serif mb-4 border-b border-[var(--brass)]/60 pb-2">Selected Projects</h2>
+        <h2 class="text-xl font-bold text-[#1c1917] font-serif mb-4 border-b border-[#e7e5e4] pb-2">Selected Projects</h2>
         <div class="flex flex-col gap-6 mb-8">
           {v.projects.map((project) => (
             <article class="entry">
               <div class="flex flex-wrap items-baseline justify-between gap-x-3">
-                <h3 class="text-lg font-bold text-[var(--parchment)]">
+                <h3 class="text-lg font-bold text-[#1c1917]">
                   {project.name}
-                  {project.note && <span class="ml-2 text-xs font-semibold uppercase tracking-wider text-[var(--brass)]">({project.note})</span>}
+                  {project.note && <span class="ml-2 text-xs font-semibold uppercase tracking-wider text-[#92400e]">({project.note})</span>}
                 </h3>
                 <a
                   href={project.url}
-                  class="text-xs font-semibold text-[var(--candle)] underline hover:text-[var(--parchment)]"
+                  class="text-xs font-semibold text-[#92400e] underline hover:text-[#78350f]"
                   rel="noopener"
                 >
                   {project.urlLabel ?? project.url}
                 </a>
               </div>
-              <ul class="list-disc pl-5 space-y-1 text-sm text-[var(--parchment)]/85 mt-2">
+              <ul class="list-disc pl-5 space-y-1 text-sm text-[#44403c] mt-2">
                 {project.bullets.map((bullet) => <li>{bullet}</li>)}
               </ul>
             </article>
           ))}
         </div>
 
-        <h2 class="text-xl font-bold text-[var(--candle)] font-serif mb-4 border-b border-[var(--brass)]/60 pb-2">Skills</h2>
-        <div class="flex flex-col gap-4 mb-8">
-          {v.skills.map((skillCat) => (
-            <article class="entry">
-              <h3 class="text-base font-bold text-[var(--parchment)] mb-1">{skillCat.data.category}</h3>
-              <ul class="list-disc pl-5 text-sm text-[var(--parchment)]/85">
-                {skillCat.data.items.map((item) => (
-                  <li>{item.name} <span class="text-xs uppercase tracking-wider text-[var(--brass)] ml-1">({item.level})</span></li>
-                ))}
-              </ul>
-            </article>
-          ))}
-        </div>
+        <h2 class="text-xl font-bold text-[#1c1917] font-serif mb-4 border-b border-[#e7e5e4] pb-2">Skills</h2>
+        {v.skillsView === 'groups' ? (
+          <div class="flex flex-col gap-3 mb-8">
+            {v.skillGroups.map((group) => (
+              <p class="entry text-sm leading-relaxed text-[#44403c]">
+                <strong class="font-bold text-[#1c1917]">{group.label}:</strong> {group.detail}
+              </p>
+            ))}
+          </div>
+        ) : (
+          <div class="flex flex-col gap-4 mb-8">
+            {(v.skills ?? []).map((skillCat) => (
+              <article class="entry">
+                <h3 class="text-base font-bold text-[#1c1917] mb-1">{skillCat.data.category}</h3>
+                <ul class="list-disc pl-5 text-sm text-[#44403c]">
+                  {skillCat.data.items.map((item) => (
+                    <li>
+                      {item.name}{' '}
+                      <span class="text-xs uppercase tracking-wider text-[#92400e] ml-1">({item.level})</span>
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            ))}
+          </div>
+        )}
       </section>
     ))}
 
     <section class="mb-8">
-      <h2 class="text-xl font-bold text-[var(--candle)] font-serif mb-4 border-b border-[var(--brass)]/60 pb-2">Education</h2>
+      <h2 class="text-xl font-bold text-[#1c1917] font-serif mb-4 border-b border-[#e7e5e4] pb-2">Education</h2>
       <div class="flex flex-col gap-6">
         {resume.education.map(edu => (
           <article class="entry">
-            <h3 class="text-lg font-bold text-[var(--parchment)]">{edu.credential}</h3>
-            <div class="font-semibold text-sm text-[var(--candle)]/90 mb-1">{edu.school}</div>
-            <div class="text-xs font-semibold text-[var(--brass)] mb-2">{edu.period}</div>
-            <ul class="list-disc pl-5 space-y-1 text-sm text-[var(--parchment)]/85">
+            <h3 class="text-lg font-bold text-[#1c1917]">{edu.credential}</h3>
+            <div class="font-semibold text-sm text-[#92400e] mb-1">{edu.school}</div>
+            <div class="text-xs font-semibold text-[#78716c] mb-2">{edu.period}</div>
+            <ul class="list-disc pl-5 space-y-1 text-sm text-[#44403c]">
               {edu.honors.map(honor => <li>{honor}</li>)}
             </ul>
           </article>
@@ -244,25 +329,26 @@ const variantPanels = [
     </section>
 
     <section class="mb-8">
-      <h2 class="text-xl font-bold text-[var(--candle)] font-serif mb-4 border-b border-[var(--brass)]/60 pb-2">Training</h2>
+      <h2 class="text-xl font-bold text-[#1c1917] font-serif mb-4 border-b border-[#e7e5e4] pb-2">Training</h2>
       <div class="flex flex-col gap-4">
         {resume.training.map(train => (
           <article class="entry">
-            <h3 class="text-base font-bold text-[var(--parchment)]">{train.name}</h3>
-            <div class="text-sm text-[var(--parchment)]/85">{train.provider} — {train.hours}</div>
+            <h3 class="text-base font-bold text-[#1c1917]">{train.name}</h3>
+            <div class="text-sm text-[#44403c]">{train.provider} — {train.hours}</div>
           </article>
         ))}
       </div>
     </section>
 
-    <section class="mb-8">
-      <h2 class="text-xl font-bold text-[var(--candle)] font-serif mb-4 border-b border-[var(--brass)]/60 pb-2">Languages</h2>
-      <ul class="list-disc pl-5 space-y-2 entry text-sm text-[var(--parchment)]/85">
+    <section>
+      <h2 class="text-xl font-bold text-[#1c1917] font-serif mb-4 border-b border-[#e7e5e4] pb-2">Languages</h2>
+      <ul class="list-disc pl-5 space-y-2 entry text-sm text-[#44403c]">
         {resume.languages.map(lang => (
-          <li><strong class="text-[var(--parchment)]">{lang.name}</strong> — {lang.level}</li>
+          <li><strong class="text-[#1c1917]">{lang.name}</strong> — {lang.level}</li>
         ))}
       </ul>
     </section>
+    </article>
 
     <div class="no-print mt-12 pt-8 border-t border-[var(--brass)]/60 flex flex-col items-center gap-6">
       <div class="w-full p-5 bg-[#1e1208]/90 border border-[var(--brass)]/60 rounded text-sm text-[var(--parchment)]/90 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
