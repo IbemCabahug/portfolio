@@ -306,31 +306,15 @@ async function verifyDomainHasMailServers(domain: string, strict = false): Promi
         const hasMx = Array.isArray(data.Answer) && data.Answer.some((a: { type: number }) => a.type === 15);
         if (hasMx) return { active: true };
 
-        // If no MX records, check if the domain has an A record (RFC 5321 fallback)
-        const hasA = Array.isArray(data.Answer) && data.Answer.some((a: { type: number }) => a.type === 1 || a.type === 28);
-        if (hasA) return { active: true };
-
-        // No MX in Answer, let's query A record directly
-        const aRes = await fetch(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=A`, {
-          headers: { Accept: 'application/dns-json' },
-          signal: createTimeoutSignal(2000),
-        });
-        if (aRes.ok) {
-          const aData = await aRes.json();
-          if (aData.Status === 3) {
-            return {
-              active: false,
-              reason: `The domain "${domain}" does not exist. Please check your return address.`,
-            };
-          }
-          if (aData.Status === 0 && Array.isArray(aData.Answer) && aData.Answer.length > 0) {
-            return { active: true };
-          }
-        }
-
+        // NO MX ACCEPTANCE PATH: A/AAAA records no longer count as a deliverable
+        // fallback. Parked domains (e.g. `asasdasd.com` — a real NameBright
+        // parking page with A records and no MX) sailed through the old
+        // "RFC 5321 implicit-MX" fallback and reached the inbox as spam. A
+        // domain that cannot answer for its own MX is not known to receive
+        // mail, so reject with an explicit, actionable message.
         return {
           active: false,
-          reason: `The domain "${domain}" does not appear to have an active mail exchanger (MX) server.`,
+          reason: `The domain "${domain}" has no mail exchanger (MX) configured. It appears parked or unable to receive email. Please double-check your return address.`,
         };
       }
     }
