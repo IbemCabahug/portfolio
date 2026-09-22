@@ -10,24 +10,10 @@ const resume = resumeEntries[0].data;
 
 const skillEntries = await getCollection('skills');
 
-// QA variant: skill categories render granularly, in a QA-appropriate order.
-const QA_SKILL_ORDER = ['QA & Testing', 'Practices', 'Tools', 'Languages', 'Frameworks', 'Data', 'Other'];
-
-function orderSkills(entries: typeof skillEntries, order: string[]) {
-  const rank = (category: string) => {
-    const index = order.indexOf(category);
-    return index === -1 ? order.length : index;
-  };
-  return [...entries].sort(
-    (a, b) => rank(a.data.category) - rank(b.data.category) || a.data.category.localeCompare(b.data.category)
-  );
-}
-
-const qaSkills = orderSkills(skillEntries, QA_SKILL_ORDER);
-
-// Developer variant: skills are GENERALIZED into broad domains (one line each)
+// Skills are GENERALIZED into broad domains (one line each) on BOTH variants,
 // instead of per-item proficiency levels — the honest frame for skills
-// exercised by directing AI-assisted builds across web, data, mobile and tooling.
+// exercised by planning, directing and testing AI-assisted builds across web,
+// data, mobile and tooling.
 const namesIn = (categories: string[]) =>
   categories
     .flatMap((category) =>
@@ -68,6 +54,36 @@ const devSkillGroups: SkillGroup[] = [
   },
 ];
 
+// QA variant: same generalized treatment, but ordered QA-first so the testing
+// work leads the section (QA & Testing before tooling, web, data and mobile).
+const qaSkillGroups: SkillGroup[] = [
+  {
+    label: 'QA & Testing',
+    detail:
+      'Manual, functional and regression testing; test case writing and execution; bug reporting and tracking; pre-release testing on wiped physical devices.',
+  },
+  {
+    label: 'Tools & Workflow',
+    detail: namesIn(['Tools']) + ', Agile/Kanban, requirements planning, debugging',
+  },
+  {
+    label: 'Web',
+    detail: namesIn(['Languages', 'Frameworks']),
+  },
+  {
+    label: 'Data',
+    detail: namesIn(['Data']),
+  },
+  {
+    label: 'Mobile',
+    detail: 'Android (manual testing of gameplay, security and vault flows on release builds)',
+  },
+  {
+    label: 'Support & Records',
+    detail: namesIn(['Other']),
+  },
+];
+
 // Two resume variants share one source of truth: Developer (default) and QA.
 // Each variant swaps the role title, summary, experience bullets and project
 // emphasis; education, training and languages stay shared below the panels.
@@ -80,8 +96,6 @@ interface VariantPanel {
   summary: string;
   experience: typeof resume.experience;
   projects: typeof resume.projects;
-  skillsView: 'groups' | 'detailed';
-  skills?: typeof skillEntries;
   skillGroups: SkillGroup[];
 }
 
@@ -95,7 +109,6 @@ const variantPanels: VariantPanel[] = [
     summary: resume.summary.developer,
     experience: resume.experience,
     projects: resume.projects.map((project) => ({ ...project, bullets: project.bullets })),
-    skillsView: 'groups',
     skillGroups: devSkillGroups,
   },
   {
@@ -109,9 +122,7 @@ const variantPanels: VariantPanel[] = [
       .filter((exp) => (exp.qaBullets ?? []).length > 0)
       .map((exp) => ({ ...exp, bullets: exp.qaBullets ?? [] })),
     projects: resume.projects.map((project) => ({ ...project, bullets: project.qaBullets ?? project.bullets })),
-    skillsView: 'detailed',
-    skills: qaSkills,
-    skillGroups: [],
+    skillGroups: qaSkillGroups,
   },
 ];
 ---
@@ -314,31 +325,13 @@ const variantPanels: VariantPanel[] = [
         </div>
 
         <h2 class="text-xl font-bold text-[#1c1917] font-serif mb-4 border-b border-[#e7e5e4] pb-2">Skills</h2>
-        {v.skillsView === 'groups' ? (
-          <div class="flex flex-col gap-3 mb-8">
-            {v.skillGroups.map((group) => (
-              <p class="entry text-sm leading-relaxed text-[#44403c]">
-                <strong class="font-bold text-[#1c1917]">{group.label}:</strong> {group.detail}
-              </p>
-            ))}
-          </div>
-        ) : (
-          <div class="flex flex-col gap-4 mb-8">
-            {(v.skills ?? []).map((skillCat) => (
-              <article class="entry">
-                <h3 class="text-base font-bold text-[#1c1917] mb-1">{skillCat.data.category}</h3>
-                <ul class="list-disc pl-5 text-sm text-[#44403c]">
-                  {skillCat.data.items.map((item) => (
-                    <li>
-                      {item.name}{' '}
-                      <span class="text-xs uppercase tracking-wider text-[#92400e] ml-1">({item.level})</span>
-                    </li>
-                  ))}
-                </ul>
-              </article>
-            ))}
-          </div>
-        )}
+        <div class="flex flex-col gap-3 mb-8">
+          {v.skillGroups.map((group) => (
+            <p class="entry text-sm leading-relaxed text-[#44403c]">
+              <strong class="font-bold text-[#1c1917]">{group.label}:</strong> {group.detail}
+            </p>
+          ))}
+        </div>
       </section>
     ))}
 

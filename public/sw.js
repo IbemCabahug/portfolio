@@ -1,6 +1,6 @@
 // public/sw.js
 // Progressive Web App Service Worker for Nhovem Cabahug's Portfolio
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v4';
 const STATIC_CACHE = `nhovem-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `nhovem-runtime-${CACHE_VERSION}`;
 
