@@ -26,17 +26,39 @@
         navigator.serviceWorker
           .register('/sw.js', { scope: '/' })
           .then((registration) => {
-            // Check for updates on load
-            registration.onupdatefound = () => {
+            // Auto-update: when a new worker installs over an existing one,
+            // tell it to take over immediately (public/sw.js listens for this
+            // message and calls skipWaiting()) instead of waiting in the
+            // "installed" state until every tab happens to be closed.
+            registration.addEventListener('updatefound', () => {
               const installingWorker = registration.installing;
-              if (installingWorker) {
-                installingWorker.onstatechange = () => {
-                  if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                    console.log('[PWA] New version available. Refresh to activate.');
-                  }
-                };
-              }
-            };
+              if (!installingWorker) return;
+              installingWorker.addEventListener('statechange', () => {
+                if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  installingWorker.postMessage({ type: 'SKIP_WAITING' });
+                }
+              });
+            });
+
+            // When the new worker takes control, reload once so the page runs
+            // the freshly deployed version instead of a mix of old and new
+            // cached assets. First-visit activation (no prior controller) does
+            // not reload — the page was just served from the network anyway.
+            const hadController = !!navigator.serviceWorker.controller;
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+              if (refreshing || !hadController) return;
+              refreshing = true;
+              window.location.reload();
+            });
+
+            // Poll for updates hourly so long-lived tabs and installed PWA
+            // windows also pick up new deploys without a manual revisit.
+            setInterval(() => {
+              registration.update().catch(() => {
+                // Update checks are best-effort; ignore offline failures.
+              });
+            }, 60 * 60 * 1000);
           })
           .catch((error) => {
             console.error('[PWA] Service Worker registration failed:', error);
