@@ -91,6 +91,23 @@ const resume = defineCollection({
       period: z.string(),
       hours: z.string().optional(),
       bullets: z.array(z.string()),
+      qaBullets: z.array(z.string()).optional(),
+    })),
+    roleTitles: z.object({
+      developer: z.string(),
+      qa: z.string(),
+    }),
+    summary: z.object({
+      developer: z.string(),
+      qa: z.string(),
+    }),
+    projects: z.array(z.object({
+      name: z.string(),
+      note: z.string().optional(),
+      url: z.string(),
+      urlLabel: z.string().optional(),
+      bullets: z.array(z.string()),
+      qaBullets: z.array(z.string()).optional(),
     })),
     education: z.array(z.object({
       credential: z.string(),

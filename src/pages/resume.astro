@@ -1,5 +1,5 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import TavernLayout from '../layouts/TavernLayout.astro';
 import { getCollection } from 'astro:content';
 
 const profileEntries = await getCollection('profile');
@@ -8,10 +8,57 @@ const profile = profileEntries[0].data;
 const resumeEntries = await getCollection('resume');
 const resume = resumeEntries[0].data;
 
-const skillsEntries = await getCollection('skills');
+const skillEntries = await getCollection('skills');
+
+// Skill categories render in a role-appropriate order per resume variant.
+const DEV_SKILL_ORDER = ['Languages', 'Frameworks', 'Data', 'Tools', 'Other', 'Practices', 'QA & Testing'];
+const QA_SKILL_ORDER = ['QA & Testing', 'Practices', 'Tools', 'Languages', 'Frameworks', 'Data', 'Other'];
+
+function orderSkills(entries: typeof skillEntries, order: string[]) {
+  const rank = (category: string) => {
+    const index = order.indexOf(category);
+    return index === -1 ? order.length : index;
+  };
+  return [...entries].sort(
+    (a, b) => rank(a.data.category) - rank(b.data.category) || a.data.category.localeCompare(b.data.category)
+  );
+}
+
+const devSkills = orderSkills(skillEntries, DEV_SKILL_ORDER);
+const qaSkills = orderSkills(skillEntries, QA_SKILL_ORDER);
+
+// Two resume variants share one source of truth: Developer (default) and QA.
+// Each variant swaps the role title, summary, experience bullets and project
+// emphasis; education, training and languages stay shared below the panels.
+const variantPanels = [
+  {
+    id: 'developer',
+    tabLabel: 'Developer',
+    roleTitle: resume.roleTitles.developer,
+    summary: resume.summary.developer,
+    experience: resume.experience,
+    projects: resume.projects.map((project) => ({ ...project, bullets: project.bullets })),
+    skills: devSkills,
+  },
+  {
+    id: 'qa',
+    tabLabel: 'QA',
+    roleTitle: resume.roleTitles.qa,
+    summary: resume.summary.qa,
+    experience: resume.experience
+      .filter((exp) => (exp.qaBullets ?? []).length > 0)
+      .map((exp) => ({ ...exp, bullets: exp.qaBullets ?? [] })),
+    projects: resume.projects.map((project) => ({ ...project, bullets: project.qaBullets ?? project.bullets })),
+    skills: qaSkills,
+  },
+];
 ---
 
-<BaseLayout title="Resume | Nhovem Cabahug" description="Nhovem Cabahug's Resume">
+<TavernLayout
+  title="Resume | Nhovem Cabahug"
+  description="Nhovem Cabahug's Resume — Developer and QA variants."
+  location="resume"
+>
   <style is:global>
     @media print {
       *, *::before, *::after {
@@ -20,8 +67,9 @@ const skillsEntries = await getCollection('skills');
         text-shadow: none !important;
         box-shadow: none !important;
       }
-      body, main, html {
+      html, body, .tavern-shell, .tavern-content {
         background: white !important;
+        min-height: 0 !important;
       }
       nav, .no-print, .location-indicator {
         display: none !important;
@@ -38,50 +86,156 @@ const skillsEntries = await getCollection('skills');
         page-break-inside: avoid;
         break-inside: avoid;
       }
-      h1, h2 {
+      h1, h2, h3 {
         page-break-after: avoid;
         break-after: avoid;
       }
     }
+
+    /* Resume variant switcher (Developer / QA) */
+    .resume-tab {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 0 1.1rem;
+      border-radius: 0.375rem;
+      background: #1e1208;
+      border: 1px solid var(--brass);
+      color: var(--candle);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+    .resume-tab:hover {
+      border-color: var(--candle);
+    }
+    .resume-tab[aria-selected="true"] {
+      background: var(--candle);
+      border-color: var(--candle);
+      color: #1e1208;
+    }
   </style>
 
-  <div class="max-w-4xl mx-auto p-8">
-    <header class="mb-12 border-b-2 border-gray-800 pb-6">
-      <h1 class="text-4xl font-bold mb-2">{profile.name}</h1>
-      <p class="text-xl mb-4">{profile.title}</p>
+  <div class="max-w-4xl mx-auto py-6 sm:py-8 px-4">
+    <nav class="no-print mb-6 flex justify-between items-center" aria-label="Breadcrumb">
+      <a
+        href="/tavern"
+        class="inline-flex items-center gap-1.5 min-h-[44px] text-sm font-semibold text-[var(--candle)] underline hover:text-[var(--parchment)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+      >
+        &larr; Return to Main Tavern
+      </a>
+      <span class="text-xs text-[var(--parchment)]/70 uppercase tracking-widest font-mono">
+        Scribe's Ledger · Resume
+      </span>
+    </nav>
+
+    <header class="mb-8 border-b-2 border-[var(--brass)] pb-6">
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-[var(--candle)] font-serif tracking-wide mb-3">{profile.name}</h1>
       
-      <div class="flex flex-col gap-1 text-sm">
+      <div class="flex flex-col gap-1 text-sm text-[var(--parchment)]/85">
         <p class="location-indicator">Location: {profile.location}</p>
-        <p>Email: <a href={`mailto:${profile.email}`} class="underline">{profile.email}</a></p>
-        <p>GitHub: <a href={profile.github} class="underline">GitHub</a></p>
+        <p>Email: <a href={`mailto:${profile.email}`} class="underline hover:text-[var(--candle)]">{profile.email}</a></p>
+        <p>GitHub: <a href={profile.github} class="underline hover:text-[var(--candle)]" rel="noopener">github.com/IbemCabahug</a></p>
       </div>
     </header>
 
-    <section class="mb-10">
-      <h2 class="text-2xl font-bold mb-6 border-b border-gray-300 pb-2">Experience</h2>
-      <div class="flex flex-col gap-6">
-        {resume.experience.map(exp => (
-          <article class="entry">
-            <h3 class="text-xl font-bold">{exp.role}</h3>
-            <div class="font-semibold mb-2">{exp.org}</div>
-            <div class="text-sm text-gray-600 mb-3">{exp.period}{exp.hours ? ` (${exp.hours})` : ''}</div>
-            <ul class="list-disc pl-5 space-y-1">
-              {exp.bullets.map(bullet => <li>{bullet}</li>)}
-            </ul>
-          </article>
-        ))}
-      </div>
-    </section>
+    <div class="no-print mb-8 flex flex-wrap items-center gap-2" role="tablist" aria-label="Choose resume variant">
+      <span class="text-[11px] uppercase tracking-widest text-[var(--brass)] font-bold mr-1">View as:</span>
+      {variantPanels.map((v) => (
+        <button
+          type="button"
+          role="tab"
+          id={`tab-${v.id}`}
+          aria-selected={v.id === 'developer' ? 'true' : 'false'}
+          aria-controls={`panel-${v.id}`}
+          data-resume-tab={v.id}
+          class="resume-tab"
+        >
+          {v.tabLabel} Resume
+        </button>
+      ))}
+    </div>
 
-    <section class="mb-10">
-      <h2 class="text-2xl font-bold mb-6 border-b border-gray-300 pb-2">Education</h2>
+    {variantPanels.map((v, index) => (
+      <section
+        id={`panel-${v.id}`}
+        role="tabpanel"
+        aria-labelledby={`tab-${v.id}`}
+        data-resume-panel={v.id}
+        hidden={index !== 0}
+      >
+        <p class="text-xl font-bold text-[var(--candle)] font-serif mb-3">{v.roleTitle}</p>
+        <p class="text-sm leading-relaxed text-[var(--parchment)]/90 mb-8">{v.summary}</p>
+
+        <h2 class="text-xl font-bold text-[var(--candle)] font-serif mb-4 border-b border-[var(--brass)]/60 pb-2">Experience</h2>
+        <div class="flex flex-col gap-6 mb-8">
+
+          {v.experience.map((exp) => (
+            <article class="entry">
+              <div class="flex flex-wrap items-baseline justify-between gap-x-3">
+                <h3 class="text-lg font-bold text-[var(--parchment)]">{exp.role}</h3>
+                <span class="text-xs font-semibold text-[var(--brass)]">{exp.period}{exp.hours ? ` · ${exp.hours}` : ''}</span>
+              </div>
+              <div class="font-semibold text-sm text-[var(--candle)]/90 mb-2">{exp.org}</div>
+              <ul class="list-disc pl-5 space-y-1 text-sm text-[var(--parchment)]/85">
+                {exp.bullets.map((bullet) => <li>{bullet}</li>)}
+              </ul>
+            </article>
+          ))}
+        </div>
+
+        <h2 class="text-xl font-bold text-[var(--candle)] font-serif mb-4 border-b border-[var(--brass)]/60 pb-2">Selected Projects</h2>
+        <div class="flex flex-col gap-6 mb-8">
+          {v.projects.map((project) => (
+            <article class="entry">
+              <div class="flex flex-wrap items-baseline justify-between gap-x-3">
+                <h3 class="text-lg font-bold text-[var(--parchment)]">
+                  {project.name}
+                  {project.note && <span class="ml-2 text-xs font-semibold uppercase tracking-wider text-[var(--brass)]">({project.note})</span>}
+                </h3>
+                <a
+                  href={project.url}
+                  class="text-xs font-semibold text-[var(--candle)] underline hover:text-[var(--parchment)]"
+                  rel="noopener"
+                >
+                  {project.urlLabel ?? project.url}
+                </a>
+              </div>
+              <ul class="list-disc pl-5 space-y-1 text-sm text-[var(--parchment)]/85 mt-2">
+                {project.bullets.map((bullet) => <li>{bullet}</li>)}
+              </ul>
+            </article>
+          ))}
+        </div>
+
+        <h2 class="text-xl font-bold text-[var(--candle)] font-serif mb-4 border-b border-[var(--brass)]/60 pb-2">Skills</h2>
+        <div class="flex flex-col gap-4 mb-8">
+          {v.skills.map((skillCat) => (
+            <article class="entry">
+              <h3 class="text-base font-bold text-[var(--parchment)] mb-1">{skillCat.data.category}</h3>
+              <ul class="list-disc pl-5 text-sm text-[var(--parchment)]/85">
+                {skillCat.data.items.map((item) => (
+                  <li>{item.name} <span class="text-xs uppercase tracking-wider text-[var(--brass)] ml-1">({item.level})</span></li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </div>
+      </section>
+    ))}
+
+    <section class="mb-8">
+      <h2 class="text-xl font-bold text-[var(--candle)] font-serif mb-4 border-b border-[var(--brass)]/60 pb-2">Education</h2>
       <div class="flex flex-col gap-6">
         {resume.education.map(edu => (
           <article class="entry">
-            <h3 class="text-xl font-bold">{edu.credential}</h3>
-            <div class="font-semibold mb-2">{edu.school}</div>
-            <div class="text-sm text-gray-600 mb-3">{edu.period}</div>
-            <ul class="list-disc pl-5 space-y-1">
+            <h3 class="text-lg font-bold text-[var(--parchment)]">{edu.credential}</h3>
+            <div class="font-semibold text-sm text-[var(--candle)]/90 mb-1">{edu.school}</div>
+            <div class="text-xs font-semibold text-[var(--brass)] mb-2">{edu.period}</div>
+            <ul class="list-disc pl-5 space-y-1 text-sm text-[var(--parchment)]/85">
               {edu.honors.map(honor => <li>{honor}</li>)}
             </ul>
           </article>
@@ -89,61 +243,57 @@ const skillsEntries = await getCollection('skills');
       </div>
     </section>
 
-    <section class="mb-10">
-      <h2 class="text-2xl font-bold mb-6 border-b border-gray-300 pb-2">Training</h2>
+    <section class="mb-8">
+      <h2 class="text-xl font-bold text-[var(--candle)] font-serif mb-4 border-b border-[var(--brass)]/60 pb-2">Training</h2>
       <div class="flex flex-col gap-4">
         {resume.training.map(train => (
           <article class="entry">
-            <h3 class="text-lg font-bold">{train.name}</h3>
-            <div>{train.provider} — {train.hours}</div>
+            <h3 class="text-base font-bold text-[var(--parchment)]">{train.name}</h3>
+            <div class="text-sm text-[var(--parchment)]/85">{train.provider} — {train.hours}</div>
           </article>
         ))}
       </div>
     </section>
 
-    <section class="mb-10">
-      <h2 class="text-2xl font-bold mb-6 border-b border-gray-300 pb-2">Skills</h2>
-      <div class="flex flex-col gap-4">
-        {skillsEntries.map(skillCat => (
-          <article class="entry">
-            <h3 class="text-lg font-bold mb-2">{skillCat.data.category}</h3>
-            <ul class="list-disc pl-5">
-              {skillCat.data.items.map(item => (
-                <li>{item.name} <span class="text-sm uppercase tracking-wider text-gray-600 ml-2">({item.level})</span></li>
-              ))}
-            </ul>
-          </article>
-        ))}
-      </div>
-    </section>
-
-    <section class="mb-10">
-      <h2 class="text-2xl font-bold mb-6 border-b border-gray-300 pb-2">Languages</h2>
-      <ul class="list-disc pl-5 space-y-2 entry">
+    <section class="mb-8">
+      <h2 class="text-xl font-bold text-[var(--candle)] font-serif mb-4 border-b border-[var(--brass)]/60 pb-2">Languages</h2>
+      <ul class="list-disc pl-5 space-y-2 entry text-sm text-[var(--parchment)]/85">
         {resume.languages.map(lang => (
-          <li><strong>{lang.name}</strong> — {lang.level}</li>
+          <li><strong class="text-[var(--parchment)]">{lang.name}</strong> — {lang.level}</li>
         ))}
       </ul>
     </section>
 
-    <div class="no-print mt-12 pt-8 border-t border-gray-300 flex flex-col items-center gap-6">
-      <div class="w-full p-5 bg-amber-50 border border-amber-300 rounded text-sm text-stone-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
+    <div class="no-print mt-12 pt-8 border-t border-[var(--brass)]/60 flex flex-col items-center gap-6">
+      <div class="w-full p-5 bg-[#1e1208]/90 border border-[var(--brass)]/60 rounded text-sm text-[var(--parchment)]/90 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
         <div>
-          <strong class="font-bold text-stone-900 block sm:inline">Seeking Technical Proof of Work?</strong>
-          <span class="text-stone-700 sm:ml-1">Explore system architecture breakdowns, live deployed applications, and source code.</span>
+          <strong class="font-bold text-[var(--candle)] block sm:inline">Seeking Technical Proof of Work?</strong>
+          <span class="sm:ml-1">Explore system architecture breakdowns, live deployed applications, and source code.</span>
         </div>
         <a
           href="/simple"
-          class="inline-flex items-center gap-1.5 font-bold text-amber-900 hover:text-amber-700 underline flex-shrink-0 min-h-[44px]"
+          class="inline-flex items-center gap-1.5 font-bold text-[var(--candle)] hover:text-[var(--parchment)] underline flex-shrink-0 min-h-[44px]"
         >
           <span>View Technical Showcase & Proof of Work</span> &rarr;
         </a>
       </div>
 
-      <div class="flex justify-center w-full">
-        <a href="/resume.pdf" download class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 border border-gray-500 hover:border-gray-800 rounded transition-colors duration-200 uppercase tracking-widest text-sm no-print">
+      <div class="flex flex-wrap justify-center w-full items-center gap-3">
+        <a
+          href="/resume.pdf"
+          download
+          class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 border border-[var(--brass)] hover:border-[var(--candle)] rounded transition-colors duration-200 uppercase tracking-widest text-sm text-[var(--candle)] no-print"
+        >
           Download PDF
         </a>
+        <span class="text-xs text-[var(--parchment)]/60">(Developer variant)</span>
+        <button
+          type="button"
+          id="print-resume"
+          class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 border border-[var(--brass)] hover:border-[var(--candle)] rounded transition-colors duration-200 uppercase tracking-widest text-sm text-[var(--candle)] no-print"
+        >
+          Print / Save this View
+        </button>
       </div>
     </div>
 
@@ -153,4 +303,51 @@ const skillsEntries = await getCollection('skills');
     import { recordMilestone } from '../store/questlog';
     recordMilestone('resume');
   </script>
-</BaseLayout>
+
+  <script is:inline>
+    (() => {
+      // Resume variant switcher: Developer / QA. Keyboard-accessible (real
+      // buttons), deep-linkable via ?role=qa, and print-aware: switching a
+      // variant updates the URL so printing or saving-as-PDF captures the
+      // exact view on screen. The Download PDF button serves the pre-rendered
+      // Developer variant.
+      const tabs = Array.from(document.querySelectorAll('[data-resume-tab]'));
+      const panels = Array.from(document.querySelectorAll('[data-resume-panel]'));
+      if (!tabs.length || !panels.length) return;
+
+      const VALID_IDS = new Set(tabs.map((tab) => tab.getAttribute('data-resume-tab')));
+      const fromQuery = new URLSearchParams(window.location.search).get('role') || '';
+      const initialId = VALID_IDS.has(fromQuery) ? fromQuery : 'developer';
+
+      function selectVariant(id, pushUrl) {
+        tabs.forEach((tab) => {
+          const active = tab.getAttribute('data-resume-tab') === id;
+          tab.setAttribute('aria-selected', active ? 'true' : 'false');
+        });
+        panels.forEach((panel) => {
+          panel.hidden = panel.getAttribute('data-resume-panel') !== id;
+        });
+        if (pushUrl) {
+          const url = new URL(window.location.href);
+          if (id === 'developer') {
+            url.searchParams.delete('role');
+          } else {
+            url.searchParams.set('role', id);
+          }
+          window.history.replaceState(window.history.state, '', url);
+        }
+      }
+
+      tabs.forEach((tab) => {
+        tab.addEventListener('click', () => {
+          selectVariant(tab.getAttribute('data-resume-tab') || '', true);
+        });
+      });
+
+      selectVariant(initialId, false);
+
+      const printButton = document.getElementById('print-resume');
+      printButton && printButton.addEventListener('click', () => window.print());
+    })();
+  </script>
+</TavernLayout>

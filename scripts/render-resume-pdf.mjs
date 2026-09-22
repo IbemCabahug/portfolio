@@ -4,7 +4,7 @@ import { createDistServer } from './serve-dist.mjs';
 import { EDGE } from './browser-path.mjs';
 const height = 768;
 
-const srv = await createDistServer({ root: 'dist', port: 0, quiet: true });
+const srv = await createDistServer({ root: 'dist/client', port: 0, quiet: true });
 
 const browser = await puppeteer.launch({
   executablePath: EDGE,

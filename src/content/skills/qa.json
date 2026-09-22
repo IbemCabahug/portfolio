@@ -1,0 +1,25 @@
+{
+  "category": "QA & Testing",
+  "items": [
+    {
+      "name": "Manual Testing",
+      "level": "confident"
+    },
+    {
+      "name": "Functional & Regression Testing",
+      "level": "confident"
+    },
+    {
+      "name": "Test Case Writing & Execution",
+      "level": "confident"
+    },
+    {
+      "name": "Bug Reporting & Tracking",
+      "level": "confident"
+    },
+    {
+      "name": "Release Testing",
+      "level": "working"
+    }
+  ]
+}

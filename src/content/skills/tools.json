@@ -16,6 +16,10 @@
     {
       "name": "Antigravity IDE",
       "level": "confident"
+    },
+    {
+      "name": "GitHub Issues & Kanban Boards",
+      "level": "confident"
     }
   ]
 }

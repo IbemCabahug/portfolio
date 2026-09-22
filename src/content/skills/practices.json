@@ -1,0 +1,21 @@
+{
+  "category": "Practices",
+  "items": [
+    {
+      "name": "Agile / Kanban",
+      "level": "working"
+    },
+    {
+      "name": "Requirements Planning",
+      "level": "confident"
+    },
+    {
+      "name": "Debugging",
+      "level": "working"
+    },
+    {
+      "name": "Technical Problem-Solving",
+      "level": "confident"
+    }
+  ]
+}

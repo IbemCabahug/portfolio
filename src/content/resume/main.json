@@ -1,4 +1,12 @@
 {
+  "roleTitles": {
+    "developer": "AI-Assisted Developer",
+    "qa": "Junior QA Tester"
+  },
+  "summary": {
+    "developer": "I build and ship web applications with an AI-assisted workflow: I write the requirements, direct AI tooling, and personally review, test, and own every line that ships. Computer Technology graduate with production experience on a biometric attendance system and a portfolio of deployed, documented projects.",
+    "qa": "Entry-level QA candidate with 1,800 hours of internship experience testing a production biometric attendance system: writing and executing test cases, performing manual pre-release testing, and reporting and tracking bugs in an Agile/Kanban workflow. Computer Technology graduate with a technical support background. Plans, directs, and tests personal projects built with AI-assisted development, and tracks defects and enhancements with GitHub Issues. Eager to grow into API testing and test automation."
+  },
   "experience": [
     {
       "role": "IT and Administrative Support Intern",
@@ -8,6 +16,13 @@
       "bullets": [
         "Provided technical and administrative support: troubleshooting, hardware and software installation, data entry, inventory records and document organisation.",
         "Contributed to BITS, the company's biometric attendance system, in production use."
+      ],
+      "qaBullets": [
+        "Performed QA on updates to BITS, the company's production biometric attendance system, by writing and executing test cases, running manual tests before each release, and reporting and tracking bugs.",
+        "Tested features including overtime check-in handling, multi-shift/split-shift corrections, punch-time normalization, batch overtime assignment, and split-shift report aggregation.",
+        "Used Agile practices with a GitHub Kanban board to track sprint tasks and move work through To Do, In Progress, Testing, and Done stages.",
+        "Supported the real-time attendance dashboard and system data handling.",
+        "Provided technical and administrative support, including troubleshooting, hardware and software installation, data entry, inventory records, and document organization."
       ]
     },
     {
@@ -15,10 +30,45 @@
       "org": "BITS — Biometric Integrated Timekeeping System",
       "period": "2026",
       "bullets": [
+        "Worked in an AI-assisted workflow: wrote requirements and acceptance criteria, directed AI tooling, and personally reviewed, tested, and owned every merged change.",
         "Built biometric overtime check-in handling so additional daily scans route to approved overtime requests instead of overwriting a shift checkout.",
         "Fixed multi-shift and split-shift edge cases producing phantom no-shift records.",
         "Normalised punch times and emitted real-time dashboard events.",
         "Added batch overtime assignment and split-shift report aggregation."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "ArcaneTyper — Multiplayer Typing Game",
+      "note": "AI-Assisted Build",
+      "url": "https://arcane-typer.vercel.app",
+      "urlLabel": "arcane-typer.vercel.app",
+      "bullets": [
+        "Wrote requirements and directed the AI-assisted build of a web typing game with survival, practice, and real-time duel modes, plus leaderboards, achievements, and user accounts.",
+        "Manually tested game modes, scoring, and real-time duel flows, and tracked bugs and enhancements using GitHub Issues."
+      ],
+      "qaBullets": [
+        "Wrote requirements and directed the AI-assisted build of a web typing game with survival, practice, and real-time duel modes, plus leaderboards, achievements, and user accounts.",
+        "Manually tested game modes, scoring, and real-time duel flows, and tracked bugs and enhancements using GitHub Issues."
+      ]
+    },
+    {
+      "name": "Mimic — Android Party Game with Private Encrypted Vault",
+      "note": "AI-Assisted Build",
+      "url": "https://github.com/IbemCabahug/mimic",
+      "urlLabel": "github.com/IbemCabahug/mimic",
+      "bullets": [
+        "Planned requirements and directed the AI-assisted build of an Android social-deduction game (3 game modes, 5 word packs, LAN multiplayer for up to 8 players) that conceals a private encrypted photo, video, and notes vault.",
+        "Manually tested game and vault security flows, including secret-gesture unlock, PIN setup, failed-PIN lockout, and encrypted video playback.",
+        "Found and reported release-only bugs — including a vault setup failure that appeared only on clean installs — and adopted a rule to test every release build on a wiped physical device.",
+        "Verified features against an automated suite of 450+ tests plus manual checks on a physical release-mode device before marking work done."
+      ],
+      "qaBullets": [
+        "Planned requirements and directed the AI-assisted build of an Android social-deduction game (3 game modes, 5 word packs, LAN multiplayer for up to 8 players) that conceals a private encrypted photo, video, and notes vault.",
+        "Manually tested game and vault security flows (secret-gesture unlock, PIN setup, failed-PIN lockout, auto-lock, encrypted video playback).",
+        "Found and reported release-only bugs, including a vault setup failure that appeared only on clean installs, and adopted a rule to test every release build on a wiped physical device.",
+        "Verified features against an automated suite of 450+ tests plus manual checks on a physical release-mode device before marking work done."
       ]
     }
   ],
