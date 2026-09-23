@@ -8,132 +8,23 @@ const profile = profileEntries[0].data;
 const resumeEntries = await getCollection('resume');
 const resume = resumeEntries[0].data;
 
-const skillEntries = await getCollection('skills');
-
-// Skills are GENERALIZED into broad domains (one line each) on BOTH variants,
-// instead of per-item proficiency levels — the honest frame for skills
-// exercised by planning, directing and testing AI-assisted builds across web,
-// data, mobile and tooling.
-const namesIn = (categories: string[]) =>
-  categories
-    .flatMap((category) =>
-      skillEntries.find((entry) => entry.data.category === category)?.data.items.map((item) => item.name) ?? []
-    )
-    .join(', ');
-
-interface SkillGroup {
-  label: string;
-  detail: string;
-}
-
-const devSkillGroups: SkillGroup[] = [
-  {
-    label: 'AI-Assisted Development',
-    detail:
-      'Full project lifecycle: requirements & acceptance criteria, AI direction (Antigravity IDE), code review, manual testing, and Git/GitHub deployment — I own every line that ships.',
-  },
-  {
-    label: 'Web',
-    detail: namesIn(['Languages', 'Frameworks']),
-  },
-  {
-    label: 'Data',
-    detail: namesIn(['Data']),
-  },
-  {
-    label: 'Mobile',
-    detail: 'Android (AI-assisted build and release testing)',
-  },
-  {
-    label: 'Tooling & Workflow',
-    detail: namesIn(['Tools']) + ', Agile/Kanban, debugging, technical problem-solving',
-  },
-  {
-    label: 'Support & Records',
-    detail: namesIn(['Other']),
-  },
-];
-
-// QA variant: same generalized treatment, but ordered QA-first so the testing
-// work leads the section (QA & Testing before tooling, web, data and mobile).
-const qaSkillGroups: SkillGroup[] = [
-  {
-    label: 'QA & Testing',
-    detail:
-      'Manual, functional and regression testing; test case writing and execution; bug reporting and tracking; pre-release testing on wiped physical devices.',
-  },
-  {
-    label: 'Tools & Workflow',
-    detail: namesIn(['Tools']) + ', Agile/Kanban, requirements planning, debugging',
-  },
-  {
-    label: 'Web',
-    detail: namesIn(['Languages', 'Frameworks']),
-  },
-  {
-    label: 'Data',
-    detail: namesIn(['Data']),
-  },
-  {
-    label: 'Mobile',
-    detail: 'Android (manual testing of gameplay, security and vault flows on release builds)',
-  },
-  {
-    label: 'Support & Records',
-    detail: namesIn(['Other']),
-  },
-];
-
-// Two resume variants share one source of truth: Developer (default) and QA.
-// Each variant swaps the role title, summary, experience bullets and project
-// emphasis; education, training and languages stay shared below the panels.
-interface VariantPanel {
-  id: string;
-  tabLabel: string;
-  roleTitle: string;
-  targetRoles?: string[];
-  pdfFile: string;
-  summary: string;
-  experience: typeof resume.experience;
-  projects: typeof resume.projects;
-  skillGroups: SkillGroup[];
-}
-
-const variantPanels: VariantPanel[] = [
-  {
-    id: 'developer',
-    tabLabel: 'Developer',
-    roleTitle: resume.roleTitles.developer,
-    targetRoles: resume.targetRoles?.developer,
-    pdfFile: '/Cabahug-Nhovem-Resume-Developer.pdf',
-    summary: resume.summary.developer,
-    experience: resume.experience,
-    projects: resume.projects.map((project) => ({ ...project, bullets: project.bullets })),
-    skillGroups: devSkillGroups,
-  },
-  {
-    id: 'qa',
-    tabLabel: 'QA',
-    roleTitle: resume.roleTitles.qa,
-    targetRoles: resume.targetRoles?.qa,
-    pdfFile: '/Cabahug-Nhovem-Resume-QA-Tester.pdf',
-    summary: resume.summary.qa,
-    experience: resume.experience
-      .filter((exp) => (exp.qaBullets ?? []).length > 0)
-      .map((exp) => ({ ...exp, bullets: exp.qaBullets ?? [] })),
-    projects: resume.projects.map((project) => ({ ...project, bullets: project.qaBullets ?? project.bullets })),
-    skillGroups: qaSkillGroups,
-  },
-];
+const pdfPath = '/Cabahug-Nhovem-Resume.pdf';
 ---
 
 <TavernLayout
   title="Resume | Nhovem Cabahug"
-  description="Nhovem Cabahug's Resume — Developer and QA variants."
+  description="Nhovem Cabahug's Resume — IT & Administrative Support Intern, QA Testing, and AI-Assisted Development."
   location="resume"
 >
   <style is:global>
+    .print-only {
+      display: none !important;
+    }
+
     @media print {
+      .print-only {
+        display: inline !important;
+      }
       *, *::before, *::after {
         background: transparent !important;
         color: black !important;
@@ -147,13 +38,9 @@ const variantPanels: VariantPanel[] = [
       nav, .no-print, .location-indicator {
         display: none !important;
       }
-      a[href]::after {
-        content: " (" attr(href) ")";
-        font-size: 0.9em;
-        word-break: break-all;
-      }
-      a[href^='mailto:']::after {
-        content: none;
+      a {
+        text-decoration: none !important;
+        color: black !important;
       }
       .entry, li {
         page-break-inside: avoid;
@@ -171,39 +58,10 @@ const variantPanels: VariantPanel[] = [
       }
     }
 
-    /* Resume document: a white "paper" sheet on the tavern background.
-       Inside the sheet we use ink-on-paper colours (stone greys plus a warm
-       amber accent) rather than tavern candle/parchment, so both resume
-       variants read like a real document and print cleanly. */
+    /* Resume document: clean white paper sheet styled for readability and print fidelity */
     .resume-sheet {
       background: #ffffff;
-      color: #44403c;
-    }
-
-    /* Resume variant switcher (Developer / QA) */
-    .resume-tab {
-      display: inline-flex;
-      align-items: center;
-      min-height: 44px;
-      padding: 0 1.1rem;
-      border-radius: 0.375rem;
-      background: #1e1208;
-      border: 1px solid var(--brass);
-      color: var(--candle);
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-    }
-    .resume-tab:hover {
-      border-color: var(--candle);
-    }
-    .resume-tab[aria-selected="true"] {
-      background: var(--candle);
-      border-color: var(--candle);
-      color: #1e1208;
+      color: #292524;
     }
   </style>
 
@@ -216,163 +74,171 @@ const variantPanels: VariantPanel[] = [
         &larr; Return to Main Tavern
       </a>
       <span class="text-xs text-[var(--parchment)]/70 uppercase tracking-widest font-mono">
-        Scribe's Ledger · Resume
+        Scribe's Ledger · Master Resume
       </span>
     </nav>
 
-    <div class="no-print resume-toolbar mb-4 flex flex-wrap items-center gap-2" role="tablist" aria-label="Choose resume variant">
-      <span class="text-[11px] uppercase tracking-widest text-[var(--brass)] font-bold mr-1">View as:</span>
-      {variantPanels.map((v) => (
-        <button
-          type="button"
-          role="tab"
-          id={`tab-${v.id}`}
-          aria-selected={v.id === 'developer' ? 'true' : 'false'}
-          aria-controls={`panel-${v.id}`}
-          data-resume-tab={v.id}
-          data-resume-pdf={v.pdfFile}
-          data-resume-variant={v.tabLabel}
-          class="resume-tab"
-        >
-          {v.tabLabel} Resume
-        </button>
-      ))}
-    </div>
-
-    <article class="resume-sheet border border-[#e7e5e4] border-t-4 border-t-[#c9a227] rounded-lg shadow-xl px-6 sm:px-10 py-8 sm:py-10">
-      <header class="mb-8 border-b-2 border-[#d6d3d1] pb-6">
-        <h1 class="text-3xl sm:text-4xl font-extrabold text-[#1c1917] font-serif tracking-wide mb-3">{profile.name}</h1>
-      
-      <div class="flex flex-col gap-1 text-sm text-[#57534e]">
-        <p class="location-indicator">Location: {profile.location}</p>
-        <p>Email: <a href={`mailto:${profile.email}`} class="underline text-[#92400e] hover:text-[#78350f]">{profile.email}</a></p>
-        <p>GitHub: <a href={profile.github} class="underline text-[#92400e] hover:text-[#78350f]" rel="noopener">github.com/IbemCabahug</a></p>
-      </div>
-    </header>
-
-    {variantPanels.map((v, index) => (
-      <section
-        id={`panel-${v.id}`}
-        role="tabpanel"
-        aria-labelledby={`tab-${v.id}`}
-        data-resume-panel={v.id}
-        hidden={index !== 0}
-      >
-        <p class="text-xl font-bold text-[#1c1917] font-serif mb-3">{v.roleTitle}</p>
-        {/*
-          ATS note: roles are rendered as `whitespace-nowrap` spans joined by
-          plain ASCII commas. Two reasons: (1) a multi-word role must never wrap
-          mid-phrase ("Junior Software Developer" split across lines breaks
-          exact-phrase matching), and (2) any line can break only at a comma,
-          between roles. Non-ASCII separators (e.g. a middle dot) are avoided
-          because sub-set embed fonts can extract them as replacement chars.
-        */}
-        {v.targetRoles && v.targetRoles.length > 0 && (
-          <p class="text-sm font-semibold text-[#78350f] mb-3">
-            Target roles:{' '}
-            {v.targetRoles.map((role, roleIndex) => (
-              <>
-                {roleIndex > 0 ? ', ' : ''}
-                <span class="whitespace-nowrap">{role}</span>
-              </>
-            ))}
-          </p>
-        )}
-        <p class="text-sm leading-relaxed text-[#44403c] mb-8">{v.summary}</p>
-
-        <h2 class="text-xl font-bold text-[#1c1917] font-serif mb-4 border-b border-[#e7e5e4] pb-2">Experience</h2>
-        <div class="flex flex-col gap-6 mb-8">
-
-          {v.experience.map((exp) => (
-            <article class="entry">
-              <div class="flex flex-wrap items-baseline justify-between gap-x-3">
-                <h3 class="text-lg font-bold text-[#1c1917]">{exp.role}</h3>
-                {/* ASCII separators only: non-ASCII glyphs (en dash, middle dot)
-                    extract as replacement characters in the PDF because the
-                    sub-set embedded fonts ship no ToUnicode mapping for them. */}
-                <span class="text-xs font-semibold text-[#78716c]">{exp.period}{exp.hours ? ` | ${exp.hours}` : ''}</span>
-              </div>
-              <div class="font-semibold text-sm text-[#92400e] mb-2">{exp.org}</div>
-              <ul class="list-disc pl-5 space-y-1 text-sm text-[#44403c]">
-                {exp.bullets.map((bullet) => <li>{bullet}</li>)}
-              </ul>
-            </article>
-          ))}
+    <article class="resume-sheet border border-[#e7e5e4] border-t-4 border-t-[#c9a227] rounded-lg shadow-xl px-6 sm:px-10 py-8 sm:py-10 text-[14px] leading-relaxed">
+      <!-- Header -->
+      <header class="mb-6 border-b-2 border-[#1c1917] pb-4">
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-[#1c1917] tracking-wider uppercase font-serif mb-2">
+          {profile.name}
+        </h1>
+        
+        <div class="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-x-2 gap-y-1 text-xs sm:text-sm text-[#44403c] font-medium">
+          <a href={`tel:${resume.contact.phone}`} class="hover:text-[#92400e] hover:underline">{resume.contact.phone}</a>
+          <span class="hidden sm:inline text-[#a8a29e]" aria-hidden="true">|</span>
+          <a href={`mailto:${resume.contact.email}`} class="hover:text-[#92400e] hover:underline text-[#92400e]">{resume.contact.email}</a>
+          <span class="hidden sm:inline text-[#a8a29e]" aria-hidden="true">|</span>
+          <span>{resume.contact.location}</span>
         </div>
 
-        <h2 class="text-xl font-bold text-[#1c1917] font-serif mb-4 border-b border-[#e7e5e4] pb-2">Selected Projects</h2>
-        <div class="flex flex-col gap-6 mb-8">
-          {v.projects.map((project) => (
-            <article class="entry">
-              <div class="flex flex-wrap items-baseline justify-between gap-x-3">
-                <h3 class="text-lg font-bold text-[#1c1917]">
-                  {project.name}
-                  {project.note && <span class="ml-2 text-xs font-semibold uppercase tracking-wider text-[#92400e]">({project.note})</span>}
-                </h3>
-                <a
-                  href={project.url}
-                  class="text-xs font-semibold text-[#92400e] underline hover:text-[#78350f]"
-                  rel="noopener"
-                >
-                  {project.urlLabel ?? project.url}
-                </a>
-              </div>
-              <ul class="list-disc pl-5 space-y-1 text-sm text-[#44403c] mt-2">
-                {project.bullets.map((bullet) => <li>{bullet}</li>)}
-              </ul>
-            </article>
-          ))}
+        <div class="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-x-2 gap-y-1 text-xs sm:text-sm text-[#44403c] font-medium mt-1">
+          <span class="print-only">
+            Portfolio: <a href={resume.contact.portfolioUrl} target="_blank" rel="noopener noreferrer" class="hover:text-[#78350f] text-[#92400e] underline">{resume.contact.portfolio}</a>
+            <span class="text-[#a8a29e]" aria-hidden="true"> | </span>
+          </span>
+          <span>GitHub: <a href={resume.contact.githubUrl} target="_blank" rel="noopener noreferrer" class="hover:text-[#78350f] text-[#92400e] underline">{resume.contact.github}</a></span>
         </div>
+      </header>
 
-        <h2 class="text-xl font-bold text-[#1c1917] font-serif mb-4 border-b border-[#e7e5e4] pb-2">Skills</h2>
-        <div class="flex flex-col gap-3 mb-8">
-          {v.skillGroups.map((group) => (
-            <p class="entry text-sm leading-relaxed text-[#44403c]">
-              <strong class="font-bold text-[#1c1917]">{group.label}:</strong> {group.detail}
+      <!-- Professional Summary -->
+      <section class="mb-6">
+        <h2 class="text-base sm:text-lg font-bold text-[#1c1917] tracking-wider uppercase font-serif mb-2 border-b border-[#d6d3d1] pb-1">
+          Professional Summary
+        </h2>
+        <p class="text-sm leading-relaxed text-[#44403c] text-justify">
+          {resume.summary}
+        </p>
+      </section>
+
+      <!-- Core Skills -->
+      <section class="mb-6">
+        <h2 class="text-base sm:text-lg font-bold text-[#1c1917] tracking-wider uppercase font-serif mb-2 border-b border-[#d6d3d1] pb-1">
+          Core Skills
+        </h2>
+        <div class="flex flex-col gap-1.5 text-sm">
+          {resume.coreSkills.map((skill) => (
+            <p class="entry leading-snug text-[#44403c]">
+              <strong class="font-bold text-[#1c1917]">{skill.category}:</strong> {skill.items}
             </p>
           ))}
         </div>
       </section>
-    ))}
 
-    <section class="mb-8">
-      <h2 class="text-xl font-bold text-[#1c1917] font-serif mb-4 border-b border-[#e7e5e4] pb-2">Education</h2>
-      <div class="flex flex-col gap-6">
-        {resume.education.map(edu => (
-          <article class="entry">
-            <h3 class="text-lg font-bold text-[#1c1917]">{edu.credential}</h3>
-            <div class="font-semibold text-sm text-[#92400e] mb-1">{edu.school}</div>
-            <div class="text-xs font-semibold text-[#78716c] mb-2">{edu.period}</div>
-            <ul class="list-disc pl-5 space-y-1 text-sm text-[#44403c]">
-              {edu.honors.map(honor => <li>{honor}</li>)}
-            </ul>
-          </article>
-        ))}
-      </div>
-    </section>
+      <!-- Experience -->
+      <section class="mb-6">
+        <h2 class="text-base sm:text-lg font-bold text-[#1c1917] tracking-wider uppercase font-serif mb-3 border-b border-[#d6d3d1] pb-1">
+          Experience
+        </h2>
+        <div class="flex flex-col gap-5">
+          {resume.experience.map((exp) => (
+            <article class="entry">
+              <div class="flex flex-wrap items-baseline justify-between gap-x-3 mb-1">
+                <h3 class="text-base font-bold text-[#1c1917]">
+                  {exp.role} <span class="font-normal text-[#57534e]">— {exp.org}</span>
+                </h3>
+                <span class="text-xs sm:text-sm font-semibold text-[#78716c] whitespace-nowrap">
+                  {exp.period} {exp.hours ? `(${exp.hours})` : ''}
+                </span>
+              </div>
+              <ul class="list-disc pl-5 space-y-1.5 text-sm text-[#44403c] mt-1.5">
+                {exp.bullets.map((bullet) => (
+                  <li class="leading-relaxed">{bullet}</li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </div>
+      </section>
 
-    <section class="mb-8">
-      <h2 class="text-xl font-bold text-[#1c1917] font-serif mb-4 border-b border-[#e7e5e4] pb-2">Training</h2>
-      <div class="flex flex-col gap-4">
-        {resume.training.map(train => (
-          <article class="entry">
-            <h3 class="text-base font-bold text-[#1c1917]">{train.name}</h3>
-            <div class="text-sm text-[#44403c]">{train.provider} — {train.hours}</div>
-          </article>
-        ))}
-      </div>
-    </section>
+      <!-- Selected Projects -->
+      <section class="mb-6">
+        <h2 class="text-base sm:text-lg font-bold text-[#1c1917] tracking-wider uppercase font-serif mb-3 border-b border-[#d6d3d1] pb-1">
+          Selected Projects
+        </h2>
+        <div class="flex flex-col gap-4">
+          {resume.projects.map((project) => (
+            <article class="entry">
+              <div class="flex flex-wrap items-baseline justify-between gap-x-3">
+                <h3 class="text-base font-bold text-[#1c1917]">
+                  {project.name}
+                  {project.note && (
+                    <span class="ml-1 text-xs font-semibold uppercase tracking-wider text-[#92400e]">
+                      ({project.note})
+                    </span>
+                  )}
+                </h3>
+                <a
+                  href={project.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-xs sm:text-sm font-semibold text-[#92400e] underline hover:text-[#78350f]"
+                >
+                  {project.urlLabel ?? project.url}
+                </a>
+              </div>
+              <ul class="list-disc pl-5 space-y-1 text-sm text-[#44403c] mt-1.5">
+                {project.bullets.map((bullet) => (
+                  <li class="leading-relaxed">{bullet}</li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </div>
+      </section>
 
-    <section>
-      <h2 class="text-xl font-bold text-[#1c1917] font-serif mb-4 border-b border-[#e7e5e4] pb-2">Languages</h2>
-      <ul class="list-disc pl-5 space-y-2 entry text-sm text-[#44403c]">
-        {resume.languages.map(lang => (
-          <li><strong class="text-[#1c1917]">{lang.name}</strong> — {lang.level}</li>
-        ))}
-      </ul>
-    </section>
+      <!-- Education -->
+      <section class="mb-6">
+        <h2 class="text-base sm:text-lg font-bold text-[#1c1917] tracking-wider uppercase font-serif mb-2 border-b border-[#d6d3d1] pb-1">
+          Education
+        </h2>
+        <div class="flex flex-col gap-3">
+          {resume.education.map((edu) => (
+            <article class="entry">
+              <h3 class="text-base font-bold text-[#1c1917]">{edu.credential}</h3>
+              <div class="text-xs sm:text-sm text-[#57534e] font-medium mb-1">
+                {edu.school} | {edu.period}
+              </div>
+              <div class="text-xs sm:text-sm text-[#44403c]">
+                {edu.honors.join(' | ')}
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <!-- Training & Certifications -->
+      <section class="mb-6">
+        <h2 class="text-base sm:text-lg font-bold text-[#1c1917] tracking-wider uppercase font-serif mb-2 border-b border-[#d6d3d1] pb-1">
+          Training & Certifications
+        </h2>
+        <div class="flex flex-col gap-2">
+          {resume.training.map((train) => (
+            <article class="entry text-sm text-[#44403c]">
+              <strong class="font-bold text-[#1c1917]">{train.name}</strong> — {train.provider}, {train.hours}
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <!-- Languages -->
+      <section>
+        <h2 class="text-base sm:text-lg font-bold text-[#1c1917] tracking-wider uppercase font-serif mb-2 border-b border-[#d6d3d1] pb-1">
+          Languages
+        </h2>
+        <p class="entry text-sm text-[#44403c]">
+          {resume.languages.map((lang, idx) => (
+            <>
+              {idx > 0 ? ' | ' : ''}
+              <span>{lang.name} ({lang.level})</span>
+            </>
+          ))}
+        </p>
+      </section>
     </article>
 
+    <!-- Bottom Actions & Link to Portfolio Proof-of-Work -->
     <div class="no-print mt-12 pt-8 border-t border-[var(--brass)]/60 flex flex-col items-center gap-6">
       <div class="w-full p-5 bg-[#1e1208]/90 border border-[var(--brass)]/60 rounded text-sm text-[var(--parchment)]/90 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
         <div>
@@ -390,25 +256,21 @@ const variantPanels: VariantPanel[] = [
       <div class="flex flex-wrap justify-center w-full items-center gap-3">
         <a
           id="download-pdf"
-          href={variantPanels[0].pdfFile}
-          download
-          class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 border border-[var(--brass)] hover:border-[var(--candle)] rounded transition-colors duration-200 uppercase tracking-widest text-sm text-[var(--candle)] no-print"
+          href={pdfPath}
+          download="Cabahug-Nhovem-Resume.pdf"
+          class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 border border-[var(--brass)] hover:border-[var(--candle)] rounded transition-colors duration-200 uppercase tracking-widest text-sm text-[var(--candle)]"
         >
           Download PDF
         </a>
-        <span id="download-variant" class="text-xs text-[var(--parchment)]/60">
-          ({variantPanels[0].tabLabel} variant)
-        </span>
         <button
           type="button"
           id="print-resume"
-          class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 border border-[var(--brass)] hover:border-[var(--candle)] rounded transition-colors duration-200 uppercase tracking-widest text-sm text-[var(--candle)] no-print"
+          class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 border border-[var(--brass)] hover:border-[var(--candle)] rounded transition-colors duration-200 uppercase tracking-widest text-sm text-[var(--candle)] cursor-pointer"
         >
           Print / Save this View
         </button>
       </div>
     </div>
-
   </div>
 
   <script>
@@ -418,59 +280,6 @@ const variantPanels: VariantPanel[] = [
 
   <script is:inline>
     (() => {
-      // Resume variant switcher: Developer / QA. Keyboard-accessible (real
-      // buttons), deep-linkable via ?role=qa, and print-aware: switching a
-      // variant updates the URL so printing or saving-as-PDF captures the
-      // exact view on screen. The Download PDF button follows the active
-      // variant (each variant has its own pre-rendered PDF).
-      const tabs = Array.from(document.querySelectorAll('[data-resume-tab]'));
-      const panels = Array.from(document.querySelectorAll('[data-resume-panel]'));
-      if (!tabs.length || !panels.length) return;
-
-      const downloadLink = document.getElementById('download-pdf');
-      const downloadVariant = document.getElementById('download-variant');
-
-      const VALID_IDS = new Set(tabs.map((tab) => tab.getAttribute('data-resume-tab')));
-      const fromQuery = new URLSearchParams(window.location.search).get('role') || '';
-      const initialId = VALID_IDS.has(fromQuery) ? fromQuery : 'developer';
-
-      function selectVariant(id, pushUrl) {
-        tabs.forEach((tab) => {
-          const active = tab.getAttribute('data-resume-tab') === id;
-          tab.setAttribute('aria-selected', active ? 'true' : 'false');
-        });
-        panels.forEach((panel) => {
-          panel.hidden = panel.getAttribute('data-resume-panel') !== id;
-        });
-
-        const activeTab = tabs.find((tab) => tab.getAttribute('data-resume-tab') === id);
-        if (activeTab) {
-          const pdfHref = activeTab.getAttribute('data-resume-pdf');
-          if (downloadLink && pdfHref) downloadLink.setAttribute('href', pdfHref);
-          if (downloadVariant) {
-            const variantLabel = activeTab.getAttribute('data-resume-variant') || id;
-            downloadVariant.textContent = `(${variantLabel} variant)`;
-          }
-        }
-        if (pushUrl) {
-          const url = new URL(window.location.href);
-          if (id === 'developer') {
-            url.searchParams.delete('role');
-          } else {
-            url.searchParams.set('role', id);
-          }
-          window.history.replaceState(window.history.state, '', url);
-        }
-      }
-
-      tabs.forEach((tab) => {
-        tab.addEventListener('click', () => {
-          selectVariant(tab.getAttribute('data-resume-tab') || '', true);
-        });
-      });
-
-      selectVariant(initialId, false);
-
       const printButton = document.getElementById('print-resume');
       printButton && printButton.addEventListener('click', () => window.print());
     })();

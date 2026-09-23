@@ -1,52 +1,48 @@
 {
-  "roleTitles": {
-    "developer": "AI-Assisted Developer (Web & Android)",
-    "qa": "Junior QA Tester"
+  "contact": {
+    "phone": "+639943130249",
+    "email": "cabahugnhovem@gmail.com",
+    "location": "Mandaue City, Cebu, 6014",
+    "portfolio": "portfolio-ibem.vercel.app",
+    "portfolioUrl": "https://portfolio-ibem.vercel.app",
+    "github": "github.com/IbemCabahug",
+    "githubUrl": "https://github.com/IbemCabahug"
   },
-  "targetRoles": {
-    "developer": [
-      "Web Developer",
-      "Frontend Developer",
-      "Android Developer",
-      "Junior Software Developer"
-    ],
-    "qa": [
-      "Junior QA Tester",
-      "Manual QA Tester"
-    ]
-  },
-  "summary": {
-    "developer": "I build and ship web applications with an AI-assisted workflow: I write the requirements, direct AI tooling, and personally review, test, and own every line that ships. Computer Technology graduate with production experience on a biometric attendance system and a portfolio of deployed, documented projects.",
-    "qa": "Entry-level QA candidate with 1,800 hours of internship experience testing a production biometric attendance system: writing and executing test cases, performing manual pre-release testing, and reporting and tracking bugs in an Agile/Kanban workflow. Computer Technology graduate with a technical support background. Plans, directs, and tests personal projects built with AI-assisted development, and tracks defects and enhancements with GitHub Issues. Eager to grow into API testing and test automation."
-  },
+  "summary": "Computer Technology graduate with 1,800 hours of hands-on IT and administrative support experience gained through an internship at a shipping and logistics company. Background spans manual QA testing of a production biometric attendance system (test case writing and execution, pre-release testing, and bug reporting/tracking in an Agile/Kanban workflow), data entry and technical support/troubleshooting. Also plans, directs, and manually tests personal software projects built with AI-assisted development, tracking work through GitHub Issues and Kanban boards. Detail-oriented, reliable, and quick to learn new systems, with fast and accurate typing (80+ WPM).",
+  "coreSkills": [
+    {
+      "category": "QA & Testing",
+      "items": "Manual, Functional & Regression Testing; Test Case Writing & Execution; Release/Pre-Release Testing; Bug Reporting & Tracking; Agile/Kanban Workflows"
+    },
+    {
+      "category": "Technical Support",
+      "items": "Basic Hardware/Software Troubleshooting; Hardware & Software Installation; End-User Technical Support; Data Entry"
+    },
+    {
+      "category": "Web & Technical Familiarity",
+      "items": "HTML, CSS, JavaScript, SQL; Git & GitHub (incl. Issues, Kanban Boards); VS Code; AI-Assisted Development"
+    },
+    {
+      "category": "Software & Productivity Tools",
+      "items": "Microsoft Excel & Word; Google Sheets & Docs"
+    },
+    {
+      "category": "Typing Speed",
+      "items": "80+ WPM (Monkeytype)"
+    }
+  ],
   "experience": [
     {
       "role": "IT and Administrative Support Intern",
       "org": "Avega Bros. Integrated Shipping Corp.",
-      "period": "July 2025 - July 2026",
-      "hours": "1,800 hours",
+      "period": "July 2025 – July 2026",
+      "hours": "1,800 hrs",
       "bullets": [
-        "Provided technical and administrative support: troubleshooting, hardware and software installation, data entry, inventory records and document organisation.",
-        "Contributed to BITS, the company's biometric attendance system, in production use."
-      ],
-      "qaBullets": [
-        "Performed QA on updates to BITS, the company's production biometric attendance system, by writing and executing test cases, running manual tests before each release, and reporting and tracking bugs.",
-        "Tested features including overtime check-in handling, multi-shift/split-shift corrections, punch-time normalization, batch overtime assignment, and split-shift report aggregation.",
-        "Used Agile practices with a GitHub Kanban board to track sprint tasks and move work through To Do, In Progress, Testing, and Done stages.",
-        "Supported the real-time attendance dashboard and system data handling.",
-        "Provided technical and administrative support, including troubleshooting, hardware and software installation, data entry, inventory records, and document organization."
-      ]
-    },
-    {
-      "role": "Backend & Attendance Engine Developer (OJT Team of 8)",
-      "org": "BITS — Biometric Integrated Timekeeping System",
-      "period": "2026",
-      "bullets": [
-        "Worked in an AI-assisted workflow: wrote requirements and acceptance criteria, directed AI tooling, and personally reviewed, tested, and owned every merged change.",
-        "Built biometric overtime check-in handling so additional daily scans route to approved overtime requests instead of overwriting a shift checkout.",
-        "Fixed multi-shift and split-shift edge cases producing phantom no-shift records.",
-        "Normalised punch times and emitted real-time dashboard events.",
-        "Added batch overtime assignment and split-shift report aggregation."
+        "Performed manual QA testing for production updates to BITS, a biometric attendance system, by developing and executing test cases, conducting pre-release testing, and reporting and tracking defects across overtime, shift, punch-time, and reporting workflows.",
+        "Used Agile/Kanban practices with a GitHub board to track sprint tasks through To Do, In Progress, Testing, and Done stages.",
+        "Entered and maintained inventory, administrative, and biometric attendance records, verifying data for errors and inconsistencies before finalization.",
+        "Organized and maintained physical and digital records for efficient retrieval while supporting the real-time attendance dashboard and associated system data.",
+        "Provided technical and administrative support through basic hardware/software troubleshooting, installation, and configuration for office systems."
       ]
     }
   ],
@@ -57,11 +53,7 @@
       "url": "https://arcane-typer.vercel.app",
       "urlLabel": "arcane-typer.vercel.app",
       "bullets": [
-        "Wrote requirements and directed the AI-assisted build of a web typing game with survival, practice, and real-time duel modes, plus leaderboards, achievements, and user accounts.",
-        "Manually tested game modes, scoring, and real-time duel flows, and tracked bugs and enhancements using GitHub Issues."
-      ],
-      "qaBullets": [
-        "Wrote requirements and directed the AI-assisted build of a web typing game with survival, practice, and real-time duel modes, plus leaderboards, achievements, and user accounts.",
+        "Wrote requirements and directed the AI-assisted build of a web-based typing game with survival, practice, and real-time duel modes, plus leaderboards, achievements, and user accounts.",
         "Manually tested game modes, scoring, and real-time duel flows, and tracked bugs and enhancements using GitHub Issues."
       ]
     },
@@ -71,24 +63,17 @@
       "url": "https://github.com/IbemCabahug/mimic",
       "urlLabel": "github.com/IbemCabahug/mimic",
       "bullets": [
-        "Planned requirements and directed the AI-assisted build of an Android social-deduction game (3 game modes, 5 word packs, LAN multiplayer for up to 8 players) that conceals a private encrypted photo, video, and notes vault.",
-        "Manually tested game and vault security flows, including secret-gesture unlock, PIN setup, failed-PIN lockout, and encrypted video playback.",
-        "Found and reported release-only bugs — including a vault setup failure that appeared only on clean installs — and adopted a rule to test every release build on a wiped physical device.",
-        "Verified features against an automated suite of 450+ tests plus manual checks on a physical release-mode device before marking work done."
-      ],
-      "qaBullets": [
-        "Planned requirements and directed the AI-assisted build of an Android social-deduction game (3 game modes, 5 word packs, LAN multiplayer for up to 8 players) that conceals a private encrypted photo, video, and notes vault.",
-        "Manually tested game and vault security flows (secret-gesture unlock, PIN setup, failed-PIN lockout, auto-lock, encrypted video playback).",
-        "Found and reported release-only bugs, including a vault setup failure that appeared only on clean installs, and adopted a rule to test every release build on a wiped physical device.",
-        "Verified features against an automated suite of 450+ tests plus manual checks on a physical release-mode device before marking work done."
+        "Planned requirements and directed the AI-assisted build of an Android social-deduction game (3 game modes, 5 word packs, LAN multiplayer for up to 8 players) with a private encrypted photo/video/notes vault unlocked by a secret gesture.",
+        "Manually tested game and vault-security flows (secret-gesture unlock, PIN setup, failed-PIN lockout, auto-lock, encrypted video playback), and verified features against an automated suite of 450+ tests plus manual checks on a physical release-mode device.",
+        "Identified release-only defects, including a vault setup failure that appeared only on clean installs, and adopted a practice of testing every release build on a wiped physical device."
       ]
     }
   ],
   "education": [
     {
       "credential": "Bachelor of Industrial Technology, Major in Computer Technology",
-      "school": "Cebu Technological University - Danao Campus",
-      "period": "August 2022 - May 2026",
+      "school": "Cebu Technological University – Danao Campus",
+      "period": "August 2022 – May 2026",
       "honors": [
         "Academic Distinction Awardee",
         "Dean's Lister"
@@ -113,7 +98,7 @@
     },
     {
       "name": "English",
-      "level": "Professional working proficiency"
+      "level": "Professional Working Proficiency"
     }
   ]
 }

@@ -85,35 +85,33 @@ const links = defineCollection({
 const resume = defineCollection({
   loader: glob({ pattern: "**/*.json", base: "./src/content/resume" }),
   schema: z.object({
+    contact: z.object({
+      phone: z.string(),
+      email: z.string(),
+      location: z.string(),
+      portfolio: z.string(),
+      portfolioUrl: z.string(),
+      github: z.string(),
+      githubUrl: z.string(),
+    }),
+    summary: z.string(),
+    coreSkills: z.array(z.object({
+      category: z.string(),
+      items: z.string(),
+    })),
     experience: z.array(z.object({
       role: z.string(),
       org: z.string(),
       period: z.string(),
       hours: z.string().optional(),
       bullets: z.array(z.string()),
-      qaBullets: z.array(z.string()).optional(),
     })),
-    roleTitles: z.object({
-      developer: z.string(),
-      qa: z.string(),
-    }),
-    // ATS coverage: the headline stays honest/personal, while these list the
-    // exact standard titles recruiters and job boards search and filter by.
-    targetRoles: z.object({
-      developer: z.array(z.string()).optional(),
-      qa: z.array(z.string()).optional(),
-    }).optional(),
-    summary: z.object({
-      developer: z.string(),
-      qa: z.string(),
-    }),
     projects: z.array(z.object({
       name: z.string(),
       note: z.string().optional(),
       url: z.string(),
       urlLabel: z.string().optional(),
       bullets: z.array(z.string()),
-      qaBullets: z.array(z.string()).optional(),
     })),
     education: z.array(z.object({
       credential: z.string(),
