@@ -25,6 +25,13 @@ name: Telemetry Refresh
 # repo on every push to main, that commit triggers a production build, which
 # re-runs the GitHub fetch and re-freezes the telemetry with real values.
 #
+# TRACKED: IbemCabahug/ArcaneTyper, IbemCabahug/mimic.
+# NOT TRACKED: IbemCabahug/bits. That name is a permanent 301 redirect to
+# samananias/bits, a repository belonging to someone else. Following it would
+# attribute a third party's commits, stars and push dates to this portfolio and
+# would rebuild the site whenever they commit. Re-add it here once our own
+# BITS repository is published under a name we control.
+#
 # WHY A COMMIT INSTEAD OF A VERCEL DEPLOY HOOK
 # A deploy hook needs PORTFOLIO_DEPLOY_HOOK stored as a secret here. Pushing a
 # commit needs nothing, and that path is already proven — an ordinary push to
@@ -89,24 +96,31 @@ jobs:
           SNAPSHOT=".github/telemetry-snapshot.json"
 
           # Keep in sync with the sourceUrl in each src/content/projects/*.mdx.
+          #
+          # IbemCabahug/bits is deliberately NOT tracked. That name is a
+          # permanent 301 redirect to samananias/bits, which belongs to someone
+          # else — following it would attribute a third party's commits, stars
+          # and push dates to this portfolio, and would rebuild the site
+          # whenever they commit. It is re-added here once our own BITS repo is
+          # published under a name we control.
           REPOS="IbemCabahug/ArcaneTyper
-          IbemCabahug/bits
           IbemCabahug/mimic"
 
           # Unauthenticated calls from a runner share an IP pool and 60 req/hr is
           # the ceiling; the default GITHUB_TOKEN raises this to 5000/hr, which
-          # is why it is used here. 3 calls total, so quota is not a concern.
+          # is why it is used here. 2 calls total, so quota is not a concern.
 
           changed=0
           while read -r repo; do
             [ -z "$repo" ] && continue
 
-            # -L is REQUIRED, not optional: for a repo that has been renamed or
+            # -L is REQUIRED, not optional. If a tracked repo is ever renamed or
             # transferred, api.github.com answers 301 with a JSON body that is
-            # NOT a commit list, and parsing it yields an empty sha. That is not
-            # hypothetical here — IbemCabahug/bits is a permanent redirect to
-            # samananias/bits, so without -L this repo was silently reported as
-            # unreadable on every single run and could never trigger a refresh.
+            # NOT a commit list, and parsing it yields an empty sha. That is
+            # exactly what IbemCabahug/bits does (permanent redirect to
+            # samananias/bits), which is why it is not tracked at all — but the
+            # same failure would silently blind any repo that is renamed later,
+            # so the flag stays.
             sha=$(curl -sSL \
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: Bearer $GH_TOKEN" \
@@ -166,7 +180,6 @@ jobs:
 
           REPOS = [
               "IbemCabahug/ArcaneTyper",
-              "IbemCabahug/bits",
               "IbemCabahug/mimic",
           ]
           PATH = ".github/telemetry-snapshot.json"
@@ -182,8 +195,7 @@ jobs:
           for repo in REPOS:
               # No redirect handling needed in urllib (it follows 301 by
               # default), which is why the bash step needs an explicit -L and
-              # this one does not. IbemCabahug/bits is a permanent redirect to
-              # samananias/bits, so this path is exercised every run.
+              # this one does not.
               req = urllib.request.Request(
                   f"https://api.github.com/repos/{repo}/commits?per_page=1",
                   headers={
