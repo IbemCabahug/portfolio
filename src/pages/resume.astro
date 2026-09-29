@@ -21,9 +21,21 @@ const pdfPath = '/Cabahug-Nhovem-Resume.pdf';
       display: none !important;
     }
 
+    /* Inverse of .print-only: visible on screen, dropped on paper. Used for
+       project links, where the screen shows a short label ("GitHub") and the
+       printed page shows the full URL. A printed or downloaded PDF is often
+       read on a phone with no hover and sometimes on paper entirely, where a
+       bare "GitHub" gives the reader no way to reach the repo. */
+    .screen-only {
+      display: inline !important;
+    }
+
     @media print {
       .print-only {
         display: inline !important;
+      }
+      .screen-only {
+        display: none !important;
       }
       *, *::before, *::after {
         background: transparent !important;
@@ -187,7 +199,8 @@ const pdfPath = '/Cabahug-Nhovem-Resume.pdf';
                         rel="noopener noreferrer"
                         class="text-xs sm:text-sm font-semibold text-[#92400e] underline hover:text-[#78350f]"
                       >
-                        {link.label}
+                        <span class="screen-only">{link.label}</span>
+                        <span class="print-only">{link.url}</span>
                       </a>
                     </>
                   ))}
