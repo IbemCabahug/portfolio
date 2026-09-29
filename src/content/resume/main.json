@@ -8,7 +8,7 @@
     "github": "github.com/IbemCabahug",
     "githubUrl": "https://github.com/IbemCabahug"
   },
-  "summary": "Computer Technology graduate with 1,800 hours of hands-on IT and administrative support experience gained through an internship at a shipping and logistics company. Background spans manual QA testing of a production biometric attendance system (test case writing and execution, pre-release testing, and bug reporting/tracking in an Agile/Kanban workflow), data entry and technical support/troubleshooting. Also plans, directs, and manually tests personal software projects built with AI-assisted development, tracking work through GitHub Issues and Kanban boards. Detail-oriented, reliable, and quick to learn new systems, with fast and accurate typing (80+ WPM).",
+  "summary": "Computer Technology graduate with 1,800 hours of hands-on IT and administrative support experience in the shipping and logistics industry. Experienced in manual QA testing of a production biometric attendance system, including test case preparation and execution, pre-release testing, and defect reporting in an Agile/Kanban workflow. Skilled in data entry, basic technical troubleshooting, and testing personal software projects developed with AI-assisted workflows, tracking defects and enhancements through GitHub Issues. Detail-oriented, adaptable, quick to learn new systems, and proficient in typing at 80+ WPM.",
   "coreSkills": [
     {
       "category": "QA & Testing",
@@ -16,14 +16,14 @@
     },
     {
       "category": "Technical Support",
-      "items": "Basic Hardware/Software Troubleshooting; Hardware & Software Installation; End-User Technical Support; Data Entry"
+      "items": "Basic Hardware/Software Troubleshooting; Hardware & Software Installation & Configuration; End-User Technical Support; Data Entry & Record Verification"
     },
     {
-      "category": "Web & Technical Familiarity",
-      "items": "HTML, CSS, JavaScript, SQL; Git & GitHub (incl. Issues, Kanban Boards); VS Code; AI-Assisted Development"
+      "category": "Web & Development Tools",
+      "items": "HTML, CSS, JavaScript, SQL; Git & GitHub (incl. Issues, Kanban Boards); Visual Studio Code; AI-Assisted Development"
     },
     {
-      "category": "Software & Productivity Tools",
+      "category": "Productivity Tools",
       "items": "Microsoft Excel & Word; Google Sheets & Docs"
     },
     {
@@ -38,11 +38,11 @@
       "period": "July 2025 – July 2026",
       "hours": "1,800 hrs",
       "bullets": [
-        "Performed manual QA testing for production updates to BITS, a biometric attendance system, by developing and executing test cases, conducting pre-release testing, and reporting and tracking defects across overtime, shift, punch-time, and reporting workflows.",
-        "Used Agile/Kanban practices with a GitHub board to track sprint tasks through To Do, In Progress, Testing, and Done stages.",
-        "Entered and maintained inventory, administrative, and biometric attendance records, verifying data for errors and inconsistencies before finalization.",
-        "Organized and maintained physical and digital records for efficient retrieval while supporting the real-time attendance dashboard and associated system data.",
-        "Provided technical and administrative support through basic hardware/software troubleshooting, installation, and configuration for office systems."
+        "Conducted manual QA testing of production updates for BITS, a biometric attendance system, by preparing and executing test cases, performing pre-release checks, and reporting and tracking defects across overtime, shift, punch-time, and reporting workflows.",
+        "Tracked sprint tasks using a GitHub Kanban board and workflow stages: To Do, In Progress, Testing, and Done.",
+        "Entered and maintained inventory, administrative, and biometric attendance records; checked data for errors and inconsistencies before finalization.",
+        "Organized physical and digital records for efficient retrieval and supported the real-time attendance dashboard and related system data.",
+        "Provided basic hardware/software troubleshooting, installation, configuration, and general office technical support."
       ]
     }
   ],
