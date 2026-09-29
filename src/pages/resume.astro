@@ -30,6 +30,25 @@ const pdfPath = '/Cabahug-Nhovem-Resume.pdf';
       display: inline !important;
     }
 
+    /* Force A4 with the same 12mm margins the PDF generator uses, so printing
+       this page produces the document the download button produces.
+
+       Without this the printed sheet takes whatever the browser or OS defaults
+       to, which is US Letter on most machines. That is not a cosmetic
+       difference: Letter is 216x279mm against A4's 210x297mm, so it is both
+       narrower and 18mm SHORTER. At 12mm margins that leaves 964px of printable
+       height against A4's 1032px, and the sheet currently renders 1036px — so
+       printing on Letter silently reintroduces the three-page overflow that
+       36478ab just fixed, while the downloaded PDF stays at two pages.
+
+       Declaring the size here also pre-selects A4 in the browser's print
+       dialog in Chrome and Edge, so the correct paper is chosen by default
+       rather than requiring the reader to notice and change it. */
+    @page {
+      size: A4 portrait;
+      margin: 12mm;
+    }
+
     @media print {
       .print-only {
         display: inline !important;
@@ -113,14 +132,29 @@ const pdfPath = '/Cabahug-Nhovem-Resume.pdf';
       .resume-sheet a { font-size: 10px !important; }
       .resume-sheet header,
       .resume-sheet section {
-        margin-bottom: 0.55rem !important;
+        margin-bottom: 0.5rem !important;
       }
       .resume-sheet header {
         padding-bottom: 0.4rem !important;
       }
-      /* Bullets carry space-y-1 (4px) between items; trimming to 2px across the
-         roughly 20 list items reclaims the last of the overflow. */
-      .resume-sheet ul { row-gap: 2px !important; }
+      /* Tailwind's space-y-1 sets margin-top on each <li>, not row-gap: the
+         <ul> is display:block, so a row-gap override is silently ignored (it
+         measured as applied while changing the height by 2px). Targeting the
+         margin directly reclaims ~3px per bullet across the ~20 list items on
+         the page. The project link line also sits closer to its title now that
+         links stack beneath it, returning height that stacking consumed. */
+      .resume-sheet ul > li + li { margin-top: 1px !important; }
+      .resume-sheet .entry h3 + div { margin-top: 2px !important; }
+
+      /* With the two project link lines now stacked under their titles, the
+         sheet measures 1071px against A4's 1032px printable height. Selected
+         Projects is the tallest block at 311px, and it carries the longest
+         bullets on the page, so the paragraph leading is where reclaiming 40px
+         is cheapest: 1.45 rather than 1.4 across roughly 40 wrapped lines.
+         Slightly denser leading on paper is a far smaller cost than dropping
+         content or shrinking type further. */
+      .resume-sheet li,
+      .resume-sheet p { line-height: 1.45 !important; }
       /* Sections are the natural page boundary, so allow one to break rather
          than shoving a whole block forward. The heading still travels with its
          first lines via the break-after: avoid rule above. */
@@ -237,39 +271,51 @@ const pdfPath = '/Cabahug-Nhovem-Resume.pdf';
         <div class="flex flex-col gap-4">
           {resume.projects.map((project) => (
             <article class="entry">
-              <div class="flex flex-wrap items-baseline justify-between gap-x-3">
-                <h3 class="text-base font-bold text-[#1c1917]">
-                  {project.name}
-                  {project.note && (
-                    <span class="ml-1 text-xs font-semibold uppercase tracking-wider text-[#92400e]">
-                      ({project.note})
-                    </span>
-                  )}
-                </h3>
-                <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                  <a
-                    href={project.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="text-xs sm:text-sm font-semibold text-[#92400e] underline hover:text-[#78350f]"
-                  >
-                    {project.urlLabel ?? project.url}
-                  </a>
-                  {project.extraLinks?.map((link) => (
-                    <>
-                      <span class="text-[#a8a29e] select-none" aria-hidden="true">·</span>
-                      <a
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="text-xs sm:text-sm font-semibold text-[#92400e] underline hover:text-[#78350f]"
-                      >
-                        <span class="screen-only">{link.label}</span>
-                        <span class="print-only">{link.url}</span>
-                      </a>
-                    </>
-                  ))}
-                </div>
+              <h3 class="text-base font-bold text-[#1c1917]">
+                {project.name}
+                {project.note && (
+                  <span class="ml-1 text-xs font-semibold uppercase tracking-wider text-[#92400e]">
+                    ({project.note})
+                  </span>
+                )}
+              </h3>
+              {/* Links sit on their own line, left-aligned under the title.
+
+                  Previously the title and links shared one flex row with
+                  justify-between, which put the links hard against the right
+                  margin and made the two projects format differently depending
+                  on how long the title was: Mimic's single link wrapped onto its
+                  own line on screen while ArcaneTyper's two links stayed inline
+                  beside the title. The same markup then behaved differently
+                  again in print, where Mimic's link fitted back inline. One
+                  project was formatted two ways depending on the output.
+
+                  Stacking them removes the dependency on title length, so both
+                  projects read identically on screen and on paper, and the
+                  links start from the same left edge as the title. */}
+              <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                <a
+                  href={project.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-xs sm:text-sm font-semibold text-[#92400e] underline hover:text-[#78350f]"
+                >
+                  {project.urlLabel ?? project.url}
+                </a>
+                {project.extraLinks?.map((link) => (
+                  <>
+                    <span class="text-[#a8a29e] select-none" aria-hidden="true">·</span>
+                    <a
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-xs sm:text-sm font-semibold text-[#92400e] underline hover:text-[#78350f]"
+                    >
+                      <span class="screen-only">{link.label}</span>
+                      <span class="print-only">{link.url}</span>
+                    </a>
+                  </>
+                ))}
               </div>
               <ul class="list-disc pl-5 space-y-1 text-sm text-[#44403c] mt-1.5">
                 {project.bullets.map((bullet) => (
