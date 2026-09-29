@@ -1,0 +1,234 @@
+name: Telemetry Refresh
+
+# WHY THIS FILE EXISTS (added 2026-09-29)
+#
+# The Quest Board and the case-study pages show live GitHub telemetry for every
+# tracked project: stars, default branch, "Pushed: <relative>", and the latest
+# commit SHA + message.
+#
+# That data is fetched at BUILD time, not at request time. src/lib/github.ts
+# calls the GitHub REST API from the frontmatter of two prerendered Astro pages
+# (src/pages/quests/index.astro and src/pages/quests/[slug].astro). Neither
+# sets `export const prerender = false`, so the values are baked into static
+# HTML and only change when the portfolio is rebuilt.
+#
+# Consequence before this file: the site advertised commit 05cc78c /
+# "Pushed: 2026-09-23T09:40:54Z" while ArcaneTyper's master was already at
+# 0af20a0 / 2026-09-29 — 41 commits stale, missing the whole v2.3.4 release.
+# Nothing in this repository ran on a timer, so telemetry was only ever as
+# fresh as whichever human happened to push last.
+#
+# WHAT THIS DOES
+# Once a day, compares the current HEAD of every tracked repo against a recorded
+# snapshot. If ANY of them moved, it records the new snapshot and pushes an
+# ordinary commit — and because Vercel's Git integration already builds this
+# repo on every push to main, that commit triggers a production build, which
+# re-runs the GitHub fetch and re-freezes the telemetry with real values.
+#
+# WHY A COMMIT INSTEAD OF A VERCEL DEPLOY HOOK
+# A deploy hook needs PORTFOLIO_DEPLOY_HOOK stored as a secret here. Pushing a
+# commit needs nothing, and that path is already proven — an ordinary push to
+# main was observed updating the live site within the minute. One less secret
+# to rotate, one less thing that can silently stop working.
+#
+# WHY NOT REBUILD UNCONDITIONALLY
+# A daily no-op rebuild burns a Vercel build (tens of seconds, real quota) and
+# rewrites every static asset for no benefit. This only commits when a tracked
+# repo genuinely moved, so a quiet week produces zero deploys.
+#
+# THE SNAPSHOT FILE
+# .github/telemetry-snapshot.json holds the last-seen HEAD sha per repo. It is
+# committed, so the history of this file is a readable audit trail of when each
+# project last moved. It is written with stable key order and a trailing
+# newline so an unchanged run produces a byte-identical file, and therefore no
+# commit at all.
+#
+# COVERAGE / LIMITATIONS — read before trusting the badge
+#   - GitHub disables scheduled workflows after 60 days of repo inactivity. If
+#     the portfolio goes quiet this cron stops silently — the same failure mode
+#     already documented in the Arcane Typer keepalive workflow. Any push here
+#     resets that clock.
+#   - A cron can be delayed ~15 min under load, or skipped during a GitHub
+#     incident. Worst case, telemetry lags by a day.
+#   - src/lib/github.ts reads `pushed_at`, which moves on a push to ANY branch,
+#     not only the default. A side-branch push therefore refreshes the "Pushed"
+#     label while the displayed commit stays on the default branch. This
+#     workflow tracks the default branch head and is unaffected, but the
+#     rendered label inherits that quirk.
+#   - Star and fork counts are not tracked. A star alone changes no commit, so
+#     it will not by itself trigger a rebuild; it is picked up the next time
+#     some other change fires one.
+
+on:
+  schedule:
+    # 04:17 UTC daily. Deliberately not on the hour: :00 is the most contended
+    # slot on GitHub's scheduler, and this job is latency-insensitive.
+    - cron: '17 4 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: telemetry-refresh
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Compare tracked repos against the snapshot
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          SNAPSHOT=".github/telemetry-snapshot.json"
+
+          # Keep in sync with the sourceUrl in each src/content/projects/*.mdx.
+          REPOS="IbemCabahug/ArcaneTyper
+          IbemCabahug/bits
+          IbemCabahug/mimic"
+
+          # Unauthenticated calls from a runner share an IP pool and 60 req/hr is
+          # the ceiling; the default GITHUB_TOKEN raises this to 5000/hr, which
+          # is why it is used here. 3 calls total, so quota is not a concern.
+
+          changed=0
+          while read -r repo; do
+            [ -z "$repo" ] && continue
+
+            # -L is REQUIRED, not optional: for a repo that has been renamed or
+            # transferred, api.github.com answers 301 with a JSON body that is
+            # NOT a commit list, and parsing it yields an empty sha. That is not
+            # hypothetical here — IbemCabahug/bits is a permanent redirect to
+            # samananias/bits, so without -L this repo was silently reported as
+            # unreadable on every single run and could never trigger a refresh.
+            sha=$(curl -sSL \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "https://api.github.com/repos/$repo/commits?per_page=1" \
+              | python3 -c 'import json,sys
+          try:
+              d = json.load(sys.stdin)
+              print(d[0]["sha"] if isinstance(d, list) and d else "")
+          except Exception:
+              print("")')
+
+            if [ -z "$sha" ]; then
+              # Never let a failed probe read as "unchanged" — that would hide a
+              # genuine update behind a transient API error. Fall back to the
+              # recorded sha so this run is a safe no-op instead.
+              echo "::warning::could not read $repo; assuming unchanged this run."
+              continue
+            fi
+
+            prev=$(python3 -c 'import json,sys
+          try:
+              print(json.load(open(sys.argv[1])).get(sys.argv[2], ""))
+          except Exception:
+              print("")' "$SNAPSHOT" "$repo")
+
+            short="${sha:0:7}"
+            if [ "$prev" = "$sha" ]; then
+              echo "  unchanged  $repo  $short"
+            else
+              echo "  CHANGED    $repo  ${prev:-<none>} -> $short"
+              changed=1
+            fi
+          done <<< "$REPOS"
+
+          echo "changed=$changed" >> "$GITHUB_OUTPUT"
+
+          if [ "$changed" -eq 1 ]; then
+            echo "::notice::A tracked repo moved — recording it and rebuilding."
+          else
+            echo "No tracked repo moved. No commit, no deploy."
+          fi
+
+      - name: Commit and push to trigger the Vercel build
+        if: steps.check.outputs.changed == '1'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          # Rebuild the snapshot from the live API rather than patching the old
+          # one, so it can never drift, and write it with stable key order plus
+          # a trailing newline so an unchanged run is byte-identical and git
+          # has nothing to commit.
+          python3 - <<'PY'
+          import json, os, urllib.request
+
+          REPOS = [
+              "IbemCabahug/ArcaneTyper",
+              "IbemCabahug/bits",
+              "IbemCabahug/mimic",
+          ]
+          PATH = ".github/telemetry-snapshot.json"
+
+          try:
+              with open(PATH) as f:
+                  previous = json.load(f)
+          except Exception:
+              previous = {}
+
+          token = os.environ["GH_TOKEN"]
+          snapshot = {}
+          for repo in REPOS:
+              # No redirect handling needed in urllib (it follows 301 by
+              # default), which is why the bash step needs an explicit -L and
+              # this one does not. IbemCabahug/bits is a permanent redirect to
+              # samananias/bits, so this path is exercised every run.
+              req = urllib.request.Request(
+                  f"https://api.github.com/repos/{repo}/commits?per_page=1",
+                  headers={
+                      "Accept": "application/vnd.github+json",
+                      "Authorization": f"Bearer {token}",
+                      "X-GitHub-Api-Version": "2022-11-28",
+                  },
+              )
+              try:
+                  with urllib.request.urlopen(req, timeout=20) as response:
+                      data = json.load(response)
+                  snapshot[repo] = data[0]["sha"]
+              except Exception as exc:
+                  # Keep the previously recorded value rather than blanking it,
+                  # so a transient API failure cannot itself look like a change.
+                  print(f"::warning::probe failed for {repo}: {exc}")
+                  snapshot[repo] = previous.get(repo, "")
+
+          with open(PATH, "w") as f:
+              json.dump(snapshot, f, indent=2, sort_keys=True)
+              f.write("\n")
+          print(json.dumps(snapshot, indent=2, sort_keys=True))
+          PY
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/telemetry-snapshot.json
+
+          if git diff --cached --quiet; then
+            echo "Snapshot is byte-identical; nothing to commit."
+            exit 0
+          fi
+
+          git commit -m "chore(telemetry): record new upstream HEADs and refresh Quest Board data
+
+          A tracked project's default branch moved, so the Quest Board and the
+          case-study pages would otherwise keep advertising a stale commit,
+          star count and push date until the next unrelated push to this repo.
+
+          This commit exists to trigger a production build: the build re-runs the
+          GitHub fetch in src/lib/github.ts and re-freezes the rendered
+          telemetry. The snapshot in .github/telemetry-snapshot.json doubles as
+          an audit trail of when each project last moved."
+
+          git push origin HEAD:main
+          echo "Pushed. Vercel Git integration will build and redeploy."
+
+
