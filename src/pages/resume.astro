@@ -169,14 +169,29 @@ const pdfPath = '/Cabahug-Nhovem-Resume.pdf';
                     </span>
                   )}
                 </h3>
-                <a
-                  href={project.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="text-xs sm:text-sm font-semibold text-[#92400e] underline hover:text-[#78350f]"
-                >
-                  {project.urlLabel ?? project.url}
-                </a>
+                <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                  <a
+                    href={project.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-xs sm:text-sm font-semibold text-[#92400e] underline hover:text-[#78350f]"
+                  >
+                    {project.urlLabel ?? project.url}
+                  </a>
+                  {project.extraLinks?.map((link) => (
+                    <>
+                      <span class="text-[#a8a29e] select-none" aria-hidden="true">·</span>
+                      <a
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="text-xs sm:text-sm font-semibold text-[#92400e] underline hover:text-[#78350f]"
+                      >
+                        {link.label}
+                      </a>
+                    </>
+                  ))}
+                </div>
               </div>
               <ul class="list-disc pl-5 space-y-1 text-sm text-[#44403c] mt-1.5">
                 {project.bullets.map((bullet) => (

@@ -111,6 +111,16 @@ const resume = defineCollection({
       note: z.string().optional(),
       url: z.string(),
       urlLabel: z.string().optional(),
+      // Optional second link, rendered as a labelled link beside the primary
+      // one. ArcaneTyper ships to a live URL *and* has a public repository, and
+      // resume guidance is explicit that both belong on a significant project:
+      // a recruiter should be able to try the app and read the code without
+      // hunting for either. Kept as an array so a project can grow a third
+      // link (docs, case study) without another schema change.
+      extraLinks: z.array(z.object({
+        url: z.string(),
+        label: z.string(),
+      })).optional(),
       bullets: z.array(z.string()),
     })),
     education: z.array(z.object({

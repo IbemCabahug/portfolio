@@ -52,9 +52,15 @@
       "note": "AI-Assisted Build",
       "url": "https://arcane-typer.vercel.app",
       "urlLabel": "arcane-typer.vercel.app",
+      "extraLinks": [
+        {
+          "url": "https://github.com/IbemCabahug/ArcaneTyper",
+          "label": "GitHub"
+        }
+      ],
       "bullets": [
-        "Wrote requirements and directed the AI-assisted build of a web-based typing game with survival, practice, and real-time duel modes, plus leaderboards, achievements, and user accounts.",
-        "Manually tested game modes, scoring, and real-time duel flows, and tracked bugs and enhancements using GitHub Issues."
+        "Defined project requirements and guided AI-assisted development of a web-based typing game featuring survival, practice, and real-time duel modes, along with leaderboards, achievements, and user accounts.",
+        "Manually tested gameplay modes, scoring, and real-time multiplayer interactions; documented bugs and tracked enhancements through GitHub Issues."
       ]
     },
     {
@@ -63,9 +69,9 @@
       "url": "https://github.com/IbemCabahug/mimic",
       "urlLabel": "github.com/IbemCabahug/mimic",
       "bullets": [
-        "Planned requirements and directed the AI-assisted build of an Android social-deduction game (3 game modes, 5 word packs, LAN multiplayer for up to 8 players) with a private encrypted photo/video/notes vault unlocked by a secret gesture.",
-        "Manually tested game and vault-security flows (secret-gesture unlock, PIN setup, failed-PIN lockout, auto-lock, encrypted video playback), and verified features against an automated suite of 450+ tests plus manual checks on a physical release-mode device.",
-        "Identified release-only defects, including a vault setup failure that appeared only on clean installs, and adopted a practice of testing every release build on a wiped physical device."
+        "Defined requirements and guided AI-assisted development of an Android social-deduction game featuring three game modes, five word packs, LAN multiplayer for up to eight players, and a private encrypted vault for photos, videos, and notes.",
+        "Manually tested gameplay and vault-security features, including gesture unlock, PIN setup, failed-PIN lockout, auto-lock, and encrypted video playback. Performed additional testing on a physical device running the release build.",
+        "Identified release-specific defects, including a vault setup issue on clean installs, and incorporated clean-install testing on a wiped physical device into the release-testing process."
       ]
     }
   ],
