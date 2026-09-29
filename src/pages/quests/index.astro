@@ -145,7 +145,11 @@ const telemetryMap = new Map(projectTelemetries.map((pt) => [pt.slug, pt.telemet
 
                     <span class="inline-flex items-center gap-1 text-[var(--ink)]/80">
                       <span>Pushed:</span>
-                      <time datetime={telemetry.pushedAt} class="font-semibold text-[var(--ink)]">{telemetry.pushedRelative}</time>
+                      <time
+                        datetime={telemetry.pushedAt}
+                        data-pushed-at={telemetry.pushedAt}
+                        class="font-semibold text-[var(--ink)]"
+                      >{telemetry.pushedRelative}</time>
                     </span>
 
                     {telemetry.latestCommit && (
@@ -209,4 +213,10 @@ const telemetryMap = new Map(projectTelemetries.map((pt) => [pt.slug, pt.telemet
       </a>
     </div>
   </div>
+
+  {/* Keeps the "Pushed: <relative>" label honest between rebuilds. Bundled and
+      de-duplicated by Astro, so /quests and every /quests/<slug> share one copy. */}
+  <script>
+    import '../../lib/relative-time';
+  </script>
 </TavernLayout>

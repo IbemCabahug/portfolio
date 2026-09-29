@@ -124,7 +124,14 @@ const telemetry = await getProjectTelemetry(entry.data.sourceUrl);
                   <span class="text-amber-600">★</span> {telemetry.stars} {telemetry.stars === 1 ? 'star' : 'stars'}
                 </span>
                 <span>Branch: <strong class="font-bold text-[var(--ink)]">{telemetry.defaultBranch}</strong></span>
-                <span>Pushed: <strong class="font-bold text-[var(--ink)]">{telemetry.pushedRelative}</strong></span>
+                <span class="inline-flex items-center gap-1">
+                  Pushed:{' '}
+                  <time
+                    datetime={telemetry.pushedAt}
+                    data-pushed-at={telemetry.pushedAt}
+                    class="font-bold text-[var(--ink)]"
+                  >{telemetry.pushedRelative}</time>
+                </span>
               </div>
             </div>
 
@@ -218,6 +225,12 @@ const telemetry = await getProjectTelemetry(entry.data.sourceUrl);
       </footer>
     </article>
   </div>
+
+  {/* Keeps the "Pushed: <relative>" label honest between rebuilds. Same module
+      the Quest Board loads; Astro de-duplicates it into one shared bundle. */}
+  <script>
+    import '../../lib/relative-time';
+  </script>
 </TavernLayout>
 
 <style is:global>
