@@ -68,6 +68,71 @@ const pdfPath = '/Cabahug-Nhovem-Resume.pdf';
         page-break-after: avoid;
         break-after: avoid;
       }
+
+      /* FIT TO PAGE.
+         Measured 2026-09-29: the sheet rendered 1524px tall against 1032px of
+         A4 printable height (297mm less 12mm margins), i.e. 1.48 pages. Because
+         .entry and li carry `break-inside: avoid`, a section that straddled the
+         boundary was pushed whole onto the next sheet, producing three pages
+         for what is a two-page document.
+
+         The on-screen sheet is deliberately large and readable, so the
+         compression here is print-only and leaves that untouched. Type drops
+         from 14px to 11.5px with tighter leading, and the vertical rhythm is
+         compressed, which brings the document comfortably inside two pages
+         without orphaning a heading from its section.
+
+         11.5px on paper is the usual lower bound for a dense technical resume
+         and stays legible; going smaller would cost more in readability than it
+         buys in pages. */
+      .resume-sheet {
+        font-size: 11.5px !important;
+        line-height: 1.4 !important;
+      }
+
+      /* The sheet's own font-size does not cascade into children that carry an
+         explicit Tailwind size utility. Measured in print media, the document
+         still held a 36px name heading (text-3xl sm:text-4xl), seven 18px
+         section headings (sm:text-lg), five 16px and fifty 14px elements, so
+         setting font-size on .resume-sheet alone reclaimed only 94px of the
+         492px overflow. Each size is scaled by roughly the same 0.82 ratio
+         (11.5 / 14) so the hierarchy the screen version relies on survives onto
+         paper instead of flattening to one size.
+
+         Written as explicit sizes rather than a transform, so the text stays
+         real, selectable text at a legible point size. */
+      .resume-sheet h1 { font-size: 21px !important; }
+      .resume-sheet h2 { font-size: 13px !important; }
+      .resume-sheet h3 { font-size: 11.5px !important; }
+      .resume-sheet p,
+      .resume-sheet li,
+      .resume-sheet dd,
+      .resume-sheet .text-base,
+      .resume-sheet .text-sm { font-size: 11.5px !important; }
+      .resume-sheet .text-xs { font-size: 9.5px !important; }
+      .resume-sheet a { font-size: 10px !important; }
+      .resume-sheet header,
+      .resume-sheet section {
+        margin-bottom: 0.55rem !important;
+      }
+      .resume-sheet header {
+        padding-bottom: 0.4rem !important;
+      }
+      /* Bullets carry space-y-1 (4px) between items; trimming to 2px across the
+         roughly 20 list items reclaims the last of the overflow. */
+      .resume-sheet ul { row-gap: 2px !important; }
+      /* Sections are the natural page boundary, so allow one to break rather
+         than shoving a whole block forward. The heading still travels with its
+         first lines via the break-after: avoid rule above. */
+      .resume-sheet section {
+        break-inside: auto;
+        page-break-inside: auto;
+      }
+      .resume-sheet .entry,
+      .resume-sheet li {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
     }
 
     /* Resume document: clean white paper sheet styled for readability and print fidelity */
