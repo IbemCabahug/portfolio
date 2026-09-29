@@ -22,6 +22,17 @@ jobs:
 
       - name: Astro Check
         run: npx astro check
+        env:
+          # astro.config.mjs treats any CI run as a production deployment and
+          # throws when PUBLIC_SITE_URL is missing or localhost-only. That guard
+          # is deliberate, but it fired here too: `npx astro check` loads the
+          # config, GitHub always sets CI=true, and this step had no
+          # PUBLIC_SITE_URL, so the check died on config load before it could
+          # check a single file. Every run in this repo's history was red for
+          # that reason alone, and the Build step below never ran.
+          # This placeholder exists only so the check exercises the same
+          # sitemap/config path as production.
+          PUBLIC_SITE_URL: https://example.com
 
       - name: Build
         run: npm run build
