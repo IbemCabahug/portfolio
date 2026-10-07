@@ -2,7 +2,7 @@
 import TavernLayout from '../../layouts/TavernLayout.astro';
 import { getCollection } from 'astro:content';
 import ThematicIcon from '../../components/icons/ThematicIcon.astro';
-import { getProjectTelemetry } from '../../lib/github';
+import { getProjectTelemetry, formatDate, formatRelativeTime } from '../../lib/github';
 
 const allProjects = await getCollection('projects');
 const projects = allProjects.sort((a, b) => a.data.order - b.data.order);
@@ -14,6 +14,41 @@ const projectTelemetries = await Promise.all(
   })
 );
 const telemetryMap = new Map(projectTelemetries.map((pt) => [pt.slug, pt.telemetry]));
+
+// Determine latest update timestamp across all active projects and telemetry
+const telemetryTimestamps = projectTelemetries
+  .map((pt) => pt.telemetry?.pushedAt || pt.telemetry?.latestCommit?.date)
+  .filter((d): d is string => typeof d === 'string' && d.length > 0)
+  .map((d) => new Date(d).getTime())
+  .filter((t) => !Number.isNaN(t));
+
+let latestTimestamp = telemetryTimestamps.length > 0 ? Math.max(...telemetryTimestamps) : 0;
+
+if (latestTimestamp === 0) {
+  try {
+    const { execSync } = await import('node:child_process');
+    const gitBins = ['git', 'C:\\Program Files\\Git\\cmd\\git.exe'];
+    for (const bin of gitBins) {
+      try {
+        const out = execSync(`"${bin}" log -1 --format=%cI src/content/projects`, {
+          encoding: 'utf8',
+          stdio: ['pipe', 'pipe', 'ignore'],
+        }).trim();
+        if (out) {
+          const t = new Date(out).getTime();
+          if (!Number.isNaN(t)) {
+            latestTimestamp = t;
+            break;
+          }
+        }
+      } catch {}
+    }
+  } catch {}
+}
+
+const latestIso = latestTimestamp > 0 ? new Date(latestTimestamp).toISOString() : new Date().toISOString();
+const latestDateFormatted = formatDate(latestIso);
+const latestRelative = formatRelativeTime(latestIso);
 ---
 
 <TavernLayout
@@ -24,9 +59,19 @@ const telemetryMap = new Map(projectTelemetries.map((pt) => [pt.slug, pt.telemet
   <div class="max-w-4xl mx-auto py-6 sm:py-8 px-4">
     {/* Notice Board Header */}
     <header class="mb-10 text-center">
-      <div class="inline-flex items-center gap-2 px-3 py-1 mb-3 rounded border border-[var(--brass)] bg-[var(--wood-deep)]/90 text-xs font-semibold tracking-wider uppercase text-[var(--candle)]">
-        <ThematicIcon name="scroll" class="w-3.5 h-3.5 text-[var(--candle)]" />
-        <span>Guild Notice Board · Projects & Case Studies</span>
+      <div class="flex flex-wrap items-center justify-center gap-2 mb-3">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded border border-[var(--brass)] bg-[var(--wood-deep)]/90 text-xs font-semibold tracking-wider uppercase text-[var(--candle)] shadow-xs">
+          <ThematicIcon name="scroll" class="w-3.5 h-3.5 text-[var(--candle)]" />
+          <span>Guild Notice Board · Projects & Case Studies</span>
+        </div>
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded border border-[var(--brass)]/80 bg-[#1e1208]/90 text-xs font-mono text-[var(--candle)] shadow-xs">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true"></span>
+          <span class="text-[var(--brass)] uppercase font-sans font-bold text-[10.5px] tracking-wider">Board Synchronized:</span>
+          <time datetime={latestIso} class="font-bold">{latestDateFormatted}</time>
+          <span class="text-[var(--parchment)]/70 text-[11px]">
+            (<time datetime={latestIso} data-pushed-at={latestIso}>{latestRelative}</time>)
+          </span>
+        </div>
       </div>
       <h1 class="text-3xl sm:text-5xl font-extrabold text-[var(--candle)] mb-2 tracking-wide font-serif drop-shadow">
         The Quest Board

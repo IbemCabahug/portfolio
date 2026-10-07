@@ -49,7 +49,7 @@ export function parseGitHubUrl(url: string): { owner: string; repo: string } | n
   }
 }
 
-function formatDate(isoString: string): string {
+export function formatDate(isoString: string): string {
   try {
     const d = new Date(isoString);
     if (isNaN(d.getTime())) return '';
@@ -59,7 +59,7 @@ function formatDate(isoString: string): string {
   }
 }
 
-function formatRelativeTime(isoString: string): string {
+export function formatRelativeTime(isoString: string): string {
   try {
     const date = new Date(isoString);
     if (isNaN(date.getTime())) return '';
