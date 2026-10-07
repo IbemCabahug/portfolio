@@ -4,12 +4,31 @@ import ThematicIcon from '../../components/icons/ThematicIcon.astro';
 import NpcDialogue from '../../components/NpcDialogue.astro';
 
 import { getCollection } from 'astro:content';
+import { getProjectTelemetry, formatDate, formatRelativeTime } from '../../lib/github';
 
 const skillsEntries = await getCollection('skills');
 const skills = skillsEntries.map(entry => entry.data);
 
 const allProjects = await getCollection('projects');
 const projects = allProjects.sort((a, b) => a.data.order - b.data.order);
+
+const projectTelemetries = await Promise.all(
+  projects.map(async (p) => {
+    const telemetry = await getProjectTelemetry(p.data.sourceUrl);
+    return { slug: p.data.slug, telemetry };
+  })
+);
+
+const telemetryTimestamps = projectTelemetries
+  .map((pt) => pt.telemetry?.pushedAt || pt.telemetry?.latestCommit?.date)
+  .filter((d): d is string => typeof d === 'string' && d.length > 0)
+  .map((d) => new Date(d).getTime())
+  .filter((t) => !Number.isNaN(t));
+
+let latestTimestamp = telemetryTimestamps.length > 0 ? Math.max(...telemetryTimestamps) : 0;
+const latestIso = latestTimestamp > 0 ? new Date(latestTimestamp).toISOString() : new Date().toISOString();
+const latestDateFormatted = formatDate(latestIso);
+const latestRelative = formatRelativeTime(latestIso);
 
 const levelMap: Record<string, number> = {
   learning: 1,
@@ -413,7 +432,14 @@ const sceneObjects = [
           <ThematicIcon name="scroll" class="w-6 h-6 text-[var(--candle)]" />
         </div>
         <div>
-          <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-[#d5803b]">Active Bounties & Proof of Work</span>
+          <div class="flex flex-wrap items-center gap-2 mb-0.5">
+            <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-[#d5803b]">Active Bounties & Proof of Work</span>
+            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-[var(--brass)]/80 bg-[#1e1208]/90 text-[10px] font-mono text-[var(--candle)] shadow-xs">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true"></span>
+              <span class="text-[var(--brass)] uppercase font-sans font-bold text-[9px] tracking-wider">Synchronized:</span>
+              <time datetime={latestIso} class="font-bold">{latestDateFormatted}</time>
+            </span>
+          </div>
           <h2 id="questboard-title" class="text-xl sm:text-2xl font-bold text-[var(--candle)] font-serif leading-tight">
             The Quest Board
           </h2>
