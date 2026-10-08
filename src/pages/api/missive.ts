@@ -44,6 +44,8 @@ const ipBuckets = new Map<string, number[]>();
 let globalTimestamps: number[] = [];
 
 function getClientIp(request: Request): string {
+  const vercelIp = request.headers.get('x-vercel-ip') || request.headers.get('x-real-ip');
+  if (vercelIp) return vercelIp.trim().slice(0, 64);
   const fwd = request.headers.get('x-forwarded-for');
   const forwarded = fwd ? fwd.split(',')[0].trim() : '';
   const ip = forwarded || request.headers.get('true-client-ip') || 'unknown';
@@ -163,6 +165,28 @@ export const POST: APIRoute = async ({ request }) => {
     return json({ success: false, message: 'Malformed missive transmission.' }, 400);
   }
 
+  // 1b. Validate Origin / Cross-Site requests.
+  // Rejects unauthorized third-party cross-origin automated dispatches.
+  const secFetchSite = request.headers.get('sec-fetch-site');
+  if (secFetchSite === 'cross-site') {
+    return json({ success: false, message: 'Cross-origin missive dispatches are rejected.' }, 403);
+  }
+  const origin = request.headers.get('origin');
+  if (origin) {
+    const siteUrl = process.env.PUBLIC_SITE_URL || '';
+    const allowed = new Set([
+      siteUrl.replace(/\/$/, ''),
+      'https://portfolio-ibem.vercel.app',
+      'http://localhost:4321',
+      'http://127.0.0.1:4321',
+      'http://localhost:3000',
+    ]);
+    const norm = origin.replace(/\/$/, '');
+    if (!allowed.has(norm) && !norm.startsWith('http://localhost:')) {
+      return json({ success: false, message: 'Cross-origin missive dispatches are rejected.' }, 403);
+    }
+  }
+
   const ip = getClientIp(request);
 
   // 2. Honeypot: bots that filled the hidden checkbox get a fake success and
@@ -204,12 +228,22 @@ export const POST: APIRoute = async ({ request }) => {
   recordGlobalAttempt();
 
   // 4. Normalize + cap payload fields.
+  // Explicitly strip carriage returns and newlines (\r, \n) from header-like fields
+  // (name, email, subject) to defeat email header / CRLF injection (CWE-93).
   const name = String(payload.name ?? '')
+    .replace(/[\r\n]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, MAX_NAME);
-  const email = String(payload.email ?? '').trim().slice(0, 254);
-  const subject = String(payload.subject ?? '').trim().slice(0, MAX_SUBJECT);
+  const email = String(payload.email ?? '')
+    .replace(/[\r\n]+/g, '')
+    .trim()
+    .slice(0, 254);
+  const subject = String(payload.subject ?? '')
+    .replace(/[\r\n]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, MAX_SUBJECT);
   const body = String(payload.message ?? '').trim().slice(0, MAX_BODY);
 
   if (!body) {
@@ -287,4 +321,15 @@ export const POST: APIRoute = async ({ request }) => {
   } catch {
     return json({ success: false, message: 'Network error encountered during transmission.' });
   }
+};
+
+export const ALL: APIRoute = async () => {
+  return new Response(JSON.stringify({ success: false, message: 'Method not allowed.' }), {
+    status: 405,
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Allow': 'POST',
+      'Cache-Control': 'no-store',
+    },
+  });
 };
