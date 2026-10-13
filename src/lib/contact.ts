@@ -54,6 +54,8 @@ export async function sendMissive(payload: MissivePayload): Promise<MissiveResul
 
     const data = (await response.json().catch(() => null)) as {
       success?: boolean;
+      authorized?: boolean;
+      accessKey?: string;
       message?: string;
       isValidationError?: boolean;
     } | null;
@@ -61,7 +63,7 @@ export async function sendMissive(payload: MissivePayload): Promise<MissiveResul
     if (!data) {
       return {
         success: false,
-        message: 'Transmission failed. You can send directly via Gmail Web.',
+        message: 'Validation service temporarily unavailable. You can send directly via Gmail Web.',
         fallbackMailto,
         fallbackGmailUrl,
       };
@@ -87,10 +89,42 @@ export async function sendMissive(payload: MissivePayload): Promise<MissiveResul
       };
     }
 
-    if (response.ok && data.success) {
+    if (!response.ok || !data.success || !data.accessKey) {
+      return {
+        success: false,
+        message: data.message || 'Transmission validation failed. You can send directly via Gmail Web.',
+        fallbackMailto,
+        fallbackGmailUrl,
+      };
+    }
+
+    // 2. Dispatch directly to Web3Forms from the visitor's genuine browser context.
+    // Client-side fetch carries browser TLS fingerprints and origin headers
+    // that bypass Cloudflare Bot Management (which blocks serverless IP ranges).
+    const upstreamRes = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({
+        access_key: data.accessKey,
+        name: resultName,
+        email: payload.email,
+        subject: resultSubject,
+        message: formattedBody,
+      }),
+    });
+
+    const upstreamData = (await upstreamRes.json().catch(() => null)) as {
+      success?: boolean;
+      message?: string;
+    } | null;
+
+    if (upstreamRes.ok && upstreamData?.success) {
       return {
         success: true,
-        message: data.message || 'Your missive has successfully reached Nhovem’s console.',
+        message: 'Your missive has successfully reached Nhovem’s console.',
         fallbackMailto,
         fallbackGmailUrl,
       };
@@ -98,7 +132,7 @@ export async function sendMissive(payload: MissivePayload): Promise<MissiveResul
 
     return {
       success: false,
-      message: data.message || 'Transmission failed. You can send directly via Gmail Web.',
+      message: upstreamData?.message || 'Transmission encountered an upstream delay. You can send directly via Gmail Web.',
       fallbackMailto,
       fallbackGmailUrl,
     };

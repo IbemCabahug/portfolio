@@ -265,7 +265,10 @@ export const POST: APIRoute = async ({ request }) => {
     );
   }
 
-  // 6. Forward to Web3Forms using the SERVER-ONLY secret key.
+  // 6. Return validation clearance & dispatch authorization.
+  // Note: Web3Forms access keys are public delivery-only tokens designed for client-side
+  // browser fetch. Routing the final delivery through the visitor's genuine browser context
+  // ensures Cloudflare Bot Management does not block the request with HTTP 403.
   const accessKey = process.env.WEB3FORMS_KEY || '';
   if (!accessKey) {
     return json(
@@ -278,49 +281,18 @@ export const POST: APIRoute = async ({ request }) => {
     );
   }
 
-  const formattedBody = `Sender: ${name}\nReturn Address: ${email}\n\n--------------------------------------------------\n${body}\n--------------------------------------------------\n(Dispatched via Ibem's Tavern Messenger Roost)`;
-
-  try {
-    const upstream = await fetch('https://api.web3forms.com/submit', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify({
-        access_key: accessKey,
-        name,
-        email,
-        subject: subject || 'Tavern Dispatch',
-        message: formattedBody,
-      }),
-    });
-
-    const data = (await upstream.json().catch(() => null)) as {
-      success?: boolean;
-      message?: string;
-    } | null;
-
-    if (upstream.ok && data?.success) {
-      logMissive(ip, 'sent', email);
-      return json(
-        { success: true, message: 'Your missive has successfully reached Nhovem’s console.' },
-        200,
-        rlHeaders
-      );
-    }
-    logMissive(ip, 'send_failed', email, data?.message || '');
-    return json(
-      {
-        success: false,
-        message: data?.message || 'Transmission failed. You can send directly via Gmail Web.',
-      },
-      200,
-      rlHeaders
-    );
-  } catch {
-    return json({ success: false, message: 'Network error encountered during transmission.' });
-  }
+  logMissive(ip, 'validation_cleared', email);
+  return json(
+    {
+      success: true,
+      authorized: true,
+      accessKey,
+      sanitized: { name, email, subject, body },
+      message: 'Validation cleared. Raven authorized for dispatch.',
+    },
+    200,
+    rlHeaders
+  );
 };
 
 export const ALL: APIRoute = async () => {

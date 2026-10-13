@@ -205,8 +205,9 @@ const navLinks = [
 
     function updateMenuJournal() {
       if (menuJournalCounter) {
-        const count = getVisitedMilestones().size;
-        menuJournalCounter.textContent = `${count}/${JOURNAL_MILESTONES.length}`;
+        const total = JOURNAL_MILESTONES.length;
+        const count = Math.min(getVisitedMilestones().size, total);
+        menuJournalCounter.textContent = `${count}/${total}`;
       }
     }
 

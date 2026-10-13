@@ -112,15 +112,6 @@ export const JOURNAL_MILESTONES: JournalMilestone[] = [
     actionHint: 'In the Mimic simulator, enter PIN 1337 or use fingerprint recognition',
   },
   {
-    id: 'feat_bits_punch',
-    title: 'Clockwork Shifter',
-    category: 'feat',
-    path: '/quests/bits',
-    tagline: 'Trigger a biometric telemetry punch scenario in the BITS engine simulator',
-    iconName: 'terminal',
-    actionHint: 'In the BITS simulator, click any attendance scenario button',
-  },
-  {
     id: 'feat_tavern_dialogue',
     title: 'Taproom Confidant',
     category: 'feat',
@@ -166,7 +157,9 @@ export function getVisitedMilestones(): Set<string> {
     if (!raw) return new Set();
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed)) {
-      return new Set(parsed.filter((item) => typeof item === 'string'));
+      const validIds = new Set(JOURNAL_MILESTONES.map((m) => m.id));
+      const filtered = parsed.filter((item): item is string => typeof item === 'string' && validIds.has(item));
+      return new Set(filtered);
     }
   } catch {}
   return new Set();
@@ -174,6 +167,8 @@ export function getVisitedMilestones(): Set<string> {
 
 export function recordMilestone(id: string): void {
   if (typeof window === 'undefined') return;
+  const validIds = new Set(JOURNAL_MILESTONES.map((m) => m.id));
+  if (!validIds.has(id)) return;
   try {
     const current = getVisitedMilestones();
     if (!current.has(id)) {
@@ -221,7 +216,7 @@ export function getAdventurerRank(count: number): AdventurerRank {
       colorClass: 'text-amber-500 font-extrabold',
     };
   }
-  if (count >= 11) {
+  if (count >= 10) {
     return {
       rank: 'Master Wayfarer',
       tier: 4,
@@ -230,7 +225,7 @@ export function getAdventurerRank(count: number): AdventurerRank {
       colorClass: 'text-amber-600 font-bold',
     };
   }
-  if (count >= 8) {
+  if (count >= 7) {
     return {
       rank: 'Veteran Adventurer',
       tier: 3,

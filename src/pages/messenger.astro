@@ -387,6 +387,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
     top: 16.2%;
     width: 43.6%;
     height: 68.5%;
+    aspect-ratio: 502 / 395;
     pointer-events: none;
     overflow: hidden;
     display: flex;
@@ -406,6 +407,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center center;
     opacity: 0.88;
     filter: brightness(0.95) contrast(1.1);
     z-index: 1;
@@ -626,21 +628,48 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
 
   /* Transceiver Full Viewport App Modal */
   #dialog-machine.transceiver-viewport-modal {
-    width: min(95vw, 1120px);
-    max-width: 1120px;
-    height: min(92vh, 760px);
-    max-height: 92vh;
-    padding: 14px 18px;
+    width: min(96vw, 1260px);
+    max-width: 1260px;
+    height: min(94vh, 840px);
+    max-height: 94vh;
+    padding: 12px 16px;
     overflow: hidden;
     gap: 8px;
+  }
+
+  /* True Fullscreen Chamber Expansion */
+  #dialog-machine:fullscreen {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+    border: none !important;
+    padding: 8px 12px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+    background: #120a04 !important;
+  }
+  #dialog-machine:fullscreen .panel-body {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  #dialog-machine:fullscreen #transceiver-frame-container {
+    flex: 1 1 0% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    border-radius: 4px !important;
   }
 
   @media (max-width: 640px) {
     #dialog-machine.transceiver-viewport-modal {
       width: 96vw;
-      height: 92vh;
-      max-height: 92vh;
-      padding: 10px 12px;
+      height: 94vh;
+      max-height: 94vh;
+      padding: 8px 10px;
       gap: 6px;
     }
   }
@@ -1476,7 +1505,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
         badges: ['60 FPS HTML5 Canvas', 'Zero-Asset Web Audio', 'Supabase 1v1 Duels'],
         launchLabel: 'Engage Arcane Typer Trial',
         standaloneUrl: 'https://arcane-typer.vercel.app/',
-        standaloneLabel: 'Launch in Standalone Window',
+        standaloneLabel: 'Launch in Standalone Window ↗',
         dossierPath: '/quests/arcanetyper',
         liveUrl: 'https://arcane-typer.vercel.app/',
         scalingMode: 'fit-canvas',
@@ -1492,17 +1521,19 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
         subtitle: 'Biometric Telemetry // Hardware Simulation',
         modalTitle: 'The Arcane Transceiver — BITS Engine',
         version: 'BITS Engine v1.0.4',
-        description: 'Interfacing with the BukSU Integrated Terrestrial Scanner attendance telemetry system. Simulate live NFC and barcode punch streams, queue-sync pipelines, and edge offline validation state machine algorithms.',
-        badges: ['Offline-First Edge Sync', 'Hardware Emulation', 'Queue Pipeline', 'Attendance Engine'],
-        launchLabel: 'Engage BITS Engine Simulator',
-        standaloneUrl: '/simulators/bits',
-        standaloneLabel: 'Open Standalone Simulator',
+        description: 'Connecting to the live deployed BITS attendance management platform at bits-beta-five.vercel.app (samananias/bits fork). Interfacing with live attendance telemetry, shift window derivation, and automated overtime state machines.',
+        badges: ['Live Deployment', 'Biometric Telemetry', 'Shift Derivation', 'Overtime State Machine'],
+        launchLabel: 'Engage Live BITS Platform',
+        standaloneUrl: 'https://bits-beta-five.vercel.app/',
+        standaloneLabel: 'Open Standalone Window ↗',
         dossierPath: '/quests/bits',
-        liveUrl: '/simulators/bits',
-        scalingMode: 'responsive',
-        thumbnail: '/art/bits-transceiver-splash.webp',
-        hudStatus: 'BITS // SYNC',
-        hudCommit: 'EDGE // TELEMETRY'
+        liveUrl: 'https://bits-beta-five.vercel.app/',
+        scalingMode: 'fit-canvas',
+        baseWidth: 1100,
+        baseHeight: 640,
+        thumbnail: '/art/bits-transceiver-splash.webp?v=20261014c',
+        hudStatus: 'BITS // LIVE',
+        hudCommit: 'PROD // DEPLOYED'
       },
       {
         id: 'mimic',
@@ -1514,7 +1545,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
         badges: ['AES-GCM-256 Vault', 'Decoy Chameleon UI', 'Zero-Knowledge Recovery', 'Mobile Simulation'],
         launchLabel: 'Engage Mimic Vault Simulator',
         standaloneUrl: '/simulators/mimic',
-        standaloneLabel: 'Open Standalone Simulator',
+        standaloneLabel: 'Open Standalone Simulator ↗',
         dossierPath: '/quests/mimic',
         liveUrl: '/simulators/mimic',
         scalingMode: 'responsive',
@@ -1580,7 +1611,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
           </div>
           <h3 class="text-base sm:text-lg font-bold text-[var(--candle)] mb-2 font-serif">Arcane Uplink Timed Out</h3>
           <p class="text-xs sm:text-sm text-[var(--parchment)]/85 max-w-md leading-relaxed mb-6 font-mono">
-            The transmission link to <strong class="text-[var(--candle)]">${proj.name}</strong> did not respond within the 3.5s threshold. The remote chamber may be warming from cold sleep, or third-party network routes are delayed.
+            The transmission link to <strong class="text-[var(--candle)]">${proj.name}</strong> did not respond within the 3.5s threshold. The remote chamber may be warming from cold sleep, or third-party authentication/network policies require direct interaction.
           </p>
           <div class="flex flex-wrap items-center justify-center gap-3">
             <button
@@ -1769,8 +1800,8 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
           const baseW = proj.baseWidth || 800;
           const baseH = proj.baseHeight || 600;
 
-          // Adaptive Mobile Portrait Dual-Screen Mode (Solution #1)
-          const isPortraitMobile = (window.matchMedia('(orientation: portrait)').matches || ch > cw) && cw <= 600;
+          // Adaptive Mobile Portrait Dual-Screen Mode (Only for Arcane Typer typing game)
+          const isPortraitMobile = proj.id === 'arcanetyper' && (window.matchMedia('(orientation: portrait)').matches || ch > cw) && cw <= 600;
 
           if (isPortraitMobile) {
             // Reserve top half for game canvas and bottom half for native soft keyboard
@@ -1827,11 +1858,14 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
           }
           iframe.style.width = '100%';
           iframe.style.height = '100%';
+          iframe.style.minHeight = '100%';
           iframe.style.position = 'relative';
           iframe.style.left = 'auto';
           iframe.style.top = 'auto';
           iframe.style.transform = 'none';
           iframe.style.transformOrigin = 'initial';
+          iframe.style.display = 'block';
+          frameContainer.style.overflow = 'auto';
         }
       }
 
@@ -1843,6 +1877,8 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
         recordMilestone('feat_transceiver');
         const proj = TRANSCEIVER_PROJECTS[currentProjectIndex];
         if (!proj) return;
+
+        const targetUrl = proj.liveUrl;
 
         frameContainer.innerHTML = '';
 
@@ -1858,13 +1894,14 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
         frameContainer.appendChild(loader);
 
         const iframe = document.createElement('iframe');
-        iframe.src = proj.liveUrl;
+        iframe.src = targetUrl;
         iframe.title = `Live Simulation of ${proj.name} inside Arcane Transceiver`;
         iframe.className = 'border-0 w-full h-full opacity-0 transition-opacity duration-300';
         if (proj.scalingMode === 'fit-canvas') {
-          iframe.setAttribute('scrolling', 'no');
+          iframe.setAttribute('scrolling', proj.id === 'arcanetyper' ? 'no' : 'auto');
         } else {
-          iframe.setAttribute('scrolling', 'yes');
+          iframe.setAttribute('scrolling', 'auto');
+          iframe.style.overflow = 'auto';
         }
         iframe.setAttribute('allow', 'autoplay; fullscreen');
         iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-forms');
@@ -1964,7 +2001,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
         });
       });
 
-      launchBtn.addEventListener('click', launchArena);
+      launchBtn.addEventListener('click', () => launchArena());
       if (unloadBtn) unloadBtn.addEventListener('click', unloadArena);
       if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen);
 
@@ -2095,19 +2132,26 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
             composerView.classList.add('hidden');
             receiptView.classList.remove('hidden');
 
+            const receiptMailtoLink = document.getElementById('receipt-mailto-link') as HTMLAnchorElement | null;
+            if (receiptMailtoLink && result.fallbackMailto) {
+              receiptMailtoLink.href = result.fallbackMailto;
+            }
+
             if (result.success) {
               if (receiptHeading) receiptHeading.textContent = 'Missive Delivered to Nhovem!';
               if (receiptDesc) {
-                receiptDesc.textContent = 'The raven has successfully delivered your words directly to Nhovem’s console at cabahugnhovem@gmail.com.';
+                receiptDesc.textContent = 'The raven has successfully delivered your words directly to Nhovem’s console at cabahugnhovem@gmail.com. A copy of your sealed message is inscribed below for your records:';
               }
+              if (receiptGmailLink) receiptGmailLink.classList.add('hidden');
+              if (receiptMailtoLink) receiptMailtoLink.classList.add('hidden');
             } else {
               if (receiptHeading) receiptHeading.textContent = 'The Raven Awaits Your Signal';
               if (receiptDesc) {
-                receiptDesc.textContent = 'Your missive has been inscribed. Send it directly using Gmail Web or your email client:';
+                receiptDesc.textContent = result.message || 'We could not dispatch automatically. You may copy your inscribed message below or launch your email client:';
               }
-              if (result.fallbackMailto) {
-                window.location.href = result.fallbackMailto;
-              }
+              if (receiptGmailLink) receiptGmailLink.classList.remove('hidden');
+              if (receiptMailtoLink) receiptMailtoLink.classList.remove('hidden');
+              // NOTE: Never automatically hijack or redirect window.location!
             }
 
             if (receiptSubject) receiptSubject.textContent = subject;
@@ -2159,9 +2203,10 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
           if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.textContent = result.success ? '✓ Missive Delivered!' : originalBtnText;
-            if (!result.success && result.fallbackMailto) {
-              window.location.href = result.fallbackMailto;
+            if (!result.success) {
+              showFormError(errorContainerId, result.message || 'Transmission encountered an upstream delay. You can copy your message or use your mail app.');
             }
+            // NOTE: Never automatically hijack or redirect window.location!
           }
         }
       });

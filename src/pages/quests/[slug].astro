@@ -3,7 +3,6 @@ import TavernLayout from '../../layouts/TavernLayout.astro';
 import { getCollection, render } from 'astro:content';
 import ThematicIcon from '../../components/icons/ThematicIcon.astro';
 import InteractiveEmbed from '../../components/InteractiveEmbed.astro';
-import BitsAttendanceSimulator from '../../components/simulators/BitsAttendanceSimulator.astro';
 import MimicVaultSimulator from '../../components/simulators/MimicVaultSimulator.astro';
 import { getProjectTelemetry } from '../../lib/github';
 
@@ -173,8 +172,13 @@ const telemetry = await getProjectTelemetry(entry.data.sourceUrl);
         <InteractiveEmbed liveUrl={entry.data.liveUrl} title={entry.data.title} />
       )}
 
-      {entry.data.slug === 'bits' && (
-        <BitsAttendanceSimulator />
+      {entry.data.slug === 'bits' && entry.data.liveUrl && (
+        <InteractiveEmbed
+          liveUrl={entry.data.liveUrl}
+          title={entry.data.title}
+          slug="bits"
+          scalingMode="responsive"
+        />
       )}
 
       {entry.data.slug === 'mimic' && (

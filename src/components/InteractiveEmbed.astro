@@ -4,25 +4,48 @@ import ThematicIcon from './icons/ThematicIcon.astro';
 interface Props {
   liveUrl: string;
   title: string;
+  slug?: string;
+  scalingMode?: 'fit-canvas' | 'responsive';
+  description?: string;
+  hint?: string;
+  badges?: string[];
+  launchLabel?: string;
 }
 
-const { liveUrl, title } = Astro.props;
+const {
+  liveUrl,
+  title,
+  slug = 'arcanetyper',
+  scalingMode = 'fit-canvas',
+  description = slug === 'bits'
+    ? 'BITS is an enterprise attendance and timekeeping platform deployed live on Vercel (samananias/bits fork). Launch an interactive trial directly inside this dossier to test the responsive web portal, or open it in a standalone window.'
+    : 'Arcane Typer operates with a self-contained 60 FPS HTML5 Canvas engine and dynamic Web Audio synthesis. Launch an interactive trial directly inside this dossier, or explore it in a standalone window.',
+  hint = slug === 'bits'
+    ? '⚡ Live Next.js Web Portal · Hardware ZKTeco Telemetry Engine · Deployed on Vercel'
+    : '⌨ Desktop physical keyboard recommended for typing trials · Zero tracking · Zero data exfiltration',
+  badges = slug === 'bits'
+    ? ['Live Vercel Deployment', 'Next.js & TypeScript', 'Hardware ZKTeco Simulator']
+    : ['60 FPS HTML5 Canvas', 'Web Audio API', 'Zero-Asset Engine'],
+  launchLabel = slug === 'bits' ? 'Engage Live BITS Platform' : 'Ignite Live Demo Arena',
+} = Astro.props;
 ---
 
 <section
   id="interactive-arena-section"
+  data-slug={slug}
+  data-scaling-mode={scalingMode}
   class="my-8 rounded-lg border-2 border-[var(--brass)] bg-[#1e1208] text-[var(--parchment)] shadow-2xl overflow-hidden transition-all duration-300"
   aria-label="Interactive Playable Demo Arena"
 >
   <!-- Top Chamber Bar -->
-  <div class="px-4 py-3 bg-[var(--wood-deep)] border-b border-[var(--brass)]/60 flex flex-wrap items-center justify-between gap-3">
+  <div class="px-4 py-3 bg-[var(--wood-deep)] border-b border-[var(--brass)]/60 flex flex-wrap items-center justify-between gap-3 shrink-0">
     <div class="flex items-center gap-2.5">
       <div class="w-8 h-8 rounded-md bg-black/50 border border-[var(--brass)]/60 flex items-center justify-center shrink-0">
-        <ThematicIcon name="swords" class="w-4 h-4 text-[var(--candle)]" />
+        <ThematicIcon name={slug === 'bits' ? 'code' : 'swords'} class="w-4 h-4 text-[var(--candle)]" />
       </div>
       <div>
         <span class="text-[10px] uppercase font-mono tracking-widest text-[var(--ember)] block font-bold">
-          Opt-In Enchanted Trial
+          {slug === 'bits' ? 'Live Telemetry Trial' : 'Opt-In Enchanted Trial'}
         </span>
         <h3 class="text-sm sm:text-base font-bold text-[var(--candle)] font-serif leading-none">
           Live Interactive Arena — {title.split('—')[0].trim()}
@@ -34,7 +57,7 @@ const { liveUrl, title } = Astro.props;
     <div id="arena-active-controls" class="hidden items-center gap-2">
       <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/60 text-emerald-400 font-mono text-[11px] font-bold">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true"></span>
-        Live Canvas Active
+        <span>{slug === 'bits' ? 'Live Platform Active' : 'Live Canvas Active'}</span>
       </span>
 
       <button
@@ -63,26 +86,35 @@ const { liveUrl, title } = Astro.props;
   <div id="arena-resting-view" class="p-6 sm:p-8 text-center space-y-4 bg-gradient-to-b from-[#1e1208] to-[#120a04]">
     <div class="max-w-xl mx-auto space-y-2">
       <p class="text-xs sm:text-sm text-[var(--parchment)]/85 leading-relaxed">
-        Arcane Typer operates with a self-contained 60 FPS HTML5 Canvas engine and dynamic Web Audio synthesis. Launch an interactive trial directly inside this dossier, or explore it in a standalone window.
+        {description}
       </p>
-      <p class="text-[11px] font-mono text-[var(--candle)]/70">
-        ⌨ Desktop physical keyboard recommended for typing trials · Zero tracking · Zero data exfiltration
+      <div class="flex flex-wrap justify-center gap-1.5 pt-1">
+        {badges.map((badge) => (
+          <span class="px-2 py-0.5 rounded bg-black/60 border border-[var(--brass)]/40 text-[10px] font-mono text-[var(--candle)]">
+            {badge}
+          </span>
+        ))}
+      </div>
+      <p class="text-[11px] font-mono text-[var(--candle)]/70 pt-1">
+        {hint}
       </p>
     </div>
 
-    <!-- Mobile Portrait Orientation Notice -->
-    <div
-      id="arena-portrait-notice"
-      class="arena-portrait-notice hidden flex-col items-center gap-2 p-3.5 rounded-lg bg-[var(--wood-deep)]/90 border border-[var(--brass)]/60 text-center max-w-md mx-auto shadow-md"
-    >
-      <div class="flex items-center gap-2 text-[var(--candle)] font-serif font-bold text-xs sm:text-sm">
-        <span class="text-lg" aria-hidden="true">📱↻</span>
-        <span>Rotate to Landscape for Best Arena Experience</span>
+    <!-- Mobile Portrait Orientation Notice (Only for fixed-ratio canvas games like Arcane Typer) -->
+    {scalingMode === 'fit-canvas' && (
+      <div
+        id="arena-portrait-notice"
+        class="arena-portrait-notice hidden flex-col items-center gap-2 p-3.5 rounded-lg bg-[var(--wood-deep)]/90 border border-[var(--brass)]/60 text-center max-w-md mx-auto shadow-md"
+      >
+        <div class="flex items-center gap-2 text-[var(--candle)] font-serif font-bold text-xs sm:text-sm">
+          <span class="text-lg" aria-hidden="true">📱↻</span>
+          <span>Rotate to Landscape for Best Arena Experience</span>
+        </div>
+        <p class="text-[11px] text-[var(--parchment)]/80 leading-relaxed font-mono">
+          Arcane Typer's spell combat canvas is optimized for landscape orientation. Rotate your device for the full 1000×600 view, or launch below in auto-adapted view.
+        </p>
       </div>
-      <p class="text-[11px] text-[var(--parchment)]/80 leading-relaxed font-mono">
-        Arcane Typer's spell combat canvas is optimized for landscape orientation. Rotate your device for the full 1000×600 view, or launch below in auto-adapted view.
-      </p>
-    </div>
+    )}
 
     <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
       <button
@@ -92,7 +124,7 @@ const { liveUrl, title } = Astro.props;
         class="inline-flex items-center gap-2 min-h-[44px] px-6 py-2.5 rounded-md bg-[var(--brass)] text-black font-bold text-sm hover:bg-[var(--candle)] transition-all shadow-lg hover:shadow-[0_0_15px_rgba(218,165,32,0.4)] cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
       >
         <ThematicIcon name="play" class="w-4 h-4 text-black" />
-        <span>Ignite Live Demo Arena</span>
+        <span>{launchLabel}</span>
       </button>
 
       <a
@@ -110,19 +142,25 @@ const { liveUrl, title } = Astro.props;
   <!-- Active State Iframe Container -->
   <div
     id="arena-frame-container"
-    class="relative w-full aspect-video min-h-[280px] sm:min-h-[480px] lg:min-h-[580px] bg-black hidden overflow-hidden"
+    class={`relative w-full bg-black hidden overflow-hidden ${
+      scalingMode === 'responsive'
+        ? 'h-[560px] sm:h-[680px]'
+        : 'aspect-video min-h-[280px] sm:min-h-[480px] lg:min-h-[580px]'
+    }`}
   >
     <!-- Iframe inserted dynamically on click to ensure 0 KB initial payload -->
   </div>
 
-  <!-- Mobile Portrait Active Orientation Hint -->
-  <div
-    id="arena-active-portrait-hint"
-    class="hidden items-center justify-center gap-2 py-2 px-3 bg-[var(--wood-deep)] border-t border-[var(--brass)]/50 text-center text-[11px] text-[var(--candle)] font-mono"
-  >
-    <span>📱</span>
-    <span>Rotate device to landscape for full-scale typing arena</span>
-  </div>
+  <!-- Mobile Portrait Active Orientation Hint (Only for fit-canvas) -->
+  {scalingMode === 'fit-canvas' && (
+    <div
+      id="arena-active-portrait-hint"
+      class="hidden items-center justify-center gap-2 py-2 px-3 bg-[var(--wood-deep)] border-t border-[var(--brass)]/50 text-center text-[11px] text-[var(--candle)] font-mono"
+    >
+      <span>📱</span>
+      <span>Rotate device to landscape for full-scale typing arena</span>
+    </div>
+  )}
 </section>
 
 <style>
@@ -130,6 +168,29 @@ const { liveUrl, title } = Astro.props;
     .arena-portrait-notice {
       display: flex !important;
     }
+  }
+
+  /* Fullscreen Expansion for Interactive Embed Arena */
+  #interactive-arena-section:fullscreen {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+    border: none !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: #000 !important;
+    z-index: 9999 !important;
+  }
+
+  #interactive-arena-section:fullscreen #arena-frame-container {
+    flex: 1 1 0% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
   }
 </style>
 
@@ -152,12 +213,15 @@ const { liveUrl, title } = Astro.props;
     const liveUrl = launchBtn.getAttribute('data-url');
     if (!liveUrl) return;
 
+    const slug = arenaSection.dataset.slug || 'arcanetyper';
+    const scalingMode = arenaSection.dataset.scalingMode || 'fit-canvas';
     const safeFrameContainer = frameContainer;
     const safeRestingView = restingView;
     const safeActiveControls = activeControls;
     const safeArenaSection = arenaSection;
 
     function checkOrientation() {
+      if (scalingMode !== 'fit-canvas' || slug !== 'arcanetyper') return;
       const isPortraitMobile =
         (window.matchMedia('(orientation: portrait)').matches || window.innerHeight > window.innerWidth) &&
         window.innerWidth <= 640;
@@ -187,13 +251,25 @@ const { liveUrl, title } = Astro.props;
       const iframe = safeFrameContainer.querySelector('iframe');
       if (!iframe) return;
 
+      if (scalingMode === 'responsive') {
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+        iframe.style.position = 'relative';
+        iframe.style.left = 'auto';
+        iframe.style.top = 'auto';
+        iframe.style.transform = 'none';
+        iframe.style.transformOrigin = 'initial';
+        iframe.style.display = 'block';
+        return;
+      }
+
       const cw = safeFrameContainer.clientWidth;
       const ch = safeFrameContainer.clientHeight;
       if (!cw || !ch) return;
 
-      // Arcane Typer native game resolution
-      const baseW = 1000;
-      const baseH = 600;
+      // Native resolution per simulation
+      const baseW = slug === 'bits' ? 1100 : 1000;
+      const baseH = slug === 'bits' ? 640 : 600;
 
       const scale = Math.min(cw / baseW, ch / baseH);
       iframe.style.width = `${baseW}px`;
@@ -211,10 +287,11 @@ const { liveUrl, title } = Astro.props;
       // Create sandboxed iframe dynamically
       const iframe = document.createElement('iframe');
       iframe.src = liveUrl!;
-      iframe.title = 'Interactive Live Demo of Arcane Typer';
-      iframe.className = 'border-0 absolute';
+      iframe.title = 'Interactive Live Demo';
+      iframe.className = 'border-0 absolute inset-0 w-full h-full';
       iframe.setAttribute('allow', 'autoplay; fullscreen');
       iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-forms');
+      iframe.setAttribute('scrolling', scalingMode === 'responsive' ? 'auto' : 'no');
       iframe.loading = 'eager';
 
       safeFrameContainer.innerHTML = '';
@@ -233,7 +310,6 @@ const { liveUrl, title } = Astro.props;
     }
 
     function unloadArena() {
-      // Clean up iframe to free audio nodes, canvas memory, and execution loop
       safeFrameContainer.innerHTML = '';
       safeFrameContainer.classList.add('hidden');
       if (activePortraitHint) {

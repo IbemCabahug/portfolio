@@ -421,9 +421,9 @@ const totalCount = JOURNAL_MILESTONES.length;
 
     function updateView() {
       const visited = getVisitedMilestones();
-      const count = visited.size;
       const total = JOURNAL_MILESTONES.length;
-      const pct = Math.round((count / total) * 100);
+      const count = Math.min(visited.size, total);
+      const pct = Math.min(100, Math.round((count / total) * 100));
 
       // Update badge
       if (counterBadge) {
