@@ -1,0 +1,105 @@
+---
+import ThematicIcon from './icons/ThematicIcon.astro';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+
+const navLinks = [
+  { href: '/', label: 'Home' },
+  { href: '/about', label: 'About' },
+  { href: '/resume', label: 'Resume' },
+  { href: '/quests', label: 'Quest Board' },
+  { href: '/tales', label: 'Field Dispatches' },
+  { href: '/simple', label: 'Field Ledger', badge: '0-JS' },
+];
+---
+
+<footer
+  class={`mt-16 border-t-2 border-[var(--brass)] bg-[#140c05] text-[var(--parchment)] py-10 px-4 sm:px-6 select-none ${className}`}
+  role="contentinfo"
+  aria-label="Site Footer"
+>
+  <div class="max-w-5xl mx-auto flex flex-col items-center gap-6">
+    
+    {/* Clean Main Navigation — Internal tavern routes pruned; single front door to Tavern retained */}
+    <nav aria-label="Footer Navigation">
+      <ul class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm font-semibold">
+        {navLinks.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class="inline-flex items-center gap-1.5 min-h-[44px] py-1 text-[var(--parchment)]/80 hover:text-[var(--candle)] hover:underline transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+            >
+              <span>{link.label}</span>
+              {link.badge && (
+                <span class="text-[10px] font-mono px-1.5 py-0.5 rounded border border-[var(--brass)]/50 text-[var(--candle)]/80">
+                  {link.badge}
+                </span>
+              )}
+            </a>
+          </li>
+        ))}
+        {/* The single gateway to the interactive Tavern */}
+        <li class="flex items-center">
+          <a
+            href="/tavern"
+            class="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md bg-[#24170d] border border-[var(--brass)] text-[var(--candle)] text-xs font-bold hover:bg-[var(--brass)] hover:text-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)] shadow-xs relative after:absolute after:-inset-1.5"
+            title="Enter Ibem's Tavern (Interactive RPG Showcase)"
+          >
+            <ThematicIcon name="tavern" class="w-3.5 h-3.5 shrink-0" />
+            <span>Enter Ibem's Tavern &rarr;</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    {/* Divider line with subtle brass tint */}
+    <div class="w-full max-w-2xl h-px bg-[var(--brass)]/30" aria-hidden="true"></div>
+
+    {/* Bottom Bar: Copyright & Back to Top */}
+    <div class="w-full flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--parchment)]/70">
+      <p class="text-center sm:text-left">
+        &copy; 2026 Nhovem Cabahug &middot; AI-Assisted Developer &middot; Cebu, PH
+      </p>
+
+      <button
+        type="button"
+        id="footer-back-to-top"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-[var(--brass)]/50 bg-[#1e1208] text-[var(--candle)] hover:bg-[var(--brass)] hover:text-[var(--wood-deep)] transition-colors min-h-[44px] cursor-pointer font-semibold focus-visible:outline-2 focus-visible:outline-[var(--candle)] text-xs"
+        aria-label="Scroll back to top of the page"
+      >
+        <span>Back to Top</span>
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="12" y1="19" x2="12" y2="5"></line>
+          <polyline points="5 12 12 5 19 12"></polyline>
+        </svg>
+      </button>
+    </div>
+
+  </div>
+</footer>
+
+<script>
+  function initFooterControls() {
+    const topBtn = document.getElementById('footer-back-to-top');
+    if (topBtn && !(topBtn as any).__bound) {
+      (topBtn as any).__bound = true;
+      topBtn.addEventListener('click', () => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+    }
+  }
+
+  document.addEventListener('astro:page-load', initFooterControls);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFooterControls);
+  } else {
+    initFooterControls();
+  }
+</script>

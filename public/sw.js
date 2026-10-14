@@ -1,6 +1,6 @@
 // public/sw.js
 // Progressive Web App Service Worker for Nhovem Cabahug's Portfolio
-const CACHE_VERSION = 'v5';
+const CACHE_VERSION = 'v6';
 const STATIC_CACHE = `nhovem-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `nhovem-runtime-${CACHE_VERSION}`;
 
@@ -71,8 +71,12 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 3. Navigation requests: Network-First with Cache Fallback -> Custom Offline Page
-  if (request.mode === 'navigate') {
+  // 3. Navigation & HTML requests (including Astro ClientRouter page swaps): Network-First
+  const isHtmlRequest =
+    request.mode === 'navigate' ||
+    (request.headers.get('accept') && request.headers.get('accept').includes('text/html'));
+
+  if (isHtmlRequest) {
     event.respondWith(
       fetch(request)
         .then((networkResponse) => {
@@ -97,7 +101,17 @@ self.addEventListener('fetch', (event) => {
 
   // 4. Static Assets (CSS, JS, Fonts, Images, Audio, WebManifest): Stale-While-Revalidate
   const isStaticAsset =
-    url.origin === self.location.origin ||
+    url.pathname.startsWith('/_astro/') ||
+    url.pathname.startsWith('/art/') ||
+    url.pathname.startsWith('/icons/') ||
+    url.pathname.startsWith('/audio/') ||
+    url.pathname.endsWith('.svg') ||
+    url.pathname.endsWith('.png') ||
+    url.pathname.endsWith('.webp') ||
+    url.pathname.endsWith('.jpg') ||
+    url.pathname.endsWith('.css') ||
+    url.pathname.endsWith('.js') ||
+    url.pathname.endsWith('.webmanifest') ||
     url.hostname.includes('fonts.googleapis.com') ||
     url.hostname.includes('fonts.gstatic.com');
 

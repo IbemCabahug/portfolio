@@ -1,5 +1,6 @@
 ---
 // src/components/PwaRegister.astro
+const isDev = import.meta.env.DEV;
 ---
 
 {/* Subtle Offline / Online Notification Toast */}
@@ -18,9 +19,28 @@
   </div>
 </div>
 
-<script is:inline>
+<script is:inline define:vars={{ isDev }}>
   (() => {
-    // 1. Service Worker Registration
+    // In local development, unregister any active service worker and purge caches so dev edits are never stale
+    if (isDev) {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+          for (const registration of registrations) {
+            registration.unregister();
+          }
+        });
+      }
+      if ('caches' in window) {
+        caches.keys().then((names) => {
+          for (const name of names) {
+            caches.delete(name);
+          }
+        });
+      }
+      return;
+    }
+
+    // 1. Service Worker Registration (Production)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker
