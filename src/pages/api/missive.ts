@@ -26,6 +26,7 @@ interface MissivePayload {
   subject?: string;
   message?: string;
   botcheck?: string;
+  turnstileToken?: string;
 }
 
 // ── Server-side rate limiting (in-memory, best-effort on serverless) ────────
@@ -156,6 +157,45 @@ const MAX_NAME = 120;
 const MAX_SUBJECT = 200;
 const MAX_BODY = 5000;
 
+async function verifyTurnstile(token: string, ip: string): Promise<{ success: boolean; error?: string }> {
+  const secret = process.env.TURNSTILE_SECRET || '1x0000000000000000000000000000000AA';
+
+  if (!token) {
+    if (process.env.TURNSTILE_SECRET && process.env.TURNSTILE_SECRET !== '1x0000000000000000000000000000000AA') {
+      return { success: false, error: 'Anti-bot verification token missing. Please complete the security challenge.' };
+    }
+    return { success: true };
+  }
+
+  try {
+    const formData = new URLSearchParams();
+    formData.append('secret', secret);
+    formData.append('response', token);
+    if (ip && ip !== 'unknown') {
+      formData.append('remoteip', ip);
+    }
+
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const outcome = (await res.json().catch(() => null)) as { success?: boolean; 'error-codes'?: string[] } | null;
+    if (!outcome?.success) {
+      return {
+        success: false,
+        error: 'Cloudflare security challenge verification failed. Please try again.',
+      };
+    }
+    return { success: true };
+  } catch {
+    if (process.env.NODE_ENV === 'production' && process.env.TURNSTILE_SECRET && process.env.TURNSTILE_SECRET !== '1x0000000000000000000000000000000AA') {
+      return { success: false, error: 'Security verification service temporarily unreachable.' };
+    }
+    return { success: true };
+  }
+}
+
 export const POST: APIRoute = async ({ request }) => {
   // 1. Parse JSON payload defensively.
   let payload: MissivePayload;
@@ -226,6 +266,21 @@ export const POST: APIRoute = async ({ request }) => {
     );
   }
   recordGlobalAttempt();
+
+  // 3c. Cloudflare Turnstile anti-bot challenge verification
+  const turnstileCheck = await verifyTurnstile(payload.turnstileToken || '', ip);
+  if (!turnstileCheck.success) {
+    logMissive(ip, 'rejected_turnstile', payload.email || '', turnstileCheck.error || '');
+    return json(
+      {
+        success: false,
+        isValidationError: true,
+        message: turnstileCheck.error || 'Anti-bot verification failed. Please complete the security challenge.',
+      },
+      400,
+      rlHeaders
+    );
+  }
 
   // 4. Normalize + cap payload fields.
   // Explicitly strip carriage returns and newlines (\r, \n) from header-like fields

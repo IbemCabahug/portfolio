@@ -37,7 +37,7 @@ const telemetry = await getProjectTelemetry(entry.data.sourceUrl);
       </span>
     </nav>
 
-    <article class="bg-[var(--parchment)] text-[var(--ink)] p-6 sm:p-10 rounded shadow-2xl border-2 border-[var(--brass)]">
+    <article class="bg-[var(--parchment)] text-[var(--ink)] p-4 sm:p-10 rounded shadow-2xl border-2 border-[var(--brass)]">
       <header class="border-b-2 border-[var(--brass)] pb-6 mb-8">
         <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
           <span class={`text-xs uppercase font-bold tracking-wider px-2.5 py-1 rounded ${entry.data.status === 'Shipped' ? 'bg-[var(--wood-deep)] text-[var(--candle)]' : 'bg-[var(--stone)] text-[var(--parchment)]'}`}>

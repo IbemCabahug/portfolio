@@ -21,10 +21,10 @@ const {
     ? 'BITS is an enterprise attendance and timekeeping platform deployed live on Vercel (samananias/bits fork). Launch an interactive trial directly inside this dossier to test the responsive web portal, or open it in a standalone window.'
     : 'Arcane Typer operates with a self-contained 60 FPS HTML5 Canvas engine and dynamic Web Audio synthesis. Launch an interactive trial directly inside this dossier, or explore it in a standalone window.',
   hint = slug === 'bits'
-    ? '⚡ Live Next.js Web Portal · Hardware ZKTeco Telemetry Engine · Deployed on Vercel'
+    ? '⚡ Live Next.js Web Portal · Multi-Role Attendance Platform · Deployed on Vercel'
     : '⌨ Desktop physical keyboard recommended for typing trials · Zero tracking · Zero data exfiltration',
   badges = slug === 'bits'
-    ? ['Live Vercel Deployment', 'Next.js & TypeScript', 'Hardware ZKTeco Simulator']
+    ? ['Live Vercel Deployment', 'Next.js & TypeScript', 'Role-Scoped Portals']
     : ['60 FPS HTML5 Canvas', 'Web Audio API', 'Zero-Asset Engine'],
   launchLabel = slug === 'bits' ? 'Engage Live BITS Platform' : 'Ignite Live Demo Arena',
 } = Astro.props;
@@ -34,56 +34,68 @@ const {
   id="interactive-arena-section"
   data-slug={slug}
   data-scaling-mode={scalingMode}
-  class="my-8 rounded-lg border-2 border-[var(--brass)] bg-[#1e1208] text-[var(--parchment)] shadow-2xl overflow-hidden transition-all duration-300"
+  class="my-6 sm:my-8 rounded-lg border-2 border-[var(--brass)] bg-[#1e1208] text-[var(--parchment)] shadow-2xl overflow-hidden transition-all duration-300"
   aria-label="Interactive Playable Demo Arena"
 >
   <!-- Top Chamber Bar -->
-  <div class="px-4 py-3 bg-[var(--wood-deep)] border-b border-[var(--brass)]/60 flex flex-wrap items-center justify-between gap-3 shrink-0">
-    <div class="flex items-center gap-2.5">
-      <div class="w-8 h-8 rounded-md bg-black/50 border border-[var(--brass)]/60 flex items-center justify-center shrink-0">
-        <ThematicIcon name={slug === 'bits' ? 'code' : 'swords'} class="w-4 h-4 text-[var(--candle)]" />
+  <div class="px-3.5 py-2.5 sm:px-4 sm:py-3 bg-[var(--wood-deep)] border-b border-[var(--brass)]/60 flex flex-wrap items-center justify-between gap-2.5 shrink-0">
+    <div class="flex items-center gap-2 sm:gap-2.5 min-w-0">
+      <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-black/50 border border-[var(--brass)]/60 flex items-center justify-center shrink-0">
+        <ThematicIcon name={slug === 'bits' ? 'code' : 'swords'} class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[var(--candle)]" />
       </div>
-      <div>
-        <span class="text-[10px] uppercase font-mono tracking-widest text-[var(--ember)] block font-bold">
+      <div class="min-w-0">
+        <span class="text-[9px] sm:text-[10px] uppercase font-mono tracking-widest text-[var(--ember)] block font-bold truncate">
           {slug === 'bits' ? 'Live Telemetry Trial' : 'Opt-In Enchanted Trial'}
         </span>
-        <h3 class="text-sm sm:text-base font-bold text-[var(--candle)] font-serif leading-none">
+        <h3 class="text-xs sm:text-base font-bold text-[var(--candle)] font-serif leading-none truncate">
           Live Interactive Arena — {title.split('—')[0].trim()}
         </h3>
       </div>
     </div>
 
     <!-- Active State Controls (hidden in resting state) -->
-    <div id="arena-active-controls" class="hidden items-center gap-2">
-      <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/60 text-emerald-400 font-mono text-[11px] font-bold">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true"></span>
-        <span>{slug === 'bits' ? 'Live Platform Active' : 'Live Canvas Active'}</span>
+    <div id="arena-active-controls" class="hidden items-center gap-1.5 sm:gap-2 ml-auto">
+      <span class="inline-flex items-center gap-1 sm:gap-1.5 px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/60 text-emerald-400 font-mono text-[10px] sm:text-[11px] font-bold">
+        <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true"></span>
+        <span>{slug === 'bits' ? 'Platform Active' : 'Canvas Active'}</span>
       </span>
 
       <button
         type="button"
         id="arena-fullscreen-btn"
-        class="inline-flex items-center gap-1 px-3 py-1.5 rounded bg-[var(--wood-deep)] border border-[var(--brass)] text-[var(--candle)] font-mono text-xs hover:bg-black transition-colors cursor-pointer min-h-[36px]"
+        class="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded bg-[var(--wood-deep)] border border-[var(--brass)] text-[var(--candle)] font-mono text-xs hover:bg-black transition-colors cursor-pointer min-h-[34px] sm:min-h-[36px]"
         title="Toggle Fullscreen"
       >
-        <span>⛶</span>
-        <span class="hidden sm:inline">Fullscreen</span>
+        <span id="arena-fs-icon">⛶</span>
+        <span id="arena-fs-text" class="hidden sm:inline">Fullscreen</span>
       </button>
 
       <button
         type="button"
         id="arena-unload-btn"
-        class="inline-flex items-center gap-1 px-3 py-1.5 rounded bg-red-950/70 border border-red-500/50 text-red-200 font-bold text-xs hover:bg-red-900 transition-colors cursor-pointer min-h-[36px]"
+        class="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded bg-red-950/70 border border-red-500/50 text-red-200 font-bold text-xs hover:bg-red-900 transition-colors cursor-pointer min-h-[34px] sm:min-h-[36px]"
         title="Unload demo and free memory"
       >
         <span>✕</span>
-        <span>Close Arena</span>
+        <span>Close</span>
       </button>
     </div>
+
+    <!-- Fail-Safe Emergency Exit Button (Pure CSS :fullscreen activation - ALWAYS visible in fullscreen) -->
+    <button
+      type="button"
+      id="arena-fullscreen-exit-pill"
+      class="arena-fs-exit-pill hidden items-center gap-1.5 px-3 py-1.5 rounded-md bg-amber-950/90 border-2 border-amber-400 text-amber-200 font-mono text-xs font-bold hover:bg-amber-900 transition-colors shadow-2xl cursor-pointer min-h-[34px] ml-auto"
+      title="Exit Fullscreen Mode"
+      aria-label="Exit Fullscreen Mode"
+    >
+      <span aria-hidden="true">⤓</span>
+      <span>Exit Fullscreen</span>
+    </button>
   </div>
 
   <!-- Resting State Preview Card -->
-  <div id="arena-resting-view" class="p-6 sm:p-8 text-center space-y-4 bg-gradient-to-b from-[#1e1208] to-[#120a04]">
+  <div id="arena-resting-view" class="p-4 sm:p-8 text-center space-y-4 bg-gradient-to-b from-[#1e1208] to-[#120a04]">
     <div class="max-w-xl mx-auto space-y-2">
       <p class="text-xs sm:text-sm text-[var(--parchment)]/85 leading-relaxed">
         {description}
@@ -116,12 +128,12 @@ const {
       </div>
     )}
 
-    <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3 pt-2 max-w-md mx-auto">
       <button
         type="button"
         id="arena-launch-btn"
         data-url={liveUrl}
-        class="inline-flex items-center gap-2 min-h-[44px] px-6 py-2.5 rounded-md bg-[var(--brass)] text-black font-bold text-sm hover:bg-[var(--candle)] transition-all shadow-lg hover:shadow-[0_0_15px_rgba(218,165,32,0.4)] cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 min-h-[44px] px-6 py-2.5 rounded-md bg-[var(--brass)] text-black font-bold text-sm hover:bg-[var(--candle)] transition-all shadow-lg hover:shadow-[0_0_15px_rgba(218,165,32,0.4)] cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
       >
         <ThematicIcon name="play" class="w-4 h-4 text-black" />
         <span>{launchLabel}</span>
@@ -131,7 +143,7 @@ const {
         href={liveUrl}
         target="_blank"
         rel="noopener noreferrer"
-        class="inline-flex items-center gap-2 min-h-[44px] px-5 py-2.5 rounded-md border-2 border-[var(--brass)] text-[var(--candle)] font-bold text-sm hover:bg-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 min-h-[44px] px-5 py-2.5 rounded-md border-2 border-[var(--brass)] text-[var(--candle)] font-bold text-sm hover:bg-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
       >
         <span>Launch in New Window</span>
         <ThematicIcon name="external" class="w-3.5 h-3.5 text-[var(--candle)]" />
@@ -144,9 +156,10 @@ const {
     id="arena-frame-container"
     class={`relative w-full bg-black hidden overflow-hidden ${
       scalingMode === 'responsive'
-        ? 'h-[560px] sm:h-[680px]'
+        ? 'min-h-[480px] h-[72vh] max-h-[760px] sm:h-[680px]'
         : 'aspect-video min-h-[280px] sm:min-h-[480px] lg:min-h-[580px]'
     }`}
+    style={scalingMode === 'responsive' ? '-webkit-overflow-scrolling: touch;' : undefined}
   >
     <!-- Iframe inserted dynamically on click to ensure 0 KB initial payload -->
   </div>
@@ -191,6 +204,14 @@ const {
     min-height: 0 !important;
     max-height: none !important;
     aspect-ratio: auto !important;
+  }
+
+  /* Fullscreen Emergency Exit Pill Visibility */
+  #interactive-arena-section:not(:fullscreen) .arena-fs-exit-pill {
+    display: none !important;
+  }
+  #interactive-arena-section:fullscreen .arena-fs-exit-pill {
+    display: inline-flex !important;
   }
 </style>
 
@@ -310,6 +331,10 @@ const {
     }
 
     function unloadArena() {
+      // 1. Immediately exit browser fullscreen if active, preventing trapped view
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
       safeFrameContainer.innerHTML = '';
       safeFrameContainer.classList.add('hidden');
       if (activePortraitHint) {
@@ -325,13 +350,43 @@ const {
     function toggleFullscreen() {
       if (!document.fullscreenElement) {
         if (safeArenaSection.requestFullscreen) {
-          safeArenaSection.requestFullscreen();
+          safeArenaSection.requestFullscreen().catch(() => {});
         }
       } else {
         if (document.exitFullscreen) {
-          document.exitFullscreen();
+          document.exitFullscreen().catch(() => {});
         }
       }
+    }
+
+    function updateFullscreenState() {
+      const isFs = Boolean(
+        document.fullscreenElement &&
+        (document.fullscreenElement === safeArenaSection || safeArenaSection.contains(document.fullscreenElement))
+      );
+      const icon = document.getElementById('arena-fs-icon');
+      const text = document.getElementById('arena-fs-text');
+      if (fullscreenBtn) {
+        if (isFs) {
+          fullscreenBtn.title = 'Exit Fullscreen Mode (Esc)';
+          if (icon) icon.textContent = '⤓';
+          if (text) text.textContent = 'Exit Fullscreen';
+        } else {
+          fullscreenBtn.title = 'Toggle Fullscreen Mode';
+          if (icon) icon.textContent = '⛶';
+          if (text) text.textContent = 'Fullscreen';
+        }
+      }
+      fitArena();
+    }
+
+    const fsEmergencyExitBtn = document.getElementById('arena-fullscreen-exit-pill');
+    if (fsEmergencyExitBtn) {
+      fsEmergencyExitBtn.addEventListener('click', () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen().catch(() => {});
+        }
+      });
     }
 
     launchBtn.addEventListener('click', launchArena);
@@ -340,7 +395,8 @@ const {
 
     window.addEventListener('resize', fitArena);
     window.addEventListener('orientationchange', fitArena);
-    document.addEventListener('fullscreenchange', fitArena);
+    document.addEventListener('fullscreenchange', updateFullscreenState);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenState);
 
     checkOrientation();
   }

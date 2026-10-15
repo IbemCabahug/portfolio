@@ -13,6 +13,7 @@ const mailLink = links.find((l) => l.data.icon === 'mail');
 const githubLink = links.find((l) => l.data.icon === 'github');
 const mailAddress = mailLink?.data.url.replace('mailto:', '') || profile?.email || 'cabahugnhovem@gmail.com';
 const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com/IbemCabahug';
+const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA';
 ---
 
 <TavernLayout
@@ -20,7 +21,8 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
   description="Step inside The Courier's Roost: an interactive 2.5D tavern aviary to send word, inspect GitHub telemetry, or review credentials."
   location="messenger"
 >
-  <div class="roost-page-wrapper">
+  <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+  <div class="roost-page-wrapper" data-turnstile-sitekey={turnstileSiteKey}>
     <!-- Atmospheric Room Intro Header -->
     <header class="roost-header text-center mb-6 px-4">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--stone)]/60 border border-[var(--brass)]/40 text-[var(--candle)] text-xs font-semibold tracking-wider uppercase mb-2">
@@ -662,6 +664,14 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
     height: 100% !important;
     min-height: 0 !important;
     border-radius: 4px !important;
+  }
+
+  /* Fullscreen Emergency Exit Pill Visibility */
+  #dialog-machine:not(:fullscreen) .transceiver-fs-exit-pill {
+    display: none !important;
+  }
+  #dialog-machine:fullscreen .transceiver-fs-exit-pill {
+    display: inline-flex !important;
   }
 
   @media (max-width: 640px) {
@@ -1330,11 +1340,19 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
         focusables[0].focus({ preventScroll: true });
       }
 
+      if (dialog.id === 'dialog-raven') {
+        renderTurnstile();
+      }
+
       document.addEventListener('keydown', handleKeydown);
     }
 
     function closeDialog() {
       if (!activeDialog) return;
+
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
 
       if (activeDialog.id === 'dialog-machine' && unloadTransceiverFn) {
         unloadTransceiverFn();
@@ -1518,7 +1536,7 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
       {
         id: 'bits',
         name: 'BITS Engine',
-        subtitle: 'Biometric Telemetry // Hardware Simulation',
+        subtitle: 'Biometric Telemetry // Enterprise Platform',
         modalTitle: 'The Arcane Transceiver — BITS Engine',
         version: 'BITS Engine v1.0.4',
         description: 'Connecting to the live deployed BITS attendance management platform at bits-beta-five.vercel.app (samananias/bits fork). Interfacing with live attendance telemetry, shift window derivation, and automated overtime state machines.',
@@ -1948,6 +1966,9 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
 
       function unloadArena() {
         clearWatchdog();
+        if (document.fullscreenElement) {
+          document.exitFullscreen().catch(() => {});
+        }
         if (!frameContainer || !restingView || !activeControls) return;
         soundEngine.playWoodClink();
         soundEngine.duckAmbient(false);
@@ -1963,14 +1984,47 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
         const target = machineDialog || frameContainer;
         if (!document.fullscreenElement) {
           if (target && target.requestFullscreen) {
-            target.requestFullscreen();
+            target.requestFullscreen().catch(() => {});
           }
         } else {
           if (document.exitFullscreen) {
-            document.exitFullscreen();
+            document.exitFullscreen().catch(() => {});
           }
         }
       }
+
+      function updateTransceiverFullscreenState() {
+        const isFs = Boolean(
+          document.fullscreenElement &&
+          (document.fullscreenElement === machineDialog || machineDialog?.contains(document.fullscreenElement))
+        );
+        const icon = document.getElementById('transceiver-fs-icon');
+        const text = document.getElementById('transceiver-fs-text');
+        if (fullscreenBtn) {
+          if (isFs) {
+            fullscreenBtn.title = 'Exit Fullscreen Mode (Esc)';
+            if (icon) icon.textContent = '⤓';
+            if (text) text.textContent = 'Exit Fullscreen';
+          } else {
+            fullscreenBtn.title = 'Toggle Fullscreen Mode';
+            if (icon) icon.textContent = '⛶';
+            if (text) text.textContent = 'Fullscreen';
+          }
+        }
+        fitArena();
+      }
+
+      const transceiverEmergencyExitBtn = document.getElementById('transceiver-fullscreen-exit-pill');
+      if (transceiverEmergencyExitBtn) {
+        transceiverEmergencyExitBtn.addEventListener('click', () => {
+          if (document.fullscreenElement) {
+            document.exitFullscreen().catch(() => {});
+          }
+        });
+      }
+
+      document.addEventListener('fullscreenchange', updateTransceiverFullscreenState);
+      document.addEventListener('webkitfullscreenchange', updateTransceiverFullscreenState);
 
       const resizeObserver = new ResizeObserver(() => {
         if (!frameContainer.classList.contains('hidden')) {
@@ -2013,6 +2067,57 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
     }
 
     setupTransceiverSimulation();
+
+    // Cloudflare Turnstile Management
+    const pageWrapper = document.querySelector('.roost-page-wrapper') as HTMLElement | null;
+    const resolvedTurnstileSiteKey = pageWrapper?.dataset.turnstileSitekey || '1x00000000000000000000AA';
+    let desktopTurnstileId: string | null = null;
+    let mobileTurnstileId: string | null = null;
+
+    function renderTurnstile() {
+      if (typeof window === 'undefined' || !(window as any).turnstile) return;
+      const turnstile = (window as any).turnstile;
+
+      const desktopSlot = document.getElementById('desktop-turnstile-slot');
+      if (desktopSlot && desktopTurnstileId === null && !desktopSlot.hasChildNodes()) {
+        try {
+          desktopTurnstileId = turnstile.render('#desktop-turnstile-slot', {
+            sitekey: resolvedTurnstileSiteKey,
+            theme: 'dark',
+            size: 'flexible',
+          });
+        } catch (e) {
+          console.warn('Desktop Turnstile render error:', e);
+        }
+      }
+
+      const mobileSlot = document.getElementById('mobile-turnstile-slot');
+      if (mobileSlot && mobileTurnstileId === null && !mobileSlot.hasChildNodes()) {
+        try {
+          mobileTurnstileId = turnstile.render('#mobile-turnstile-slot', {
+            sitekey: resolvedTurnstileSiteKey,
+            theme: 'dark',
+            size: 'flexible',
+          });
+        } catch (e) {
+          console.warn('Mobile Turnstile render error:', e);
+        }
+      }
+    }
+
+    if (typeof window !== 'undefined') {
+      if ((window as any).turnstile) {
+        renderTurnstile();
+      } else {
+        const turnstilePoller = setInterval(() => {
+          if ((window as any).turnstile) {
+            clearInterval(turnstilePoller);
+            renderTurnstile();
+          }
+        }, 200);
+        setTimeout(() => clearInterval(turnstilePoller), 8000);
+      }
+    }
 
     // Form Handling and Missive Dispatching
     const recipientEmail = 'cabahugnhovem@gmail.com';
@@ -2090,6 +2195,19 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
         const subject = (document.getElementById(subjectId) as HTMLInputElement)?.value.trim() || 'Tavern Dispatch';
         const body = (document.getElementById(bodyId) as HTMLTextAreaElement)?.value.trim() || '';
 
+        // Anti-abuse: Cloudflare Turnstile token
+        let turnstileToken = '';
+        if (typeof window !== 'undefined' && (window as any).turnstile) {
+          const widgetId = isDesktop ? desktopTurnstileId : mobileTurnstileId;
+          if (widgetId !== null) {
+            turnstileToken = (window as any).turnstile.getResponse(widgetId) || '';
+          }
+        }
+        if (!turnstileToken) {
+          const tokenInput = form.querySelector('[name="cf-turnstile-response"]') as HTMLInputElement | null;
+          if (tokenInput) turnstileToken = tokenInput.value;
+        }
+
         const fullFormattedBody = `Sender: ${name}\nReturn Address: ${email}\n\n--------------------------------------------------\n${body}\n--------------------------------------------------\n(Dispatched via Ibem's Tavern Messenger Roost)`;
 
         const result = await sendMissive({
@@ -2098,7 +2216,18 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
           subject,
           message: body,
           botcheck: botcheckValue,
+          turnstileToken,
         });
+
+        // Reset Turnstile challenge token after submission attempt
+        if (typeof window !== 'undefined' && (window as any).turnstile) {
+          const widgetId = isDesktop ? desktopTurnstileId : mobileTurnstileId;
+          if (widgetId !== null) {
+            try {
+              (window as any).turnstile.reset(widgetId);
+            } catch {}
+          }
+        }
 
         // If email failed backend validation, restore submit button and show error
         if (result.isValidationError) {
@@ -2191,6 +2320,11 @@ const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com
                 receiptView.classList.add('hidden');
                 composerView.classList.remove('hidden');
                 form.reset();
+                if (typeof window !== 'undefined' && (window as any).turnstile && desktopTurnstileId !== null) {
+                  try {
+                    (window as any).turnstile.reset(desktopTurnstileId);
+                  } catch {}
+                }
                 if (submitBtn) {
                   submitBtn.disabled = false;
                   submitBtn.textContent = originalBtnText;

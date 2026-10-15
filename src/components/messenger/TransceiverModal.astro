@@ -63,8 +63,8 @@
           class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-black/50 border border-[var(--brass)] text-[var(--candle)] font-mono text-xs hover:bg-black transition-colors cursor-pointer min-h-[32px]"
           title="Toggle Fullscreen"
         >
-          <span>⛶</span>
-          <span class="hidden sm:inline">Fullscreen</span>
+          <span id="transceiver-fs-icon">⛶</span>
+          <span id="transceiver-fs-text" class="hidden sm:inline">Fullscreen</span>
         </button>
 
         <button
@@ -77,6 +77,18 @@
           <span>Disengage</span>
         </button>
       </div>
+
+      <!-- Pure CSS :fullscreen Emergency Exit Pill -->
+      <button
+        type="button"
+        id="transceiver-fullscreen-exit-pill"
+        class="transceiver-fs-exit-pill hidden items-center gap-1.5 px-3 py-1 rounded bg-amber-950/90 border border-amber-400 text-amber-200 font-mono text-xs font-bold hover:bg-amber-900 transition-colors shadow-2xl cursor-pointer min-h-[32px]"
+        title="Exit Fullscreen Mode"
+        aria-label="Exit Fullscreen Mode"
+      >
+        <span aria-hidden="true">⤓</span>
+        <span>Exit Fullscreen</span>
+      </button>
     </div>
 
     <!-- Resting View: Dynamic Project Preview with Navigation -->

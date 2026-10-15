@@ -8,12 +8,12 @@ export interface Props {
 const { compact = false } = Astro.props;
 ---
 
-<div class={`bits-simulator-card ${compact ? 'my-0 p-3 sm:p-4 border-0 bg-transparent shadow-none' : 'my-8 p-5 sm:p-7 rounded-xl border-2 border-[var(--brass)] bg-[#180e06] shadow-2xl'} text-[var(--parchment)]`}>
+<div class={`bits-simulator-card ${compact ? 'my-0 p-2 sm:p-4 border-0 bg-transparent shadow-none' : 'my-6 sm:my-8 p-3.5 sm:p-7 rounded-xl border-2 border-[var(--brass)] bg-[#180e06] shadow-2xl'} text-[var(--parchment)]`}>
   {compact ? (
     <div class="flex items-center justify-between gap-3 pb-2.5 mb-3 border-b border-[var(--brass)]/40 text-xs font-mono">
       <div class="flex items-center gap-2">
         <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" id="bits-status-dot"></span>
-        <span class="text-emerald-300 font-bold text-xs" id="bits-status-text">ZKTeco Hardware Feed Active // Biometric Telemetry</span>
+        <span class="text-emerald-300 font-bold text-xs" id="bits-status-text">Biometric Telemetry // Active Pipeline</span>
       </div>
       <span class="text-[var(--brass)] text-[10px] hidden sm:inline px-2 py-0.5 rounded bg-black/60 border border-[var(--brass)]/40">Event Sourcing Pipeline</span>
     </div>
@@ -181,7 +181,7 @@ const { compact = false } = Astro.props;
       <span class="text-[var(--brass)] font-bold">SQL Relational Event Trace:</span>
       <span class="text-stone-400" id="bits-table-indicator">Table: biometric_punches &bull; 2 rows</span>
     </div>
-    <div class="overflow-x-auto text-[11px] text-stone-300" id="bits-sql-trace">
+    <div class="overflow-x-auto text-[11px] text-stone-300" id="bits-sql-trace" style="-webkit-overflow-scrolling: touch;">
       {/* Table code preview injected by JS */}
     </div>
   </div>
