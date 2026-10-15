@@ -115,7 +115,6 @@ export async function sendMissive(payload: MissivePayload): Promise<MissiveResul
         email: payload.email,
         subject: resultSubject,
         message: formattedBody,
-        ...(payload.turnstileToken ? { 'cf-turnstile-response': payload.turnstileToken } : {}),
       }),
     });
 
