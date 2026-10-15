@@ -2084,7 +2084,8 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
           desktopTurnstileId = turnstile.render('#desktop-turnstile-slot', {
             sitekey: resolvedTurnstileSiteKey,
             theme: 'dark',
-            size: 'flexible',
+            size: 'normal',
+            action: 'contact-missive',
           });
         } catch (e) {
           console.warn('Desktop Turnstile render error:', e);
@@ -2097,7 +2098,8 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
           mobileTurnstileId = turnstile.render('#mobile-turnstile-slot', {
             sitekey: resolvedTurnstileSiteKey,
             theme: 'dark',
-            size: 'flexible',
+            size: 'normal',
+            action: 'contact-missive',
           });
         } catch (e) {
           console.warn('Mobile Turnstile render error:', e);
@@ -2206,6 +2208,18 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
         if (!turnstileToken) {
           const tokenInput = form.querySelector('[name="cf-turnstile-response"]') as HTMLInputElement | null;
           if (tokenInput) turnstileToken = tokenInput.value;
+        }
+
+        if (!turnstileToken && typeof window !== 'undefined' && (window as any).turnstile) {
+          const widgetId = isDesktop ? desktopTurnstileId : mobileTurnstileId;
+          if (widgetId !== null) {
+            showFormError(errorContainerId, 'Security challenge is verifying. Please verify the anti-bot box or wait a moment.');
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.textContent = originalBtnText;
+            }
+            return;
+          }
         }
 
         const fullFormattedBody = `Sender: ${name}\nReturn Address: ${email}\n\n--------------------------------------------------\n${body}\n--------------------------------------------------\n(Dispatched via Ibem's Tavern Messenger Roost)`;
