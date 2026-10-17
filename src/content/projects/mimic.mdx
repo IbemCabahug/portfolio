@@ -2,12 +2,14 @@
 title: "Mimic — party game with an encrypted vault"
 slug: "mimic"
 role: "Sole Developer"
-status: "In progress"
+status: "Shipped"
 stack: ["Flutter", "Android", "AES-256", "Dart", "Cryptography"]
 featured: false
 thumbnail: "/art/projects/mimic-icon.webp"
 order: 3
-summary: "An Android social deduction party game that also contains an AES-256 encrypted personal vault for photos, videos, notes and documents. Everything stays on the device: no accounts, no cloud, no tracking."
+summary: "An Android social deduction party game that also contains an AES-256 encrypted personal vault for photos, videos, notes and documents. Vault contents remain strictly local on the device with zero cloud storage."
+downloadUrl: "https://github.com/IbemCabahug/mimic-release/releases/latest/download/mimic-v1.1.0.apk"
+releaseUrl: "https://github.com/IbemCabahug/mimic-release/releases/latest"
 sourceUrl: "https://github.com/IbemCabahug/mimic"
 ---
 
@@ -17,10 +19,10 @@ Mimic is a dual-state mobile application engineered in Flutter for Android. On t
 
 Key design constraints:
 - **Zero Cloud Infrastructure**: No user accounts, no remote backend servers, no analytics beacons, and no tracking.
-- **Zero Network Permissions**: The Android manifest deliberately omits the `INTERNET` permission, mathematically guaranteeing that unencrypted or encrypted files cannot be exfiltrated across a network.
+- **Offline Local Vault Isolation**: Vault storage and cryptographic operations are entirely local to the device filesystem. The `INTERNET` permission in the Android manifest is isolated strictly to local-network (LAN) party multiplayer and optional licensing; vault contents never interact with network sockets.
 - **Hardware-Backed Security**: Cryptographic salts and key derivation leverage the Android Keystore system.
 
-> **Development Status**: Core cryptographic engine, file vault encryption pipeline, and party game engine operational; currently in closed local device hardening.
+> **Project Status — Shipped**: Completed and verified on Android. The social deduction game, local LAN multiplayer, and AES-256 encrypted local vault are fully implemented and verified on physical Android release hardware.
 
 ---
 
@@ -59,28 +61,10 @@ Mimic never stores the user's master passphrase or symmetric key anywhere on dis
    - Files are encrypted using AES in **Galois/Counter Mode (GCM)** with a unique 96-bit initialization vector (IV) per file operation.
    - GCM provides **Authenticated Encryption with Associated Data (AEAD)**. In addition to encrypting the file stream, it generates a 128-bit authentication tag.
    - If an attacker alters even a single bit of the ciphertext on disk, the authentication verification fails during decryption, preventing bit-flipping attacks and corrupted file execution.
-
-```dart
-// Conceptual cryptographic encryption block in Dart
-import 'package:cryptography/cryptography.dart';
-
-Future<EncryptedPayload> encryptFileBlob(List<int> plainBytes, SecretKey derivedKey) async {
-  final algorithm = AesGcm.with256Bits();
-  final nonce = algorithm.newNonce(); // 96-bit unique IV
-
-  final secretBox = await algorithm.encrypt(
-    plainBytes,
-    secretKey: derivedKey,
-    nonce: nonce,
-  );
-
-  return EncryptedPayload(
-    cipherText: secretBox.cipherText,
-    nonce: secretBox.nonce,
-    macTag: secretBox.mac.bytes, // 128-bit integrity tag
-  );
-}
-```
+3. **Stream Pipeline & Cipher Engine**:
+   - Built on Dart cryptographic primitives with stream-based chunking for media files.
+   - Files are encrypted in bounded chunks using the derived 256-bit key and distinct per-operation nonces.
+   - Decryption validates the 128-bit AEAD tag prior to releasing byte streams to presentation widgets or local audio/video players, ensuring corrupted or tampered blobs are never executed.
 
 ### 3. Dual-State Partitioning in Flutter
 The application maintains two completely isolated presentation pipelines:
@@ -95,16 +79,18 @@ The application maintains two completely isolated presentation pipelines:
 
 | Layer | Implementation | Security Benefit |
 | :--- | :--- | :--- |
-| **Cipher** | AES-256-GCM (AEAD) | Military-grade confidentiality + cryptographic integrity |
-| **Key Derivation** | PBKDF2 (100,000+ iterations) | Robust defense against brute-force GPU attacks |
+| **Cipher** | AES-256-GCM (AEAD) | Authenticated confidentiality (AEAD) with 128-bit tamper detection |
+| **Key Derivation** | PBKDF2 (100,000+ iterations) | Robust defense against brute-force GPU dictionary attacks |
 | **Salt Storage** | Android Keystore | Hardware-backed salt isolation |
-| **Network Surface** | `INTERNET` permission omitted | Mathematical guarantee against remote data leaks |
-| **Local Storage** | Sandboxed encrypted blobs | Zero plaintext remnants on device disk |
+| **Network Isolation** | Local-only vault storage | Vault operations never touch network sockets; network access is restricted to LAN multiplayer and licensing |
+| **Local Storage** | Sandboxed encrypted blobs | Ciphertext-at-rest storage with unique per-file initialization vectors |
 
 ---
 
 ## Retrospective & Key Takeaways
 
-1. **Memory Life-Cycles in Managed Runtimes**: Dart and Flutter manage memory via garbage collection. Clearing cryptographic keys requires explicitly overwriting byte arrays with zeros before disposing references, rather than simply setting objects to `null`.
-2. **Streaming Large Encrypted Files**: Loading an entire 200MB encrypted video into memory causes mobile Out-Of-Memory (OOM) crashes. Architected chunk-based streaming decryption so media players read decrypted chunks on the fly.
-3. **User Experience vs. Security Paranoia**: Balancing uncompromising cryptographic safety with a frictionless, enjoyable party game UI proved that privacy-focused engineering doesn't need to look clinical or intimidating.
+1. **Hardware-Anchored Lifecycle & Upgrade Continuity**: Physical device testing on Android highlighted the critical necessity of preserving hardware-bound keystore credentials across app updates. Because encryption keys are bound to device keystore hardware and local salts, updates must preserve signing identity to avoid catastrophic data loss.
+2. **Memory Life-Cycles in Managed Runtimes**: Dart and Flutter manage memory via garbage collection. Clearing cryptographic keys requires explicitly overwriting byte arrays with zeros before disposing references, rather than simply setting objects to `null`.
+3. **Streaming Large Encrypted Files**: Loading an entire 200MB encrypted video into memory causes mobile Out-Of-Memory (OOM) crashes. Architected chunk-based streaming decryption so media players read decrypted chunks on the fly.
+4. **User Experience vs. Security Paranoia**: Balancing uncompromising cryptographic safety with a frictionless, enjoyable party game UI proved that privacy-focused engineering doesn't need to look clinical or intimidating.
+5. **Authorship & Verification**: Guided AI-assisted architecture and development of the Android application, defining product requirements, coordinating the cryptographic pipeline, and validating the completed build through clean-install testing on physical Android devices.

@@ -18,7 +18,7 @@
     },
     {
       "label": "Show me security & offline vault architecture",
-      "response": "Inspect Mimic. A cross-platform party game engineered around an isolated, client-side AES-256 encrypted game vault with zero telemetry.",
+      "response": "Inspect Mimic. An Android party game engineered around an isolated, client-side AES-256 encrypted personal vault.",
       "offerLabel": "Inspect Mimic Case Study",
       "offerHref": "/quests/mimic"
     }

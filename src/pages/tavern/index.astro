@@ -322,7 +322,6 @@ const sceneObjects = [
     <a href="/tavern/skills" id="narrow-skills" class="narrow-link">View Skills</a>
     <a href="/quests" id="narrow-questboard" class="narrow-link">Go to the Quest Board</a>
     <a href="/messenger" class="narrow-link">Go to Messenger's Corner</a>
-    <button type="button" class="narrow-link" id="narrow-beer">🍺 An ice-cold bottle on the counter</button>
   </div>
 
   <!-- Global Modal Backdrop -->
@@ -1891,7 +1890,6 @@ const sceneObjects = [
 
     // ── Red Horse Beer Easter Egg Controller ─────────────────────
     const triggerBeer = document.getElementById('trigger-beer');
-    const narrowBeer = document.getElementById('narrow-beer');
     const dialogBeer = document.getElementById('dialog-beer-blackout');
     const lyricsBoxEl = document.getElementById('beer-lyrics-box');
     const lyricEl = document.getElementById('beer-active-lyric');
@@ -2524,8 +2522,6 @@ const sceneObjects = [
 
     triggerBeer?.addEventListener('click', handleBeerTrigger);
     triggerBeer?.addEventListener('touchend', handleBeerTrigger, { passive: false });
-
-    narrowBeer?.addEventListener('click', handleBeerTrigger);
 
     btnCloseBeer?.addEventListener('click', (e) => {
       e.stopPropagation();

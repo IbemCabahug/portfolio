@@ -41,6 +41,8 @@ const projects = defineCollection({
     thumbnail: z.string().optional(),
     liveUrl: z.url().optional(),
     sourceUrl: z.url().optional(),
+    downloadUrl: z.url().optional(),
+    releaseUrl: z.url().optional(),
     allowFraming: z.boolean().optional(),
     featured: z.boolean(),
     order: z.number(),

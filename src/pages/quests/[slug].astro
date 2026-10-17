@@ -86,29 +86,66 @@ const telemetry = await getProjectTelemetry(entry.data.sourceUrl);
           </ul>
         </div>
 
-        <div class="flex flex-wrap gap-4">
-          {entry.data.liveUrl && !entry.data.allowFraming && (
-            <a
-              href={entry.data.liveUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex items-center gap-2 justify-center min-h-[44px] px-5 py-2 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
-            >
-              <ThematicIcon name="play" class="w-4 h-4 text-[var(--candle)]" />
-              <span>Launch Live Application</span>
-            </a>
-          )}
-          {entry.data.sourceUrl && (
-            <a
-              href={entry.data.sourceUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex items-center gap-2 justify-center min-h-[44px] px-5 py-2 border-2 border-[var(--wood-deep)] text-[var(--wood-deep)] font-bold text-sm rounded hover:bg-[var(--wood-deep)] hover:text-[var(--parchment)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
-            >
-              <ThematicIcon name="code" class="w-4 h-4" />
-              <span>Inspect Source Code</span>
-            </a>
-          )}
+        <div class="flex flex-col gap-2.5">
+          <div class="flex flex-wrap gap-4 items-center">
+            {entry.data.downloadUrl && (
+              <a
+                href={entry.data.downloadUrl}
+                class="inline-flex items-center gap-2 justify-center min-h-[44px] px-5 py-2 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded border-2 border-[var(--brass)] hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+                id="project-download-action"
+              >
+                <ThematicIcon name="scroll" class="w-4 h-4 text-[var(--candle)]" />
+                <span>Download Android APK</span>
+              </a>
+            )}
+            {entry.data.releaseUrl && (
+              <a
+                href={entry.data.releaseUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class={`inline-flex items-center gap-2 justify-center min-h-[44px] px-5 py-2 font-bold text-sm rounded border-2 transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2 ${
+                  entry.data.downloadUrl
+                    ? 'border-2 border-[var(--wood-deep)] text-[var(--wood-deep)] hover:bg-[var(--wood-deep)] hover:text-[var(--parchment)]'
+                    : 'bg-[var(--wood-deep)] text-[var(--candle)] border-[var(--brass)] hover:bg-black'
+                }`}
+                id="project-release-action"
+              >
+                <ThematicIcon name="external" class="w-4 h-4" />
+                <span>{entry.data.downloadUrl ? 'Release notes & installation' : 'Download for Android — release page'}</span>
+              </a>
+            )}
+            {entry.data.liveUrl && !entry.data.allowFraming && (
+              <a
+                href={entry.data.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 justify-center min-h-[44px] px-5 py-2 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+              >
+                <ThematicIcon name="play" class="w-4 h-4 text-[var(--candle)]" />
+                <span>Launch Live Application</span>
+              </a>
+            )}
+            {entry.data.sourceUrl && (
+              <a
+                href={entry.data.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 justify-center min-h-[44px] px-5 py-2 border-2 border-[var(--wood-deep)] text-[var(--wood-deep)] font-bold text-sm rounded hover:bg-[var(--wood-deep)] hover:text-[var(--parchment)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+              >
+                <ThematicIcon name="code" class="w-4 h-4" />
+                <span>Inspect Source Code</span>
+              </a>
+            )}
+          </div>
+          {entry.data.downloadUrl ? (
+            <p class="text-xs text-[var(--ink)]/80 font-serif italic" id="project-download-helper">
+              Android APK · Download hosted on GitHub
+            </p>
+          ) : entry.data.releaseUrl ? (
+            <p class="text-xs text-[var(--ink)]/80 font-serif italic" id="project-release-helper">
+              Android APK · Installation instructions and release notes on GitHub
+            </p>
+          ) : null}
         </div>
 
         {/* Live GitHub Telemetry or Offline Device Architecture Strip */}

@@ -25,7 +25,8 @@
     "resume:pdf": "node scripts/render-resume-pdf.mjs",
     "a11y": "node scripts/lighthouse-run.mjs",
     "audit:b9": "node scripts/audit-border-contrast.mjs",
-    "test:audit": "node scripts/test-security-ux-audit.mjs"
+    "test:audit": "node scripts/test-security-ux-audit.mjs",
+    "test:mimic": "node scripts/test-mimic-release-presentation.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^7.0.8",
