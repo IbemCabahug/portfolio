@@ -1618,11 +1618,20 @@ const sceneObjects = [
 
 <script>
   import { initPerformanceGovernor } from '../../lib/perf-governor';
+  import { getFocusableElements, setBackgroundInert } from '../../lib/messenger-ui';
   import { soundEngine } from '../../lib/sound-engine';
-  import { recordMilestone } from '../../store/questlog';
   import { getSound, setSound } from '../../store/preferences';
 
+  let tavernAbort: AbortController | null = null;
+
   function initTavernPage() {
+    const dialogSkills = document.getElementById('dialog-skills');
+    if (!dialogSkills) return;
+
+    tavernAbort?.abort();
+    tavernAbort = new AbortController();
+    const { signal } = tavernAbort;
+
     initPerformanceGovernor();
     soundEngine.init();
     const triggerInnkeeper = document.getElementById('trigger-innkeeper');
@@ -1631,7 +1640,6 @@ const sceneObjects = [
     const narrowRegular = document.getElementById('narrow-regular');
     const triggerQuestBoard = document.getElementById('trigger-quest-board');
     
-    const dialogSkills = document.getElementById('dialog-skills');
     const dialogInnkeeper = document.getElementById('dialog-innkeeper');
     const dialogRegular = document.getElementById('dialog-regular');
     const dialogArchivist = document.getElementById('dialog-archivist');
@@ -1645,6 +1653,7 @@ const sceneObjects = [
     let activeTrigger: HTMLElement | null = null;
 
     function openDialog(dialog: HTMLElement, trigger: HTMLElement, filterCategory?: string) {
+      if (activeDialog) closeDialog();
       soundEngine.playParchmentRustle();
       sceneInteractives.forEach(el => {
         el.classList.add('disabled-by-dialog');
@@ -1674,6 +1683,7 @@ const sceneObjects = [
       trigger.setAttribute('aria-expanded', 'true');
       activeDialog = dialog;
       activeTrigger = trigger;
+      setBackgroundInert(dialog, true);
       
       if (dialog === dialogSkills) {
         const icon = dialog.querySelector('.panel-icon');
@@ -1695,7 +1705,7 @@ const sceneObjects = [
       const focusables = getFocusableElements(dialog);
       if (focusables.length) focusables[0].focus({ preventScroll: true });
       
-      document.addEventListener('keydown', handleKeydown);
+      document.addEventListener('keydown', handleKeydown, { signal });
     }
 
     function closeDialog() {
@@ -1704,6 +1714,7 @@ const sceneObjects = [
         (activeDialog as any).__stopDialogue();
       }
       soundEngine.playWoodClink();
+      setBackgroundInert(activeDialog, false);
       sceneInteractives.forEach(el => {
         el.classList.remove('disabled-by-dialog');
         el.removeAttribute('tabindex');
@@ -1724,10 +1735,6 @@ const sceneObjects = [
       document.removeEventListener('keydown', handleKeydown);
     }
 
-    function getFocusableElements(el: HTMLElement): HTMLElement[] {
-      return Array.from(el.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'));
-    }
-
     function handleKeydown(e: KeyboardEvent) {
       if (e.key === 'Escape') {
         closeDialog();
@@ -1735,16 +1742,17 @@ const sceneObjects = [
       }
       if (e.key === 'Tab' && activeDialog) {
         const focusables = getFocusableElements(activeDialog);
+        if (focusables.length === 0) return;
         const first = focusables[0];
         const last = focusables[focusables.length - 1];
         
         if (e.shiftKey) {
-          if (document.activeElement === first) {
+          if (document.activeElement === first || !activeDialog.contains(document.activeElement)) {
             e.preventDefault();
             last.focus();
           }
         } else {
-          if (document.activeElement === last) {
+          if (document.activeElement === last || !activeDialog.contains(document.activeElement)) {
             e.preventDefault();
             first.focus();
           }
@@ -1857,7 +1865,7 @@ const sceneObjects = [
       if (e.key === 'Escape') {
         document.querySelector('.scene-container')?.classList.remove('innkeeper-away', 'archivist-away');
       }
-    });
+    }, { signal });
 
     // F19: Orientation Prompt Session Dismissal
     const promptEl = document.getElementById('tavern-orientation-prompt');
@@ -2534,11 +2542,13 @@ const sceneObjects = [
         e.stopPropagation();
         closeBeerBlackout();
       }
-    });
+    }, { signal });
 
     // Teardown any playing audio, animation frames, and synthesizer contexts when navigating away
     document.addEventListener('astro:before-swap', () => {
       closeBeerBlackout();
+      tavernAbort?.abort();
+      tavernAbort = null;
     }, { once: true });
   }
 

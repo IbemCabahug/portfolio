@@ -1,28 +1,19 @@
 /**
- * Client & Server Email Validation Engine (Approach B)
- * Protects the Messenger Roost from fake, disposable, and burner email spam.
- *
- * Layers of Defense:
- * 1. Syntax & RFC Format Verification
- * 2. Troll & Placeholder Pattern Heuristics
- * 3. Disposable & Burner Domain Blocklist (150+ known temporary mail providers)
- * 4. Live DNS-over-HTTPS (DoH) MX Record Lookup via Google DNS (with Cloudflare fallback)
- *
- * Usage:
- * - Client-side pre-flight (UX only): `validateEmail(email)` — fails open if the
- *   visitor's browser cannot reach the DoH resolvers, so nobody is falsely blocked;
- *   the server re-validates strictly before any message is dispatched.
- * - Server-side authoritative gate (`src/pages/api/missive.ts`):
- *   `validateEmail(email, { strict: true })` — DNS verification failures REJECT the
- *   address so the MX check can never be silently skipped.
+ * Client & Server Email Validation Utility
+ * Helps catch typos, disposable burner domains, and unroutable domains on contact forms.
+ * Note: Syntax and DNS checks verify domain mail routing, not sender identity or mailbox ownership.
  */
 
 export interface EmailValidationOptions {
   /**
-   * When true, live DNS verification failures reject the email instead of failing open.
-   * Mandatory for the server-side dispatch endpoint, where DoH is always reachable.
+   * When true, transient DNS resolver failures return a temporary verification error
+   * instead of failing open.
    */
   strict?: boolean;
+  /**
+   * Optional custom fetch implementation for deterministic unit testing.
+   */
+  fetchImpl?: typeof fetch;
 }
 
 export interface EmailValidationResult {
@@ -31,11 +22,11 @@ export interface EmailValidationResult {
   isDisposable?: boolean;
   isSyntaxError?: boolean;
   isDomainError?: boolean;
+  isTransientDnsError?: boolean;
 }
 
 // Curated blocklist of disposable, temporary, and burner email domains
 const DISPOSABLE_DOMAINS: ReadonlySet<string> = new Set([
-  // Popular burner mail services
   'mailinator.com',
   'mailinator.net',
   'mailinator2.com',
@@ -44,6 +35,9 @@ const DISPOSABLE_DOMAINS: ReadonlySet<string> = new Set([
   'guerrillamail.biz',
   'guerrillamail.org',
   'guerrillamailblock.com',
+  'guerrillamail.de',
+  'guerrillamail.info',
+  'guerillamail.com',
   'sharklasers.com',
   'grr.la',
   'pokemail.net',
@@ -64,6 +58,7 @@ const DISPOSABLE_DOMAINS: ReadonlySet<string> = new Set([
   'trashmail.me',
   'trashmail.io',
   'trashmail.at',
+  'trash-mail.at',
   'yopmail.com',
   'yopmail.fr',
   'yopmail.net',
@@ -107,11 +102,9 @@ const DISPOSABLE_DOMAINS: ReadonlySet<string> = new Set([
   'spamgourmet.com',
   'mytrashmail.com',
   'mailcatch.com',
-  'trash-mail.at',
   'binkmail.com',
   'safetymail.info',
   'filzmail.com',
-  'guerillamail.com',
   'tempinbox.com',
   'armyspy.com',
   'cuvox.de',
@@ -136,7 +129,6 @@ const DISPOSABLE_DOMAINS: ReadonlySet<string> = new Set([
   'crazymail.com',
   'mail-temp.com',
   'mailtothis.com',
-  'trashmail.net',
   'zoemail.org',
   'zillamail.com',
   'yapped.net',
@@ -147,14 +139,12 @@ const DISPOSABLE_DOMAINS: ReadonlySet<string> = new Set([
   'trbvm.com',
   'tradermail.info',
   'tempr.email',
-  'tempinbox.com',
   'suremail.info',
   'spamhole.com',
   'spambox.us',
   'sogetthis.com',
   'sofort-mail.de',
   'sneakemail.com',
-  'sharklasers.com',
   'sharedmailbox.org',
   'safersignup.de',
   'pookmail.com',
@@ -163,20 +153,14 @@ const DISPOSABLE_DOMAINS: ReadonlySet<string> = new Set([
   'nospam4.us',
   'nobulk.com',
   'nervmich.net',
-  'mytempemail.com',
   'mycleaninbox.net',
   'mailsac.com',
   'mailnull.com',
   'mailnes.net',
-  'maildrop.cc',
-  'mailcatch.com',
   'mailbog.com',
   'instantemailaddress.com',
-  'incognitomail.org',
   'hidemail.de',
   'greensloth.com',
-  'getairmail.com',
-  'filzmail.com',
   'eyepaste.com',
   'emailthe.net',
   'emailproxsy.com',
@@ -186,44 +170,65 @@ const DISPOSABLE_DOMAINS: ReadonlySet<string> = new Set([
   'disposableinbox.com',
   'deadfake.com',
   'bouncr.com',
-  'binkmail.com',
   'anonymbox.com',
   'anonaddy.me',
   '0-mail.com',
   '10mail.org',
   '20minutemail.com',
   '33mail.com',
-  'guerrillamail.de',
-  'guerrillamail.info',
 ]);
 
-// Known placeholder / troll usernames that indicate fake or low-effort submissions
-const TROLL_LOCAL_PARTS: ReadonlySet<string> = new Set([
-  'test',
+// Obvious keyboard-mash / non-routable placeholder local parts.
+// Legitimate role addresses (admin, user, info, contact, hr, careers, support, office, etc.)
+// are intentionally permitted so recruiters and organizations are never blocked.
+const PLACEHOLDER_LOCAL_PARTS: ReadonlySet<string> = new Set([
   'asdf',
-  'fake',
-  'troll',
-  'admin',
-  'administrator',
-  'root',
-  'user',
-  'guest',
-  'nobody',
-  'null',
-  'none',
-  'noemail',
-  'spam',
-  'burner',
-  'anon',
-  'anonymous',
-  'temp',
-  'dummy',
-  'sample',
-  'xyz',
   'qwerty',
   '123456',
   '12345',
-  'abc',
+  'noemail',
+  'noreply',
+  'no-reply',
+  'dontreply',
+  'fake',
+  'troll',
+  'burner',
+  'throwaway',
+]);
+
+// RFC 2606 / RFC 6761 reserved & unroutable placeholder domains
+const PLACEHOLDER_DOMAINS: ReadonlySet<string> = new Set([
+  'example.com',
+  'example.org',
+  'example.net',
+  'test.com',
+  'fake.com',
+  'domain.com',
+  'asdf.com',
+  'troll.com',
+  'invalid',
+  'localhost',
+  'test',
+  'example',
+]);
+
+// Exact-match major consumer/business mail providers with known active MX infrastructure
+const KNOWN_MAIL_PROVIDERS: ReadonlySet<string> = new Set([
+  'gmail.com',
+  'googlemail.com',
+  'yahoo.com',
+  'ymail.com',
+  'outlook.com',
+  'hotmail.com',
+  'live.com',
+  'msn.com',
+  'icloud.com',
+  'me.com',
+  'mac.com',
+  'proton.me',
+  'protonmail.com',
+  'zoho.com',
+  'aol.com',
 ]);
 
 /**
@@ -233,7 +238,6 @@ export function isDisposableDomain(domain: string): boolean {
   const normalized = domain.toLowerCase().trim();
   if (DISPOSABLE_DOMAINS.has(normalized)) return true;
 
-  // Check subdomains (e.g. user@any.mailinator.com)
   for (const disposable of DISPOSABLE_DOMAINS) {
     if (normalized.endsWith('.' + disposable)) {
       return true;
@@ -242,129 +246,193 @@ export function isDisposableDomain(domain: string): boolean {
   return false;
 }
 
-/**
- * Performs DNS-over-HTTPS (DoH) MX lookup to verify if the domain has active mail servers.
- * Resolves with Google Public DNS, with graceful fallback to Cloudflare DNS.
- * Returns true if valid or if DoH is unreachable (fail-open for network resilience).
- */
-async function verifyDomainHasMailServers(domain: string, strict = false): Promise<{ active: boolean; reason?: string }> {
-  // Common trusted domains skip live DNS query for speed and zero latency
-  const TRUSTED_PROVIDER_SUFFIXES = [
-    'gmail.com',
-    'googlemail.com',
-    'yahoo.com',
-    'ymail.com',
-    'outlook.com',
-    'hotmail.com',
-    'live.com',
-    'msn.com',
-    'icloud.com',
-    'me.com',
-    'mac.com',
-    'proton.me',
-    'protonmail.com',
-    'zoho.com',
-    'aol.com',
-    'edu',
-    'gov',
-    'mil',
-  ];
+interface DnsJsonAnswer {
+  type: number;
+  data?: string;
+}
 
+interface DnsJsonResponse {
+  Status?: number;
+  Answer?: DnsJsonAnswer[];
+}
+
+function inspectMxRecords(answers: DnsJsonAnswer[] | undefined): 'valid_mx' | 'null_mx' | 'no_mx' {
+  if (!Array.isArray(answers) || answers.length === 0) return 'no_mx';
+  const mxRecords = answers.filter((a) => a.type === 15);
+  if (mxRecords.length === 0) return 'no_mx';
+
+  // RFC 7505 Null MX: single MX record of "0 ." or "." indicates domain accepts no mail
+  const hasNullMx = mxRecords.some((a) => {
+    const raw = (a.data || '').trim();
+    return raw === '.' || raw === '0 .' || /^0\s+\.$/.test(raw);
+  });
+  const hasRealMx = mxRecords.some((a) => {
+    const raw = (a.data || '').trim();
+    return raw.length > 0 && raw !== '.' && !/^0\s+\.$/.test(raw);
+  });
+
+  if (hasNullMx && !hasRealMx) return 'null_mx';
+  if (hasRealMx) return 'valid_mx';
+  return 'no_mx';
+}
+
+/**
+ * Performs DNS-over-HTTPS (DoH) lookup to verify if the domain can receive mail.
+ * Checks MX records first (honoring RFC 7505 Null MX), then falls back to A/AAAA
+ * implicit MX per RFC 5321 Section 5.1.
+ */
+async function verifyDomainHasMailServers(
+  domain: string,
+  strict = false,
+  fetchFn: typeof fetch = fetch
+): Promise<{ active: boolean; reason?: string; transientError?: boolean }> {
   const lowerDomain = domain.toLowerCase();
-  for (const trusted of TRUSTED_PROVIDER_SUFFIXES) {
-    if (lowerDomain === trusted || lowerDomain.endsWith('.' + trusted)) {
-      return { active: true };
-    }
+  if (KNOWN_MAIL_PROVIDERS.has(lowerDomain)) {
+    return { active: true };
   }
 
-  // 3.5s timeout abort controller so UI never hangs
   const createTimeoutSignal = (ms: number) => {
     const controller = new AbortController();
     setTimeout(() => controller.abort(), ms);
     return controller.signal;
   };
 
-  // 1. Try Google Public DNS DoH
-  try {
-    const googleRes = await fetch(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=MX`, {
-      headers: { Accept: 'application/dns-json' },
-      signal: createTimeoutSignal(3000),
-    });
+  const resolvers = [
+    {
+      mxUrl: `https://dns.google/resolve?name=${encodeURIComponent(lowerDomain)}&type=MX`,
+      aUrl: `https://dns.google/resolve?name=${encodeURIComponent(lowerDomain)}&type=A`,
+      aaaaUrl: `https://dns.google/resolve?name=${encodeURIComponent(lowerDomain)}&type=AAAA`,
+      timeoutMs: 3000,
+    },
+    {
+      mxUrl: `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(lowerDomain)}&type=MX`,
+      aUrl: `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(lowerDomain)}&type=A`,
+      aaaaUrl: `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(lowerDomain)}&type=AAAA`,
+      timeoutMs: 2500,
+    },
+  ];
 
-    if (googleRes.ok) {
-      const data = await googleRes.json();
-      // Status 3 = NXDOMAIN (Domain does not exist at all)
+  for (const resolver of resolvers) {
+    try {
+      const mxRes = await fetchFn(resolver.mxUrl, {
+        headers: { Accept: 'application/dns-json' },
+        signal: createTimeoutSignal(resolver.timeoutMs),
+      });
+
+      if (!mxRes.ok) continue;
+      const data = (await mxRes.json()) as DnsJsonResponse;
+
+      // Status 3 = NXDOMAIN (Domain does not exist)
       if (data.Status === 3) {
         return {
           active: false,
-          reason: `The domain "${domain}" does not exist. Please check your return address.`,
+          reason: `The domain "${domain}" does not exist. Please check your email address for typos.`,
         };
       }
 
-      // If Status 0 (NOERROR), check if MX records exist
       if (data.Status === 0) {
-        const hasMx = Array.isArray(data.Answer) && data.Answer.some((a: { type: number }) => a.type === 15);
-        if (hasMx) return { active: true };
+        const mxStatus = inspectMxRecords(data.Answer);
+        if (mxStatus === 'valid_mx') {
+          return { active: true };
+        }
+        if (mxStatus === 'null_mx') {
+          return {
+            active: false,
+            reason: `The domain "${domain}" is configured not to accept incoming email (Null MX). Please provide another email address.`,
+          };
+        }
 
-        // NO MX ACCEPTANCE PATH: A/AAAA records no longer count as a deliverable
-        // fallback. Parked domains (e.g. `asasdasd.com` — a real NameBright
-        // parking page with A records and no MX) sailed through the old
-        // "RFC 5321 implicit-MX" fallback and reached the inbox as spam. A
-        // domain that cannot answer for its own MX is not known to receive
-        // mail, so reject with an explicit, actionable message.
+        // RFC 5321 Section 5.1 Implicit MX: when no MX records exist, check A/AAAA address records
+        const hasInlineAddress =
+          Array.isArray(data.Answer) && data.Answer.some((a) => a.type === 1 || a.type === 28);
+        if (hasInlineAddress) {
+          return { active: true };
+        }
+
+        try {
+          const aRes = await fetchFn(resolver.aUrl, {
+            headers: { Accept: 'application/dns-json' },
+            signal: createTimeoutSignal(resolver.timeoutMs),
+          });
+          if (aRes.ok) {
+            const aData = (await aRes.json()) as DnsJsonResponse;
+            if (Array.isArray(aData.Answer) && aData.Answer.some((a) => a.type === 1)) {
+              return { active: true };
+            }
+          }
+          const aaaaRes = await fetchFn(resolver.aaaaUrl, {
+            headers: { Accept: 'application/dns-json' },
+            signal: createTimeoutSignal(resolver.timeoutMs),
+          });
+          if (aaaaRes.ok) {
+            const aaaaData = (await aaaaRes.json()) as DnsJsonResponse;
+            if (Array.isArray(aaaaData.Answer) && aaaaData.Answer.some((a) => a.type === 28)) {
+              return { active: true };
+            }
+          }
+        } catch {
+          // If secondary A/AAAA lookup fails transiently, try next resolver
+          continue;
+        }
+
         return {
           active: false,
-          reason: `The domain "${domain}" has no mail exchanger (MX) configured. It appears parked or unable to receive email. Please double-check your return address.`,
+          reason: `The domain "${domain}" has no mail server (MX or address) records configured. Please double-check your email address.`,
         };
       }
+    } catch {
+      // Try next DoH resolver
     }
-  } catch {
-    // Fallback to Cloudflare DNS
-  }
-
-  // 2. Fallback to Cloudflare DoH
-  try {
-    const cfRes = await fetch(`https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=MX`, {
-      headers: { Accept: 'application/dns-json' },
-      signal: createTimeoutSignal(2500),
-    });
-
-    if (cfRes.ok) {
-      const cfData = await cfRes.json();
-      if (cfData.Status === 3) {
-        return {
-          active: false,
-          reason: `The domain "${domain}" does not exist. Please check your return address.`,
-        };
-      }
-      if (cfData.Status === 0) {
-        const hasMx = Array.isArray(cfData.Answer) && cfData.Answer.some((a: { type: number }) => a.type === 15);
-        if (hasMx) return { active: true };
-      }
-    }
-  } catch {
-    // Both DNS queries failed (e.g. offline or a strictly blocked resolver).
   }
 
   if (strict) {
-    // Server-side authoritative call: an unverifiable domain must NOT be let through.
     return {
       active: false,
-      reason: 'We could not verify this email domain right now. Please try again in a moment.',
+      transientError: true,
+      reason: 'We could not reach DNS to verify your email domain right now. Please try again in a moment, or send directly via your email client.',
     };
   }
 
-  // Client-side pre-flight only: fail open so a browser-side DoH hiccup
-  // never blocks a legitimate visitor (the server re-validates strictly).
-  return { active: true };
+  return { active: true, transientError: true };
 }
 
 /**
- * Validates an email address against syntax, troll heuristics, disposable domain lists,
- * and live DNS MX records.
+ * Normalizes a domain name, converting internationalized domain labels (IDN)
+ * to ASCII punycode where supported by the standard URL parser.
  */
-export async function validateEmail(rawEmail: string, options: EmailValidationOptions = {}): Promise<EmailValidationResult> {
-  const email = (rawEmail || '').trim();
+function normalizeDomain(rawDomain: string): string | null {
+  const trimmed = rawDomain.trim().toLowerCase();
+  if (!trimmed || trimmed.startsWith('.') || trimmed.endsWith('.') || trimmed.includes('..')) {
+    return null;
+  }
+  try {
+    const url = new URL(`http://${trimmed}`);
+    if (url.username || url.password || url.port || url.pathname !== '/' || url.search || url.hash) {
+      return null;
+    }
+    return url.hostname.toLowerCase();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Validates an email address against syntax, placeholder heuristics, disposable domain lists,
+ * and live DNS mail routing records.
+ */
+export async function validateEmail(
+  rawEmail: string,
+  options: EmailValidationOptions = {}
+): Promise<EmailValidationResult> {
+  if (typeof rawEmail !== 'string') {
+    return {
+      valid: false,
+      isSyntaxError: true,
+      reason: 'Please enter your email address.',
+    };
+  }
+
+  const email = rawEmail.trim();
 
   // 1. Empty Check
   if (!email) {
@@ -372,6 +440,15 @@ export async function validateEmail(rawEmail: string, options: EmailValidationOp
       valid: false,
       isSyntaxError: true,
       reason: 'Please enter your email address.',
+    };
+  }
+
+  // Reject control characters or whitespace
+  if (/[\r\n\t\s]/.test(email)) {
+    return {
+      valid: false,
+      isSyntaxError: true,
+      reason: 'The email format is invalid. Please remove any spaces.',
     };
   }
 
@@ -385,28 +462,20 @@ export async function validateEmail(rawEmail: string, options: EmailValidationOp
   }
 
   // 3. Syntax Verification
-  const parts = email.split('@');
-  if (parts.length !== 2) {
+  const atIndex = email.lastIndexOf('@');
+  if (atIndex <= 0 || atIndex !== email.indexOf('@') || atIndex === email.length - 1) {
     return {
       valid: false,
       isSyntaxError: true,
-      reason: 'Please enter a valid email format (e.g. traveler@guild.com).',
+      reason: 'Please enter a valid email format (e.g. name@company.com).',
     };
   }
 
-  const [localPart, domainPart] = parts;
-  const normalizedLocal = localPart.toLowerCase().trim();
-  const normalizedDomain = domainPart.toLowerCase().trim();
+  const localPart = email.slice(0, atIndex);
+  const rawDomainPart = email.slice(atIndex + 1);
+  const normalizedLocal = localPart.toLowerCase();
 
-  if (!normalizedLocal || !normalizedDomain) {
-    return {
-      valid: false,
-      isSyntaxError: true,
-      reason: 'Please enter a complete email address with username and domain.',
-    };
-  }
-
-  if (normalizedLocal.length > 64) {
+  if (localPart.length > 64) {
     return {
       valid: false,
       isSyntaxError: true,
@@ -414,20 +483,55 @@ export async function validateEmail(rawEmail: string, options: EmailValidationOp
     };
   }
 
-  // Standard email regex check
-  const EMAIL_FORMAT_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
-  if (!EMAIL_FORMAT_REGEX.test(email)) {
+  if (localPart.startsWith('.') || localPart.endsWith('.') || localPart.includes('..')) {
     return {
       valid: false,
       isSyntaxError: true,
-      reason: 'The email format is invalid. Please check for typos.',
+      reason: 'The email username cannot start, end, or contain consecutive dots.',
     };
   }
 
-  // Top-Level Domain (TLD) validation: must have dot, TLD at least 2 chars, all letters
+  // Standard RFC 5322 dot-atom local-part characters (supports +tag, role names, etc.)
+  const LOCAL_PART_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+$/;
+  if (!LOCAL_PART_REGEX.test(localPart)) {
+    return {
+      valid: false,
+      isSyntaxError: true,
+      reason: 'The email username contains invalid characters. Please check for typos.',
+    };
+  }
+
+  const normalizedDomain = normalizeDomain(rawDomainPart);
+  if (!normalizedDomain || normalizedDomain.length > 253) {
+    return {
+      valid: false,
+      isSyntaxError: true,
+      reason: 'The email domain format is invalid. Please check for typos.',
+    };
+  }
+
   const domainSegments = normalizedDomain.split('.');
+  if (domainSegments.length < 2) {
+    return {
+      valid: false,
+      isSyntaxError: true,
+      reason: 'Please include a full domain name (e.g. company.com).',
+    };
+  }
+
+  const DOMAIN_LABEL_REGEX = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i;
+  for (const segment of domainSegments) {
+    if (!DOMAIN_LABEL_REGEX.test(segment)) {
+      return {
+        valid: false,
+        isSyntaxError: true,
+        reason: 'The email domain contains invalid characters. Please check for typos.',
+      };
+    }
+  }
+
   const tld = domainSegments[domainSegments.length - 1];
-  if (!tld || tld.length < 2 || !/^[a-z]+$/i.test(tld)) {
+  if (!tld || tld.length < 2 || (!/^[a-z]{2,}$/i.test(tld) && !/^xn--[a-z0-9]{2,}$/i.test(tld))) {
     return {
       valid: false,
       isSyntaxError: true,
@@ -435,22 +539,17 @@ export async function validateEmail(rawEmail: string, options: EmailValidationOp
     };
   }
 
-  // 4. Troll / Placeholder Heuristics
-  // Any troll/placeholder username (e.g. troll, test, asdf, fake, admin, 12345)
-  // is rejected regardless of domain, so `troll@gmail.com` can no longer slip through.
+  // 4. Placeholder / Reserved Domain Heuristics
+  // Check base local part before '+' tag for obvious keyboard-mash placeholders
+  const baseLocal = normalizedLocal.split('+')[0];
   if (
-    TROLL_LOCAL_PARTS.has(normalizedLocal) ||
-    (normalizedLocal === domainSegments[0] && normalizedLocal.length <= 4) ||
-    normalizedDomain === 'example.com' ||
-    normalizedDomain === 'test.com' ||
-    normalizedDomain === 'fake.com' ||
-    normalizedDomain === 'domain.com' ||
-    normalizedDomain === 'asdf.com' ||
-    normalizedDomain === 'troll.com'
+    PLACEHOLDER_LOCAL_PARTS.has(baseLocal) ||
+    PLACEHOLDER_DOMAINS.has(normalizedDomain) ||
+    PLACEHOLDER_DOMAINS.has(tld)
   ) {
     return {
       valid: false,
-      reason: 'Please provide an authentic, personal email address where you can be reached.',
+      reason: 'Please enter a reachable personal or business email address so Nhovem can reply.',
     };
   }
 
@@ -459,22 +558,29 @@ export async function validateEmail(rawEmail: string, options: EmailValidationOp
     return {
       valid: false,
       isDisposable: true,
-      reason: 'Temporary or disposable burner email addresses are not accepted. Please use a permanent email address.',
+      reason: 'Temporary or disposable email addresses are not accepted. Please use a permanent personal or work address.',
     };
   }
 
-  // 6. Live DNS MX Verification (DNS-over-HTTPS)
-  // Server-side (strict) calls fail closed when DoH is unreachable, so a troll
-  // cannot skirt the MX check by blocking the resolver (which the old client-only
-  // path did due to `connect-src` and the previous fail-open behaviour).
-  const dnsResult = await verifyDomainHasMailServers(normalizedDomain, options.strict === true);
+  // 6. Live DNS Mail Server Verification (DNS-over-HTTPS)
+  const dnsResult = await verifyDomainHasMailServers(
+    normalizedDomain,
+    options.strict === true,
+    options.fetchImpl ?? fetch
+  );
   if (!dnsResult.active) {
     return {
       valid: false,
-      isDomainError: true,
-      reason: dnsResult.reason || `The domain "${normalizedDomain}" does not appear to have an active mail server.`,
+      isDomainError: dnsResult.transientError ? undefined : true,
+      isTransientDnsError: dnsResult.transientError === true,
+      reason:
+        dnsResult.reason ||
+        `The domain "${normalizedDomain}" does not appear to have an active mail server.`,
     };
   }
 
-  return { valid: true };
+  return {
+    valid: true,
+    isTransientDnsError: dnsResult.transientError === true ? true : undefined,
+  };
 }

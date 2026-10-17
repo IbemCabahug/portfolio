@@ -27,66 +27,19 @@
   import { soundEngine } from '../lib/sound-engine';
   import { recordMilestone } from '../store/questlog';
 
-  function initPreferences() {
-    soundEngine.init();
+  let prefAbort: AbortController | null = null;
 
-    const btnMotion = document.getElementById('toggle-motion');
-    const btnSound = document.getElementById('toggle-sound');
-
-    function updateDOM() {
-      const motion = getMotion();
-      const sound = getSound();
-      
-      if (btnMotion) {
-        btnMotion.textContent = motion === 'full' ? 'Motion: Full' : 'Motion: Reduced';
-        btnMotion.setAttribute('aria-pressed', motion === 'reduced' ? 'true' : 'false');
-      }
-      
-      if (btnSound) {
-        if (sound === 'on') {
-          btnSound.innerHTML = `<span class="inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" aria-hidden="true"></span><span>Sound: On</span></span>`;
-          btnSound.classList.add('sound-active');
-          btnSound.setAttribute('aria-pressed', 'true');
-          btnSound.setAttribute('title', 'Tavern hearth ambient soundscape active. Click to mute.');
-        } else {
-          btnSound.innerHTML = `<span>Sound: Off</span>`;
-          btnSound.classList.remove('sound-active');
-          btnSound.setAttribute('aria-pressed', 'false');
-          btnSound.setAttribute('title', 'Tavern sound muted. Click to enable hearth soundscape.');
-        }
-      }
-    }
-
-    updateDOM();
-
-    btnMotion?.addEventListener('click', () => {
-      soundEngine.playWoodClink();
-      setMotion(getMotion() === 'full' ? 'reduced' : 'full');
-    });
-
-    btnSound?.addEventListener('click', () => {
-      const next = getSound() === 'on' ? 'off' : 'on';
-      if (next === 'on') {
-        soundEngine.enable();
-        soundEngine.playWoodClink();
-        recordMilestone('feat_hearth');
-      } else {
-        soundEngine.disable();
-      }
-      setSound(next);
-    });
-  }
-
-  document.addEventListener('astro:page-load', initPreferences);
-  subscribePreferences(() => {
+  function updatePreferenceButtons() {
     const btnMotion = document.getElementById('toggle-motion');
     const btnSound = document.getElementById('toggle-sound');
     const motion = getMotion();
     const sound = getSound();
+
     if (btnMotion) {
       btnMotion.textContent = motion === 'full' ? 'Motion: Full' : 'Motion: Reduced';
       btnMotion.setAttribute('aria-pressed', motion === 'reduced' ? 'true' : 'false');
     }
+
     if (btnSound) {
       if (sound === 'on') {
         btnSound.innerHTML = `<span class="inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" aria-hidden="true"></span><span>Sound: On</span></span>`;
@@ -100,7 +53,43 @@
         btnSound.setAttribute('title', 'Tavern sound muted. Click to enable hearth soundscape.');
       }
     }
+  }
+
+  function initPreferences() {
+    prefAbort?.abort();
+    prefAbort = new AbortController();
+    const { signal } = prefAbort;
+
+    soundEngine.init();
+    updatePreferenceButtons();
+
+    const btnMotion = document.getElementById('toggle-motion');
+    const btnSound = document.getElementById('toggle-sound');
+
+    btnMotion?.addEventListener('click', () => {
+      soundEngine.playWoodClink();
+      setMotion(getMotion() === 'full' ? 'reduced' : 'full');
+    }, { signal });
+
+    btnSound?.addEventListener('click', () => {
+      const next = getSound() === 'on' ? 'off' : 'on';
+      if (next === 'on') {
+        soundEngine.enable();
+        soundEngine.playWoodClink();
+        recordMilestone('feat_hearth');
+      } else {
+        soundEngine.disable();
+      }
+      setSound(next);
+    }, { signal });
+  }
+
+  document.addEventListener('astro:page-load', initPreferences);
+  document.addEventListener('astro:before-swap', () => {
+    prefAbort?.abort();
+    prefAbort = null;
   });
+  subscribePreferences(updatePreferenceButtons);
 </script>
 
 <style>

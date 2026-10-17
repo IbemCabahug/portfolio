@@ -3,7 +3,7 @@
 const isDev = import.meta.env.DEV;
 ---
 
-{/* Subtle Offline / Online Notification Toast */}
+{/* Subtle Offline / Online / Update Notification Toast */}
 <div
   id="pwa-network-toast"
   role="status"
@@ -16,11 +16,21 @@ const isDev = import.meta.env.DEV;
   >
     <span id="pwa-toast-dot" class="w-2 h-2 rounded-full bg-amber-400"></span>
     <span id="pwa-toast-msg">Network status</span>
+    <button
+      id="pwa-toast-action"
+      type="button"
+      class="hidden ml-1 px-2.5 py-1 rounded bg-[var(--brass)] text-black font-bold text-[11px] hover:bg-[var(--candle)] transition-colors cursor-pointer min-h-[32px]"
+    >
+      Reload
+    </button>
   </div>
 </div>
 
 <script is:inline define:vars={{ isDev }}>
   (() => {
+    if (window.__pwaRegistered) return;
+    window.__pwaRegistered = true;
+
     // In local development, unregister any active service worker and purge caches so dev edits are never stale
     if (isDev) {
       if ('serviceWorker' in navigator) {
@@ -40,44 +50,93 @@ const isDev = import.meta.env.DEV;
       return;
     }
 
+    // Check whether user has unsaved form input or an active interactive demo/modal open (UX-07)
+    function isUserBusyWithActiveWork() {
+      if (document.body && document.body.dataset.demoActive === 'true') return true;
+      if (document.querySelector('form[data-dirty="true"]')) return true;
+      if (document.querySelector('[data-quest-demo-shell] [data-active]:not([hidden]), bits-live-demo [data-active]:not([hidden])')) return true;
+      if (document.querySelector('#arena-frame-container:not(.hidden), #transceiver-frame-container:not(.hidden)')) return true;
+      if (document.querySelector('[role="dialog"]:not([hidden])')) return true;
+      const desktopBody = document.getElementById('desktop-missive-body');
+      const mobileBody = document.getElementById('mobile-missive-body');
+      if ((desktopBody && desktopBody.value && desktopBody.value.trim()) || (mobileBody && mobileBody.value && mobileBody.value.trim())) {
+        return true;
+      }
+      return false;
+    }
+
+    function showUpdateAvailableBanner(waitingWorker) {
+      const toast = document.getElementById('pwa-network-toast');
+      const msg = document.getElementById('pwa-toast-msg');
+      const dot = document.getElementById('pwa-toast-dot');
+      const actionBtn = document.getElementById('pwa-toast-action');
+      if (!toast || !msg || !dot || !actionBtn) return;
+
+      clearTimeout(window.__pwaToastTimer);
+      msg.textContent = 'Update available for this portfolio';
+      dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
+      actionBtn.textContent = 'Reload now';
+      actionBtn.classList.remove('hidden');
+
+      toast.classList.remove('translate-y-16', 'opacity-0', 'pointer-events-none');
+      toast.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+
+      actionBtn.onclick = () => {
+        actionBtn.disabled = true;
+        actionBtn.textContent = 'Updating…';
+        window.__pwaAllowReload = true;
+        if (waitingWorker) {
+          waitingWorker.postMessage({ type: 'SKIP_WAITING' });
+        } else {
+          window.location.reload();
+        }
+      };
+    }
+
     // 1. Service Worker Registration (Production)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker
           .register('/sw.js', { scope: '/' })
           .then((registration) => {
-            // Auto-update: when a new worker installs over an existing one,
-            // tell it to take over immediately (public/sw.js listens for this
-            // message and calls skipWaiting()) instead of waiting in the
-            // "installed" state until every tab happens to be closed.
+            if (registration.waiting && navigator.serviceWorker.controller) {
+              if (isUserBusyWithActiveWork()) {
+                showUpdateAvailableBanner(registration.waiting);
+              } else {
+                window.__pwaAllowReload = true;
+                registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+              }
+            }
+
             registration.addEventListener('updatefound', () => {
               const installingWorker = registration.installing;
               if (!installingWorker) return;
               installingWorker.addEventListener('statechange', () => {
                 if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  installingWorker.postMessage({ type: 'SKIP_WAITING' });
+                  if (isUserBusyWithActiveWork()) {
+                    showUpdateAvailableBanner(installingWorker);
+                  } else {
+                    window.__pwaAllowReload = true;
+                    installingWorker.postMessage({ type: 'SKIP_WAITING' });
+                  }
                 }
               });
             });
 
-            // When the new worker takes control, reload once so the page runs
-            // the freshly deployed version instead of a mix of old and new
-            // cached assets. First-visit activation (no prior controller) does
-            // not reload — the page was just served from the network anyway.
             const hadController = !!navigator.serviceWorker.controller;
             let refreshing = false;
             navigator.serviceWorker.addEventListener('controllerchange', () => {
               if (refreshing || !hadController) return;
+              if (isUserBusyWithActiveWork() && !window.__pwaAllowReload) {
+                showUpdateAvailableBanner(null);
+                return;
+              }
               refreshing = true;
               window.location.reload();
             });
 
-            // Poll for updates hourly so long-lived tabs and installed PWA
-            // windows also pick up new deploys without a manual revisit.
             setInterval(() => {
-              registration.update().catch(() => {
-                // Update checks are best-effort; ignore offline failures.
-              });
+              registration.update().catch(() => {});
             }, 60 * 60 * 1000);
           })
           .catch((error) => {
@@ -91,7 +150,10 @@ const isDev = import.meta.env.DEV;
       const toast = document.getElementById('pwa-network-toast');
       const msg = document.getElementById('pwa-toast-msg');
       const dot = document.getElementById('pwa-toast-dot');
+      const actionBtn = document.getElementById('pwa-toast-action');
       if (!toast || !msg || !dot) return;
+
+      if (actionBtn) actionBtn.classList.add('hidden');
 
       if (isOnline) {
         msg.textContent = 'Connection restored — Tavern in sync';
@@ -104,18 +166,17 @@ const isDev = import.meta.env.DEV;
       toast.classList.remove('translate-y-16', 'opacity-0');
       toast.classList.add('translate-y-0', 'opacity-100');
 
-      // Auto dismiss after 3.5 seconds
       clearTimeout(window.__pwaToastTimer);
       window.__pwaToastTimer = setTimeout(() => {
-        toast.classList.remove('translate-y-0', 'opacity-100');
-        toast.classList.add('translate-y-16', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+        toast.classList.add('translate-y-16', 'opacity-0', 'pointer-events-none');
       }, 3500);
     }
 
     window.addEventListener('online', () => showNetworkToast(true));
     window.addEventListener('offline', () => showNetworkToast(false));
 
-    // 3. Capture PWA Install Prompt (for optional custom triggers)
+    // 3. Capture PWA Install Prompt
     window.addEventListener('beforeinstallprompt', (e) => {
       window.deferredPwaPrompt = e;
       window.dispatchEvent(new CustomEvent('pwa:installable'));

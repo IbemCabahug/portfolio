@@ -24,7 +24,8 @@
     "measure:fields": "node scripts/report-layout.mjs",
     "resume:pdf": "node scripts/render-resume-pdf.mjs",
     "a11y": "node scripts/lighthouse-run.mjs",
-    "audit:b9": "node scripts/audit-border-contrast.mjs"
+    "audit:b9": "node scripts/audit-border-contrast.mjs",
+    "test:audit": "node scripts/test-security-ux-audit.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^7.0.8",
@@ -38,12 +39,25 @@
     "@astrojs/check": "^0.9.10",
     "lighthouse": "^13.4.1",
     "puppeteer-core": "^25.9.0",
-    "sharp": "0.34.5",
+    "sharp": "^0.35.5",
     "typescript": "^5.7.3"
+  },
+  "overrides": {
+    "brace-expansion": "^5.0.12",
+    "devalue": "^5.9.3",
+    "fast-uri": "^3.1.8",
+    "http-cache-semantics": "^4.2.1",
+    "smol-toml": "^1.8.1",
+    "source-map-js": "^1.2.2",
+    "undici": "^8.10.2",
+    "@vercel/routing-utils": {
+      "path-to-regexp": "^6.3.0"
+    }
   },
   "allowScripts": {
     "esbuild@0.25.12": true,
     "esbuild@0.28.2": true,
-    "sharp@0.34.5": true
+    "sharp@0.34.5": true,
+    "sharp@0.35.5": true
   }
 }

@@ -24,8 +24,8 @@ const { mailAddress } = Astro.props;
         </svg>
       </span>
       <div>
-        <span class="text-xs uppercase font-extrabold tracking-widest text-[var(--ember)]">Priority Dispatch</span>
-        <h2 id="raven-dialog-title" class="text-xl sm:text-2xl font-bold text-[var(--candle)]">Send Word with the Raven</h2>
+        <span class="text-xs uppercase font-extrabold tracking-widest text-[var(--ember)]">Priority Dispatch &bull; Contact Form</span>
+        <h2 id="raven-dialog-title" class="text-xl sm:text-2xl font-bold text-[var(--candle)]">Send a Message (Dispatch Raven)</h2>
       </div>
     </div>
   </div>
@@ -33,103 +33,136 @@ const { mailAddress } = Astro.props;
   <!-- Composer View -->
   <div id="raven-composer-view" class="panel-body space-y-3">
     <p class="text-xs sm:text-sm text-[var(--parchment)]/90 leading-relaxed">
-      Inscribe your dispatch below. Selecting a missive category provides a structured template, and sealing the message routes it directly to Nhovem's console.
+      Write your message below. Selecting a category pre-fills a subject template, or you can write your own.
     </p>
 
-    <!-- Template Categories (GitHub Issue Style) -->
+    <!-- Template Categories (ARIA Radio Group - UX-04) -->
     <div>
-      <span class="block text-xs uppercase tracking-wider text-[var(--brass)] font-semibold mb-1.5">Select Dispatch Template</span>
-      <div class="grid grid-cols-3 gap-1.5" role="radiogroup" aria-label="Missive template selection">
+      <span id="desktop-template-group-label" class="block text-xs uppercase tracking-wider text-[var(--brass)] font-semibold mb-1.5">Select Message Template</span>
+      <div class="grid grid-cols-3 gap-1.5" role="radiogroup" aria-labelledby="desktop-template-group-label">
         <button
           type="button"
+          role="radio"
+          aria-checked="true"
+          tabindex="0"
           class="template-pill active"
           data-template="quest"
           data-prefix="[Quest Offer]"
           data-subject="Frontend / Web Project Inquiry"
-          data-placeholder="Describe the quest, target timeline, technology stack, and how you'd like to collaborate..."
+          data-placeholder="Describe the project, target timeline, technology stack, and how you'd like to collaborate..."
         >
-          📜 Quest Offer
+          📜 Project / Quest
         </button>
         <button
           type="button"
+          role="radio"
+          aria-checked="false"
+          tabindex="-1"
           class="template-pill"
           data-template="role"
           data-prefix="[Guild Recruitment]"
           data-subject="AI-Assisted Developer Role Opportunity"
-          data-placeholder="Share details about the AI-assisted developer role, team structure, remote/hybrid requirements, and company mission..."
+          data-placeholder="Share details about the developer role, team structure, remote/hybrid requirements, and company mission..."
         >
-          ⚔️ Recruitment
+          ⚔️ Job / Hiring
         </button>
         <button
           type="button"
+          role="radio"
+          aria-checked="false"
+          tabindex="-1"
           class="template-pill"
           data-template="general"
           data-prefix="[Tavern Greetings]"
           data-subject="Greetings from a Fellow Traveler"
           data-placeholder="Share your thoughts on the portfolio, say hello, or connect with Nhovem..."
         >
-          🍺 Tavern Chat
+          🍺 General Chat
         </button>
       </div>
     </div>
 
     <!-- Form Fields -->
-    <form id="desktop-raven-form" class="space-y-2.5">
+    <form id="desktop-raven-form" class="space-y-2.5" novalidate>
       <input type="checkbox" name="botcheck" id="desktop-botcheck" class="hidden" style="display:none !important;position:absolute;left:-9999px;" tabindex="-1" autocomplete="off" aria-hidden="true" />
-      <div id="desktop-raven-error" class="hidden text-xs text-red-400 bg-red-900/30 border border-red-500/50 rounded px-3 py-2" role="alert"></div>
+      <div id="desktop-raven-error" class="hidden text-xs text-red-300 bg-red-950/60 border border-red-400/60 rounded px-3 py-2" role="alert" aria-live="assertive"></div>
+      <div id="desktop-raven-status" class="hidden text-xs text-[var(--candle)] bg-[var(--wood-deep)]/80 border border-[var(--brass)]/60 rounded px-3 py-2" role="status" aria-live="polite"></div>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
         <div>
-          <label for="desktop-sender-name" class="block text-xs text-[var(--parchment)]/80 font-medium mb-1">Your Name / Call-Sign <span class="text-[var(--ember)]">*</span></label>
+          <label for="desktop-sender-name" class="block text-xs text-[var(--parchment)]/80 font-medium mb-1">Your Name <span class="text-[var(--ember)]" aria-hidden="true">*</span></label>
           <input
             type="text"
             id="desktop-sender-name"
             name="senderName"
+            autocomplete="name"
             required
-            placeholder="e.g. Robin of the North"
+            maxlength="120"
+            aria-invalid="false"
+            aria-describedby="desktop-sender-name-error"
+            placeholder="e.g. Alex Rivera"
             class="tavern-input w-full px-3 py-1.5 text-xs sm:text-sm rounded bg-black/40 border border-[var(--brass)]/40 text-[var(--candle)] focus:border-[var(--candle)] focus:outline-none transition-colors"
           />
+          <p id="desktop-sender-name-error" class="field-error hidden text-xs text-red-300 mt-1" role="status"></p>
         </div>
         <div>
-          <label for="desktop-sender-email" class="block text-xs text-[var(--parchment)]/80 font-medium mb-1">Your Return Address (Email) <span class="text-[var(--ember)]">*</span></label>
+          <label for="desktop-sender-email" class="block text-xs text-[var(--parchment)]/80 font-medium mb-1">Your Email Address <span class="text-[var(--ember)]" aria-hidden="true">*</span></label>
           <input
             type="email"
             id="desktop-sender-email"
             name="senderEmail"
+            autocomplete="email"
             required
-            placeholder="e.g. traveler@guild.com"
+            maxlength="254"
+            aria-invalid="false"
+            aria-describedby="desktop-sender-email-error"
+            placeholder="e.g. alex@company.com"
             class="tavern-input w-full px-3 py-1.5 text-xs sm:text-sm rounded bg-black/40 border border-[var(--brass)]/40 text-[var(--candle)] focus:border-[var(--candle)] focus:outline-none transition-colors"
           />
+          <p id="desktop-sender-email-error" class="field-error hidden text-xs text-red-300 mt-1" role="status"></p>
         </div>
       </div>
 
       <div>
-        <label for="desktop-missive-subject" class="block text-xs text-[var(--parchment)]/80 font-medium mb-1">Missive Title / Subject <span class="text-[var(--ember)]">*</span></label>
+        <label for="desktop-missive-subject" class="block text-xs text-[var(--parchment)]/80 font-medium mb-1">Subject <span class="text-[var(--ember)]" aria-hidden="true">*</span></label>
         <input
           type="text"
           id="desktop-missive-subject"
           name="subject"
+          autocomplete="off"
           required
+          maxlength="200"
+          aria-invalid="false"
+          aria-describedby="desktop-missive-subject-error"
           value="[Quest Offer] Frontend / Web Project Inquiry"
           class="tavern-input w-full px-3 py-1.5 text-xs sm:text-sm rounded bg-black/40 border border-[var(--brass)]/40 text-[var(--candle)] focus:border-[var(--candle)] focus:outline-none transition-colors"
         />
+        <p id="desktop-missive-subject-error" class="field-error hidden text-xs text-red-300 mt-1" role="status"></p>
       </div>
 
       <div>
-        <label for="desktop-missive-body" class="block text-xs text-[var(--parchment)]/80 font-medium mb-1">Sealed Message <span class="text-[var(--ember)]">*</span></label>
+        <label for="desktop-missive-body" class="block text-xs text-[var(--parchment)]/80 font-medium mb-1">Message <span class="text-[var(--ember)]" aria-hidden="true">*</span></label>
         <textarea
           id="desktop-missive-body"
           name="message"
           required
+          maxlength="5000"
           rows="3"
-          placeholder="Describe the quest, target timeline, technology stack, and how you'd like to collaborate..."
+          aria-invalid="false"
+          aria-describedby="desktop-missive-body-error"
+          placeholder="Describe the project, target timeline, technology stack, and how you'd like to collaborate..."
           class="tavern-input w-full px-3 py-2 text-xs sm:text-sm rounded bg-black/40 border border-[var(--brass)]/40 text-[var(--candle)] focus:border-[var(--candle)] focus:outline-none transition-colors resize-none"
         ></textarea>
+        <p id="desktop-missive-body-error" class="field-error hidden text-xs text-red-300 mt-1" role="status"></p>
       </div>
 
       <div class="flex flex-wrap items-center justify-between text-[11px] text-[var(--parchment)]/70 pt-0.5">
         <span>Destination: <strong class="text-[var(--candle)] font-mono">{mailAddress}</strong></span>
-        <span>Turnaround: 24–48 hours</span>
+        <span>Typical reply: 24–48 hours</span>
       </div>
+
+      <p class="text-[11px] text-[var(--parchment)]/75 leading-snug bg-black/25 border border-[var(--brass)]/25 rounded px-2.5 py-1.5">
+        <strong>Privacy &amp; delivery notice:</strong> Submitting checks your email domain via DNS-over-HTTPS (Google/Cloudflare), verifies anti-bot status via Cloudflare Turnstile, and routes your message through Web3Forms to <span class="font-mono">{mailAddress}</span>. Prefer not to use the form? <a href={`mailto:${mailAddress}`} class="underline text-[var(--candle)] hover:text-white">Email directly</a>.
+      </p>
 
       <!-- Cloudflare Turnstile Anti-Spam Gate -->
       <div class="turnstile-container my-2 flex flex-col items-center justify-center min-h-[70px] w-full">
@@ -141,13 +174,13 @@ const { mailAddress } = Astro.props;
           type="submit"
           class="inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-sm rounded hover:bg-[var(--candle)] transition-colors shadow-md cursor-pointer"
         >
-          Seal & Dispatch Raven &rarr;
+          Send Message (Dispatch Raven) &rarr;
         </button>
         <button
           type="button"
           class="close-panel-btn inline-flex items-center justify-center min-h-[44px] px-6 py-2 bg-[var(--brass)] text-black font-bold text-xs sm:text-sm rounded hover:bg-[var(--candle)] transition-colors cursor-pointer ml-auto"
         >
-          Return to Roost (Esc)
+          Close (Esc)
         </button>
       </div>
     </form>
@@ -163,9 +196,9 @@ const { mailAddress } = Astro.props;
           <line x1="17.5" y1="15" x2="9" y2="15"/>
         </svg>
       </span>
-      <h3 class="text-base sm:text-lg font-bold text-emerald-400" id="receipt-heading">The Raven Takes Wing!</h3>
+      <h3 class="text-base sm:text-lg font-bold text-emerald-400" id="receipt-heading">Message Submitted!</h3>
       <p class="text-xs text-[var(--parchment)]/90 max-w-md mx-auto" id="receipt-desc">
-        Your missive has been prepared and routed to your email client. A copy of your sealed message is inscribed below for your records:
+        Your message has been accepted for delivery. A copy of your message is shown below for your records:
       </p>
     </div>
 

@@ -38,7 +38,7 @@ const { mailAddress, githubUrl, profile } = Astro.props;
     <div class="space-y-4">
       <div class="flex flex-wrap items-center gap-2 mb-1">
         <span class="text-xs uppercase font-extrabold tracking-widest text-[var(--ember)] bg-[var(--wood-deep)]/10 px-2 py-0.5 rounded border border-[var(--ember)]/30">
-          Priority Dispatch
+          Priority Dispatch &bull; Contact Form
         </span>
         <span class="text-xs text-[var(--ink)]/70 font-mono">
           Electronic Messenger Raven
@@ -46,45 +46,54 @@ const { mailAddress, githubUrl, profile } = Astro.props;
       </div>
 
       <h2 class="text-2xl font-bold text-[var(--ink)] mb-1 flex items-center gap-2">
-        <span>Send Word via the Raven</span>
+        <span>Send a Message (via the Raven)</span>
       </h2>
 
       <p class="text-sm text-[var(--ink)]/85 leading-relaxed">
-        Inscribe your missive below. Choosing a dispatch category will pre-fill a structured template to send directly to Nhovem's console.
+        Write your message below. Choosing a category pre-fills a subject template, or you can write your own.
       </p>
 
       <!-- Mobile Form -->
-      <form id="mobile-raven-form" class="space-y-3 pt-2">
+      <form id="mobile-raven-form" class="space-y-3 pt-2" novalidate>
         <input type="checkbox" name="botcheck" id="mobile-botcheck" class="hidden" style="display:none !important;position:absolute;left:-9999px;" tabindex="-1" autocomplete="off" aria-hidden="true" />
-        <div id="mobile-raven-error" class="hidden text-xs text-red-700 bg-red-100 border border-red-300 rounded px-3 py-2" role="alert"></div>
+        <div id="mobile-raven-error" class="hidden text-xs text-red-800 bg-red-100 border border-red-400 rounded px-3 py-2" role="alert" aria-live="assertive"></div>
+        <div id="mobile-raven-status" class="hidden text-xs text-[var(--wood-deep)] bg-amber-100 border border-[var(--brass)] rounded px-3 py-2" role="status" aria-live="polite"></div>
         <div>
-          <span class="block text-xs uppercase tracking-wider text-[var(--ink)] font-bold mb-1">Dispatch Category</span>
-          <div class="grid grid-cols-3 gap-1.5">
-            <button type="button" class="mobile-template-pill active" data-template="quest" data-prefix="[Quest Offer]" data-subject="Frontend / Web Project Inquiry" data-placeholder="Describe the quest, target timeline, and technology stack...">📜 Quest Offer</button>
-            <button type="button" class="mobile-template-pill" data-template="role" data-prefix="[Guild Recruitment]" data-subject="AI-Assisted Developer Role Opportunity" data-placeholder="Share details about the AI-assisted developer role, team structure, and location...">⚔️ Recruitment</button>
-            <button type="button" class="mobile-template-pill" data-template="general" data-prefix="[Tavern Greetings]" data-subject="Greetings from a Fellow Traveler" data-placeholder="Say hello or share feedback on the portfolio...">🍺 Tavern Chat</button>
+          <span id="mobile-template-group-label" class="block text-xs uppercase tracking-wider text-[var(--ink)] font-bold mb-1">Message Template</span>
+          <div class="grid grid-cols-3 gap-1.5" role="radiogroup" aria-labelledby="mobile-template-group-label">
+            <button type="button" role="radio" aria-checked="true" tabindex="0" class="mobile-template-pill active" data-template="quest" data-prefix="[Quest Offer]" data-subject="Frontend / Web Project Inquiry" data-placeholder="Describe the project, target timeline, and technology stack...">📜 Project / Quest</button>
+            <button type="button" role="radio" aria-checked="false" tabindex="-1" class="mobile-template-pill" data-template="role" data-prefix="[Guild Recruitment]" data-subject="AI-Assisted Developer Role Opportunity" data-placeholder="Share details about the developer role, team structure, and location...">⚔️ Job / Hiring</button>
+            <button type="button" role="radio" aria-checked="false" tabindex="-1" class="mobile-template-pill" data-template="general" data-prefix="[Tavern Greetings]" data-subject="Greetings from a Fellow Traveler" data-placeholder="Say hello or share feedback on the portfolio...">🍺 General Chat</button>
           </div>
         </div>
 
         <div>
-          <label for="mobile-sender-name" class="block text-xs font-bold text-[var(--ink)] mb-1">Your Name <span class="text-[var(--ember)]">*</span></label>
-          <input type="text" id="mobile-sender-name" required placeholder="e.g. Robin of the North" class="w-full px-3 py-2 text-sm rounded bg-[var(--wood-deep)]/10 border border-[var(--brass)]/50 text-[var(--ink)] focus:outline-2 focus:outline-[var(--brass)]" />
+          <label for="mobile-sender-name" class="block text-xs font-bold text-[var(--ink)] mb-1">Your Name <span class="text-[var(--ember)]" aria-hidden="true">*</span></label>
+          <input type="text" id="mobile-sender-name" name="senderName" autocomplete="name" required maxlength="120" aria-invalid="false" aria-describedby="mobile-sender-name-error" placeholder="e.g. Alex Rivera" class="w-full px-3 py-2 text-sm rounded bg-[var(--wood-deep)]/10 border border-[var(--brass)]/50 text-[var(--ink)] focus:outline-2 focus:outline-[var(--brass)]" />
+          <p id="mobile-sender-name-error" class="field-error hidden text-xs text-red-700 font-medium mt-1" role="status"></p>
         </div>
 
         <div>
-          <label for="mobile-sender-email" class="block text-xs font-bold text-[var(--ink)] mb-1">Your Email <span class="text-[var(--ember)]">*</span></label>
-          <input type="email" id="mobile-sender-email" required placeholder="e.g. traveler@guild.com" class="w-full px-3 py-2 text-sm rounded bg-[var(--wood-deep)]/10 border border-[var(--brass)]/50 text-[var(--ink)] focus:outline-2 focus:outline-[var(--brass)]" />
+          <label for="mobile-sender-email" class="block text-xs font-bold text-[var(--ink)] mb-1">Your Email Address <span class="text-[var(--ember)]" aria-hidden="true">*</span></label>
+          <input type="email" id="mobile-sender-email" name="senderEmail" autocomplete="email" required maxlength="254" aria-invalid="false" aria-describedby="mobile-sender-email-error" placeholder="e.g. alex@company.com" class="w-full px-3 py-2 text-sm rounded bg-[var(--wood-deep)]/10 border border-[var(--brass)]/50 text-[var(--ink)] focus:outline-2 focus:outline-[var(--brass)]" />
+          <p id="mobile-sender-email-error" class="field-error hidden text-xs text-red-700 font-medium mt-1" role="status"></p>
         </div>
 
         <div>
-          <label for="mobile-missive-subject" class="block text-xs font-bold text-[var(--ink)] mb-1">Subject <span class="text-[var(--ember)]">*</span></label>
-          <input type="text" id="mobile-missive-subject" required value="[Quest Offer] Frontend / Web Project Inquiry" class="w-full px-3 py-2 text-sm rounded bg-[var(--wood-deep)]/10 border border-[var(--brass)]/50 text-[var(--ink)] focus:outline-2 focus:outline-[var(--brass)]" />
+          <label for="mobile-missive-subject" class="block text-xs font-bold text-[var(--ink)] mb-1">Subject <span class="text-[var(--ember)]" aria-hidden="true">*</span></label>
+          <input type="text" id="mobile-missive-subject" name="subject" autocomplete="off" required maxlength="200" aria-invalid="false" aria-describedby="mobile-missive-subject-error" value="[Quest Offer] Frontend / Web Project Inquiry" class="w-full px-3 py-2 text-sm rounded bg-[var(--wood-deep)]/10 border border-[var(--brass)]/50 text-[var(--ink)] focus:outline-2 focus:outline-[var(--brass)]" />
+          <p id="mobile-missive-subject-error" class="field-error hidden text-xs text-red-700 font-medium mt-1" role="status"></p>
         </div>
 
         <div>
-          <label for="mobile-missive-body" class="block text-xs font-bold text-[var(--ink)] mb-1">Message <span class="text-[var(--ember)]">*</span></label>
-          <textarea id="mobile-missive-body" required rows="3" placeholder="Describe the quest, target timeline, and technology stack..." class="w-full px-3 py-2 text-sm rounded bg-[var(--wood-deep)]/10 border border-[var(--brass)]/50 text-[var(--ink)] focus:outline-2 focus:outline-[var(--brass)] resize-none"></textarea>
+          <label for="mobile-missive-body" class="block text-xs font-bold text-[var(--ink)] mb-1">Message <span class="text-[var(--ember)]" aria-hidden="true">*</span></label>
+          <textarea id="mobile-missive-body" name="message" required maxlength="5000" rows="3" aria-invalid="false" aria-describedby="mobile-missive-body-error" placeholder="Describe the project, target timeline, and technology stack..." class="w-full px-3 py-2 text-sm rounded bg-[var(--wood-deep)]/10 border border-[var(--brass)]/50 text-[var(--ink)] focus:outline-2 focus:outline-[var(--brass)] resize-none"></textarea>
+          <p id="mobile-missive-body-error" class="field-error hidden text-xs text-red-700 font-medium mt-1" role="status"></p>
         </div>
+
+        <p class="text-[11px] text-[var(--ink)]/80 leading-snug bg-[var(--wood-deep)]/5 border border-[var(--brass)]/30 rounded px-2.5 py-1.5">
+          <strong>Privacy &amp; delivery notice:</strong> Submitting checks your email domain via DNS-over-HTTPS (Google/Cloudflare), verifies anti-bot status via Cloudflare Turnstile, and routes your message through Web3Forms to <span class="font-mono">{mailAddress}</span>. Prefer not to use the form? <a href={`mailto:${mailAddress}`} class="underline font-semibold text-[var(--wood-deep)]">Email directly</a>.
+        </p>
 
         <!-- Cloudflare Turnstile Anti-Spam Gate -->
         <div class="turnstile-container my-2 flex flex-col items-center justify-center min-h-[70px] w-full">
@@ -96,7 +105,7 @@ const { mailAddress, githubUrl, profile } = Astro.props;
             type="submit"
             class="inline-flex items-center justify-center min-h-[44px] px-6 py-2.5 bg-[var(--wood-deep)] text-[var(--candle)] font-bold text-sm rounded border border-[var(--brass)] hover:bg-black transition-colors cursor-pointer text-center shadow-md flex-1"
           >
-            Seal & Dispatch Raven &rarr;
+            Send Message (Dispatch Raven) &rarr;
           </button>
         </div>
       </form>
@@ -107,7 +116,7 @@ const { mailAddress, githubUrl, profile } = Astro.props;
         <button
           type="button"
           id="mobile-copy-email-btn"
-          class="px-2.5 py-1 bg-[var(--wood-deep)] text-[var(--candle)] rounded hover:bg-black transition-colors text-xs font-bold cursor-pointer"
+          class="inline-flex items-center justify-center min-h-[44px] px-3.5 py-1.5 bg-[var(--wood-deep)] text-[var(--candle)] rounded hover:bg-black transition-colors text-xs font-bold cursor-pointer"
         >
           Copy Address
         </button>

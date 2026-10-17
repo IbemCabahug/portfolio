@@ -215,7 +215,13 @@ const isScene = location === 'tavern' || location === 'messenger';
   <script>
     import { navigate } from 'astro:transitions/client';
 
+    let hudAbort: AbortController | null = null;
+
     function initTavernHud() {
+      hudAbort?.abort();
+      hudAbort = new AbortController();
+      const { signal } = hudAbort;
+
       const fsBtn = document.getElementById('menu-toggle-fullscreen');
       const fsText = document.getElementById('fullscreen-btn-text');
       const exitPill = document.getElementById('fullscreen-exit-pill');
@@ -241,17 +247,20 @@ const isScene = location === 'tavern' || location === 'messenger';
             document.exitFullscreen().catch(() => {});
           }
         }
-      });
+      }, { signal });
 
       exitPill?.addEventListener('click', () => {
         if (document.exitFullscreen) {
           document.exitFullscreen().catch(() => {});
         }
-      });
+      }, { signal });
     }
 
-    // Bind on every astro page load
     document.addEventListener('astro:page-load', initTavernHud);
+    document.addEventListener('astro:before-swap', () => {
+      hudAbort?.abort();
+      hudAbort = null;
+    });
 
     // Track fullscreen changes globally
     document.addEventListener('fullscreenchange', () => {
@@ -265,16 +274,38 @@ const isScene = location === 'tavern' || location === 'messenger';
       }
     });
 
-    // Keyboard Chamber Arrow Navigation (Client-side route swap keeps Fullscreen active)
+    // Keyboard Chamber Arrow Navigation (UX-06: respects modifiers, open dialogs, and ARIA widgets)
     document.addEventListener('keydown', (e) => {
-      const active = document.activeElement;
+      if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+
+      // Do not hijack arrow keys when any modal dialog is open
+      if (document.querySelector('[role="dialog"]:not([hidden])')) {
+        return;
+      }
+
+      const active = document.activeElement as HTMLElement | null;
       if (active) {
         const tag = active.tagName.toLowerCase();
         const role = active.getAttribute('role');
         const isEditable = active.hasAttribute('contenteditable');
+        const inCompositeWidget = Boolean(
+          active.closest('[role="tablist"], [role="radiogroup"], [role="menu"], [role="listbox"], bits-live-demo')
+        );
         const isScrollable = active.scrollHeight > active.clientHeight || active.scrollWidth > active.clientWidth;
-        
-        if (tag === 'input' || tag === 'textarea' || tag === 'select' || role === 'textbox' || isEditable || isScrollable) {
+
+        if (
+          tag === 'input' ||
+          tag === 'textarea' ||
+          tag === 'select' ||
+          role === 'textbox' ||
+          role === 'tab' ||
+          role === 'radio' ||
+          role === 'slider' ||
+          isEditable ||
+          inCompositeWidget ||
+          isScrollable
+        ) {
           return;
         }
       }

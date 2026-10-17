@@ -1,8 +1,9 @@
 // public/sw.js
 // Progressive Web App Service Worker for Nhovem Cabahug's Portfolio
-const CACHE_VERSION = 'v6';
+const CACHE_VERSION = 'v7';
 const STATIC_CACHE = `nhovem-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `nhovem-runtime-${CACHE_VERSION}`;
+const MAX_RUNTIME_ENTRIES = 60;
 
 const PRECACHE_URLS = [
   '/',
@@ -19,11 +20,20 @@ const PRECACHE_URLS = [
   '/icons/icon-maskable-512.png'
 ];
 
-// Install Event: pre-cache critical app shell and activate immediately
+async function putInRuntimeCache(request, response) {
+  const cache = await caches.open(RUNTIME_CACHE);
+  await cache.put(request, response);
+  const keys = await cache.keys();
+  if (keys.length > MAX_RUNTIME_ENTRIES) {
+    const excess = keys.length - MAX_RUNTIME_ENTRIES;
+    await Promise.all(keys.slice(0, excess).map((key) => cache.delete(key)));
+  }
+}
+
+// Install Event: pre-cache critical app shell; wait for client coordination before skipping waiting over an active controller (UX-07)
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(STATIC_CACHE).then((cache) => {
-      // Use Promise.allSettled so a single missing asset doesn't abort SW installation
       return Promise.allSettled(
         PRECACHE_URLS.map((url) =>
           fetch(url, { cache: 'no-cache' }).then((response) => {
@@ -35,7 +45,7 @@ self.addEventListener('install', (event) => {
           })
         )
       );
-    }).then(() => self.skipWaiting())
+    })
   );
 });
 
@@ -47,7 +57,6 @@ self.addEventListener('activate', (event) => {
         cacheNames
           .filter((name) => name.startsWith('nhovem-') && name !== STATIC_CACHE && name !== RUNTIME_CACHE)
           .map((name) => {
-            console.log(`[SW] Purging outdated cache: ${name}`);
             return caches.delete(name);
           })
       );
@@ -59,15 +68,21 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const request = event.request;
 
-  // 1. Only handle GET requests; never touch POST (e.g. Web3Forms Raven contact form)
+  // 1. Only handle GET requests; never touch POST/PUT/DELETE
   if (request.method !== 'GET') {
     return;
   }
 
   const url = new URL(request.url);
 
-  // 2. Pass through dynamic external APIs without caching
-  if (url.hostname.includes('api.web3forms.com') || url.hostname.includes('api.github.com')) {
+  // 2. Never intercept local /api/* routes or dynamic external APIs
+  if (
+    url.pathname.startsWith('/api/') ||
+    url.hostname.includes('api.web3forms.com') ||
+    url.hostname.includes('api.github.com') ||
+    url.hostname.includes('challenges.cloudflare.com') ||
+    url.hostname.includes('cloudflare-dns.com')
+  ) {
     return;
   }
 
@@ -82,7 +97,7 @@ self.addEventListener('fetch', (event) => {
         .then((networkResponse) => {
           if (networkResponse && networkResponse.status === 200) {
             const clone = networkResponse.clone();
-            caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, clone));
+            event.waitUntil(putInRuntimeCache(request, clone));
           }
           return networkResponse;
         })
@@ -91,7 +106,6 @@ self.addEventListener('fetch', (event) => {
           if (cachedResponse) {
             return cachedResponse;
           }
-          // If neither network nor cache matched, serve the thematic offline page
           const offlinePage = await caches.match('/offline');
           return offlinePage || Response.error();
         })
@@ -122,14 +136,11 @@ self.addEventListener('fetch', (event) => {
           .then((networkResponse) => {
             if (networkResponse && networkResponse.status === 200) {
               const clone = networkResponse.clone();
-              caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, clone));
+              event.waitUntil(putInRuntimeCache(request, clone));
             }
             return networkResponse;
           })
-          .catch(() => {
-            // Network failure is fine for stale-while-revalidate; cached copy will serve
-            return null;
-          });
+          .catch(() => null);
 
         return cachedResponse || fetchPromise.then((res) => res || caches.match('/favicon.svg'));
       })
@@ -137,7 +148,7 @@ self.addEventListener('fetch', (event) => {
   }
 });
 
-// Message listener for skipWaiting trigger
+// Message listener for explicit client-approved skipWaiting trigger
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();

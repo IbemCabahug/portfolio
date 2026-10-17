@@ -13,16 +13,28 @@ const mailLink = links.find((l) => l.data.icon === 'mail');
 const githubLink = links.find((l) => l.data.icon === 'github');
 const mailAddress = mailLink?.data.url.replace('mailto:', '') || profile?.email || 'cabahugnhovem@gmail.com';
 const githubUrl = githubLink?.data.url || profile?.github || 'https://github.com/IbemCabahug';
-const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA';
+const rawSiteKey = (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '').trim();
+const DUMMY_SITE_KEYS = new Set([
+  '1x00000000000000000000AA',
+  '2x00000000000000000000AB',
+  '3x00000000000000000000FF',
+]);
+const turnstileSiteKey = import.meta.env.DEV
+  ? rawSiteKey || '1x00000000000000000000AA'
+  : DUMMY_SITE_KEYS.has(rawSiteKey)
+    ? ''
+    : rawSiteKey;
 ---
 
 <TavernLayout
-  title="The Courier's Roost — Messenger's Corner — Nhovem Cabahug"
-  description="Step inside The Courier's Roost: an interactive 2.5D tavern aviary to send word, inspect GitHub telemetry, or review credentials."
+  title="The Courier's Roost — Messenger's Corner (Contact) — Nhovem Cabahug"
+  description="Step inside The Courier's Roost: an interactive 2.5D tavern aviary to send a message, inspect GitHub telemetry, or review credentials."
   location="messenger"
 >
-  <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
-  <div class="roost-page-wrapper" data-turnstile-sitekey={turnstileSiteKey}>
+  {turnstileSiteKey && (
+    <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+  )}
+  <div class="roost-page-wrapper" data-turnstile-sitekey={turnstileSiteKey} data-is-dev={import.meta.env.DEV ? 'true' : 'false'}>
     <!-- Atmospheric Room Intro Header -->
     <header class="roost-header text-center mb-6 px-4">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--stone)]/60 border border-[var(--brass)]/40 text-[var(--candle)] text-xs font-semibold tracking-wider uppercase mb-2">
@@ -1227,10 +1239,29 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
   import { initPerformanceGovernor } from '../lib/perf-governor';
   import { sendMissive } from '../lib/contact';
   import { validateEmail } from '../lib/email-validator';
+  import {
+    getFocusableElements,
+    setBackgroundInert,
+    setupTemplateRadioGroup,
+    showFormError,
+    clearFormError,
+    setFormStatus,
+    setFieldError,
+    clearFieldError,
+  } from '../lib/messenger-ui';
   import { soundEngine } from '../lib/sound-engine';
   import { recordMilestone } from '../store/questlog';
 
+  let messengerAbort: AbortController | null = null;
+
   function initMessengerPage() {
+    const pageWrapper = document.querySelector('.roost-page-wrapper') as HTMLElement | null;
+    if (!pageWrapper) return;
+
+    messengerAbort?.abort();
+    messengerAbort = new AbortController();
+    const { signal } = messengerAbort;
+
     initPerformanceGovernor();
     soundEngine.init();
 
@@ -1238,7 +1269,6 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
     const RATE_LIMIT_KEY = 'raven_sends';
     const COOLDOWN_MS = 60_000;  // 60 seconds between sends
     const MAX_PER_HOUR = 3;      // max 3 sends per hour
-    let formLoadTime = Date.now();
 
     function getRateLimitData(): { timestamps: number[] } {
       try {
@@ -1252,19 +1282,20 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
       const data = getRateLimitData();
       const now = Date.now();
       const oneHourAgo = now - 3_600_000;
-      // Clean old entries
       data.timestamps = data.timestamps.filter(t => t > oneHourAgo);
-      localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify(data));
+      try {
+        localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify(data));
+      } catch {}
 
       if (data.timestamps.length >= MAX_PER_HOUR) {
-        return { allowed: false, reason: 'You have reached the hourly dispatch limit (3 ravens per hour). Please try again later.' };
+        return { allowed: false, reason: 'You have reached the hourly dispatch limit (3 messages per hour). Please try again later or use direct email.' };
       }
       if (data.timestamps.length > 0) {
         const lastSend = Math.max(...data.timestamps);
         const elapsed = now - lastSend;
         if (elapsed < COOLDOWN_MS) {
           const waitSec = Math.ceil((COOLDOWN_MS - elapsed) / 1000);
-          return { allowed: false, reason: `Please wait ${waitSec}s before dispatching another raven.` };
+          return { allowed: false, reason: `Please wait ${waitSec}s before sending another message.` };
         }
       }
       return { allowed: true };
@@ -1273,24 +1304,9 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
     function recordSendSuccess() {
       const data = getRateLimitData();
       data.timestamps.push(Date.now());
-      localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify(data));
-    }
-
-    function showFormError(errorId: string, message: string) {
-      const el = document.getElementById(errorId);
-      if (el) {
-        el.textContent = message;
-        el.classList.remove('hidden');
-        setTimeout(() => el.classList.add('hidden'), 8000);
-      }
-    }
-
-    function clearFormError(errorId: string) {
-      const el = document.getElementById(errorId);
-      if (el && !el.classList.contains('hidden')) {
-        el.textContent = '';
-        el.classList.add('hidden');
-      }
+      try {
+        localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify(data));
+      } catch {}
     }
     // ── End Anti-Abuse Shield ──────────────────────────
 
@@ -1307,10 +1323,6 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
     let activeDialog: HTMLElement | null = null;
     let activeTrigger: HTMLElement | null = null;
     let unloadTransceiverFn: (() => void) | null = null;
-
-    function getFocusableElements(el: HTMLElement): HTMLElement[] {
-      return Array.from(el.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'));
-    }
 
     function openDialog(dialog: HTMLElement, trigger: HTMLElement) {
       if (activeDialog) closeDialog();
@@ -1334,6 +1346,7 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
 
       dialog.hidden = false;
       dialog.scrollTop = 0;
+      setBackgroundInert(dialog, true);
 
       const focusables = getFocusableElements(dialog);
       if (focusables.length > 0) {
@@ -1344,7 +1357,7 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
         renderTurnstile();
       }
 
-      document.addEventListener('keydown', handleKeydown);
+      document.addEventListener('keydown', handleKeydown, { signal });
     }
 
     function closeDialog() {
@@ -1359,6 +1372,8 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
       }
 
       soundEngine.playWoodClink();
+      setBackgroundInert(activeDialog, false);
+
       sceneObjects.forEach((el) => {
         el.classList.remove('disabled-by-dialog');
         el.removeAttribute('tabindex');
@@ -1394,12 +1409,12 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
         const last = focusables[focusables.length - 1];
 
         if (e.shiftKey) {
-          if (document.activeElement === first) {
+          if (document.activeElement === first || !activeDialog.contains(document.activeElement)) {
             e.preventDefault();
             last.focus();
           }
         } else {
-          if (document.activeElement === last) {
+          if (document.activeElement === last || !activeDialog.contains(document.activeElement)) {
             e.preventDefault();
             first.focus();
           }
@@ -1415,7 +1430,7 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
         trigger.addEventListener('click', (e) => {
           e.preventDefault();
           openDialog(dialog, trigger);
-        });
+        }, { signal });
       }
     });
 
@@ -1429,14 +1444,12 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
         setTimeout(() => {
           openDialog(ravenDialog, ravenTrigger);
         }, 50);
-      });
+      }, { signal });
     }
 
     // Auto-open compose modal if arriving via ?compose=true or #compose
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('compose') === 'true' || window.location.hash === '#compose') {
-      const ravenDialog = document.getElementById('dialog-raven');
-      const ravenTrigger = document.getElementById('trigger-perch-raven');
       if (ravenDialog && ravenTrigger) {
         setTimeout(() => {
           openDialog(ravenDialog, ravenTrigger);
@@ -1449,46 +1462,19 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
       btn.addEventListener('click', (e) => {
         e.preventDefault();
         closeDialog();
-      });
+      }, { signal });
     });
 
     // Clicking backdrop closes active dialog
     if (backdrop) {
       backdrop.addEventListener('click', () => {
         closeDialog();
-      });
+      }, { signal });
     }
 
-    // Missive Template Selector logic (GitHub Issue style)
-    function setupTemplatePills(selector: string, subjectInputId: string, bodyInputId: string) {
-      const pills = document.querySelectorAll<HTMLButtonElement>(selector);
-      const subjectInput = document.getElementById(subjectInputId) as HTMLInputElement | null;
-      const bodyInput = document.getElementById(bodyInputId) as HTMLTextAreaElement | null;
-
-      pills.forEach((pill) => {
-        pill.addEventListener('click', () => {
-          pills.forEach((p) => p.classList.remove('active'));
-          pill.classList.add('active');
-
-          const prefix = pill.getAttribute('data-prefix') || '';
-          const subject = pill.getAttribute('data-subject') || '';
-          const placeholder = pill.getAttribute('data-placeholder') || '';
-
-          if (subjectInput) {
-            subjectInput.value = `${prefix} ${subject}`;
-          }
-          if (bodyInput) {
-            bodyInput.placeholder = placeholder;
-            if (!bodyInput.value.trim()) {
-              bodyInput.focus();
-            }
-          }
-        });
-      });
-    }
-
-    setupTemplatePills('.template-pill', 'desktop-missive-subject', 'desktop-missive-body');
-    setupTemplatePills('.mobile-template-pill', 'mobile-missive-subject', 'mobile-missive-body');
+    // Accessible Missive Template Radio Group (UX-04)
+    setupTemplateRadioGroup('.template-pill', 'desktop-missive-subject', 'desktop-missive-body', signal);
+    setupTemplateRadioGroup('.mobile-template-pill', 'mobile-missive-subject', 'mobile-missive-body', signal);
 
     // Scalable Transceiver Project Simulations Registry
     interface TransceiverProject {
@@ -1629,7 +1615,7 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
           </div>
           <h3 class="text-base sm:text-lg font-bold text-[var(--candle)] mb-2 font-serif">Arcane Uplink Timed Out</h3>
           <p class="text-xs sm:text-sm text-[var(--parchment)]/85 max-w-md leading-relaxed mb-6 font-mono">
-            The transmission link to <strong class="text-[var(--candle)]">${proj.name}</strong> did not respond within the 3.5s threshold. The remote chamber may be warming from cold sleep, or third-party authentication/network policies require direct interaction.
+            The transmission link to <strong class="text-[var(--candle)]">${proj.name}</strong> did not respond within the 12s threshold. The remote chamber may be warming from cold sleep, or third-party authentication/network policies require direct interaction.
           </p>
           <div class="flex flex-wrap items-center justify-center gap-3">
             <button
@@ -1753,7 +1739,6 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
           dossierLink.href = proj.dossierPath;
         }
 
-        // Update in-world HUD screen
         if (hudThumb) {
           hudThumb.src = proj.thumbnail;
         }
@@ -1765,7 +1750,7 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
 
         if (animate && contentEl) {
           contentEl.classList.remove('transceiver-content-fade');
-          void contentEl.offsetWidth; // Force reflow
+          void contentEl.offsetWidth;
           contentEl.classList.add('transceiver-content-fade');
         }
       }
@@ -1785,13 +1770,19 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
         setProject(currentProjectIndex + 1);
       }
 
-      if (prevBtn) prevBtn.addEventListener('click', prevProject);
-      if (nextBtn) nextBtn.addEventListener('click', nextProject);
+      if (prevBtn) prevBtn.addEventListener('click', prevProject, { signal });
+      if (nextBtn) nextBtn.addEventListener('click', nextProject, { signal });
 
       // Keyboard arrow navigation when resting view is active
       window.addEventListener('keydown', (e) => {
+        if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
         if (!machineDialog || machineDialog.hidden) return;
-        if (restingView.classList.contains('hidden')) return; // simulation is running
+        if (restingView.classList.contains('hidden')) return;
+
+        const target = e.target as HTMLElement | null;
+        if (target && (['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable)) {
+          return;
+        }
 
         if (e.key === 'ArrowLeft') {
           e.preventDefault();
@@ -1800,7 +1791,7 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
           e.preventDefault();
           nextProject();
         }
-      });
+      }, { signal });
 
       function fitArena() {
         if (!frameContainer) return;
@@ -1818,11 +1809,9 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
           const baseW = proj.baseWidth || 800;
           const baseH = proj.baseHeight || 600;
 
-          // Adaptive Mobile Portrait Dual-Screen Mode (Only for Arcane Typer typing game)
           const isPortraitMobile = proj.id === 'arcanetyper' && (window.matchMedia('(orientation: portrait)').matches || ch > cw) && cw <= 600;
 
           if (isPortraitMobile) {
-            // Reserve top half for game canvas and bottom half for native soft keyboard
             const scale = Math.min(cw / baseW, (ch * 0.54) / baseH);
             iframe.style.width = `${baseW}px`;
             iframe.style.height = `${baseH}px`;
@@ -1832,7 +1821,6 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
             iframe.style.transform = `translateX(-50%) scale(${scale})`;
             iframe.style.transformOrigin = 'top center';
 
-            // Manage atmospheric typing helper tray in bottom half
             let tray = frameContainer.querySelector('#transceiver-portrait-tray') as HTMLElement | null;
             if (!tray) {
               tray = document.createElement('div');
@@ -1853,7 +1841,6 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
             tray.style.top = `${renderedH}px`;
             tray.style.display = 'flex';
           } else {
-            // Standard centered desktop / landscape scaling
             const scale = Math.min(cw / baseW, ch / baseH);
             iframe.style.width = `${baseW}px`;
             iframe.style.height = `${baseH}px`;
@@ -1869,7 +1856,6 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
             }
           }
         } else {
-          // Responsive mode for BITS & Mimic
           const tray = frameContainer.querySelector('#transceiver-portrait-tray') as HTMLElement | null;
           if (tray) {
             tray.style.display = 'none';
@@ -1897,10 +1883,8 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
         if (!proj) return;
 
         const targetUrl = proj.liveUrl;
-
         frameContainer.innerHTML = '';
 
-        // Atmospheric loading state
         const loader = document.createElement('div');
         loader.id = 'transceiver-loading-screen';
         loader.className = 'absolute inset-0 z-10 flex flex-col items-center justify-center p-6 text-center bg-[var(--wood-deep)] text-[var(--parchment)]';
@@ -1951,13 +1935,13 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
         activeControls.classList.remove('hidden');
         activeControls.classList.add('flex');
         frameContainer.classList.remove('hidden');
+        document.body.dataset.demoActive = 'true';
 
-        // 3.5s reliability watchdog timer
         watchdogTimer = setTimeout(() => {
           if (!isLoaded) {
             renderTimeoutDiagnostic(proj);
           }
-        }, 3500);
+        }, 12000);
 
         fitArena();
         requestAnimationFrame(fitArena);
@@ -1977,6 +1961,7 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
         activeControls.classList.add('hidden');
         activeControls.classList.remove('flex');
         restingView.classList.remove('hidden');
+        delete document.body.dataset.demoActive;
       }
 
       function toggleFullscreen() {
@@ -2020,11 +2005,11 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
           if (document.fullscreenElement) {
             document.exitFullscreen().catch(() => {});
           }
-        });
+        }, { signal });
       }
 
-      document.addEventListener('fullscreenchange', updateTransceiverFullscreenState);
-      document.addEventListener('webkitfullscreenchange', updateTransceiverFullscreenState);
+      document.addEventListener('fullscreenchange', updateTransceiverFullscreenState, { signal });
+      document.addEventListener('webkitfullscreenchange', updateTransceiverFullscreenState, { signal });
 
       const resizeObserver = new ResizeObserver(() => {
         if (!frameContainer.classList.contains('hidden')) {
@@ -2032,14 +2017,20 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
         }
       });
       resizeObserver.observe(frameContainer);
-      window.addEventListener('resize', fitArena);
+      window.addEventListener('resize', fitArena, { signal });
       window.addEventListener('orientationchange', () => {
         setTimeout(fitArena, 100);
         setTimeout(fitArena, 300);
-      });
+      }, { signal });
       if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', fitArena);
+        window.visualViewport.addEventListener('resize', fitArena, { signal });
       }
+
+      signal.addEventListener('abort', () => {
+        clearWatchdog();
+        resizeObserver.disconnect();
+        delete document.body.dataset.demoActive;
+      }, { once: true });
 
       // Bind direct mobile dispatch stack triggers
       const mobileTriggers = document.querySelectorAll<HTMLElement>('.mobile-transceiver-trigger');
@@ -2052,33 +2043,47 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
             setProject(pIdx);
             launchArena();
           }
-        });
+        }, { signal });
       });
 
-      launchBtn.addEventListener('click', () => launchArena());
-      if (unloadBtn) unloadBtn.addEventListener('click', unloadArena);
-      if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen);
+      launchBtn.addEventListener('click', () => launchArena(), { signal });
+      if (unloadBtn) unloadBtn.addEventListener('click', unloadArena, { signal });
+      if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen, { signal });
 
       unloadTransceiverFn = unloadArena;
 
-      // Initialize indicators and project display
       renderIndicators();
       renderProject(false);
     }
 
     setupTransceiverSimulation();
 
-    // Cloudflare Turnstile Management
-    const pageWrapper = document.querySelector('.roost-page-wrapper') as HTMLElement | null;
-    const resolvedTurnstileSiteKey = pageWrapper?.dataset.turnstileSitekey || '1x00000000000000000000AA';
+    // Cloudflare Turnstile Management (SEC-04)
+    const resolvedTurnstileSiteKey = pageWrapper.dataset.turnstileSitekey || '';
     let desktopTurnstileId: string | null = null;
     let mobileTurnstileId: string | null = null;
 
+    function renderTurnstileUnavailableNotice(slot: HTMLElement | null) {
+      if (!slot || slot.hasChildNodes()) return;
+      const notice = document.createElement('p');
+      notice.className = 'text-xs font-mono text-[var(--parchment)]/80 bg-black/30 border border-[var(--brass)]/30 rounded px-3 py-2 text-center';
+      notice.textContent = 'Anti-bot verification is not configured for this environment. Direct email links remain available.';
+      slot.appendChild(notice);
+    }
+
     function renderTurnstile() {
+      const desktopSlot = document.getElementById('desktop-turnstile-slot');
+      const mobileSlot = document.getElementById('mobile-turnstile-slot');
+
+      if (!resolvedTurnstileSiteKey) {
+        renderTurnstileUnavailableNotice(desktopSlot);
+        renderTurnstileUnavailableNotice(mobileSlot);
+        return;
+      }
+
       if (typeof window === 'undefined' || !(window as any).turnstile) return;
       const turnstile = (window as any).turnstile;
 
-      const desktopSlot = document.getElementById('desktop-turnstile-slot');
       if (desktopSlot && desktopTurnstileId === null && !desktopSlot.hasChildNodes()) {
         try {
           desktopTurnstileId = turnstile.render('#desktop-turnstile-slot', {
@@ -2092,7 +2097,6 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
         }
       }
 
-      const mobileSlot = document.getElementById('mobile-turnstile-slot');
       if (mobileSlot && mobileTurnstileId === null && !mobileSlot.hasChildNodes()) {
         try {
           mobileTurnstileId = turnstile.render('#mobile-turnstile-slot', {
@@ -2108,7 +2112,7 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
     }
 
     if (typeof window !== 'undefined') {
-      if ((window as any).turnstile) {
+      if (!resolvedTurnstileSiteKey || (window as any).turnstile) {
         renderTurnstile();
       } else {
         const turnstilePoller = setInterval(() => {
@@ -2117,11 +2121,15 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
             renderTurnstile();
           }
         }, 200);
-        setTimeout(() => clearInterval(turnstilePoller), 8000);
+        const pollerTimeout = setTimeout(() => clearInterval(turnstilePoller), 8000);
+        signal.addEventListener('abort', () => {
+          clearInterval(turnstilePoller);
+          clearTimeout(pollerTimeout);
+        }, { once: true });
       }
     }
 
-    // Form Handling and Missive Dispatching
+    // Form Handling and Missive Dispatching (UX-02, UX-03)
     const recipientEmail = 'cabahugnhovem@gmail.com';
 
     function handleMissiveSubmission(
@@ -2135,231 +2143,324 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
       const form = document.getElementById(formId) as HTMLFormElement | null;
       if (!form) return;
 
+      const nameInput = document.getElementById(nameId) as HTMLInputElement | null;
       const emailInput = document.getElementById(emailId) as HTMLInputElement | null;
+      const subjectInput = document.getElementById(subjectId) as HTMLInputElement | null;
+      const bodyInput = document.getElementById(bodyId) as HTMLTextAreaElement | null;
+
+      const nameErrorId = `${nameId}-error`;
+      const emailErrorId = `${emailId}-error`;
+      const subjectErrorId = `${subjectId}-error`;
+      const bodyErrorId = `${bodyId}-error`;
+
       const errorContainerId = isDesktop ? 'desktop-raven-error' : 'mobile-raven-error';
+      const statusContainerId = isDesktop ? 'desktop-raven-status' : 'mobile-raven-status';
 
-      // Inline validation: clear error on typing, validate on blur
-      if (emailInput) {
-        emailInput.addEventListener('input', () => {
+      let isSubmitting = false;
+
+      function syncDirtyState() {
+        if (!form) return;
+        const hasContent = Boolean(
+          nameInput?.value.trim() ||
+          emailInput?.value.trim() ||
+          bodyInput?.value.trim()
+        );
+        if (hasContent) {
+          form.dataset.dirty = 'true';
+        } else {
+          delete form.dataset.dirty;
+        }
+      }
+
+      [
+        { input: nameInput, id: nameId, errId: nameErrorId },
+        { input: emailInput, id: emailId, errId: emailErrorId },
+        { input: subjectInput, id: subjectId, errId: subjectErrorId },
+        { input: bodyInput, id: bodyId, errId: bodyErrorId },
+      ].forEach(({ input, id, errId }) => {
+        if (!input) return;
+        input.addEventListener('input', () => {
+          clearFieldError(id, errId);
           clearFormError(errorContainerId);
-        });
+          syncDirtyState();
+        }, { signal });
+      });
 
+      if (emailInput) {
         emailInput.addEventListener('blur', async () => {
           const val = emailInput.value.trim();
           if (val) {
             const check = await validateEmail(val);
             if (!check.valid) {
-              showFormError(errorContainerId, check.reason || 'Please provide a valid permanent email address.');
+              setFieldError(emailId, emailErrorId, check.reason || 'Please provide a valid email address.');
+            } else {
+              clearFieldError(emailId, emailErrorId);
             }
           }
-        });
+        }, { signal });
       }
 
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
+        if (isSubmitting) return;
 
-        // Anti-abuse: honeypot check
-        const honeypotId = isDesktop ? 'desktop-botcheck' : 'mobile-botcheck';
-        const honeypot = document.getElementById(honeypotId) as HTMLInputElement | null;
-        const botcheckValue = honeypot?.checked ? 'filled' : '';
+        clearFormError(errorContainerId);
+        clearFieldError(nameId, nameErrorId);
+        clearFieldError(emailId, emailErrorId);
+        clearFieldError(subjectId, subjectErrorId);
+        clearFieldError(bodyId, bodyErrorId);
 
-        // Anti-abuse: time-to-submit check (< 2.5s = bot)
-        if ((Date.now() - formLoadTime) < 2500) {
-          // Silently accept (fake success) so bots don't retry
+        const rawName = nameInput?.value.trim() || '';
+        const email = emailInput?.value.trim() || '';
+        const rawSubject = subjectInput?.value.trim() || '';
+        const body = bodyInput?.value.trim() || '';
+
+        if (rawName.length > 120) {
+          setFieldError(nameId, nameErrorId, 'Name must be 120 characters or fewer.');
+          nameInput?.focus();
+          return;
+        }
+        if (!email) {
+          setFieldError(emailId, emailErrorId, 'Please enter your return email address.');
+          emailInput?.focus();
+          return;
+        }
+        if (rawSubject.length > 200) {
+          setFieldError(subjectId, subjectErrorId, 'Subject must be 200 characters or fewer.');
+          subjectInput?.focus();
+          return;
+        }
+        if (!body) {
+          setFieldError(bodyId, bodyErrorId, 'Please enter a message before sending.');
+          bodyInput?.focus();
+          return;
+        }
+        if (body.length > 5000) {
+          setFieldError(bodyId, bodyErrorId, 'Message must be 5,000 characters or fewer.');
+          bodyInput?.focus();
           return;
         }
 
-        // Anti-abuse: rate limiting
+        // Anti-abuse: client rate limiting
         const rateCheck = checkRateLimit();
         if (!rateCheck.allowed) {
           showFormError(errorContainerId, rateCheck.reason || 'Rate limit exceeded.');
           return;
         }
 
-        const email = (document.getElementById(emailId) as HTMLInputElement)?.value.trim() || '';
-
-        // Pre-flight email authenticity validation (syntax, burner domains, DNS MX)
-        const emailValidation = await validateEmail(email);
-        if (!emailValidation.valid) {
-          showFormError(errorContainerId, emailValidation.reason || 'Please provide a valid permanent email address.');
-          emailInput?.focus();
-          return;
-        }
-
+        // Synchronous submission lock before first await (UX-02)
+        isSubmitting = true;
         const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement | null;
-        const originalBtnText = submitBtn ? submitBtn.textContent : '';
+        const originalBtnText = submitBtn ? submitBtn.textContent : 'Send Message';
         if (submitBtn) {
           submitBtn.disabled = true;
-          submitBtn.textContent = 'The Raven Takes Wing...';
+          submitBtn.setAttribute('aria-busy', 'true');
+          submitBtn.textContent = 'Checking your message…';
         }
+        setFormStatus(statusContainerId, 'Checking email and anti-bot verification…');
 
-        const name = (document.getElementById(nameId) as HTMLInputElement)?.value.trim() || 'Traveler';
-        const subject = (document.getElementById(subjectId) as HTMLInputElement)?.value.trim() || 'Tavern Dispatch';
-        const body = (document.getElementById(bodyId) as HTMLTextAreaElement)?.value.trim() || '';
-
-        // Anti-abuse: Cloudflare Turnstile token
-        let turnstileToken = '';
-        if (typeof window !== 'undefined' && (window as any).turnstile) {
-          const widgetId = isDesktop ? desktopTurnstileId : mobileTurnstileId;
-          if (widgetId !== null) {
-            turnstileToken = (window as any).turnstile.getResponse(widgetId) || '';
-          }
-        }
-        if (!turnstileToken) {
-          const tokenInput = form.querySelector('[name="cf-turnstile-response"]') as HTMLInputElement | null;
-          if (tokenInput) turnstileToken = tokenInput.value;
-        }
-
-        if (!turnstileToken && typeof window !== 'undefined' && (window as any).turnstile) {
-          const widgetId = isDesktop ? desktopTurnstileId : mobileTurnstileId;
-          if (widgetId !== null) {
-            showFormError(errorContainerId, 'Security challenge is verifying. Please verify the anti-bot box or wait a moment.');
+        try {
+          // Pre-flight email authenticity validation (syntax, disposable domains, DNS MX)
+          const emailValidation = await validateEmail(email);
+          if (!emailValidation.valid) {
+            const msg = emailValidation.reason || 'Please provide a valid email address.';
+            setFieldError(emailId, emailErrorId, msg);
+            showFormError(errorContainerId, msg);
+            setFormStatus(statusContainerId, '');
             if (submitBtn) {
               submitBtn.disabled = false;
               submitBtn.textContent = originalBtnText;
             }
+            emailInput?.focus();
             return;
           }
-        }
 
-        const fullFormattedBody = `Sender: ${name}\nReturn Address: ${email}\n\n--------------------------------------------------\n${body}\n--------------------------------------------------\n(Dispatched via Ibem's Tavern Messenger Roost)`;
+          // Anti-abuse: honeypot check
+          const honeypotId = isDesktop ? 'desktop-botcheck' : 'mobile-botcheck';
+          const honeypot = document.getElementById(honeypotId) as HTMLInputElement | null;
+          const botcheckValue = honeypot?.checked ? 'filled' : '';
 
-        const result = await sendMissive({
-          name,
-          email,
-          subject,
-          message: body,
-          botcheck: botcheckValue,
-          turnstileToken,
-        });
-
-        // Reset Turnstile challenge token after submission attempt
-        if (typeof window !== 'undefined' && (window as any).turnstile) {
-          const widgetId = isDesktop ? desktopTurnstileId : mobileTurnstileId;
-          if (widgetId !== null) {
-            try {
-              (window as any).turnstile.reset(widgetId);
-            } catch {}
+          // Anti-abuse: Cloudflare Turnstile token
+          let turnstileToken = '';
+          if (typeof window !== 'undefined' && (window as any).turnstile) {
+            const widgetId = isDesktop ? desktopTurnstileId : mobileTurnstileId;
+            if (widgetId !== null) {
+              turnstileToken = (window as any).turnstile.getResponse(widgetId) || '';
+            }
           }
-        }
+          if (!turnstileToken) {
+            const tokenInput = form.querySelector('[name="cf-turnstile-response"]') as HTMLInputElement | null;
+            if (tokenInput) turnstileToken = tokenInput.value;
+          }
 
-        // If email failed backend validation, restore submit button and show error
-        if (result.isValidationError) {
+          if (!turnstileToken && resolvedTurnstileSiteKey && typeof window !== 'undefined' && (window as any).turnstile) {
+            const widgetId = isDesktop ? desktopTurnstileId : mobileTurnstileId;
+            if (widgetId !== null) {
+              showFormError(errorContainerId, 'Security challenge is still verifying. Please complete the anti-bot check and try again.');
+              setFormStatus(statusContainerId, '');
+              if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+              }
+              return;
+            }
+          }
+
+          const name = rawName || 'Traveler';
+          const subject = rawSubject || 'Tavern Dispatch';
+          const fullFormattedBody = `Sender: ${name}\nReturn Address: ${email}\n\n--------------------------------------------------\n${body}\n--------------------------------------------------\n(Dispatched via Ibem's Tavern Messenger Roost)`;
+
           if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalBtnText;
+            submitBtn.textContent = 'Sending Message…';
           }
-          showFormError(errorContainerId, result.message || 'Please provide a valid permanent email address.');
-          emailInput?.focus();
-          return;
-        }
+          setFormStatus(statusContainerId, 'Sending your message…');
 
-        // Record successful send for rate limiting
-        if (result.success) {
-          recordSendSuccess();
-        }
+          const result = await sendMissive({
+            name,
+            email,
+            subject,
+            message: body,
+            botcheck: botcheckValue,
+            turnstileToken,
+          });
 
-        // 2. If on desktop modal, show the receipt view
-        if (isDesktop) {
-          const composerView = document.getElementById('raven-composer-view');
-          const receiptView = document.getElementById('raven-receipt-view');
-          const receiptHeading = document.getElementById('receipt-heading');
-          const receiptDesc = document.getElementById('receipt-desc');
-          const receiptSubject = document.getElementById('receipt-subject');
-          const receiptFrom = document.getElementById('receipt-from');
-          const receiptBody = document.getElementById('receipt-body');
-          const receiptGmailLink = document.getElementById('receipt-gmail-link') as HTMLAnchorElement | null;
-
-          if (composerView && receiptView) {
-            recordMilestone('feat_raven_missive');
-            composerView.classList.add('hidden');
-            receiptView.classList.remove('hidden');
-
-            const receiptMailtoLink = document.getElementById('receipt-mailto-link') as HTMLAnchorElement | null;
-            if (receiptMailtoLink && result.fallbackMailto) {
-              receiptMailtoLink.href = result.fallbackMailto;
+          // Reset Turnstile challenge token after submission attempt
+          if (typeof window !== 'undefined' && (window as any).turnstile) {
+            const widgetId = isDesktop ? desktopTurnstileId : mobileTurnstileId;
+            if (widgetId !== null) {
+              try {
+                (window as any).turnstile.reset(widgetId);
+              } catch {}
             }
+          }
 
-            if (result.success) {
-              if (receiptHeading) receiptHeading.textContent = 'Missive Delivered to Nhovem!';
-              if (receiptDesc) {
-                receiptDesc.textContent = 'The raven has successfully delivered your words directly to Nhovem’s console at cabahugnhovem@gmail.com. A copy of your sealed message is inscribed below for your records:';
+          // If backend validation failed, restore submit button and show persistent error
+          if (result.isValidationError) {
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.textContent = originalBtnText;
+            }
+            setFormStatus(statusContainerId, '');
+            const errMsg = result.message || 'Please check your form entries and try again.';
+            showFormError(errorContainerId, errMsg);
+            if (/email/i.test(errMsg)) {
+              setFieldError(emailId, emailErrorId, errMsg);
+              emailInput?.focus();
+            } else if (/message/i.test(errMsg)) {
+              setFieldError(bodyId, bodyErrorId, errMsg);
+              bodyInput?.focus();
+            }
+            return;
+          }
+
+          if (result.success) {
+            delete form.dataset.dirty;
+            recordSendSuccess();
+            setFormStatus(statusContainerId, 'Message delivered.');
+          } else {
+            setFormStatus(statusContainerId, '');
+          }
+
+          if (isDesktop) {
+            const composerView = document.getElementById('raven-composer-view');
+            const receiptView = document.getElementById('raven-receipt-view');
+            const receiptHeading = document.getElementById('receipt-heading');
+            const receiptDesc = document.getElementById('receipt-desc');
+            const receiptSubject = document.getElementById('receipt-subject');
+            const receiptFrom = document.getElementById('receipt-from');
+            const receiptBody = document.getElementById('receipt-body');
+            const receiptGmailLink = document.getElementById('receipt-gmail-link') as HTMLAnchorElement | null;
+
+            if (composerView && receiptView) {
+              recordMilestone('feat_raven_missive');
+              composerView.classList.add('hidden');
+              receiptView.classList.remove('hidden');
+
+              const receiptMailtoLink = document.getElementById('receipt-mailto-link') as HTMLAnchorElement | null;
+              if (receiptMailtoLink && result.fallbackMailto) {
+                receiptMailtoLink.href = result.fallbackMailto;
               }
-              if (receiptGmailLink) receiptGmailLink.classList.add('hidden');
-              if (receiptMailtoLink) receiptMailtoLink.classList.add('hidden');
-            } else {
-              if (receiptHeading) receiptHeading.textContent = 'The Raven Awaits Your Signal';
-              if (receiptDesc) {
-                receiptDesc.textContent = result.message || 'We could not dispatch automatically. You may copy your inscribed message below or launch your email client:';
-              }
-              if (receiptGmailLink) receiptGmailLink.classList.remove('hidden');
-              if (receiptMailtoLink) receiptMailtoLink.classList.remove('hidden');
-              // NOTE: Never automatically hijack or redirect window.location!
-            }
 
-            if (receiptSubject) receiptSubject.textContent = subject;
-            if (receiptFrom) receiptFrom.textContent = `${name} <${email}>`;
-            if (receiptBody) receiptBody.textContent = body;
-
-            if (receiptGmailLink && result.fallbackGmailUrl) {
-              receiptGmailLink.href = result.fallbackGmailUrl;
-            }
-
-            // Setup copy formatted missive button
-            const receiptCopyBtn = document.getElementById('receipt-copy-btn');
-            if (receiptCopyBtn) {
-              receiptCopyBtn.onclick = async () => {
-                try {
-                  await navigator.clipboard.writeText(fullFormattedBody);
-                } catch {
-                  const textarea = document.createElement('textarea');
-                  textarea.value = fullFormattedBody;
-                  document.body.appendChild(textarea);
-                  textarea.select();
-                  document.execCommand('copy');
-                  document.body.removeChild(textarea);
+              if (result.success) {
+                if (receiptHeading) receiptHeading.textContent = 'Missive Delivered to Nhovem!';
+                if (receiptDesc) {
+                  receiptDesc.textContent = 'The raven has delivered your message to Nhovem at cabahugnhovem@gmail.com. A copy of your message is shown below for your records:';
                 }
-                const oldText = receiptCopyBtn.textContent;
-                receiptCopyBtn.textContent = 'Copied to Clipboard!';
-                setTimeout(() => {
-                  receiptCopyBtn.textContent = oldText;
-                }, 2500);
-              };
-            }
+                if (receiptGmailLink) receiptGmailLink.classList.add('hidden');
+                if (receiptMailtoLink) receiptMailtoLink.classList.add('hidden');
+              } else {
+                if (receiptHeading) receiptHeading.textContent = 'Direct Email Fallback Ready';
+                if (receiptDesc) {
+                  receiptDesc.textContent = result.message || 'We could not dispatch automatically. You may copy your message below or open your email client:';
+                }
+                if (receiptGmailLink) receiptGmailLink.classList.remove('hidden');
+                if (receiptMailtoLink) receiptMailtoLink.classList.remove('hidden');
+              }
 
-            // Reset button
-            const resetBtn = document.getElementById('receipt-reset-btn');
-            if (resetBtn) {
-              resetBtn.onclick = () => {
-                receiptView.classList.add('hidden');
-                composerView.classList.remove('hidden');
-                form.reset();
-                if (typeof window !== 'undefined' && (window as any).turnstile && desktopTurnstileId !== null) {
+              if (receiptSubject) receiptSubject.textContent = subject;
+              if (receiptFrom) receiptFrom.textContent = `${name} <${email}>`;
+              if (receiptBody) receiptBody.textContent = body;
+
+              if (receiptGmailLink && result.fallbackGmailUrl) {
+                receiptGmailLink.href = result.fallbackGmailUrl;
+              }
+
+              const receiptCopyBtn = document.getElementById('receipt-copy-btn');
+              if (receiptCopyBtn) {
+                receiptCopyBtn.onclick = async () => {
                   try {
-                    (window as any).turnstile.reset(desktopTurnstileId);
-                  } catch {}
-                }
-                if (submitBtn) {
-                  submitBtn.disabled = false;
-                  submitBtn.textContent = originalBtnText;
-                }
-              };
-            }
-          }
-        } else {
-          // Mobile form fallback
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = result.success ? '✓ Missive Delivered!' : originalBtnText;
-            if (!result.success) {
-              showFormError(errorContainerId, result.message || 'Transmission encountered an upstream delay. You can copy your message or use your mail app.');
-            }
-            // NOTE: Never automatically hijack or redirect window.location!
-          }
-        }
-      });
-    }
+                    await navigator.clipboard.writeText(fullFormattedBody);
+                  } catch {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = fullFormattedBody;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                  }
+                  const oldText = receiptCopyBtn.textContent;
+                  receiptCopyBtn.textContent = 'Copied to Clipboard!';
+                  setTimeout(() => {
+                    receiptCopyBtn.textContent = oldText;
+                  }, 2500);
+                };
+              }
 
+              const resetBtn = document.getElementById('receipt-reset-btn');
+              if (resetBtn) {
+                resetBtn.onclick = () => {
+                  receiptView.classList.add('hidden');
+                  composerView.classList.remove('hidden');
+                  form.reset();
+                  delete form.dataset.dirty;
+                  setFormStatus(statusContainerId, '');
+                  if (typeof window !== 'undefined' && (window as any).turnstile && desktopTurnstileId !== null) {
+                    try {
+                      (window as any).turnstile.reset(desktopTurnstileId);
+                    } catch {}
+                  }
+                  if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalBtnText;
+                  }
+                };
+              }
+            }
+          } else {
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.textContent = result.success ? '✓ Message Sent!' : originalBtnText;
+              if (!result.success) {
+                showFormError(errorContainerId, result.message || 'Automatic delivery was unavailable. You can copy your message or use the direct email buttons above.');
+              }
+            }
+          }
+        } finally {
+          isSubmitting = false;
+          submitBtn?.removeAttribute('aria-busy');
+        }
+      }, { signal });
+    }
 
     handleMissiveSubmission(
       'desktop-raven-form',
@@ -2403,9 +2504,13 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x0000000
           mobileStatus.classList.add('hidden');
           mobileCopyBtn.textContent = 'Copy Address';
         }, 2500);
-      });
+      }, { signal });
     }
   }
 
   document.addEventListener('astro:page-load', initMessengerPage);
+  document.addEventListener('astro:before-swap', () => {
+    messengerAbort?.abort();
+    messengerAbort = null;
+  });
 </script>

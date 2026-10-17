@@ -1,14 +1,15 @@
 ---
-import ThematicIcon from './icons/ThematicIcon.astro';
+import QuestDemoShell, { type QuestDemoViewConfig } from './QuestDemoShell.astro';
+import { demoUrl } from '../lib/bits-demo-url';
 
 interface Props {
   liveUrl: string;
   title: string;
   slug?: string;
+  instanceId?: string;
   scalingMode?: 'fit-canvas' | 'responsive';
   description?: string;
   hint?: string;
-  badges?: string[];
   launchLabel?: string;
 }
 
@@ -16,395 +17,50 @@ const {
   liveUrl,
   title,
   slug = 'arcanetyper',
+  instanceId = slug,
   scalingMode = 'fit-canvas',
-  description = slug === 'bits'
-    ? 'BITS is an enterprise attendance and timekeeping platform deployed live on Vercel (samananias/bits fork). Launch an interactive trial directly inside this dossier to test the responsive web portal, or open it in a standalone window.'
-    : 'Arcane Typer operates with a self-contained 60 FPS HTML5 Canvas engine and dynamic Web Audio synthesis. Launch an interactive trial directly inside this dossier, or explore it in a standalone window.',
-  hint = slug === 'bits'
-    ? '⚡ Live Next.js Web Portal · Multi-Role Attendance Platform · Deployed on Vercel'
-    : '⌨ Desktop physical keyboard recommended for typing trials · Zero tracking · Zero data exfiltration',
-  badges = slug === 'bits'
-    ? ['Live Vercel Deployment', 'Next.js & TypeScript', 'Role-Scoped Portals']
-    : ['60 FPS HTML5 Canvas', 'Web Audio API', 'Zero-Asset Engine'],
-  launchLabel = slug === 'bits' ? 'Engage Live BITS Platform' : 'Ignite Live Demo Arena',
+  description = 'Launch an interactive typing trial directly inside this project dossier, or open the standalone application in a new browser tab.',
+  hint = 'Physical keyboard recommended for typing trials; landscape orientation is optional on smaller screens.',
+  launchLabel = 'Launch demo',
 } = Astro.props;
+
+const projectName = slug === 'arcanetyper' ? 'ArcaneTyper' : title.split('—')[0].trim() || 'Live Project';
+const validatedUrl = demoUrl(liveUrl, import.meta.env.DEV);
+
+const views: QuestDemoViewConfig[] = [
+  {
+    key: 'game',
+    label: `${projectName} Arena`,
+    url: validatedUrl,
+    iframeTitle: `${projectName} interactive live demo`,
+    displayMode: scalingMode,
+    canvasWidth: 1000,
+    canvasHeight: 600,
+    sandbox: 'allow-scripts allow-same-origin allow-popups allow-forms',
+    allow: 'autoplay; fullscreen',
+    referrerPolicy: 'strict-origin-when-cross-origin',
+    reloadLabel: 'Reload view',
+    loadingStatus: 'Loading external view. Connection and application state are not yet verified.',
+    loadedStatus:
+      'External view requested. If the game is blank or unresponsive, reload view or open it in a new tab.',
+    unavailableStatus:
+      'This view is not configured for this deployment. Use the standalone project link when available.',
+  },
+];
 ---
 
-<section
-  id="interactive-arena-section"
-  data-slug={slug}
-  data-scaling-mode={scalingMode}
-  class="my-6 sm:my-8 rounded-lg border-2 border-[var(--brass)] bg-[#1e1208] text-[var(--parchment)] shadow-2xl overflow-hidden transition-all duration-300"
-  aria-label="Interactive Playable Demo Arena"
->
-  <!-- Top Chamber Bar -->
-  <div class="px-3.5 py-2.5 sm:px-4 sm:py-3 bg-[var(--wood-deep)] border-b border-[var(--brass)]/60 flex flex-wrap items-center justify-between gap-2.5 shrink-0">
-    <div class="flex items-center gap-2 sm:gap-2.5 min-w-0">
-      <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-black/50 border border-[var(--brass)]/60 flex items-center justify-center shrink-0">
-        <ThematicIcon name={slug === 'bits' ? 'code' : 'swords'} class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[var(--candle)]" />
-      </div>
-      <div class="min-w-0">
-        <span class="text-[9px] sm:text-[10px] uppercase font-mono tracking-widest text-[var(--ember)] block font-bold truncate">
-          {slug === 'bits' ? 'Live Telemetry Trial' : 'Opt-In Enchanted Trial'}
-        </span>
-        <h3 class="text-xs sm:text-base font-bold text-[var(--candle)] font-serif leading-none truncate">
-          Live Interactive Arena — {title.split('—')[0].trim()}
-        </h3>
-      </div>
-    </div>
-
-    <!-- Active State Controls (hidden in resting state) -->
-    <div id="arena-active-controls" class="hidden items-center gap-1.5 sm:gap-2 ml-auto">
-      <span class="inline-flex items-center gap-1 sm:gap-1.5 px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/60 text-emerald-400 font-mono text-[10px] sm:text-[11px] font-bold">
-        <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true"></span>
-        <span>{slug === 'bits' ? 'Platform Active' : 'Canvas Active'}</span>
-      </span>
-
-      <button
-        type="button"
-        id="arena-fullscreen-btn"
-        class="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded bg-[var(--wood-deep)] border border-[var(--brass)] text-[var(--candle)] font-mono text-xs hover:bg-black transition-colors cursor-pointer min-h-[34px] sm:min-h-[36px]"
-        title="Toggle Fullscreen"
-      >
-        <span id="arena-fs-icon">⛶</span>
-        <span id="arena-fs-text" class="hidden sm:inline">Fullscreen</span>
-      </button>
-
-      <button
-        type="button"
-        id="arena-unload-btn"
-        class="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded bg-red-950/70 border border-red-500/50 text-red-200 font-bold text-xs hover:bg-red-900 transition-colors cursor-pointer min-h-[34px] sm:min-h-[36px]"
-        title="Unload demo and free memory"
-      >
-        <span>✕</span>
-        <span>Close</span>
-      </button>
-    </div>
-
-    <!-- Fail-Safe Emergency Exit Button (Pure CSS :fullscreen activation - ALWAYS visible in fullscreen) -->
-    <button
-      type="button"
-      id="arena-fullscreen-exit-pill"
-      class="arena-fs-exit-pill hidden items-center gap-1.5 px-3 py-1.5 rounded-md bg-amber-950/90 border-2 border-amber-400 text-amber-200 font-mono text-xs font-bold hover:bg-amber-900 transition-colors shadow-2xl cursor-pointer min-h-[34px] ml-auto"
-      title="Exit Fullscreen Mode"
-      aria-label="Exit Fullscreen Mode"
-    >
-      <span aria-hidden="true">⤓</span>
-      <span>Exit Fullscreen</span>
-    </button>
-  </div>
-
-  <!-- Resting State Preview Card -->
-  <div id="arena-resting-view" class="p-4 sm:p-8 text-center space-y-4 bg-gradient-to-b from-[#1e1208] to-[#120a04]">
-    <div class="max-w-xl mx-auto space-y-2">
-      <p class="text-xs sm:text-sm text-[var(--parchment)]/85 leading-relaxed">
-        {description}
-      </p>
-      <div class="flex flex-wrap justify-center gap-1.5 pt-1">
-        {badges.map((badge) => (
-          <span class="px-2 py-0.5 rounded bg-black/60 border border-[var(--brass)]/40 text-[10px] font-mono text-[var(--candle)]">
-            {badge}
-          </span>
-        ))}
-      </div>
-      <p class="text-[11px] font-mono text-[var(--candle)]/70 pt-1">
-        {hint}
-      </p>
-    </div>
-
-    <!-- Mobile Portrait Orientation Notice (Only for fixed-ratio canvas games like Arcane Typer) -->
-    {scalingMode === 'fit-canvas' && (
-      <div
-        id="arena-portrait-notice"
-        class="arena-portrait-notice hidden flex-col items-center gap-2 p-3.5 rounded-lg bg-[var(--wood-deep)]/90 border border-[var(--brass)]/60 text-center max-w-md mx-auto shadow-md"
-      >
-        <div class="flex items-center gap-2 text-[var(--candle)] font-serif font-bold text-xs sm:text-sm">
-          <span class="text-lg" aria-hidden="true">📱↻</span>
-          <span>Rotate to Landscape for Best Arena Experience</span>
-        </div>
-        <p class="text-[11px] text-[var(--parchment)]/80 leading-relaxed font-mono">
-          Arcane Typer's spell combat canvas is optimized for landscape orientation. Rotate your device for the full 1000×600 view, or launch below in auto-adapted view.
-        </p>
-      </div>
-    )}
-
-    <div class="flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3 pt-2 max-w-md mx-auto">
-      <button
-        type="button"
-        id="arena-launch-btn"
-        data-url={liveUrl}
-        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 min-h-[44px] px-6 py-2.5 rounded-md bg-[var(--brass)] text-black font-bold text-sm hover:bg-[var(--candle)] transition-all shadow-lg hover:shadow-[0_0_15px_rgba(218,165,32,0.4)] cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
-      >
-        <ThematicIcon name="play" class="w-4 h-4 text-black" />
-        <span>{launchLabel}</span>
-      </button>
-
-      <a
-        href={liveUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 min-h-[44px] px-5 py-2.5 rounded-md border-2 border-[var(--brass)] text-[var(--candle)] font-bold text-sm hover:bg-[var(--wood-deep)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
-      >
-        <span>Launch in New Window</span>
-        <ThematicIcon name="external" class="w-3.5 h-3.5 text-[var(--candle)]" />
-      </a>
-    </div>
-  </div>
-
-  <!-- Active State Iframe Container -->
-  <div
-    id="arena-frame-container"
-    class={`relative w-full bg-black hidden overflow-hidden ${
-      scalingMode === 'responsive'
-        ? 'min-h-[480px] h-[72vh] max-h-[760px] sm:h-[680px]'
-        : 'aspect-video min-h-[280px] sm:min-h-[480px] lg:min-h-[580px]'
-    }`}
-    style={scalingMode === 'responsive' ? '-webkit-overflow-scrolling: touch;' : undefined}
-  >
-    <!-- Iframe inserted dynamically on click to ensure 0 KB initial payload -->
-  </div>
-
-  <!-- Mobile Portrait Active Orientation Hint (Only for fit-canvas) -->
-  {scalingMode === 'fit-canvas' && (
-    <div
-      id="arena-active-portrait-hint"
-      class="hidden items-center justify-center gap-2 py-2 px-3 bg-[var(--wood-deep)] border-t border-[var(--brass)]/50 text-center text-[11px] text-[var(--candle)] font-mono"
-    >
-      <span>📱</span>
-      <span>Rotate device to landscape for full-scale typing arena</span>
-    </div>
-  )}
-</section>
-
-<style>
-  @media (max-width: 640px) and (orientation: portrait) {
-    .arena-portrait-notice {
-      display: flex !important;
-    }
-  }
-
-  /* Fullscreen Expansion for Interactive Embed Arena */
-  #interactive-arena-section:fullscreen {
-    width: 100vw !important;
-    max-width: 100vw !important;
-    height: 100vh !important;
-    max-height: 100vh !important;
-    border-radius: 0 !important;
-    border: none !important;
-    margin: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    background: #000 !important;
-    z-index: 9999 !important;
-  }
-
-  #interactive-arena-section:fullscreen #arena-frame-container {
-    flex: 1 1 0% !important;
-    height: 100% !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    aspect-ratio: auto !important;
-  }
-
-  /* Fullscreen Emergency Exit Pill Visibility */
-  #interactive-arena-section:not(:fullscreen) .arena-fs-exit-pill {
-    display: none !important;
-  }
-  #interactive-arena-section:fullscreen .arena-fs-exit-pill {
-    display: inline-flex !important;
-  }
-</style>
-
-<script>
-  function initInteractiveArena() {
-    const launchBtn = document.getElementById('arena-launch-btn');
-    const unloadBtn = document.getElementById('arena-unload-btn');
-    const fullscreenBtn = document.getElementById('arena-fullscreen-btn');
-    const restingView = document.getElementById('arena-resting-view');
-    const activeControls = document.getElementById('arena-active-controls');
-    const frameContainer = document.getElementById('arena-frame-container');
-    const arenaSection = document.getElementById('interactive-arena-section');
-    const portraitNotice = document.getElementById('arena-portrait-notice');
-    const activePortraitHint = document.getElementById('arena-active-portrait-hint');
-
-    if (!launchBtn || !restingView || !activeControls || !frameContainer || !arenaSection) return;
-    if (arenaSection.dataset.arenaInit === 'true') return;
-    arenaSection.dataset.arenaInit = 'true';
-
-    const liveUrl = launchBtn.getAttribute('data-url');
-    if (!liveUrl) return;
-
-    const slug = arenaSection.dataset.slug || 'arcanetyper';
-    const scalingMode = arenaSection.dataset.scalingMode || 'fit-canvas';
-    const safeFrameContainer = frameContainer;
-    const safeRestingView = restingView;
-    const safeActiveControls = activeControls;
-    const safeArenaSection = arenaSection;
-
-    function checkOrientation() {
-      if (scalingMode !== 'fit-canvas' || slug !== 'arcanetyper') return;
-      const isPortraitMobile =
-        (window.matchMedia('(orientation: portrait)').matches || window.innerHeight > window.innerWidth) &&
-        window.innerWidth <= 640;
-
-      if (portraitNotice) {
-        if (isPortraitMobile) {
-          portraitNotice.classList.remove('hidden');
-          portraitNotice.classList.add('flex');
-        } else {
-          portraitNotice.classList.add('hidden');
-          portraitNotice.classList.remove('flex');
-        }
-      }
-
-      if (activePortraitHint && !safeFrameContainer.classList.contains('hidden')) {
-        if (isPortraitMobile) {
-          activePortraitHint.classList.remove('hidden');
-          activePortraitHint.classList.add('flex');
-        } else {
-          activePortraitHint.classList.add('hidden');
-          activePortraitHint.classList.remove('flex');
-        }
-      }
-    }
-
-    function fitArena() {
-      const iframe = safeFrameContainer.querySelector('iframe');
-      if (!iframe) return;
-
-      if (scalingMode === 'responsive') {
-        iframe.style.width = '100%';
-        iframe.style.height = '100%';
-        iframe.style.position = 'relative';
-        iframe.style.left = 'auto';
-        iframe.style.top = 'auto';
-        iframe.style.transform = 'none';
-        iframe.style.transformOrigin = 'initial';
-        iframe.style.display = 'block';
-        return;
-      }
-
-      const cw = safeFrameContainer.clientWidth;
-      const ch = safeFrameContainer.clientHeight;
-      if (!cw || !ch) return;
-
-      // Native resolution per simulation
-      const baseW = slug === 'bits' ? 1100 : 1000;
-      const baseH = slug === 'bits' ? 640 : 600;
-
-      const scale = Math.min(cw / baseW, ch / baseH);
-      iframe.style.width = `${baseW}px`;
-      iframe.style.height = `${baseH}px`;
-      iframe.style.position = 'absolute';
-      iframe.style.left = '50%';
-      iframe.style.top = '50%';
-      iframe.style.transform = `translate(-50%, -50%) scale(${scale})`;
-      iframe.style.transformOrigin = 'center center';
-
-      checkOrientation();
-    }
-
-    function launchArena() {
-      // Create sandboxed iframe dynamically
-      const iframe = document.createElement('iframe');
-      iframe.src = liveUrl!;
-      iframe.title = 'Interactive Live Demo';
-      iframe.className = 'border-0 absolute inset-0 w-full h-full';
-      iframe.setAttribute('allow', 'autoplay; fullscreen');
-      iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-forms');
-      iframe.setAttribute('scrolling', scalingMode === 'responsive' ? 'auto' : 'no');
-      iframe.loading = 'eager';
-
-      safeFrameContainer.innerHTML = '';
-      safeFrameContainer.appendChild(iframe);
-
-      safeRestingView.classList.add('hidden');
-      safeActiveControls.classList.remove('hidden');
-      safeActiveControls.classList.add('flex');
-      safeFrameContainer.classList.remove('hidden');
-
-      fitArena();
-      iframe.addEventListener('load', fitArena);
-
-      // Scroll smoothly into view if needed
-      safeArenaSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-
-    function unloadArena() {
-      // 1. Immediately exit browser fullscreen if active, preventing trapped view
-      if (document.fullscreenElement) {
-        document.exitFullscreen().catch(() => {});
-      }
-      safeFrameContainer.innerHTML = '';
-      safeFrameContainer.classList.add('hidden');
-      if (activePortraitHint) {
-        activePortraitHint.classList.add('hidden');
-        activePortraitHint.classList.remove('flex');
-      }
-      safeActiveControls.classList.add('hidden');
-      safeActiveControls.classList.remove('flex');
-      safeRestingView.classList.remove('hidden');
-      checkOrientation();
-    }
-
-    function toggleFullscreen() {
-      if (!document.fullscreenElement) {
-        if (safeArenaSection.requestFullscreen) {
-          safeArenaSection.requestFullscreen().catch(() => {});
-        }
-      } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen().catch(() => {});
-        }
-      }
-    }
-
-    function updateFullscreenState() {
-      const isFs = Boolean(
-        document.fullscreenElement &&
-        (document.fullscreenElement === safeArenaSection || safeArenaSection.contains(document.fullscreenElement))
-      );
-      const icon = document.getElementById('arena-fs-icon');
-      const text = document.getElementById('arena-fs-text');
-      if (fullscreenBtn) {
-        if (isFs) {
-          fullscreenBtn.title = 'Exit Fullscreen Mode (Esc)';
-          if (icon) icon.textContent = '⤓';
-          if (text) text.textContent = 'Exit Fullscreen';
-        } else {
-          fullscreenBtn.title = 'Toggle Fullscreen Mode';
-          if (icon) icon.textContent = '⛶';
-          if (text) text.textContent = 'Fullscreen';
-        }
-      }
-      fitArena();
-    }
-
-    const fsEmergencyExitBtn = document.getElementById('arena-fullscreen-exit-pill');
-    if (fsEmergencyExitBtn) {
-      fsEmergencyExitBtn.addEventListener('click', () => {
-        if (document.fullscreenElement) {
-          document.exitFullscreen().catch(() => {});
-        }
-      });
-    }
-
-    launchBtn.addEventListener('click', launchArena);
-    if (unloadBtn) unloadBtn.addEventListener('click', unloadArena);
-    if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen);
-
-    window.addEventListener('resize', fitArena);
-    window.addEventListener('orientationchange', fitArena);
-    document.addEventListener('fullscreenchange', updateFullscreenState);
-    document.addEventListener('webkitfullscreenchange', updateFullscreenState);
-
-    checkOrientation();
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initInteractiveArena);
-  } else {
-    initInteractiveArena();
-  }
-  document.addEventListener('astro:page-load', initInteractiveArena);
-</script>
+<QuestDemoShell
+  instanceId={instanceId}
+  projectName={projectName}
+  ariaLabel={`${projectName} interactive live demo`}
+  icon={slug === 'bits' ? 'code' : 'swords'}
+  intro={description}
+  hint={hint}
+  launchLabel={launchLabel}
+  showPortraitGuidance={scalingMode === 'fit-canvas'}
+  views={views}
+  hostTag="quest-demo-shell"
+  hostDataset={{
+    'data-game-url': validatedUrl,
+  }}
+/>

@@ -1,0 +1,1104 @@
+---
+import ThematicIcon from './icons/ThematicIcon.astro';
+
+export interface QuestDemoViewConfig {
+  key: string;
+  label: string;
+  url: string | null;
+  iframeTitle: string;
+  displayMode: 'fit-canvas' | 'responsive';
+  canvasWidth?: number;
+  canvasHeight?: number;
+  sandbox: string;
+  allow?: string;
+  referrerPolicy?: ReferrerPolicy;
+  reloadLabel?: string;
+  loadingStatus?: string;
+  loadedStatus?: string;
+  unavailableStatus?: string;
+  slowStatus?: string;
+  footnote?: string;
+}
+
+interface Props {
+  instanceId: string;
+  projectName: string;
+  ariaLabel: string;
+  icon?: 'swords' | 'code' | 'play';
+  intro: string;
+  hint: string;
+  secondaryNote?: string;
+  launchLabel?: string;
+  popoutLabel?: string;
+  activeNotice?: string;
+  showPortraitGuidance?: boolean;
+  views: QuestDemoViewConfig[];
+  hostTag?: 'quest-demo-shell' | 'bits-live-demo';
+  hostDataset?: Record<string, string | null | undefined>;
+}
+
+const {
+  instanceId,
+  projectName,
+  ariaLabel,
+  icon = 'play',
+  intro,
+  hint,
+  secondaryNote,
+  launchLabel = 'Launch demo',
+  popoutLabel = 'Open in new tab \u2197\uFE0E',
+  activeNotice,
+  showPortraitGuidance = false,
+  views,
+  hostTag = 'quest-demo-shell',
+  hostDataset = {},
+} = Astro.props;
+
+const primaryView = views[0];
+const primaryUrl = primaryView?.url ?? null;
+const hasTabs = views.length > 1;
+const serializedViews = JSON.stringify(views);
+
+const cleanHostDataset = Object.fromEntries(
+  Object.entries(hostDataset).filter(([, val]) => val !== undefined && val !== null && val !== '')
+);
+
+const HostTag = hostTag;
+---
+
+<HostTag
+  class="quest-demo-shell-host"
+  data-quest-demo-shell
+  data-instance-id={instanceId}
+  data-views={serializedViews}
+  {...cleanHostDataset}
+>
+  <section
+    id={`demo-shell-${instanceId}`}
+    data-shell-section
+    aria-label={ariaLabel}
+    class="quest-demo-shell"
+  >
+    <!-- Shared Header Bar -->
+    <header class="shell-header">
+      <div class="shell-title-group">
+        <div class="shell-icon-box" aria-hidden="true">
+          <ThematicIcon name={icon} class="w-4 h-4 text-[var(--candle)]" />
+        </div>
+        <h2 class="shell-heading">Live Demo — {projectName}</h2>
+      </div>
+
+      <!-- Shared Active Controls (visible only when demo is launched) -->
+      <div class="shell-active-actions" data-active-controls hidden>
+        <a
+          data-popout
+          href={primaryUrl ?? undefined}
+           hidden={!primaryUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="shell-btn shell-btn-secondary"
+        >
+          {popoutLabel}
+        </a>
+        <button
+          type="button"
+          data-fullscreen
+          class="shell-btn shell-btn-secondary"
+        >
+          Fullscreen
+        </button>
+        <button
+          type="button"
+          data-close
+          class="shell-btn shell-btn-close"
+        >
+          Close demo
+        </button>
+      </div>
+    </header>
+
+    <!-- Resting Preview State -->
+    <div class="shell-resting" data-resting>
+      <div class="shell-resting-copy">
+        <p class="shell-intro">{intro}</p>
+        <p class="shell-hint">{hint}</p>
+        {secondaryNote && <p class="shell-secondary-note">{secondaryNote}</p>}
+        {!primaryUrl && (
+          <p class="shell-unavailable-banner" data-resting-unavailable role="status">
+            ⚠ This live demo URL is not configured or is unavailable in this environment.
+          </p>
+        )}
+      </div>
+
+      {showPortraitGuidance && (
+        <div class="shell-portrait-notice" data-portrait-notice hidden>
+          <p class="shell-portrait-title">
+            <span aria-hidden="true">📱↻</span>
+            <span>Landscape orientation recommended on small screens</span>
+          </p>
+          <p class="shell-portrait-body">
+            {projectName} uses a fixed 1000×600 canvas. Rotate your device for a larger view, or launch here in scaled mode.
+          </p>
+        </div>
+      )}
+
+      <div class="shell-resting-actions">
+        <button
+          type="button"
+          data-launch
+          disabled={!primaryUrl}
+          aria-label={`${launchLabel} — ${projectName}`}
+          class="shell-btn shell-btn-primary"
+        >
+          <ThematicIcon name="play" class="w-4 h-4 text-[#160e06]" />
+          <span>{launchLabel}</span>
+        </button>
+
+        {primaryUrl && (
+          <a
+            href={primaryUrl}
+            data-resting-popout
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Open ${projectName} in new tab`}
+            class="shell-btn shell-btn-secondary"
+          >
+            <span>{popoutLabel}</span>
+          </a>
+        )}
+      </div>
+
+      <noscript>
+        <p class="shell-noscript">
+          JavaScript is needed for the embedded demo. Use the standalone link above instead.
+        </p>
+      </noscript>
+    </div>
+
+    <!-- Active Launched State -->
+    <div class="shell-active" data-active hidden>
+      {hasTabs && (
+        <div class="shell-tabbar">
+          <div role="tablist" aria-label={`${projectName} live demo views`} class="shell-tablist">
+            {views.map((view, idx) => (
+              <button
+                type="button"
+                role="tab"
+                id={`${instanceId}-${view.key}-tab`}
+                aria-controls={`${instanceId}-${view.key}-panel`}
+                aria-selected={idx === 0 ? 'true' : 'false'}
+                tabindex={idx === 0 ? 0 : -1}
+                data-view={view.key}
+                class="shell-tab"
+              >
+                <span class="shell-tab-indicator" aria-hidden="true"></span>
+                <span>{view.label}</span>
+              </button>
+            ))}
+          </div>
+          {activeNotice && <p class="shell-active-notice">{activeNotice}</p>}
+        </div>
+      )}
+
+      <p
+        data-announcement
+        role="status"
+        aria-live="polite"
+        class="shell-announcement"
+      ></p>
+
+      {views.map((view, idx) => (
+        <div
+          id={`${instanceId}-${view.key}-panel`}
+          role={hasTabs ? 'tabpanel' : undefined}
+          aria-labelledby={hasTabs ? `${instanceId}-${view.key}-tab` : undefined}
+          data-panel={view.key}
+          hidden={idx !== 0}
+          class="shell-panel"
+        >
+          <div
+            data-frame={view.key}
+            data-display-mode={view.displayMode}
+            data-canvas-width={view.canvasWidth ?? 1000}
+            data-canvas-height={view.canvasHeight ?? 600}
+            class={`frame-slot ${view.displayMode === 'fit-canvas' ? 'frame-slot-canvas' : 'frame-slot-responsive'}`}
+          ></div>
+
+          {showPortraitGuidance && view.displayMode === 'fit-canvas' && (
+            <div class="shell-active-portrait-hint" data-active-portrait-hint hidden>
+              <span aria-hidden="true">📱</span>
+              <span>Rotate device to landscape for a larger typing canvas.</span>
+            </div>
+          )}
+
+          <div class="frame-toolbar">
+            <p data-status={view.key} class="frame-status"></p>
+            <button
+              type="button"
+              data-retry={view.key}
+              class="shell-btn shell-btn-secondary shell-btn-reload"
+            >
+              {view.reloadLabel ?? 'Reload view'}
+            </button>
+          </div>
+
+          {view.footnote && <p class="shell-footnote">{view.footnote}</p>}
+        </div>
+      ))}
+    </div>
+  </section>
+</HostTag>
+
+<style>
+  .quest-demo-shell-host {
+    display: block;
+    margin-block: 1.75rem;
+  }
+
+  .quest-demo-shell {
+    border: 2px solid var(--brass);
+    border-radius: 0.5rem;
+    background: var(--wood-deep, #1e1208);
+    color: var(--parchment, #f4ebd9);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.55);
+    overflow: hidden;
+    scroll-margin-top: 5.5rem;
+  }
+
+  .shell-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: #160d05;
+    border-bottom: 1px solid rgba(168, 122, 39, 0.65);
+  }
+
+  .shell-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-width: 0;
+  }
+
+  .shell-icon-box {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.375rem;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(168, 122, 39, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .shell-heading {
+    margin: 0;
+    color: var(--candle, #ffe4a0);
+    font-family: var(--font-serif, serif);
+    font-size: 1.125rem;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .shell-active-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .shell-resting {
+    padding: 1.25rem 1rem;
+    background: linear-gradient(180deg, #1e1208 0%, #140b04 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .shell-resting {
+      padding: 1.5rem 1.5rem;
+    }
+  }
+
+  .shell-resting-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 68ch;
+  }
+
+  .shell-intro {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--parchment, #f4ebd9);
+  }
+
+  .shell-hint {
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--candle, #ffe4a0);
+  }
+
+  .shell-secondary-note {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: rgba(244, 235, 217, 0.88);
+  }
+
+  .shell-unavailable-banner {
+    margin: 0.25rem 0 0;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid var(--brass);
+    border-radius: 0.375rem;
+    background: rgba(0, 0, 0, 0.4);
+    color: var(--candle);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .shell-portrait-notice {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.375rem;
+    border: 1px solid rgba(168, 122, 39, 0.65);
+    background: rgba(0, 0, 0, 0.4);
+    max-width: 60ch;
+  }
+
+  .shell-portrait-title {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--candle);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .shell-portrait-body {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--parchment);
+  }
+
+  .shell-resting-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    padding-top: 0.25rem;
+  }
+
+  .shell-noscript {
+    margin: 0.5rem 0 0;
+    font-size: 0.875rem;
+    color: var(--candle);
+  }
+
+  /* Buttons and Links — 44px minimum target size */
+  .shell-btn,
+  .shell-tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1.25;
+    text-decoration: none;
+    cursor: pointer;
+    scroll-margin-top: 5.5rem;
+    transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+  }
+
+  .shell-btn-primary {
+    background: var(--brass, #a87a27);
+    color: #160e06;
+    border: 2px solid var(--brass, #a87a27);
+  }
+
+  .shell-btn-primary:hover:not(:disabled) {
+    background: var(--candle, #ffe4a0);
+    border-color: var(--candle, #ffe4a0);
+    color: #160e06;
+  }
+
+  .shell-btn-secondary {
+    background: #24160a;
+    color: var(--candle, #ffe4a0);
+    border: 1px solid var(--brass, #a87a27);
+  }
+
+  .shell-btn-secondary:hover:not(:disabled) {
+    background: #382310;
+    color: #ffffff;
+  }
+
+  .shell-btn-close {
+    background: #3a1212;
+    color: #fecaca;
+    border: 1px solid #dc2626;
+  }
+
+  .shell-btn-close:hover:not(:disabled) {
+    background: #5c1919;
+    color: #ffffff;
+  }
+
+  .shell-btn:focus-visible,
+  .shell-tab:focus-visible {
+    outline: 2px solid var(--candle, #ffe4a0);
+    outline-offset: 3px;
+  }
+
+  .shell-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  /* Active State & Optional Tablist */
+  .shell-active {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .shell-tabbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: #1b1007;
+    border-bottom: 1px solid rgba(168, 122, 39, 0.5);
+  }
+
+  .shell-tablist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .shell-tab {
+    background: #120a04;
+    color: var(--parchment, #f4ebd9);
+    border: 1px solid var(--brass, #a87a27);
+    position: relative;
+  }
+
+  .shell-tab:hover {
+    background: #2e1c0c;
+  }
+
+  .shell-tab-indicator {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    border: 1.5px solid currentColor;
+    display: inline-block;
+  }
+
+  .shell-tab[aria-selected='true'] {
+    background: var(--brass, #a87a27);
+    color: #160e06;
+    border-color: var(--candle, #ffe4a0);
+    box-shadow: inset 0 -3px 0 #160e06;
+  }
+
+  .shell-tab[aria-selected='true'] .shell-tab-indicator {
+    background: #160e06;
+    border-color: #160e06;
+  }
+
+  .shell-active-notice {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.45;
+    color: rgba(244, 235, 217, 0.9);
+  }
+
+  .shell-announcement {
+    margin: 0;
+    padding: 0.35rem 1rem;
+    font-size: 0.875rem;
+    color: var(--candle, #ffe4a0);
+    background: #160d05;
+    border-bottom: 1px solid rgba(168, 122, 39, 0.3);
+  }
+
+  .shell-announcement:empty {
+    display: none;
+  }
+
+  .shell-panel {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .frame-slot {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background: #0b0f19;
+  }
+
+  .frame-slot:empty {
+    display: none;
+  }
+
+  .frame-slot-responsive {
+    height: 70vh;
+    min-height: 360px;
+    max-height: 760px;
+  }
+
+  .frame-slot-canvas {
+    aspect-ratio: 1000 / 600;
+    min-height: 280px;
+    background: #000000;
+  }
+
+  .frame-slot-responsive :global(iframe) {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+    background: #ffffff;
+  }
+
+  .frame-slot-canvas :global(iframe) {
+    border: 0;
+    display: block;
+    background: #000000;
+  }
+
+  .shell-active-portrait-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: #160d05;
+    border-top: 1px solid rgba(168, 122, 39, 0.45);
+    color: var(--candle);
+    font-size: 0.875rem;
+    text-align: center;
+  }
+
+  .frame-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: #160d05;
+    border-top: 1px solid rgba(168, 122, 39, 0.55);
+  }
+
+  .frame-status {
+    margin: 0;
+    flex: 1 1 220px;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--parchment, #f4ebd9);
+  }
+
+  .shell-footnote {
+    margin: 0;
+    padding: 0.5rem 1rem 0.75rem;
+    background: #160d05;
+    font-size: 0.875rem;
+    line-height: 1.45;
+    color: rgba(244, 235, 217, 0.85);
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+
+  /* Fullscreen layout */
+  .quest-demo-shell:fullscreen {
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    border-radius: 0;
+    border: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    background: #0d0703;
+  }
+
+  .quest-demo-shell:fullscreen .shell-active {
+    flex: 1 1 0%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .quest-demo-shell:fullscreen .shell-panel:not([hidden]) {
+    flex: 1 1 0%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .quest-demo-shell:fullscreen .frame-slot {
+    flex: 1 1 0%;
+    height: auto;
+    min-height: 260px;
+    max-height: none;
+    aspect-ratio: auto;
+  }
+
+  @media (max-width: 480px) {
+    .shell-header,
+    .shell-resting,
+    .shell-tabbar,
+    .frame-toolbar {
+      padding: 0.65rem 0.75rem;
+    }
+
+    .frame-slot-responsive {
+      height: 65vh;
+    }
+  }
+</style>
+
+<script>
+  import { demoUrl } from '../lib/bits-demo-url';
+  import type { QuestDemoViewConfig } from './QuestDemoShell.astro';
+
+  function updateGlobalDemoActiveState() {
+    const anyActive = document.querySelector('[data-quest-demo-shell] [data-active]:not([hidden])');
+    if (anyActive) {
+      document.body.dataset.demoActive = 'true';
+    } else {
+      delete document.body.dataset.demoActive;
+    }
+  }
+
+  class QuestDemoShellElement extends HTMLElement {
+    private lifetime?: AbortController;
+    private session?: AbortController;
+    private resizeObserver?: ResizeObserver;
+    private frames = new Map<string, HTMLIFrameElement>();
+    private timers = new Map<string, ReturnType<typeof setTimeout>>();
+    private views: QuestDemoViewConfig[] = [];
+    private activeViewKey = '';
+
+    private parseViews(): QuestDemoViewConfig[] {
+      try {
+        const raw = this.dataset.views ? JSON.parse(this.dataset.views) : [];
+        return Array.isArray(raw) ? raw : [];
+      } catch {
+        return [];
+      }
+    }
+
+    private el<T extends HTMLElement>(selector: string): T | null {
+      return this.querySelector<T>(selector);
+    }
+
+    private resolveViewUrl(viewKey: string): string | null {
+      const datasetKey = `${viewKey}Url`;
+      if (datasetKey in this.dataset) {
+        const rawOverride = this.dataset[datasetKey];
+        if (!rawOverride) return null;
+        return demoUrl(rawOverride, true);
+      }
+      // If dataset key was explicitly deleted on a host that originally had it (e.g. bits-live-demo), check if host is bits-live-demo
+      if (this.tagName.toLowerCase() === 'bits-live-demo' && (viewKey === 'dashboard' || viewKey === 'terminal')) {
+        return null;
+      }
+      const cfg = this.views.find((v) => v.key === viewKey);
+      return cfg?.url ?? null;
+    }
+
+    private setStatus(viewKey: string, text: string) {
+      const statusEl = this.el<HTMLElement>(`[data-status="${viewKey}"]`);
+      if (statusEl) statusEl.textContent = text;
+    }
+
+    private setAnnouncement(text: string) {
+      const ann = this.el<HTMLElement>('[data-announcement]');
+      if (ann) ann.textContent = text;
+    }
+
+    private getSlowTimeoutMs(): number {
+      const custom = Number(this.dataset.slowTimeoutMs);
+      return Number.isFinite(custom) && custom > 0 ? custom : 12000;
+    }
+
+    connectedCallback() {
+      this.lifetime?.abort();
+      this.lifetime = new AbortController();
+      const { signal } = this.lifetime;
+
+      this.views = this.parseViews();
+      this.activeViewKey = this.views[0]?.key ?? '';
+
+      const launchBtn = this.el<HTMLButtonElement>('[data-launch]');
+      const closeBtn = this.el<HTMLButtonElement>('[data-close]');
+      const fullscreenBtn = this.el<HTMLButtonElement>('[data-fullscreen]');
+
+      launchBtn?.addEventListener('click', () => this.launch(), { signal });
+      closeBtn?.addEventListener('click', () => this.unload(true), { signal });
+
+      const tabs = Array.from(this.querySelectorAll<HTMLButtonElement>('[data-view]'));
+      tabs.forEach((tab) => {
+        tab.addEventListener('click', () => {
+          const viewKey = tab.dataset.view;
+          if (viewKey) this.select(viewKey, false);
+        }, { signal });
+
+        tab.addEventListener('keydown', (event) => {
+          if (event.altKey || event.ctrlKey || event.metaKey) return;
+          const currentTabs = Array.from(this.querySelectorAll<HTMLButtonElement>('[data-view]'));
+          const index = currentTabs.indexOf(tab);
+          if (index < 0) return;
+
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            event.stopPropagation();
+            const viewKey = tab.dataset.view;
+            if (viewKey) this.select(viewKey, true);
+            return;
+          }
+
+          const next =
+            event.key === 'Home'
+              ? 0
+              : event.key === 'End'
+                ? currentTabs.length - 1
+                : event.key === 'ArrowRight'
+                  ? (index + 1) % currentTabs.length
+                  : event.key === 'ArrowLeft'
+                    ? (index + currentTabs.length - 1) % currentTabs.length
+                    : -1;
+          if (next < 0) return;
+          event.preventDefault();
+          event.stopPropagation();
+          currentTabs.forEach((item, i) => {
+            item.tabIndex = i === next ? 0 : -1;
+          });
+          currentTabs[next]?.focus();
+        }, { signal });
+      });
+
+      this.querySelectorAll<HTMLButtonElement>('[data-retry]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const viewKey = button.dataset.retry;
+          if (viewKey) this.loadView(viewKey, true);
+        }, { signal });
+      });
+
+      fullscreenBtn?.addEventListener('click', async () => {
+        const section = this.el<HTMLElement>('[data-shell-section]');
+        if (!section) return;
+        try {
+          const isThisFullscreen =
+            document.fullscreenElement === section ||
+            (document.fullscreenElement && section.contains(document.fullscreenElement));
+          if (isThisFullscreen) {
+            await document.exitFullscreen();
+          } else if (typeof section.requestFullscreen === 'function') {
+            await section.requestFullscreen();
+          } else {
+            throw new Error('Fullscreen API unavailable');
+          }
+        } catch {
+          this.setAnnouncement('Fullscreen is unavailable. The demo still works here.');
+        }
+      }, { signal });
+
+      document.addEventListener('fullscreenchange', () => {
+        this.syncFullscreenState();
+        this.fitActiveCanvas();
+      }, { signal });
+
+      window.addEventListener('resize', () => {
+        this.checkOrientation();
+        this.fitActiveCanvas();
+      }, { signal });
+
+      window.addEventListener('orientationchange', () => {
+        this.checkOrientation();
+        this.fitActiveCanvas();
+      }, { signal });
+
+      this.checkOrientation();
+    }
+
+    disconnectedCallback() {
+      this.unload(false);
+      this.lifetime?.abort();
+      this.lifetime = undefined;
+    }
+
+    private syncFullscreenState() {
+      const section = this.el<HTMLElement>('[data-shell-section]');
+      const fullscreenBtn = this.el<HTMLButtonElement>('[data-fullscreen]');
+      if (!section || !fullscreenBtn) return;
+      const isThisFullscreen =
+        document.fullscreenElement === section ||
+        Boolean(document.fullscreenElement && section.contains(document.fullscreenElement));
+      fullscreenBtn.textContent = isThisFullscreen ? 'Exit fullscreen' : 'Fullscreen';
+    }
+
+    private checkOrientation() {
+      const isPortraitNarrow =
+        (window.matchMedia('(orientation: portrait)').matches || window.innerHeight > window.innerWidth) &&
+        window.innerWidth <= 640;
+
+      const restingNotice = this.el<HTMLElement>('[data-portrait-notice]');
+      if (restingNotice) {
+        restingNotice.hidden = !isPortraitNarrow;
+      }
+
+      const activeHint = this.el<HTMLElement>('[data-active-portrait-hint]');
+      const isLaunched = Boolean(this.session);
+      if (activeHint) {
+        activeHint.hidden = !(isLaunched && isPortraitNarrow);
+      }
+    }
+
+    private fitActiveCanvas() {
+      if (!this.activeViewKey) return;
+      const slot = this.el<HTMLElement>(`[data-frame="${this.activeViewKey}"]`);
+      if (!slot || slot.dataset.displayMode !== 'fit-canvas') return;
+
+      const iframe = slot.querySelector<HTMLIFrameElement>('iframe');
+      if (!iframe) return;
+
+      const cw = slot.clientWidth;
+      const ch = slot.clientHeight;
+      if (!cw || !ch) return;
+
+      const baseW = Number(slot.dataset.canvasWidth) || 1000;
+      const baseH = Number(slot.dataset.canvasHeight) || 600;
+      const scale = Math.min(cw / baseW, ch / baseH);
+
+      iframe.style.width = `${baseW}px`;
+      iframe.style.height = `${baseH}px`;
+      iframe.style.position = 'absolute';
+      iframe.style.left = '50%';
+      iframe.style.top = '50%';
+      iframe.style.transform = `translate(-50%, -50%) scale(${scale})`;
+      iframe.style.transformOrigin = 'center center';
+    }
+
+    private launch() {
+      const primaryKey = this.views[0]?.key;
+      if (this.session || !primaryKey || !this.resolveViewUrl(primaryKey)) return;
+
+      this.session = new AbortController();
+      const resting = this.el<HTMLElement>('[data-resting]');
+      const active = this.el<HTMLElement>('[data-active]');
+      const activeControls = this.el<HTMLElement>('[data-active-controls]');
+
+      if (resting) resting.hidden = true;
+      if (active) active.hidden = false;
+      if (activeControls) activeControls.hidden = false;
+
+      if (typeof ResizeObserver !== 'undefined') {
+        this.resizeObserver?.disconnect();
+        this.resizeObserver = new ResizeObserver(() => this.fitActiveCanvas());
+        this.querySelectorAll<HTMLElement>('[data-frame]').forEach((slot) => {
+          this.resizeObserver?.observe(slot);
+        });
+      }
+
+      updateGlobalDemoActiveState();
+      this.checkOrientation();
+      this.select(primaryKey, true);
+
+      // Focus placement on launch: active tab for multi-view, or Close/Fullscreen shell control for single-view
+      if (this.views.length === 1) {
+        this.el<HTMLElement>('[data-close]')?.focus();
+      }
+    }
+
+    private select(viewKey: string, focusTab = false) {
+      const viewConfig = this.views.find((v) => v.key === viewKey);
+      if (!viewConfig) return;
+      this.activeViewKey = viewKey;
+
+      this.querySelectorAll<HTMLButtonElement>('[data-view]').forEach((tab) => {
+        const isSelected = tab.dataset.view === viewKey;
+        tab.setAttribute('aria-selected', String(isSelected));
+        tab.tabIndex = isSelected ? 0 : -1;
+        if (isSelected && focusTab) {
+          tab.focus();
+        }
+      });
+
+      this.querySelectorAll<HTMLElement>('[data-panel]').forEach((panel) => {
+        panel.hidden = panel.dataset.panel !== viewKey;
+      });
+
+      const popoutLink = this.el<HTMLAnchorElement>('[data-popout]');
+      const url = this.resolveViewUrl(viewKey);
+      if (popoutLink) {
+        popoutLink.hidden = !url;
+        if (url) {
+          popoutLink.href = url;
+        } else {
+          popoutLink.removeAttribute('href');
+        }
+        popoutLink.textContent =
+          this.views.length > 1
+            ? `Open ${viewKey === 'dashboard' ? 'BITS' : viewKey === 'terminal' ? 'terminal' : viewConfig.label} in new tab \u2197\uFE0E`
+            : 'Open in new tab \u2197\uFE0E';
+      }
+
+      if (this.views.length > 1) {
+        this.setAnnouncement(`${viewConfig.label} selected.`);
+      }
+
+      this.loadView(viewKey, false);
+      this.fitActiveCanvas();
+    }
+
+    private loadView(viewKey: string, reload = false) {
+      if (!this.session) return;
+      if (this.frames.has(viewKey) && !reload) return;
+
+      const viewConfig = this.views.find((v) => v.key === viewKey);
+      if (!viewConfig) return;
+
+      const slot = this.el<HTMLElement>(`[data-frame="${viewKey}"]`);
+      const retryBtn = this.el<HTMLButtonElement>(`[data-retry="${viewKey}"]`);
+      const url = this.resolveViewUrl(viewKey);
+
+      if (!url) {
+        this.frames.get(viewKey)?.remove();
+        this.frames.delete(viewKey);
+        slot?.replaceChildren();
+        this.setStatus(
+          viewKey,
+          viewConfig.unavailableStatus ??
+            'This view is not configured for this deployment. Other configured views remain available.'
+        );
+        if (retryBtn) retryBtn.disabled = true;
+        return;
+      }
+
+      if (retryBtn) retryBtn.disabled = false;
+      clearTimeout(this.timers.get(viewKey));
+      this.frames.get(viewKey)?.remove();
+
+      const frame = document.createElement('iframe');
+      frame.title = viewConfig.iframeTitle;
+      frame.sandbox.value = viewConfig.sandbox;
+      if (viewConfig.allow) {
+        frame.setAttribute('allow', viewConfig.allow);
+      }
+      frame.referrerPolicy = viewConfig.referrerPolicy ?? 'strict-origin-when-cross-origin';
+      if (viewConfig.displayMode === 'fit-canvas') {
+        frame.setAttribute('scrolling', 'no');
+      }
+      frame.src = url;
+
+      this.setStatus(
+        viewKey,
+        viewConfig.loadingStatus ??
+          'Loading external view. Connection and application state are not yet verified.'
+      );
+
+      frame.addEventListener(
+        'load',
+        () => {
+          clearTimeout(this.timers.get(viewKey));
+          this.setStatus(
+            viewKey,
+            viewConfig.loadedStatus ??
+              'External view requested. If it is blank or unavailable, reload view or open it in a new tab.'
+          );
+          this.fitActiveCanvas();
+        },
+        { signal: this.session.signal }
+      );
+
+      this.frames.set(viewKey, frame);
+      slot?.replaceChildren(frame);
+      this.fitActiveCanvas();
+
+      const timeoutMs = this.getSlowTimeoutMs();
+      this.timers.set(
+        viewKey,
+        setTimeout(() => {
+          this.setStatus(
+            viewKey,
+            viewConfig.slowStatus ??
+              'This view is taking longer than expected. You can reload view or use the standalone link.'
+          );
+        }, timeoutMs)
+      );
+    }
+
+    private unload(restoreFocus: boolean) {
+      this.session?.abort();
+      this.session = undefined;
+      this.resizeObserver?.disconnect();
+      this.resizeObserver = undefined;
+
+      this.timers.forEach((timer) => clearTimeout(timer));
+      this.timers.clear();
+
+      this.frames.forEach((frame) => frame.remove());
+      this.frames.clear();
+      this.querySelectorAll<HTMLElement>('[data-frame]').forEach((slot) => slot.replaceChildren());
+
+      const section = this.el<HTMLElement>('[data-shell-section]');
+      if (
+        section &&
+        document.fullscreenElement &&
+        (document.fullscreenElement === section || section.contains(document.fullscreenElement))
+      ) {
+        void document.exitFullscreen().catch(() => {});
+      }
+
+      const active = this.el<HTMLElement>('[data-active]');
+      const activeControls = this.el<HTMLElement>('[data-active-controls]');
+      const resting = this.el<HTMLElement>('[data-resting]');
+
+      if (active) active.hidden = true;
+      if (activeControls) activeControls.hidden = true;
+      if (resting) resting.hidden = false;
+
+      this.setAnnouncement('');
+      updateGlobalDemoActiveState();
+      this.checkOrientation();
+
+      if (restoreFocus && this.isConnected) {
+        this.el<HTMLElement>('[data-launch]')?.focus();
+      }
+    }
+  }
+
+  if (!customElements.get('quest-demo-shell')) {
+    customElements.define('quest-demo-shell', QuestDemoShellElement);
+  }
+  if (!customElements.get('bits-live-demo')) {
+    customElements.define('bits-live-demo', class BitsLiveDemoElement extends QuestDemoShellElement {});
+  }
+</script>

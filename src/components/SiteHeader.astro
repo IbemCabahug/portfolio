@@ -33,12 +33,13 @@ if (!badgeLabel) {
   else badgeLabel = 'Portfolio';
 }
 
-// 4 Primary Global Navigation Links (Tavern removed as requested, since upper-left brand acts as Tavern button)
+// Primary Global Navigation Links with task-clear labels (UX-10)
 const navLinks = [
   { href: '/', label: 'Home', active: pathname === '/' },
   { href: '/about', label: 'About', active: pathname.startsWith('/about') },
   { href: '/resume', label: 'Resume', active: pathname.startsWith('/resume') },
-  { href: '/quests', label: 'Quest Board', active: pathname.startsWith('/quests') },
+  { href: '/quests', label: 'Projects', active: pathname.startsWith('/quests'), title: 'Quest Board — Engineering Projects & Case Studies' },
+  { href: '/messenger', label: 'Contact', active: pathname.startsWith('/messenger'), title: "Messenger's Corner — Contact Nhovem" },
 ];
 ---
 
@@ -73,20 +74,21 @@ const navLinks = [
       <a
         href="/simple"
         class="hidden 2xl:inline-flex items-center gap-1.5 h-8 px-2.5 sm:px-3 text-xs font-semibold rounded-md border border-[var(--brass)] bg-[#1e1208] text-[var(--parchment)] hover:border-[var(--candle)] hover:text-[var(--candle)] hover:bg-black transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] whitespace-nowrap shadow-xs"
-        title="High-contrast, zero-JS text edition (Field Ledger)"
+        title="High-contrast, zero-JS text edition (Simple Portfolio / Field Ledger)"
       >
         <ThematicIcon name="scroll" class="w-3.5 h-3.5 text-[var(--candle)] shrink-0" />
-        <span>Field Ledger</span>
+        <span>Simple View (0-JS)</span>
       </a>
     )}
   </div>
 
-  {/* ZONE 3: The Stable / Global Navigation Layer (Right — Home | About | Resume | Quest Board | Menu) */}
+  {/* ZONE 3: The Stable / Global Navigation Layer (Right — Home | About | Resume | Projects | Contact | Menu) */}
   <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
     <nav aria-label="Main Navigation" class="hidden md:flex items-center gap-1 text-xs font-semibold">
       {navLinks.map((link) => (
         <a
           href={link.href}
+          title={link.title}
           class={`relative flex items-center h-8 px-2.5 rounded transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)] ${
             link.active
               ? 'text-[var(--candle)] font-bold active-nav-link'
@@ -120,16 +122,16 @@ const navLinks = [
           <span class="hidden sm:inline">Menu</span>
         </span>
       </summary>
-      <ul class="absolute right-0 top-full mt-1 w-56 p-2 rounded-md bg-[var(--wood-deep)] border-2 border-[var(--brass)] text-xs font-semibold shadow-2xl z-50 flex flex-col gap-0.5">
+      <ul class="absolute right-0 top-full mt-1 w-64 p-2 rounded-md bg-[var(--wood-deep)] border-2 border-[var(--brass)] text-xs font-semibold shadow-2xl z-50 flex flex-col gap-0.5 max-h-[85dvh] overflow-y-auto">
         <li class="px-2 py-1 text-[10px] uppercase tracking-widest text-[var(--brass)] font-extrabold border-b border-[var(--brass)]/30 mb-1">
           Tavern Chambers
         </li>
-        <li><a href="/tavern" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Main Tavern</a></li>
-        <li><a href="/tavern/skills" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Adventurer's Badge</a></li>
-        <li><a href="/tavern/npc" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Tavern Regular</a></li>
-        <li><a href="/tavern/archivist" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">The Archivist</a></li>
-        <li><a href="/quests" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Quest Board</a></li>
-        <li><a href="/messenger" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Messenger's Corner</a></li>
+        <li><a href="/tavern" class="flex items-center justify-between min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]"><span>Main Tavern</span><span class="text-[10px] font-mono text-[var(--parchment)]/60">Hub</span></a></li>
+        <li><a href="/tavern/skills" class="flex items-center justify-between min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]"><span>Adventurer's Badge</span><span class="text-[10px] font-mono text-[var(--parchment)]/60">Skills</span></a></li>
+        <li><a href="/tavern/npc" class="flex items-center justify-between min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]"><span>Tavern Regular</span><span class="text-[10px] font-mono text-[var(--parchment)]/60">Experience</span></a></li>
+        <li><a href="/tavern/archivist" class="flex items-center justify-between min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]"><span>The Archivist</span><span class="text-[10px] font-mono text-[var(--parchment)]/60">Systems</span></a></li>
+        <li><a href="/quests" class="flex items-center justify-between min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]"><span>Quest Board</span><span class="text-[10px] font-mono text-[var(--parchment)]/60">Projects</span></a></li>
+        <li><a href="/messenger" class="flex items-center justify-between min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]"><span>Messenger's Corner</span><span class="text-[10px] font-mono text-[var(--parchment)]/60">Contact</span></a></li>
         <li class="border-t border-[var(--brass)]/30 my-1"></li>
         <li class="px-2 py-1 text-[10px] uppercase tracking-widest text-[var(--brass)] font-extrabold border-b border-[var(--brass)]/30 mb-1">
           Portfolio Records
@@ -137,8 +139,8 @@ const navLinks = [
         <li><a href="/" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Home / Entrance</a></li>
         <li><a href="/about" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">About Nhovem</a></li>
         <li><a href="/resume" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Resume</a></li>
-        <li><a href="/tales" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Field Dispatches (Tales)</a></li>
-        <li><a href="/simple" class="flex items-center min-h-[44px] px-2 rounded text-[var(--parchment)]/80 hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Field Ledger (0-JS)</a></li>
+        <li><a href="/tales" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Field Dispatches (Notes)</a></li>
+        <li><a href="/simple" class="flex items-center justify-between min-h-[44px] px-2 rounded text-[var(--parchment)]/80 hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]"><span>Simple Portfolio</span><span class="text-[10px] font-mono text-[var(--parchment)]/60">0-JS</span></a></li>
         <li class="border-t border-[var(--brass)]/30 my-1"></li>
         <li class="px-2 py-1 text-[10px] uppercase tracking-widest text-[var(--brass)] font-extrabold border-b border-[var(--brass)]/30 mb-1">
           Wayfarer & Controls
@@ -160,12 +162,28 @@ const navLinks = [
         <li>
           <button
             type="button"
+            id="menu-toggle-motion"
+            class="w-full flex items-center justify-between min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)] text-left cursor-pointer transition-colors text-xs text-[var(--parchment)]"
+            aria-label="Toggle animations between Full and Reduced motion"
+            aria-pressed="false"
+          >
+            <span class="flex items-center gap-2">
+              <span id="menu-motion-icon" class="text-sm" aria-hidden="true">✨</span>
+              <span id="menu-motion-text">Motion: Full</span>
+            </span>
+            <span id="menu-motion-badge" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/40 text-[var(--candle)]">Full</span>
+          </button>
+        </li>
+        <li>
+          <button
+            type="button"
             id="menu-toggle-sound"
             class="w-full flex items-center justify-between min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)] text-left cursor-pointer transition-colors text-xs text-[var(--parchment)]"
             aria-label="Toggle tavern hearth ambient soundscape"
+            aria-pressed="false"
           >
             <span class="flex items-center gap-2">
-              <span id="menu-sound-icon" class="text-sm">🔈</span>
+              <span id="menu-sound-icon" class="text-sm" aria-hidden="true">🔈</span>
               <span id="menu-sound-text">Tavern Sound: Off</span>
             </span>
             <span id="menu-sound-badge" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/40 text-stone-400">Muted</span>
@@ -192,37 +210,70 @@ const navLinks = [
 </header>
 
 <script>
-  import { getSound, setSound, subscribePreferences } from '../store/preferences';
+  import { getMotion, getSound, setMotion, setSound, subscribePreferences } from '../store/preferences';
   import { soundEngine } from '../lib/sound-engine';
   import { getVisitedMilestones, subscribeQuestLog, JOURNAL_MILESTONES, recordMilestone } from '../store/questlog';
 
+  let headerAbort: AbortController | null = null;
+  let headerSubscriptionsBound = false;
+
+  function updateMenuJournal() {
+    const menuJournalCounter = document.getElementById('menu-journal-counter');
+    if (menuJournalCounter) {
+      const total = JOURNAL_MILESTONES.length;
+      const count = Math.min(getVisitedMilestones().size, total);
+      menuJournalCounter.textContent = `${count}/${total}`;
+    }
+  }
+
+  function updateMenuPreferenceStates() {
+    const motionBtn = document.getElementById('menu-toggle-motion');
+    const motionIcon = document.getElementById('menu-motion-icon');
+    const motionText = document.getElementById('menu-motion-text');
+    const motionBadge = document.getElementById('menu-motion-badge');
+    const isReduced = getMotion() === 'reduced';
+
+    if (motionBtn) motionBtn.setAttribute('aria-pressed', isReduced ? 'true' : 'false');
+    if (motionIcon) motionIcon.textContent = isReduced ? '🪶' : '✨';
+    if (motionText) motionText.textContent = isReduced ? 'Motion: Reduced' : 'Motion: Full';
+    if (motionBadge) {
+      motionBadge.textContent = isReduced ? 'Reduced' : 'Full';
+      motionBadge.className = isReduced
+        ? 'text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-950/80 border border-amber-500/60 text-amber-300 font-bold'
+        : 'text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/40 text-[var(--candle)]';
+    }
+
+    const soundBtn = document.getElementById('menu-toggle-sound');
+    const soundIcon = document.getElementById('menu-sound-icon');
+    const soundText = document.getElementById('menu-sound-text');
+    const soundBadge = document.getElementById('menu-sound-badge');
+    const isSoundOn = getSound() === 'on';
+
+    if (soundBtn) soundBtn.setAttribute('aria-pressed', isSoundOn ? 'true' : 'false');
+    if (soundIcon) soundIcon.textContent = isSoundOn ? '🔥' : '🔈';
+    if (soundText) soundText.textContent = isSoundOn ? 'Tavern Sound: Active' : 'Tavern Sound: Muted';
+    if (soundBadge) {
+      soundBadge.textContent = isSoundOn ? 'Active' : 'Muted';
+      soundBadge.className = isSoundOn
+        ? 'text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/60 text-emerald-400 font-bold'
+        : 'text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/40 text-stone-400';
+    }
+  }
+
   function initHeaderControls() {
+    headerAbort?.abort();
+    headerAbort = new AbortController();
+    const { signal } = headerAbort;
+
     soundEngine.init();
 
-    // Mobile menu Wayfarer Journal trigger
     const menuJournalBtn = document.getElementById('menu-trigger-quest-log');
-    const menuJournalCounter = document.getElementById('menu-journal-counter');
-
-    function updateMenuJournal() {
-      if (menuJournalCounter) {
-        const total = JOURNAL_MILESTONES.length;
-        const count = Math.min(getVisitedMilestones().size, total);
-        menuJournalCounter.textContent = `${count}/${total}`;
-      }
-    }
-
-    if (menuJournalBtn && !(menuJournalBtn as any).__bound) {
-      (menuJournalBtn as any).__bound = true;
-      menuJournalBtn.addEventListener('click', () => {
-        const dropdown = document.getElementById('site-menu-dropdown') as HTMLDetailsElement | null;
-        if (dropdown) dropdown.open = false;
-        const trigger = document.getElementById('trigger-quest-log');
-        if (trigger) trigger.click();
-      });
-    }
-
-    subscribeQuestLog(updateMenuJournal);
-    updateMenuJournal();
+    menuJournalBtn?.addEventListener('click', () => {
+      const dropdown = document.getElementById('site-menu-dropdown') as HTMLDetailsElement | null;
+      if (dropdown) dropdown.open = false;
+      const trigger = document.getElementById('trigger-quest-log');
+      if (trigger) trigger.click();
+    }, { signal });
 
     const fsBtn = document.getElementById('menu-toggle-fullscreen');
     const fsText = document.getElementById('fullscreen-btn-text');
@@ -235,55 +286,45 @@ const navLinks = [
       }
     }
 
-    if (fsBtn && !(fsBtn as any).__bound) {
-      (fsBtn as any).__bound = true;
-      fsBtn.addEventListener('click', () => {
-        if (!document.fullscreenElement) {
-          document.documentElement.requestFullscreen().catch(() => {});
-        } else {
-          document.exitFullscreen().catch(() => {});
-        }
-      });
-    }
+    fsBtn?.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }, { signal });
 
-    document.addEventListener('fullscreenchange', updateFsState);
+    document.addEventListener('fullscreenchange', updateFsState, { signal });
     updateFsState();
+
+    // Mobile menu motion toggle (UX-08)
+    const motionBtn = document.getElementById('menu-toggle-motion');
+    motionBtn?.addEventListener('click', () => {
+      soundEngine.playWoodClink();
+      setMotion(getMotion() === 'full' ? 'reduced' : 'full');
+    }, { signal });
 
     // Mobile menu sound toggle
     const soundBtn = document.getElementById('menu-toggle-sound');
-    const soundIcon = document.getElementById('menu-sound-icon');
-    const soundText = document.getElementById('menu-sound-text');
-    const soundBadge = document.getElementById('menu-sound-badge');
-
-    function updateMenuSoundState() {
-      const isSoundOn = getSound() === 'on';
-      if (soundIcon) soundIcon.textContent = isSoundOn ? '🔥' : '🔈';
-      if (soundText) soundText.textContent = isSoundOn ? 'Tavern Sound: Active' : 'Tavern Sound: Muted';
-      if (soundBadge) {
-        soundBadge.textContent = isSoundOn ? 'Active' : 'Muted';
-        soundBadge.className = isSoundOn
-          ? 'text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/60 text-emerald-400 font-bold'
-          : 'text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/40 text-stone-400';
+    soundBtn?.addEventListener('click', () => {
+      const next = getSound() === 'on' ? 'off' : 'on';
+      if (next === 'on') {
+        soundEngine.enable();
+        soundEngine.playWoodClink();
+        recordMilestone('feat_hearth');
+      } else {
+        soundEngine.disable();
       }
-    }
+      setSound(next);
+    }, { signal });
 
-    if (soundBtn && !(soundBtn as any).__bound) {
-      (soundBtn as any).__bound = true;
-      soundBtn.addEventListener('click', () => {
-        const next = getSound() === 'on' ? 'off' : 'on';
-        if (next === 'on') {
-          soundEngine.enable();
-          soundEngine.playWoodClink();
-          recordMilestone('feat_hearth');
-        } else {
-          soundEngine.disable();
-        }
-        setSound(next);
-      });
+    if (!headerSubscriptionsBound) {
+      headerSubscriptionsBound = true;
+      subscribeQuestLog(updateMenuJournal);
+      subscribePreferences(updateMenuPreferenceStates);
     }
-
-    subscribePreferences(updateMenuSoundState);
-    updateMenuSoundState();
+    updateMenuJournal();
+    updateMenuPreferenceStates();
 
     // Close menu dropdown when clicking outside
     const menuDropdown = document.getElementById('site-menu-dropdown') as HTMLDetailsElement | null;
@@ -292,16 +333,15 @@ const navLinks = [
         if (!menuDropdown.contains(e.target as Node)) {
           menuDropdown.open = false;
         }
-      });
+      }, { signal });
     }
   }
 
   document.addEventListener('astro:page-load', initHeaderControls);
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initHeaderControls);
-  } else {
-    initHeaderControls();
-  }
+  document.addEventListener('astro:before-swap', () => {
+    headerAbort?.abort();
+    headerAbort = null;
+  });
 </script>
 
 <style>
@@ -321,7 +361,7 @@ const navLinks = [
       height: var(--hud-height) !important;
       min-height: var(--hud-height) !important;
     }
-    .site-header a[href="/simple"] {
+    .contextual-controls a[href="/simple"] {
       display: none !important;
     }
     .site-header details summary {
