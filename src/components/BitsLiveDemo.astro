@@ -1,0 +1,183 @@
+---
+import { demoUrl } from '../lib/bits-demo-url';
+interface Props { liveUrl: string; title: string }
+const { liveUrl, title } = Astro.props;
+const dashboardUrl = demoUrl(liveUrl, import.meta.env.DEV);
+const terminalUrl = demoUrl(import.meta.env.PUBLIC_ZK_SIMULATOR_URL, import.meta.env.DEV);
+---
+
+<bits-live-demo data-dashboard-url={dashboardUrl} data-terminal-url={terminalUrl}>
+  <section aria-label="BITS interactive live demo" class="bits-demo">
+    <header>
+      <h2>Live Demo — {title.split('—')[0].trim()}</h2>
+      <p>Explore the dashboard and virtual ZKTeco terminal without leaving this project.</p>
+    </header>
+    <div data-resting>
+      <p>Launch loads the external BITS application. The terminal loads only when selected. Use sample identities only; verify scan results in BITS Attendance.</p>
+      <p>Use the Simulator tab above the dashboard to stay in this demo. Buttons inside BITS retain their original behavior and may open another browser tab.</p>
+      <button type="button" data-launch disabled={!dashboardUrl}>Launch BITS demo</button>
+      {dashboardUrl && <a href={dashboardUrl} target="_blank" rel="noopener noreferrer">Open BITS in new tab ↗</a>}
+      <noscript><p>JavaScript is needed for the embedded demo. Use the standalone link above instead.</p></noscript>
+    </div>
+    <div data-active hidden>
+      <div class="demo-controls">
+        <div role="tablist" aria-label="Live demo views">
+          <button type="button" role="tab" id="bits-dashboard-tab" aria-controls="bits-dashboard-panel" aria-selected="true" tabindex="0" data-view="dashboard">BITS Dashboard</button>
+          <button type="button" role="tab" id="bits-terminal-tab" aria-controls="bits-terminal-panel" aria-selected="false" tabindex="-1" data-view="terminal">ZKTeco Simulator</button>
+        </div>
+        <div class="demo-actions">
+          <a data-popout target="_blank" rel="noopener noreferrer">Open in new tab ↗</a>
+          <button type="button" data-fullscreen>Fullscreen</button>
+          <button type="button" data-close>Close demo</button>
+        </div>
+      </div>
+      <p data-announcement role="status" aria-live="polite"></p>
+      <p>To stay here, use these tabs. BITS’s own terminal button may open a separate browser tab.</p>
+      <div id="bits-dashboard-panel" role="tabpanel" aria-labelledby="bits-dashboard-tab" data-panel="dashboard">
+        <div class="frame-toolbar"><p data-status="dashboard"></p><button type="button" data-retry="dashboard">Reload dashboard</button></div>
+        <div data-frame="dashboard" class="frame-slot"></div>
+      </div>
+      <div id="bits-terminal-panel" role="tabpanel" aria-labelledby="bits-terminal-tab" data-panel="terminal" hidden>
+        <div class="frame-toolbar"><p data-status="terminal"></p><button type="button" data-retry="terminal">Retry terminal</button></div>
+        <div data-frame="terminal" class="frame-slot"></div>
+        <p>Simulated scans are not real biometric capture. Return to BITS to confirm that attendance was received.</p>
+      </div>
+    </div>
+  </section>
+</bits-live-demo>
+
+<style>
+  bits-live-demo { display: block; margin-block: 2rem; }
+  .bits-demo { border: 2px solid var(--brass); border-radius: .5rem; background: var(--wood-deep, #1e1208); color: var(--parchment, #f5e6c8); padding: 1rem; }
+  h2 { color: var(--candle); font-size: 1.25rem; font-weight: bold; }
+  p { margin-block: .75rem; line-height: 1.5; }
+  button, a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: .5rem .75rem; border: 1px solid var(--brass); border-radius: .25rem; color: inherit; cursor: pointer; }
+  button:hover, a:hover { background: #382713; }
+  button:focus-visible, a:focus-visible { outline: 2px solid var(--candle); outline-offset: 3px; }
+  button[aria-selected='true'] { background: var(--brass); color: #160e06; font-weight: bold; }
+  button:disabled { opacity: .6; cursor: not-allowed; }
+  [data-resting] > a { margin: .5rem; }
+  .demo-controls, .demo-actions, [role='tablist'], .frame-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .demo-controls, .frame-toolbar { justify-content: space-between; }
+  .frame-toolbar p { flex: 1; min-width: 150px; }
+  .frame-slot { height: 70vh; min-height: 360px; background: #111827; }
+  .frame-slot :global(iframe) { width: 100%; height: 100%; border: 0; display: block; background: white; }
+  [hidden] { display: none !important; }
+  .bits-demo:fullscreen { overflow: auto; width: 100%; height: 100%; }
+  .bits-demo:fullscreen .frame-slot { height: 70vh; }
+  @media (max-width: 480px) { .bits-demo { padding: .5rem; } .frame-slot { height: 65vh; } }
+</style>
+
+<script>
+  type View = 'dashboard' | 'terminal';
+
+  class BitsLiveDemo extends HTMLElement {
+    private lifetime?: AbortController;
+    private session?: AbortController;
+    private frames = new Map<View, HTMLIFrameElement>();
+    private timers = new Map<View, ReturnType<typeof setTimeout>>();
+
+    private element<T extends HTMLElement>(selector: string): T { return this.querySelector<T>(selector)!; }
+    private url(view: View) { return view === 'dashboard' ? this.dataset.dashboardUrl : this.dataset.terminalUrl; }
+    private status(view: View, text: string) { this.element(`[data-status="${view}"]`).textContent = text; }
+
+    connectedCallback() {
+      this.lifetime?.abort();
+      this.lifetime = new AbortController();
+      const options = { signal: this.lifetime.signal };
+      this.element('[data-launch]').addEventListener('click', () => this.launch(), options);
+      this.element('[data-close]').addEventListener('click', () => this.unload(true), options);
+      this.querySelectorAll<HTMLButtonElement>('[data-view]').forEach(tab => {
+        tab.addEventListener('click', () => this.select(tab.dataset.view as View), options);
+        tab.addEventListener('keydown', event => {
+          const tabs = [...this.querySelectorAll<HTMLButtonElement>('[data-view]')];
+          const index = tabs.indexOf(tab);
+          const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1
+            : event.key === 'ArrowRight' ? (index + 1) % tabs.length
+            : event.key === 'ArrowLeft' ? (index + tabs.length - 1) % tabs.length : -1;
+          if (next < 0) return;
+          event.preventDefault();
+          tabs.forEach((item, i) => item.tabIndex = i === next ? 0 : -1);
+          tabs[next].focus();
+        }, options);
+      });
+      this.querySelectorAll<HTMLButtonElement>('[data-retry]').forEach(button => {
+        button.addEventListener('click', () => this.load(button.dataset.retry as View, true), options);
+      });
+      this.element('[data-fullscreen]').addEventListener('click', async () => {
+        try {
+          if (document.fullscreenElement === this.element('section')) await document.exitFullscreen();
+          else await this.element('section').requestFullscreen();
+        } catch { this.element('[data-announcement]').textContent = 'Fullscreen is unavailable. The demo still works here.'; }
+      }, options);
+      document.addEventListener('fullscreenchange', () => {
+        this.element('[data-fullscreen]').textContent = document.fullscreenElement === this.element('section') ? 'Exit fullscreen' : 'Fullscreen';
+      }, options);
+    }
+
+    disconnectedCallback() { this.unload(false); this.lifetime?.abort(); }
+
+    private launch() {
+      if (this.session || !this.url('dashboard')) return;
+      this.session = new AbortController();
+      this.element('[data-resting]').hidden = true;
+      this.element('[data-active]').hidden = false;
+      this.select('dashboard', true);
+    }
+
+    private select(view: View, focus = false) {
+      this.querySelectorAll<HTMLButtonElement>('[data-view]').forEach(tab => {
+        const active = tab.dataset.view === view;
+        tab.setAttribute('aria-selected', String(active));
+        tab.tabIndex = active ? 0 : -1;
+        if (active && focus) tab.focus();
+      });
+      this.querySelectorAll<HTMLElement>('[data-panel]').forEach(panel => panel.hidden = panel.dataset.panel !== view);
+      const link = this.element<HTMLAnchorElement>('[data-popout]');
+      const url = this.url(view);
+      link.hidden = !url;
+      if (url) link.href = url;
+      else link.removeAttribute('href');
+      link.textContent = `Open ${view === 'dashboard' ? 'BITS' : 'terminal'} in new tab ↗`;
+      this.element('[data-announcement]').textContent = `${view === 'dashboard' ? 'BITS Dashboard' : 'ZKTeco Terminal'} selected.`;
+      this.load(view);
+    }
+
+    private load(view: View, reload = false) {
+      if (!this.session || (this.frames.has(view) && !reload)) return;
+      const url = this.url(view);
+      if (!url) {
+        this.status(view, 'This view is not configured for this deployment. BITS remains available in the Dashboard tab.');
+        this.element<HTMLButtonElement>(`[data-retry="${view}"]`).disabled = true;
+        return;
+      }
+      this.element<HTMLButtonElement>(`[data-retry="${view}"]`).disabled = false;
+      clearTimeout(this.timers.get(view));
+      this.frames.get(view)?.remove();
+      const frame = document.createElement('iframe');
+      frame.title = view === 'dashboard' ? 'BITS attendance dashboard' : 'ZKTeco virtual terminal';
+      frame.sandbox.value = 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox';
+      frame.referrerPolicy = 'strict-origin-when-cross-origin';
+      frame.src = url;
+      this.status(view, 'Loading external view. Connection and attendance delivery are not yet verified.');
+      frame.addEventListener('load', () => {
+        clearTimeout(this.timers.get(view));
+        this.status(view, 'External view requested. If it is blank or unavailable, retry or open it in a new tab. Confirm scans in BITS Attendance.');
+      }, { signal: this.session.signal });
+      this.frames.set(view, frame);
+      this.element(`[data-frame="${view}"]`).append(frame);
+      this.timers.set(view, setTimeout(() => this.status(view, 'This view is taking longer than expected. You can retry or use the standalone link.'), 12000));
+    }
+
+    private unload(focus: boolean) {
+      this.session?.abort(); this.session = undefined;
+      this.timers.forEach(timer => clearTimeout(timer)); this.timers.clear();
+      this.frames.forEach(frame => frame.remove()); this.frames.clear();
+      if (document.fullscreenElement === this.querySelector('section')) void document.exitFullscreen().catch(() => {});
+      this.element('[data-active]').hidden = true;
+      this.element('[data-resting]').hidden = false;
+      if (focus) this.element('[data-launch]').focus();
+    }
+  }
+  if (!customElements.get('bits-live-demo')) customElements.define('bits-live-demo', BitsLiveDemo);
+</script>
