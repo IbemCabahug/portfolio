@@ -1,6 +1,6 @@
 // public/sw.js
 // Progressive Web App Service Worker for Nhovem Cabahug's Portfolio
-const CACHE_VERSION = 'v7';
+const CACHE_VERSION = 'v8';
 const STATIC_CACHE = `nhovem-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `nhovem-runtime-${CACHE_VERSION}`;
 const MAX_RUNTIME_ENTRIES = 60;
@@ -73,36 +73,51 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  const url = new URL(request.url);
-
-  // 2. Never intercept local /api/* routes or dynamic external APIs
-  if (
-    url.pathname.startsWith('/api/') ||
-    url.hostname.includes('api.web3forms.com') ||
-    url.hostname.includes('api.github.com') ||
-    url.hostname.includes('challenges.cloudflare.com') ||
-    url.hostname.includes('cloudflare-dns.com')
-  ) {
+  let url;
+  try {
+    url = new URL(request.url);
+  } catch {
     return;
   }
 
-  // 3. Navigation & HTML requests (including Astro ClientRouter page swaps): Network-First
+  // 2. Explicit origin boundary (PLAN-08):
+  // Cache ONLY same-origin requests or specifically allowlisted external font hosts.
+  // Bypass all other cross-origin requests immediately (e.g. Turnstile, Web3Forms, Resend, GitHub).
+  const isSameOrigin = url.origin === self.location.origin;
+  const isAllowedExternalFont =
+    url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com';
+
+  if (!isSameOrigin && !isAllowedExternalFont) {
+    return;
+  }
+
+  // 3. Never intercept local /api/* endpoints
+  if (isSameOrigin && url.pathname.startsWith('/api/')) {
+    return;
+  }
+
+  // 4. Navigation & HTML requests (Network-First)
   const isHtmlRequest =
     request.mode === 'navigate' ||
     (request.headers.get('accept') && request.headers.get('accept').includes('text/html'));
 
-  if (isHtmlRequest) {
+  if (isSameOrigin && isHtmlRequest) {
     event.respondWith(
       fetch(request)
         .then((networkResponse) => {
           if (networkResponse && networkResponse.status === 200) {
-            const clone = networkResponse.clone();
-            event.waitUntil(putInRuntimeCache(request, clone));
+            const cacheControl = (networkResponse.headers.get('cache-control') || '').toLowerCase();
+            if (!cacheControl.includes('no-store') && !cacheControl.includes('private')) {
+              const clone = networkResponse.clone();
+              event.waitUntil(putInRuntimeCache(request, clone));
+            }
           }
           return networkResponse;
         })
         .catch(async () => {
-          const cachedResponse = await caches.match(request);
+          const cachedResponse =
+            (await caches.match(request, { ignoreSearch: true })) ||
+            (await caches.match(url.pathname));
           if (cachedResponse) {
             return cachedResponse;
           }
@@ -113,8 +128,9 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 4. Static Assets (CSS, JS, Fonts, Images, Audio, WebManifest): Stale-While-Revalidate
+  // 5. Static Assets (CSS, JS, Fonts, Images, Audio, WebManifest): Stale-While-Revalidate
   const isStaticAsset =
+    isAllowedExternalFont ||
     url.pathname.startsWith('/_astro/') ||
     url.pathname.startsWith('/art/') ||
     url.pathname.startsWith('/icons/') ||
@@ -125,9 +141,7 @@ self.addEventListener('fetch', (event) => {
     url.pathname.endsWith('.jpg') ||
     url.pathname.endsWith('.css') ||
     url.pathname.endsWith('.js') ||
-    url.pathname.endsWith('.webmanifest') ||
-    url.hostname.includes('fonts.googleapis.com') ||
-    url.hostname.includes('fonts.gstatic.com');
+    url.pathname.endsWith('.webmanifest');
 
   if (isStaticAsset) {
     event.respondWith(
@@ -135,14 +149,26 @@ self.addEventListener('fetch', (event) => {
         const fetchPromise = fetch(request)
           .then((networkResponse) => {
             if (networkResponse && networkResponse.status === 200) {
-              const clone = networkResponse.clone();
-              event.waitUntil(putInRuntimeCache(request, clone));
+              const cacheControl = (networkResponse.headers.get('cache-control') || '').toLowerCase();
+              if (!cacheControl.includes('no-store') && !cacheControl.includes('private')) {
+                const clone = networkResponse.clone();
+                event.waitUntil(putInRuntimeCache(request, clone));
+              }
             }
             return networkResponse;
           })
           .catch(() => null);
 
-        return cachedResponse || fetchPromise.then((res) => res || caches.match('/favicon.svg'));
+        return (
+          cachedResponse ||
+          fetchPromise.then((res) => {
+            if (res) return res;
+            if (url.pathname.endsWith('.svg') || url.pathname.endsWith('.png')) {
+              return caches.match('/favicon.svg');
+            }
+            return Response.error();
+          })
+        );
       })
     );
   }

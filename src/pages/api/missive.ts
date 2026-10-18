@@ -16,6 +16,7 @@
  */
 
 import type { APIRoute } from 'astro';
+import { isIP, SocketAddress } from 'node:net';
 import { validateEmail } from '../../lib/email-validator';
 
 export const prerender = false;
@@ -64,15 +65,29 @@ const TOKEN_REPLAY_TTL_MS = 600_000; // 10 minutes
 const ipBuckets = new Map<string, number[]>();
 let globalTimestamps: number[] = [];
 const usedTurnstileTokens = new Map<string, number>();
+const inFlightTurnstileTokens = new Set<string>();
 
 export function __resetRateLimitsForTests(): void {
   ipBuckets.clear();
   globalTimestamps = [];
   usedTurnstileTokens.clear();
+  inFlightTurnstileTokens.clear();
 }
 
 export function __getIpBucketCount(): number {
   return ipBuckets.size;
+}
+
+export function __seedIpBucketForTests(ip: string, timestamps: number[]): void {
+  ipBuckets.set(ip, [...timestamps]);
+}
+
+export function __seedGlobalTimestampsForTests(timestamps: number[]): void {
+  globalTimestamps = [...timestamps];
+}
+
+export function __getInFlightTokensCount(): number {
+  return inFlightTurnstileTokens.size;
 }
 
 function isProductionEnv(): boolean {
@@ -91,41 +106,74 @@ function isProductionEnv(): boolean {
   return false;
 }
 
+export function isValidIp(ip: string): boolean {
+  if (!ip) return false;
+  return isIP(ip.trim()) !== 0;
+}
+
+export function normalizeIp(raw: string): string {
+  if (!raw) return 'unknown';
+  const trimmed = raw.trim().toLowerCase();
+  const family = isIP(trimmed);
+  if (!family) return 'unknown';
+  try {
+    const s = new SocketAddress({ address: trimmed, family: family === 4 ? 'ipv4' : 'ipv6' });
+    return s.address.toLowerCase();
+  } catch {
+    return trimmed;
+  }
+}
+
 /**
- * Resolves the client IP using only platform-authenticated headers on Vercel,
- * avoiding caller-spoofable forwarding headers in deployed environments (SEC-05).
+ * Resolves the client IP using platform-authenticated headers on Vercel,
+ * eliminating unverified header precedence and mapping invalid inputs to
+ * a safe, bounded 'unknown' bucket (PLAN-03 / SEC-05).
+ *
+ * Official Vercel platform documentation:
+ * - `x-vercel-forwarded-for`: Injected and preserved by Vercel's edge proxy even
+ *   if custom reverse proxies exist.
+ * - `x-real-ip`: Populated by Vercel edge containing the visitor IP (also
+ *   consumed by @astrojs/vercel serverless middleware).
+ * - `x-forwarded-for`: Standard header, but caller-prefixed if external proxies
+ *   are in front without trusted proxy settings.
+ *
+ * NOTE: While application parsing and header priority are enforced here,
+ * edge platform header authenticity cannot be locally verified without
+ * running in Vercel's live production infrastructure (Platform Gate).
  */
 export function getClientIp(request: Request): string {
   const isVercel = Boolean(process.env.VERCEL || process.env.VERCEL_ENV);
   let candidate = '';
 
   if (isVercel) {
-    candidate =
-      request.headers.get('x-vercel-ip') ||
-      request.headers.get('x-real-ip') ||
-      'unknown';
+    // On Vercel, x-vercel-forwarded-for is preserved by Vercel edge; x-real-ip is populated by Vercel proxy.
+    const vercelForwarded = request.headers.get('x-vercel-forwarded-for');
+    const realIp = request.headers.get('x-real-ip');
+    candidate = (vercelForwarded ? vercelForwarded.split(',')[0] : realIp) || 'unknown';
   } else {
-    candidate =
-      request.headers.get('x-vercel-ip') ||
-      request.headers.get('x-real-ip') ||
-      (request.headers.get('x-forwarded-for') || '').split(',')[0] ||
-      '127.0.0.1';
+    // Off-platform development or testing
+    const realIp = request.headers.get('x-real-ip');
+    const xff = request.headers.get('x-forwarded-for');
+    candidate = realIp || (xff ? xff.split(',')[0] : '') || '127.0.0.1';
   }
 
-  const trimmed = candidate.trim().slice(0, 64);
-  if (!trimmed || !/^[a-fA-F0-9:.]+$/.test(trimmed)) {
-    return 'unknown';
-  }
-  return trimmed;
+  const normalized = normalizeIp(candidate);
+  return normalized;
 }
 
 function redactIpForLog(ip: string): string {
   if (!ip || ip === 'unknown') return 'unknown';
-  if (ip.includes('.')) {
+  const family = isIP(ip);
+  if (family === 4) {
     const parts = ip.split('.');
     if (parts.length === 4) return `${parts[0]}.${parts[1]}.${parts[2]}.0`;
   }
-  if (ip.includes(':')) {
+  if (family === 6) {
+    if (ip.startsWith('::ffff:')) {
+      const v4 = ip.slice(7);
+      const parts = v4.split('.');
+      if (parts.length === 4) return `::ffff:${parts[0]}.${parts[1]}.${parts[2]}.0`;
+    }
     const parts = ip.split(':');
     return `${parts.slice(0, 3).join(':')}::`;
   }
@@ -257,11 +305,12 @@ function json(body: unknown, status = 200, extraHeaders: Record<string, string> 
 }
 
 function createTimeoutSignal(ms: number): AbortSignal {
+  const timeoutMs = process.env.NODE_ENV === 'test' ? Math.min(ms, 50) : ms;
   if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') {
-    return AbortSignal.timeout(ms);
+    return AbortSignal.timeout(timeoutMs);
   }
   const controller = new AbortController();
-  setTimeout(() => controller.abort(), ms);
+  setTimeout(() => controller.abort(), timeoutMs);
   return controller.signal;
 }
 
@@ -290,15 +339,43 @@ function markTokenUsed(token: string): void {
   usedTurnstileTokens.set(token, Date.now());
 }
 
-function getExpectedHostnames(): Set<string> {
-  const hosts = new Set<string>(['portfolio-ibem.vercel.app']);
-  const siteUrl = process.env.PUBLIC_SITE_URL || '';
+const STRICT_HOSTNAME_REGEX = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+$/i;
+
+export function isValidHostname(host: string): boolean {
+  if (!host || host.length > 253) return false;
+  return STRICT_HOSTNAME_REGEX.test(host);
+}
+
+export function getExpectedHostnames(): Set<string> {
+  const hosts = new Set<string>();
+  // Canonical owner-approved production host
+  hosts.add('portfolio-ibem.vercel.app');
+
+  const siteUrl = (process.env.PUBLIC_SITE_URL || '').trim();
   if (siteUrl) {
     try {
       const parsed = new URL(siteUrl);
-      if (parsed.hostname) hosts.add(parsed.hostname.toLowerCase());
+      if (
+        !parsed.username &&
+        !parsed.password &&
+        !parsed.search &&
+        !parsed.hash &&
+        (!parsed.pathname || parsed.pathname === '/') &&
+        (parsed.protocol === 'https:' || (!isProductionEnv() && parsed.protocol === 'http:')) &&
+        parsed.hostname &&
+        isValidHostname(parsed.hostname)
+      ) {
+        hosts.add(parsed.hostname.toLowerCase());
+      }
     } catch {}
   }
+
+  // Explicitly configured preview hostname (fails closed unless explicitly set and valid)
+  const approvedPreviewHost = (process.env.APPROVED_PREVIEW_HOSTNAME || '').trim().toLowerCase();
+  if (approvedPreviewHost && isValidHostname(approvedPreviewHost)) {
+    hosts.add(approvedPreviewHost);
+  }
+
   if (!isProductionEnv()) {
     hosts.add('localhost');
     hosts.add('127.0.0.1');
@@ -341,7 +418,7 @@ export async function verifyTurnstile(
     };
   }
 
-  if (isTokenReplayed(trimmedToken)) {
+  if (isTokenReplayed(trimmedToken) || inFlightTurnstileTokens.has(trimmedToken)) {
     return {
       success: false,
       error: 'This security challenge token has already been used. Please complete a fresh challenge.',
@@ -362,6 +439,7 @@ export async function verifyTurnstile(
     }
   }
 
+  inFlightTurnstileTokens.add(trimmedToken);
   const secretToUse = configuredSecret || '1x0000000000000000000000000000000AA';
 
   try {
@@ -393,24 +471,44 @@ export async function verifyTurnstile(
       'error-codes'?: string[];
     } | null;
 
-    if (!outcome || outcome.success !== true) {
+    if (!outcome || typeof outcome !== 'object' || outcome.success !== true) {
       return {
         success: false,
         error: 'Cloudflare security challenge verification failed. Please try again.',
       };
     }
 
-    if (outcome.action && outcome.action !== 'contact-missive') {
-      return {
-        success: false,
-        error: 'Security challenge action mismatch. Please reload and try again.',
-      };
-    }
+    const outcomeAction = typeof outcome.action === 'string' ? outcome.action.trim() : '';
+    const outcomeHost =
+      typeof outcome.hostname === 'string' ? outcome.hostname.trim().toLowerCase() : '';
+    const expectedHosts = getExpectedHostnames();
 
-    if (outcome.hostname) {
-      const normalizedHost = outcome.hostname.toLowerCase();
-      const expectedHosts = getExpectedHostnames();
-      if (!expectedHosts.has(normalizedHost) && !(isProd && normalizedHost.endsWith('.vercel.app'))) {
+    if (isProd) {
+      // In production, require exact action 'contact-missive'
+      if (!outcomeAction || outcomeAction !== 'contact-missive') {
+        return {
+          success: false,
+          error: 'Security challenge action mismatch. Please reload and try again.',
+        };
+      }
+
+      // In production, require nonempty hostname belonging to the exact owner-approved host set
+      // (Wildcard *.vercel.app suffix acceptance is removed per PLAN-01)
+      if (!outcomeHost || !expectedHosts.has(outcomeHost)) {
+        return {
+          success: false,
+          error: 'Security challenge hostname mismatch.',
+        };
+      }
+    } else {
+      // In non-production, validate action and hostname if provided
+      if (outcomeAction && outcomeAction !== 'contact-missive') {
+        return {
+          success: false,
+          error: 'Security challenge action mismatch. Please reload and try again.',
+        };
+      }
+      if (outcomeHost && !expectedHosts.has(outcomeHost)) {
         return {
           success: false,
           error: 'Security challenge hostname mismatch.',
@@ -426,6 +524,8 @@ export async function verifyTurnstile(
       isServiceError: true,
       error: 'Security verification service timed out or is temporarily unreachable. Please try again or use your email client.',
     };
+  } finally {
+    inFlightTurnstileTokens.delete(trimmedToken);
   }
 }
 
@@ -577,24 +677,106 @@ async function readBoundedJsonBody(
   return { ok: true, payload: record as MissivePayload };
 }
 
+export function getAllowedOrigins(): Set<string> {
+  const allowed = new Set<string>();
+  // Canonical owner-approved production origin
+  allowed.add('https://portfolio-ibem.vercel.app');
+
+  const siteUrl = (process.env.PUBLIC_SITE_URL || '').trim();
+  if (siteUrl) {
+    try {
+      const u = new URL(siteUrl);
+      if (
+        !u.username &&
+        !u.password &&
+        !u.search &&
+        !u.hash &&
+        (!u.pathname || u.pathname === '/') &&
+        (u.protocol === 'https:' || (!isProductionEnv() && u.protocol === 'http:')) &&
+        isValidHostname(u.hostname)
+      ) {
+        allowed.add(u.origin.toLowerCase());
+      }
+    } catch {}
+  }
+
+  const approvedPreviewHost = (process.env.APPROVED_PREVIEW_HOSTNAME || '').trim().toLowerCase();
+  if (approvedPreviewHost && isValidHostname(approvedPreviewHost)) {
+    allowed.add(`https://${approvedPreviewHost}`);
+  }
+
+  // Loopback HTTP origins are strictly permitted only in non-production environments
+  if (!isProductionEnv()) {
+    allowed.add('http://localhost:4321');
+    allowed.add('http://127.0.0.1:4321');
+    allowed.add('http://localhost:3000');
+    allowed.add('http://127.0.0.1:3000');
+  }
+
+  return allowed;
+}
+
 export const POST: APIRoute = async ({ request }) => {
-  // 1a. Validate Origin / Cross-Site requests early.
+  // 1a. Validate Origin / Fetch Metadata early (PLAN-02).
   const secFetchSite = request.headers.get('sec-fetch-site');
   if (secFetchSite === 'cross-site') {
     return json({ success: false, message: 'Cross-origin missive dispatches are rejected.' }, 403);
   }
-  const origin = request.headers.get('origin');
-  if (origin) {
-    const siteUrl = process.env.PUBLIC_SITE_URL || '';
-    const allowed = new Set([
-      siteUrl.replace(/\/$/, ''),
-      'https://portfolio-ibem.vercel.app',
-      'http://localhost:4321',
-      'http://127.0.0.1:4321',
-      'http://localhost:3000',
-    ]);
-    const norm = origin.replace(/\/$/, '');
-    if (!allowed.has(norm) && !norm.startsWith('http://localhost:')) {
+
+  const rawOrigin = request.headers.get('origin');
+  if (rawOrigin && rawOrigin.trim().toLowerCase() === 'null') {
+    return json({ success: false, message: 'Null origins are rejected.' }, 403);
+  }
+
+  // In production, browser contact requests require an explicit Origin header
+  if (isProductionEnv() && (!rawOrigin || rawOrigin.trim() === '')) {
+    return json({ success: false, message: 'Origin header is required for contact submissions.' }, 403);
+  }
+
+  if (rawOrigin) {
+    const trimmedOrigin = rawOrigin.trim();
+    // RFC 6454: Origin header consists of scheme://host[:port].
+    // Reject if it contains userinfo/credentials (@), query (?), fragment (#), or path
+    if (
+      trimmedOrigin.includes('@') ||
+      trimmedOrigin.includes('?') ||
+      trimmedOrigin.includes('#')
+    ) {
+      return json({ success: false, message: 'Malformed origin header.' }, 403);
+    }
+
+    let normalizedOrigin = '';
+    try {
+      const parsedOrigin = new URL(trimmedOrigin);
+      if (parsedOrigin.username || parsedOrigin.password || parsedOrigin.search || parsedOrigin.hash) {
+        return json({ success: false, message: 'Malformed origin header.' }, 403);
+      }
+      if (parsedOrigin.pathname && parsedOrigin.pathname !== '/' && parsedOrigin.pathname !== '') {
+        return json({ success: false, message: 'Malformed origin header.' }, 403);
+      }
+      // Ensure the raw origin wasn't reduced from a URL with subpath
+      if (trimmedOrigin !== parsedOrigin.origin && trimmedOrigin !== `${parsedOrigin.origin}/`) {
+        return json({ success: false, message: 'Malformed origin header.' }, 403);
+      }
+      if (parsedOrigin.protocol !== 'https:' && parsedOrigin.protocol !== 'http:') {
+        return json({ success: false, message: 'Invalid origin scheme.' }, 403);
+      }
+      if (isProductionEnv() && parsedOrigin.protocol !== 'https:') {
+        return json(
+          {
+            success: false,
+            message: 'Insecure or non-production origins are rejected in production.',
+          },
+          403
+        );
+      }
+      normalizedOrigin = parsedOrigin.origin.toLowerCase();
+    } catch {
+      return json({ success: false, message: 'Malformed origin header.' }, 403);
+    }
+
+    const allowedOrigins = getAllowedOrigins();
+    if (!allowedOrigins.has(normalizedOrigin)) {
       return json({ success: false, message: 'Cross-origin missive dispatches are rejected.' }, 403);
     }
   }

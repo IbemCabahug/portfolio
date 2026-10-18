@@ -19,24 +19,28 @@ export interface MissiveDraft {
 let activeDraft: MissiveDraft | null = null;
 
 export function saveMissiveDraft(draft: MissiveDraft): void {
-  // Only store if there is actual user-entered content
-  if (
-    draft.name.trim() ||
-    draft.email.trim() ||
-    draft.subject.trim() ||
-    draft.body.trim()
-  ) {
+  // If the user cleared all fields, clear the stored draft so the empty form state is preserved
+  const hasContent = Boolean(
+    (draft.name && draft.name.trim()) ||
+    (draft.email && draft.email.trim()) ||
+    (draft.subject && draft.subject.trim()) ||
+    (draft.body && draft.body.trim())
+  );
+
+  if (hasContent) {
     activeDraft = {
       name: draft.name,
       email: draft.email,
       subject: draft.subject,
       body: draft.body,
     };
+  } else {
+    activeDraft = null;
   }
 }
 
 export function getMissiveDraft(): MissiveDraft | null {
-  return activeDraft;
+  return activeDraft ? { ...activeDraft } : null;
 }
 
 export function clearMissiveDraft(): void {

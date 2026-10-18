@@ -1263,6 +1263,7 @@ const turnstileSiteKey = import.meta.env.DEV
   import { saveMissiveDraft, getMissiveDraft, clearMissiveDraft } from '../../lib/messenger-draft';
 
   let messengerAbort: AbortController | null = null;
+  let currentSnapshotDraftFn: (() => void) | null = null;
 
   function initMessengerPage() {
     const pageWrapper = document.querySelector('.roost-page-wrapper') as HTMLElement | null;
@@ -1334,24 +1335,66 @@ const turnstileSiteKey = import.meta.env.DEV
     let activeTrigger: HTMLElement | null = null;
     let unloadTransceiverFn: (() => void) | null = null;
 
-    function snapshotCurrentDraft() {
+    function snapshotFromDesktop() {
       const desktopName = (document.getElementById('desktop-sender-name') as HTMLInputElement | null)?.value || '';
       const desktopEmail = (document.getElementById('desktop-sender-email') as HTMLInputElement | null)?.value || '';
       const desktopSubject = (document.getElementById('desktop-missive-subject') as HTMLInputElement | null)?.value || '';
       const desktopBody = (document.getElementById('desktop-missive-body') as HTMLTextAreaElement | null)?.value || '';
 
+      saveMissiveDraft({
+        name: desktopName,
+        email: desktopEmail,
+        subject: desktopSubject,
+        body: desktopBody,
+      });
+
+      const mobileName = document.getElementById('mobile-sender-name') as HTMLInputElement | null;
+      const mobileEmail = document.getElementById('mobile-sender-email') as HTMLInputElement | null;
+      const mobileSubject = document.getElementById('mobile-missive-subject') as HTMLInputElement | null;
+      const mobileBody = document.getElementById('mobile-missive-body') as HTMLTextAreaElement | null;
+      if (mobileName) mobileName.value = desktopName;
+      if (mobileEmail) mobileEmail.value = desktopEmail;
+      if (mobileSubject) mobileSubject.value = desktopSubject;
+      if (mobileBody) mobileBody.value = desktopBody;
+    }
+
+    function snapshotFromMobile() {
       const mobileName = (document.getElementById('mobile-sender-name') as HTMLInputElement | null)?.value || '';
       const mobileEmail = (document.getElementById('mobile-sender-email') as HTMLInputElement | null)?.value || '';
       const mobileSubject = (document.getElementById('mobile-missive-subject') as HTMLInputElement | null)?.value || '';
       const mobileBody = (document.getElementById('mobile-missive-body') as HTMLTextAreaElement | null)?.value || '';
 
       saveMissiveDraft({
-        name: desktopName || mobileName,
-        email: desktopEmail || mobileEmail,
-        subject: desktopSubject || mobileSubject,
-        body: desktopBody || mobileBody,
+        name: mobileName,
+        email: mobileEmail,
+        subject: mobileSubject,
+        body: mobileBody,
       });
+
+      const desktopName = document.getElementById('desktop-sender-name') as HTMLInputElement | null;
+      const desktopEmail = document.getElementById('desktop-sender-email') as HTMLInputElement | null;
+      const desktopSubject = document.getElementById('desktop-missive-subject') as HTMLInputElement | null;
+      const desktopBody = document.getElementById('desktop-missive-body') as HTMLTextAreaElement | null;
+      if (desktopName) desktopName.value = mobileName;
+      if (desktopEmail) desktopEmail.value = mobileEmail;
+      if (desktopSubject) desktopSubject.value = mobileSubject;
+      if (desktopBody) desktopBody.value = mobileBody;
     }
+
+    function snapshotCurrentDraft() {
+      if (activeDialog?.id === 'dialog-raven') {
+        snapshotFromDesktop();
+        return;
+      }
+      const isMobileView = window.innerWidth <= 600 && window.matchMedia('(orientation: portrait)').matches;
+      if (isMobileView) {
+        snapshotFromMobile();
+      } else {
+        snapshotFromDesktop();
+      }
+    }
+
+    currentSnapshotDraftFn = snapshotCurrentDraft;
 
     function openDialog(dialog: HTMLElement, trigger: HTMLElement | null) {
       if (activeDialog) closeDialog(true);
@@ -1391,17 +1434,20 @@ const turnstileSiteKey = import.meta.env.DEV
       }
 
       if (dialog.id === 'dialog-raven') {
-        const savedDraft = getMissiveDraft();
-        if (savedDraft) {
-          const desktopName = document.getElementById('desktop-sender-name') as HTMLInputElement | null;
-          const desktopEmail = document.getElementById('desktop-sender-email') as HTMLInputElement | null;
-          const desktopSubject = document.getElementById('desktop-missive-subject') as HTMLInputElement | null;
-          const desktopBody = document.getElementById('desktop-missive-body') as HTMLTextAreaElement | null;
-          if (desktopName && savedDraft.name) desktopName.value = savedDraft.name;
-          if (desktopEmail && savedDraft.email) desktopEmail.value = savedDraft.email;
-          if (desktopSubject && savedDraft.subject) desktopSubject.value = savedDraft.subject;
-          if (desktopBody && savedDraft.body) desktopBody.value = savedDraft.body;
+        const mobileName = (document.getElementById('mobile-sender-name') as HTMLInputElement | null)?.value;
+        const mobileBody = (document.getElementById('mobile-missive-body') as HTMLTextAreaElement | null)?.value;
+        if (mobileName || mobileBody) {
+          snapshotCurrentDraft();
         }
+        const savedDraft = getMissiveDraft();
+        const desktopName = document.getElementById('desktop-sender-name') as HTMLInputElement | null;
+        const desktopEmail = document.getElementById('desktop-sender-email') as HTMLInputElement | null;
+        const desktopSubject = document.getElementById('desktop-missive-subject') as HTMLInputElement | null;
+        const desktopBody = document.getElementById('desktop-missive-body') as HTMLTextAreaElement | null;
+        if (desktopName) desktopName.value = savedDraft?.name || '';
+        if (desktopEmail) desktopEmail.value = savedDraft?.email || '';
+        if (desktopSubject) desktopSubject.value = savedDraft?.subject || '';
+        if (desktopBody) desktopBody.value = savedDraft?.body || '';
         renderTurnstile();
       }
 
@@ -1534,6 +1580,12 @@ const turnstileSiteKey = import.meta.env.DEV
     // Accessible Missive Template Radio Group (UX-04)
     setupTemplateRadioGroup('.template-pill', 'desktop-missive-subject', 'desktop-missive-body', signal);
     setupTemplateRadioGroup('.mobile-template-pill', 'mobile-missive-subject', 'mobile-missive-body', signal);
+
+    // Continuous draft coordination across responsive viewports
+    const desktopFormEl = document.getElementById('desktop-raven-form');
+    const mobileFormEl = document.getElementById('mobile-raven-form');
+    desktopFormEl?.addEventListener('input', () => snapshotFromDesktop(), { signal });
+    mobileFormEl?.addEventListener('input', () => snapshotFromMobile(), { signal });
 
     // Scalable Transceiver Project Simulations Registry
     interface TransceiverProject {
@@ -2420,7 +2472,14 @@ const turnstileSiteKey = import.meta.env.DEV
           if (result.success) {
             delete form.dataset.dirty;
             recordSendSuccess();
-                  clearMissiveDraft();
+            clearMissiveDraft();
+            // Clear both synchronized composers so closing the receipt cannot
+            // snapshot the delivered message back into draft memory.
+            for (const formId of ['desktop-raven-form', 'mobile-raven-form']) {
+              const composer = document.getElementById(formId) as HTMLFormElement | null;
+              composer?.reset();
+              if (composer) delete composer.dataset.dirty;
+            }
             setFormStatus(statusContainerId, 'Message delivered.');
           } else {
             setFormStatus(statusContainerId, '');
@@ -2498,6 +2557,7 @@ const turnstileSiteKey = import.meta.env.DEV
                   receiptView.classList.add('hidden');
                   composerView.classList.remove('hidden');
                   form.reset();
+                  (document.getElementById('mobile-raven-form') as HTMLFormElement | null)?.reset();
                   delete form.dataset.dirty;
                   setFormStatus(statusContainerId, '');
                   if (typeof window !== 'undefined' && (window as any).turnstile && desktopTurnstileId !== null) {
@@ -2608,7 +2668,11 @@ const turnstileSiteKey = import.meta.env.DEV
 
   document.addEventListener('astro:page-load', initMessengerPage);
   document.addEventListener('astro:before-swap', () => {
+    try {
+      currentSnapshotDraftFn?.();
+    } catch {}
     messengerAbort?.abort();
     messengerAbort = null;
+    currentSnapshotDraftFn = null;
   });
 </script>

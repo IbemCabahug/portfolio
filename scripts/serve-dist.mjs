@@ -41,7 +41,7 @@ const TYPES = {
   '.webmanifest': 'application/manifest+json; charset=utf-8',
 }
 
-export async function createDistServer({ root = 'dist', port = 4321, quiet = false } = {}) {
+export async function createDistServer({ root = 'dist', port = 4321, quiet = false, handleRequest } = {}) {
   const ROOT = resolve(root)
 
   // Refuse to serve a root that is missing or has no index.html. A harness pointed
@@ -75,6 +75,8 @@ export async function createDistServer({ root = 'dist', port = 4321, quiet = fal
   }
 
   const server = createServer(async (req, res) => {
+    // Optional local test fixtures. Normal serving and cache headers stay unchanged.
+    if (handleRequest && await handleRequest(req, res)) return
     const file = await resolveFile(req.url ?? '/')
     if (!file) {
       const fallback = await readFile(join(ROOT, '404.html')).catch(() => null)
