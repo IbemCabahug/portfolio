@@ -368,8 +368,11 @@ await test('SEC-06: vercel.json CSP includes frame-ancestors \'self\'', () => {
   assert.match(vercelConfig, /frame-ancestors 'self';/);
 });
 
-await test('UX-02 & UX-03: messenger.astro has no silent <2500ms drop and uses synchronous isSubmitting guard', () => {
-  const messenger = readRepoFile('src/pages/messenger.astro');
+await test('UX-02 & UX-03: messenger.astro / MessengerRoom.astro has no silent <2500ms drop and uses synchronous isSubmitting guard', () => {
+  const messengerPath = fs.existsSync(path.join(rootDir, 'src/components/messenger/MessengerRoom.astro'))
+    ? 'src/components/messenger/MessengerRoom.astro'
+    : 'src/pages/messenger.astro';
+  const messenger = readRepoFile(messengerPath);
   assert.equal(messenger.includes('formLoadTime'), false, 'Silent <2.5s drop must be removed');
   assert.match(messenger, /if \(isSubmitting\) return;/);
   assert.match(messenger, /isSubmitting = true;/);
@@ -404,7 +407,7 @@ await test('UX-07: public/sw.js bounds runtime cache and PwaRegister.astro guard
 
 await test('UX-08 & UX-10: SiteHeader.astro provides primary Contact link and mobile motion toggle', () => {
   const header = readRepoFile('src/components/SiteHeader.astro');
-  assert.match(header, /href: '\/messenger', label: 'Contact'/);
+  assert.match(header, /href: '\/messenger\/raven', label: 'Contact'/);
   assert.match(header, /id="menu-toggle-motion"/);
 });
 

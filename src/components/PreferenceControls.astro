@@ -1,14 +1,17 @@
 ---
+import ThematicIcon from './icons/ThematicIcon.astro';
 ---
 <div class="preference-pod flex items-center h-8 rounded-md border border-[var(--brass)] bg-[#1e1208] text-xs shadow-xs overflow-hidden" role="group" aria-label="Display and sound preferences">
   <button
     id="toggle-motion"
     type="button"
-    class="px-2.5 h-full font-semibold text-[var(--parchment)] hover:text-[var(--candle)] hover:bg-[var(--brass)]/20 focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-[-2px] flex items-center justify-center whitespace-nowrap transition-colors cursor-pointer"
+    class="px-2.5 h-full font-semibold text-[var(--parchment)] hover:text-[var(--candle)] hover:bg-[var(--brass)]/20 focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-[-2px] flex items-center justify-center gap-1.5 whitespace-nowrap transition-colors cursor-pointer"
     aria-pressed="false"
     title="Toggle animations (Full / Reduced)"
   >
-    Motion: Full
+    <ThematicIcon name="motion-full" class="w-3.5 h-3.5 text-[var(--brass)] shrink-0 motion-icon-full" />
+    <ThematicIcon name="motion-reduced" class="w-3.5 h-3.5 text-[var(--brass)] shrink-0 motion-icon-reduced hidden" />
+    <span id="motion-text">Motion: Full</span>
   </button>
   <div class="w-px h-3.5 bg-[var(--brass)]/40 shrink-0" aria-hidden="true"></div>
   <button
@@ -36,8 +39,14 @@
     const sound = getSound();
 
     if (btnMotion) {
-      btnMotion.textContent = motion === 'full' ? 'Motion: Full' : 'Motion: Reduced';
-      btnMotion.setAttribute('aria-pressed', motion === 'reduced' ? 'true' : 'false');
+      const isReduced = motion === 'reduced';
+      btnMotion.setAttribute('aria-pressed', isReduced ? 'true' : 'false');
+      const iconFull = btnMotion.querySelector('.motion-icon-full');
+      const iconReduced = btnMotion.querySelector('.motion-icon-reduced');
+      const motionText = document.getElementById('motion-text');
+      if (iconFull) iconFull.classList.toggle('hidden', isReduced);
+      if (iconReduced) iconReduced.classList.toggle('hidden', !isReduced);
+      if (motionText) motionText.textContent = isReduced ? 'Motion: Reduced' : 'Motion: Full';
     }
 
     if (btnSound) {

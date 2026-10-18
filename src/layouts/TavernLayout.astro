@@ -116,8 +116,8 @@ const isScene = location === 'tavern' || location === 'messenger';
     }
 
     .tavern-shell.scene-layout {
-      min-height: 100dvh;
       min-height: 100vh;
+      min-height: 100dvh;
       overflow-y: auto;
       overflow-x: hidden;
       display: flex;
@@ -132,6 +132,7 @@ const isScene = location === 'tavern' || location === 'messenger';
 
     .tavern-shell.scene-layout .scene-wrapper {
       flex: 1 1 0;
+      min-height: calc(100vh - var(--hud-height, 48px));
       min-height: calc(100dvh - var(--hud-height, 48px));
       display: flex;
       flex-direction: column;
@@ -195,11 +196,13 @@ const isScene = location === 'tavern' || location === 'messenger';
       max-height: 100vh !important;
       max-height: 100dvh !important;
       max-width: calc(100vh * (2560 / 1431)) !important;
+      max-width: calc(100dvh * (2560 / 1431)) !important;
     }
 
-    @media (max-width: 768px) and (orientation: portrait) {
+    @media (orientation: portrait) {
       .tavern-shell.scene-layout {
         height: auto;
+        min-height: 100vh;
         min-height: 100dvh;
         overflow-y: auto;
       }

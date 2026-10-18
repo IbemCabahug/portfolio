@@ -11,7 +11,9 @@ export interface Props {
     | 'github'
     | 'resume'
     | 'swords'
-    | 'external';
+    | 'external'
+    | 'motion-full'
+    | 'motion-reduced';
   class?: string;
   size?: number | string;
 }
@@ -264,5 +266,46 @@ const { name, class: className = 'w-5 h-5 inline-block', size = 20 } = Astro.pro
     <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
     <polyline points="15 3 21 3 21 9" />
     <line x1="10" y1="14" x2="21" y2="3" />
+  </svg>
+)}
+
+{name === 'motion-full' && (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    width={size}
+    height={size}
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.75"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    class={className}
+    aria-hidden="true"
+  >
+    <!-- Engraved Tavern Breeze (Full Motion) - Three flowing gust trails with curls -->
+    <path d="M3 8h12a3 3 0 1 0-3-3" />
+    <path d="M2 13h16a3.5 3.5 0 1 1-3.5 3.5" />
+    <path d="M5 18h6a2.5 2.5 0 1 0-2.5-2.5" />
+  </svg>
+)}
+
+{name === 'motion-reduced' && (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    width={size}
+    height={size}
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.75"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    class={className}
+    aria-hidden="true"
+  >
+    <!-- Still Air / Gentle Breeze (Reduced Motion) - Shortened calm trail -->
+    <path d="M4 12h12a3 3 0 1 0-3-3" />
+    <line x1="6" y1="16" x2="12" y2="16" />
   </svg>
 )}

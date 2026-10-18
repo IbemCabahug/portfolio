@@ -364,7 +364,7 @@ const sceneObjects = [
   <NpcDialogue
     npcId="innkeeper"
     title="The Innkeeper"
-    showCloseIcon={false}
+    showCloseIcon={true}
     portraitSrc="/art/innkeeper-portrait-519.webp"
     portraitWidth={519}
     portraitHeight={1365}
@@ -388,7 +388,7 @@ const sceneObjects = [
   <NpcDialogue
     npcId="regular"
     title="The Tavern Regular"
-    showCloseIcon={false}
+    showCloseIcon={true}
     portraitSrc="/art/tavern-regular-bust-1024.webp"
     portraitWidth={1024}
     portraitHeight={1205}
@@ -409,7 +409,7 @@ const sceneObjects = [
   <NpcDialogue
     npcId="archivist"
     title="The Hooded Archivist"
-    showCloseIcon={false}
+    showCloseIcon={true}
     portraitSrc="/art/archivist-neutral-520.webp"
     portraitWidth={520}
     portraitHeight={1263}
@@ -596,9 +596,12 @@ const sceneObjects = [
     position: relative;
     container-type: inline-size;
     aspect-ratio: 2560 / 1431;
+    width: min(100vw, calc((100vh - var(--hud-height, 48px)) * (2560 / 1431)));
     width: min(100vw, calc((100dvh - var(--hud-height, 48px)) * (2560 / 1431)));
+    height: min(calc(100vh - var(--hud-height, 48px)), calc(100vw * (1431 / 2560)));
     height: min(calc(100dvh - var(--hud-height, 48px)), calc(100vw * (1431 / 2560)));
     max-width: 100vw;
+    max-height: calc(100vh - var(--hud-height, 48px));
     max-height: calc(100dvh - var(--hud-height, 48px));
     margin: auto;
     overflow: hidden;
@@ -1300,17 +1303,6 @@ const sceneObjects = [
     .skills-grid {
       grid-template-columns: 1fr;
     }
-    .dialogue-panel .dialogue-stack {
-      width: 95vw;
-      bottom: 12px;
-      max-height: 85dvh;
-    }
-    .dialogue-panel .dialogue-replies {
-      width: 100%;
-      max-width: 100%;
-      max-height: 140px;
-      overflow-y: auto;
-    }
   }
 
   .bounty-slip {
@@ -1486,9 +1478,6 @@ const sceneObjects = [
 
   /* In portrait narrow screens (<= 600px), hide scene and show narrow links + orientation prompt */
   @media (max-width: 600px) and (orientation: portrait) {
-    .dialogue-panel .innkeeper-portrait { display: none; }
-    .dialogue-panel .dialogue-stack { left: 3%; right: 3%; width: auto; transform: none; bottom: 8px; max-height: 88dvh; }
-    .dialogue-panel .dialogue-replies { max-width: 100%; width: 100%; }
     .scene-container {
       display: none;
     }

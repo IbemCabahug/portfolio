@@ -39,7 +39,7 @@ const navLinks = [
   { href: '/about', label: 'About', active: pathname.startsWith('/about') },
   { href: '/resume', label: 'Resume', active: pathname.startsWith('/resume') },
   { href: '/quests', label: 'Projects', active: pathname.startsWith('/quests'), title: 'Quest Board — Engineering Projects & Case Studies' },
-  { href: '/messenger', label: 'Contact', active: pathname.startsWith('/messenger'), title: "Messenger's Corner — Contact Nhovem" },
+  { href: '/messenger/raven', label: 'Contact', active: pathname === '/messenger' || pathname.startsWith('/messenger/'), title: "Send a Raven — Contact Nhovem" },
 ];
 ---
 
@@ -51,13 +51,13 @@ const navLinks = [
   <div class="flex items-center gap-2 sm:gap-3 shrink-0">
     <a
       href="/tavern"
-      class="flex items-center gap-1.5 h-8 text-xs sm:text-sm font-bold text-[var(--candle)] hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)]"
+      class="flex items-center gap-1.5 h-8 text-xs sm:text-sm font-bold text-[var(--candle)] hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-[var(--candle)] shrink-0"
       title="Return to Main Tavern Room"
     >
-      <span class="font-serif tracking-wide text-sm sm:text-base">Ibem's Tavern</span>
+      <span class="font-serif tracking-wide text-sm sm:text-base whitespace-nowrap">Ibem's Tavern</span>
     </a>
     <span
-      class="hidden sm:inline-flex items-center text-[11px] font-semibold px-2 py-0.5 rounded bg-[#1e1208] border border-[var(--brass)]/60 text-[var(--candle)]"
+      class="hidden lg:inline-flex items-center text-[11px] font-semibold px-2 py-0.5 rounded bg-[#1e1208] border border-[var(--brass)]/60 text-[var(--candle)] max-w-[150px] truncate"
       id="header-chamber-badge"
     >
       {badgeLabel}
@@ -84,7 +84,7 @@ const navLinks = [
 
   {/* ZONE 3: The Stable / Global Navigation Layer (Right — Home | About | Resume | Projects | Contact | Menu) */}
   <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-    <nav aria-label="Main Navigation" class="hidden md:flex items-center gap-1 text-xs font-semibold">
+    <nav aria-label="Main Navigation" class="hidden xl:flex items-center gap-1 text-xs font-semibold shrink-0">
       {navLinks.map((link) => (
         <a
           href={link.href}
@@ -108,9 +108,9 @@ const navLinks = [
     </nav>
 
     {/* Chambers & Site Menu Dropdown */}
-    <details class="relative group" id="site-menu-dropdown">
+    <details class="relative group shrink-0" id="site-menu-dropdown">
       <summary
-        class="flex items-center justify-center h-8 px-2.5 text-xs font-semibold rounded-md border border-[var(--brass)] bg-[#1e1208] text-[var(--candle)] cursor-pointer hover:bg-black hover:border-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] list-none select-none transition-colors shadow-xs"
+        class="flex items-center justify-center h-8 px-2.5 text-xs font-semibold rounded-md border border-[var(--brass)] bg-[#1e1208] text-[var(--candle)] cursor-pointer hover:bg-black hover:border-[var(--candle)] focus-visible:outline-2 focus-visible:outline-[var(--brass)] list-none select-none transition-colors shadow-xs shrink-0"
         aria-label="Toggle site chambers and navigation menu"
       >
         <span class="flex items-center gap-1.5">
@@ -131,7 +131,7 @@ const navLinks = [
         <li><a href="/tavern/npc" class="flex items-center justify-between min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]"><span>Tavern Regular</span><span class="text-[10px] font-mono text-[var(--parchment)]/60">Experience</span></a></li>
         <li><a href="/tavern/archivist" class="flex items-center justify-between min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]"><span>The Archivist</span><span class="text-[10px] font-mono text-[var(--parchment)]/60">Systems</span></a></li>
         <li><a href="/quests" class="flex items-center justify-between min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]"><span>Quest Board</span><span class="text-[10px] font-mono text-[var(--parchment)]/60">Projects</span></a></li>
-        <li><a href="/messenger" class="flex items-center justify-between min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]"><span>Messenger's Corner</span><span class="text-[10px] font-mono text-[var(--parchment)]/60">Contact</span></a></li>
+        <li><a href="/messenger" class="flex items-center justify-between min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]"><span>Messenger's Corner</span><span class="text-[10px] font-mono text-[var(--parchment)]/60">Chamber</span></a></li>
         <li class="border-t border-[var(--brass)]/30 my-1"></li>
         <li class="px-2 py-1 text-[10px] uppercase tracking-widest text-[var(--brass)] font-extrabold border-b border-[var(--brass)]/30 mb-1">
           Portfolio Records
@@ -140,6 +140,7 @@ const navLinks = [
         <li><a href="/about" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">About Nhovem</a></li>
         <li><a href="/resume" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Resume</a></li>
         <li><a href="/tales" class="flex items-center min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]">Field Dispatches (Notes)</a></li>
+        <li><a href="/messenger/raven" class="flex items-center justify-between min-h-[44px] px-2 rounded hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]"><span>Send a Raven (Contact)</span><span class="text-[10px] font-mono text-[var(--parchment)]/60">Direct</span></a></li>
         <li><a href="/simple" class="flex items-center justify-between min-h-[44px] px-2 rounded text-[var(--parchment)]/80 hover:bg-[var(--brass)]/20 hover:text-[var(--candle)]"><span>Simple Portfolio</span><span class="text-[10px] font-mono text-[var(--parchment)]/60">0-JS</span></a></li>
         <li class="border-t border-[var(--brass)]/30 my-1"></li>
         <li class="px-2 py-1 text-[10px] uppercase tracking-widest text-[var(--brass)] font-extrabold border-b border-[var(--brass)]/30 mb-1">
@@ -168,7 +169,10 @@ const navLinks = [
             aria-pressed="false"
           >
             <span class="flex items-center gap-2">
-              <span id="menu-motion-icon" class="text-sm" aria-hidden="true">✨</span>
+              <span id="menu-motion-icon-wrapper" class="flex items-center text-[var(--brass)]" aria-hidden="true">
+                <ThematicIcon name="motion-full" class="w-4 h-4 menu-motion-icon-full" />
+                <ThematicIcon name="motion-reduced" class="w-4 h-4 menu-motion-icon-reduced hidden" />
+              </span>
               <span id="menu-motion-text">Motion: Full</span>
             </span>
             <span id="menu-motion-badge" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/40 text-[var(--candle)]">Full</span>
@@ -228,13 +232,18 @@ const navLinks = [
 
   function updateMenuPreferenceStates() {
     const motionBtn = document.getElementById('menu-toggle-motion');
-    const motionIcon = document.getElementById('menu-motion-icon');
+    const motionIconWrapper = document.getElementById('menu-motion-icon-wrapper');
     const motionText = document.getElementById('menu-motion-text');
     const motionBadge = document.getElementById('menu-motion-badge');
     const isReduced = getMotion() === 'reduced';
 
     if (motionBtn) motionBtn.setAttribute('aria-pressed', isReduced ? 'true' : 'false');
-    if (motionIcon) motionIcon.textContent = isReduced ? '🪶' : '✨';
+    if (motionIconWrapper) {
+      const iconFull = motionIconWrapper.querySelector('.menu-motion-icon-full');
+      const iconReduced = motionIconWrapper.querySelector('.menu-motion-icon-reduced');
+      if (iconFull) iconFull.classList.toggle('hidden', isReduced);
+      if (iconReduced) iconReduced.classList.toggle('hidden', !isReduced);
+    }
     if (motionText) motionText.textContent = isReduced ? 'Motion: Reduced' : 'Motion: Full';
     if (motionBadge) {
       motionBadge.textContent = isReduced ? 'Reduced' : 'Full';

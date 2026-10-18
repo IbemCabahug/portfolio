@@ -57,6 +57,7 @@ const {
 
 const isModal = mode === 'modal';
 const TitleTag = isModal ? 'h2' : 'h1';
+const shouldShowCloseIcon = showCloseIcon || isModal;
 ---
 
 <div
@@ -69,103 +70,108 @@ const TitleTag = isModal ? 'h2' : 'h1';
   hidden={isModal}
   data-npc-id={npcId}
   data-mode={mode}
+  data-has-portrait={portraitSrc ? "true" : "false"}
 >
-  {portraitSrc && (
-    <img
-      class="npc-dialogue-portrait"
-      src={portraitSrc}
-      width={portraitWidth}
-      height={portraitHeight}
-      alt=""
-      aria-hidden="true"
-      loading="lazy"
-      decoding="async"
-    />
-  )}
+  <div class={`npc-dialogue-stage ${portraitSrc ? 'has-portrait' : 'no-portrait'}`}>
+    {portraitSrc && (
+      <div class="npc-portrait-stage">
+        <img
+          class="npc-dialogue-portrait"
+          src={portraitSrc}
+          width={portraitWidth}
+          height={portraitHeight}
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+    )}
 
-  <div class="dialogue-stack" id={stackId || `${npcId}-stack`} hidden={!isModal}>
-    <!-- Speech Band (Left in landscape, top in portrait) -->
-    <div class="dialogue-band" id={`${npcId}-band`}>
-      <div class="panel-header flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="speech-pip" aria-hidden="true"></span>
-          <TitleTag id={`${npcId}-dialogue-title`} class="text-base sm:text-lg font-bold text-[var(--candle)] font-serif leading-tight">
-            {title}
-          </TitleTag>
+    <div class="dialogue-stack" id={stackId || `${npcId}-stack`} hidden={!isModal}>
+      <!-- Speech Band (Left in landscape, top in portrait) -->
+      <div class="dialogue-band" id={`${npcId}-band`}>
+        <div class="panel-header flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="speech-pip" aria-hidden="true"></span>
+            <TitleTag id={`${npcId}-dialogue-title`} class="text-base sm:text-lg font-bold text-[var(--candle)] font-serif leading-tight">
+              {title}
+            </TitleTag>
+          </div>
+          {shouldShowCloseIcon && (
+            isModal ? (
+              <button
+                type="button"
+                class="close-panel-btn panel-close-icon-btn"
+                aria-label={`Close ${title}`}
+                data-action="close"
+              >
+                ✕
+              </button>
+            ) : (
+              <a
+                href={closeHref}
+                class="close-panel-btn panel-close-icon-btn"
+                aria-label={`Back from ${title}`}
+              >
+                ✕
+              </a>
+            )
+          )}
         </div>
-        {showCloseIcon && (
-          isModal ? (
-            <button
-              type="button"
-              class="close-panel-btn panel-close-icon-btn"
-              aria-label={`Close ${title}`}
-              data-action="close"
-            >
-              ✕
+
+        <div class="panel-body">
+          <div class="dialogue-prose" id={`${npcId}-dialogue-prose`} tabindex="-1">
+            {initialBeats.map((line) => (
+              <p>{line}</p>
+            ))}
+          </div>
+        </div>
+
+        <div class="panel-actions flex items-center justify-between">
+          <span class="dialogue-hint text-[11px] text-[var(--parchment)]/70 hidden sm:inline">
+            Tap box or press Space to skip
+          </span>
+          {isModal ? (
+            <button type="button" class="close-panel-btn ml-auto" data-action="close">
+              {closeLabel}
             </button>
           ) : (
-            <a
-              href={closeHref}
-              class="close-panel-btn panel-close-icon-btn"
-              aria-label={`Back from ${title}`}
-            >
-              ✕
+            <a href={closeHref} class="close-panel-btn ml-auto">
+              {closeLabel}
             </a>
-          )
-        )}
-      </div>
-
-      <div class="panel-body">
-        <div class="dialogue-prose" id={`${npcId}-dialogue-prose`} tabindex="-1">
-          {initialBeats.map((line) => (
-            <p>{line}</p>
-          ))}
+          )}
         </div>
       </div>
 
-      <div class="panel-actions flex items-center justify-between">
-        <span class="dialogue-hint text-[11px] text-[var(--parchment)]/70 hidden sm:inline">
-          Tap box or press Space to skip
-        </span>
-        {isModal ? (
-          <button type="button" class="close-panel-btn ml-auto" data-action="close">
-            {closeLabel}
-          </button>
-        ) : (
-          <a href={closeHref} class="close-panel-btn ml-auto">
-            {closeLabel}
-          </a>
-        )}
+      <!-- Replies Tray (Right in landscape, bottom in portrait) -->
+      <div class="dialogue-replies-tray" id={`${npcId}-replies-tray`}>
+        <div class="replies-header">
+          <span>Inquiries</span>
+          <span class="text-[10px] text-[var(--brass)]/80 tracking-wider">SELECT A TOPIC</span>
+        </div>
+        <ul class="dialogue-replies" id={repliesId || `${npcId}-replies`}>
+          {replies.map((reply, i) => (
+            <li>
+              <button
+                type="button"
+                class="reply-btn"
+                data-reply-index={i}
+                data-question-index={i}
+              >
+                {reply.question}
+              </button>
+            </li>
+          ))}
+          {farewell && (
+            <li>
+              <button type="button" class="reply-btn farewell-btn" data-action="farewell">
+                {farewell.question}
+              </button>
+            </li>
+          )}
+        </ul>
       </div>
-    </div>
-
-    <!-- Replies Tray (Right in landscape, bottom in portrait) -->
-    <div class="dialogue-replies-tray" id={`${npcId}-replies-tray`}>
-      <div class="replies-header">
-        <span>Inquiries</span>
-        <span class="text-[10px] text-[var(--brass)]/80 tracking-wider">SELECT A TOPIC</span>
-      </div>
-      <ul class="dialogue-replies" id={repliesId || `${npcId}-replies`}>
-        {replies.map((reply, i) => (
-          <li>
-            <button
-              type="button"
-              class="reply-btn"
-              data-reply-index={i}
-              data-question-index={i}
-            >
-              {reply.question}
-            </button>
-          </li>
-        ))}
-        {farewell && (
-          <li>
-            <button type="button" class="reply-btn farewell-btn" data-action="farewell">
-              {farewell.question}
-            </button>
-          </li>
-        )}
-      </ul>
     </div>
   </div>
 
@@ -206,11 +212,39 @@ const TitleTag = isModal ? 'h2' : 'h1';
     animation: none !important;
     transform: none !important;
   }
+  .npc-dialogue-container.tavern-panel {
+    contain: none !important;
+  }
   .npc-dialogue-container[hidden] {
     display: none !important;
   }
   .npc-dialogue-container > * {
     pointer-events: auto;
+  }
+
+  .npc-dialogue-stage,
+  .npc-portrait-stage {
+    display: contents;
+  }
+
+  .npc-dialogue-portrait {
+    display: none;
+    position: absolute;
+    pointer-events: none;
+    user-select: none;
+    object-fit: contain;
+    z-index: 1;
+    filter: drop-shadow(0 10px 28px rgba(0, 0, 0, 0.85));
+  }
+
+  .dialogue-stack {
+    position: fixed;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    z-index: 2;
+    min-width: 0;
+    min-height: 0;
   }
 
   .speech-pip {
@@ -294,10 +328,12 @@ const TitleTag = isModal ? 'h2' : 'h1';
 
   /* Graceful farewell concluding & fade effects */
   .dialogue-stack,
+  .npc-portrait-stage,
   .npc-dialogue-portrait {
     transition: opacity 0.2s ease-out;
   }
   .dialogue-concluding-fade .dialogue-stack,
+  .dialogue-concluding-fade .npc-portrait-stage,
   .dialogue-concluding-fade .npc-dialogue-portrait {
     opacity: 0 !important;
   }
@@ -404,11 +440,12 @@ const TitleTag = isModal ? 'h2' : 'h1';
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
-    min-height: 36px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
     padding: 0;
-    font-size: 1.1rem;
+    font-size: 1.25rem;
     font-weight: bold;
     border-radius: 4px;
     background: rgba(30, 18, 8, 0.85);
@@ -416,6 +453,7 @@ const TitleTag = isModal ? 'h2' : 'h1';
     color: var(--candle, #ffe4a0);
     cursor: pointer;
     transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    flex-shrink: 0;
   }
   .panel-close-icon-btn:is(:hover, :focus-visible) {
     background: #000;
@@ -457,14 +495,17 @@ const TitleTag = isModal ? 'h2' : 'h1';
   }
 
   /* --------------------------------------------------------------------------
-     Desktop Widescreen Layout (>= 1024px width & >= 550px height)
+     1. Desktop Widescreen Layout (>= 1024px width, >= 550px height, LANDSCAPE)
+     Cinematic side-by-side: Character art left, dialogue stack right
      -------------------------------------------------------------------------- */
-  @media (min-width: 1024px) and (min-height: 550px) {
+  @media (min-width: 1024px) and (min-height: 550px) and (orientation: landscape) {
     .npc-dialogue-portrait {
+      display: block !important;
       position: absolute;
       left: 6%;
       bottom: 0;
       height: 76vh;
+      height: 76dvh;
       max-height: 680px;
       width: auto;
       object-fit: contain;
@@ -483,7 +524,8 @@ const TitleTag = isModal ? 'h2' : 'h1';
       flex-direction: column;
       align-items: flex-end;
       gap: 12px;
-      max-height: 85%;
+      max-height: 85vh;
+      max-height: 85dvh;
       z-index: 2;
     }
 
@@ -510,8 +552,171 @@ const TitleTag = isModal ? 'h2' : 'h1';
   }
 
   /* --------------------------------------------------------------------------
-     Mobile Portrait Layout (<= 600px width in portrait)
-     Staged RPG Bottom Sheet: Character art in top 44%, Dialogue in bottom 56%
+     2. Tablet & Large Portrait Layout (>= 601px width in PORTRAIT)
+     Connected Portrait-Above-Dialogue Staging:
+     Decorative portrait stage above, Dialogue stack below with explicit 12px gap
+     Includes 768x1024, 820x1180, 960x1440, 1024x1366, 1032x1376, and 800x800
+     -------------------------------------------------------------------------- */
+  @media (min-width: 601px) and (orientation: portrait) {
+    .modal-dialogue .npc-dialogue-stage.has-portrait {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: max(16px, env(safe-area-inset-bottom) + 8px);
+      width: min(92vw, 760px);
+      max-width: 760px;
+      height: calc(100vh - max(var(--hud-height, 48px), env(safe-area-inset-top) + 8px) - max(16px, env(safe-area-inset-bottom) + 8px));
+      height: calc(100dvh - max(var(--hud-height, 48px), env(safe-area-inset-top) + 8px) - max(16px, env(safe-area-inset-bottom) + 8px));
+      max-height: calc(100vh - max(var(--hud-height, 48px), env(safe-area-inset-top) + 8px) - max(16px, env(safe-area-inset-bottom) + 8px));
+      max-height: calc(100dvh - max(var(--hud-height, 48px), env(safe-area-inset-top) + 8px) - max(16px, env(safe-area-inset-bottom) + 8px));
+      gap: 12px;
+      z-index: 50;
+      pointer-events: none;
+      box-sizing: border-box;
+    }
+
+    .modal-dialogue .npc-dialogue-stage.has-portrait .npc-portrait-stage {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      width: 100%;
+      flex: 1 1 auto;
+      min-height: 0;
+      max-height: 520px;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .modal-dialogue .npc-dialogue-stage.has-portrait .npc-dialogue-portrait {
+      display: block !important;
+      position: static !important;
+      transform: none !important;
+      left: auto !important;
+      top: auto !important;
+      bottom: auto !important;
+      right: auto !important;
+      width: auto !important;
+      height: auto !important;
+      max-height: 100% !important;
+      max-width: 100% !important;
+      object-fit: contain !important;
+      object-position: bottom center !important;
+      filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.9));
+      pointer-events: none;
+      flex-shrink: 1;
+    }
+
+    .modal-dialogue .npc-dialogue-stage.has-portrait .dialogue-stack {
+      position: static !important;
+      transform: none !important;
+      left: auto !important;
+      bottom: auto !important;
+      right: auto !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      height: clamp(380px, 48dvh, 520px);
+      max-height: clamp(380px, 48dvh, 520px);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 2;
+      min-height: 0;
+      flex-shrink: 0;
+      pointer-events: auto;
+      box-sizing: border-box;
+    }
+
+    .modal-dialogue .npc-dialogue-stage.has-portrait .dialogue-band {
+      width: 100%;
+      flex: 1 1 50%;
+      min-height: 0;
+      max-height: 52%;
+      overflow: hidden;
+      padding: 12px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-sizing: border-box;
+    }
+
+    .modal-dialogue .npc-dialogue-stage.has-portrait .dialogue-band .panel-header {
+      padding-bottom: 6px;
+      flex-shrink: 0;
+    }
+
+    .modal-dialogue .npc-dialogue-stage.has-portrait .dialogue-band .panel-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+    }
+
+    .modal-dialogue .npc-dialogue-stage.has-portrait .dialogue-band .panel-actions {
+      flex-shrink: 0;
+      padding-top: 6px;
+    }
+
+    .modal-dialogue .npc-dialogue-stage.has-portrait .dialogue-prose {
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    .modal-dialogue .npc-dialogue-stage.has-portrait .dialogue-replies-tray {
+      width: 100%;
+      flex: 1 1 50%;
+      min-height: 0;
+      max-height: 50%;
+      overflow: hidden;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+    }
+
+    .modal-dialogue .npc-dialogue-stage.has-portrait .dialogue-replies-tray .replies-header {
+      flex-shrink: 0;
+      padding-bottom: 6px;
+    }
+
+    .modal-dialogue .npc-dialogue-stage.has-portrait .dialogue-replies {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      gap: 6px;
+    }
+
+    .modal-dialogue .npc-dialogue-stage.has-portrait .reply-btn {
+      min-height: 44px !important;
+      padding: 8px 12px 8px 24px !important;
+      font-size: 0.9rem !important;
+    }
+
+    /* Fallback: when viewport height is too constrained for both art and dialogue, hide decorative art gracefully */
+    @media (max-height: 600px) {
+      .modal-dialogue .npc-dialogue-stage.has-portrait .npc-portrait-stage {
+        display: none !important;
+      }
+    }
+
+    /* Fallback / Page-mode in tablet portrait (e.g. without portrait or in page mode) */
+    .page-dialogue .dialogue-stack,
+    .modal-dialogue .npc-dialogue-stage.no-portrait .dialogue-stack {
+      position: relative;
+      left: auto;
+      transform: none;
+      bottom: auto;
+      width: 100%;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+  }
+
+  /* --------------------------------------------------------------------------
+     3. Narrow Mobile Portrait (<= 600px width in PORTRAIT)
+     Text-first bottom sheet, decorative character art hidden
      -------------------------------------------------------------------------- */
   @media (max-width: 600px) and (orientation: portrait) {
     .npc-dialogue-portrait {
@@ -522,10 +727,11 @@ const TitleTag = isModal ? 'h2' : 'h1';
       position: fixed;
       left: 3%;
       right: 3%;
-      bottom: 8px;
+      bottom: max(8px, env(safe-area-inset-bottom));
       width: auto;
       transform: none;
-      max-height: 56dvh;
+      max-height: 60vh;
+      max-height: 60dvh;
       display: flex;
       flex-direction: column;
       gap: 8px;
@@ -534,7 +740,7 @@ const TitleTag = isModal ? 'h2' : 'h1';
 
     .dialogue-band {
       padding: 10px 14px;
-      flex: 0 0 auto;
+      flex: 0 1 auto;
       max-height: 48%;
       overflow: hidden;
     }
@@ -553,7 +759,7 @@ const TitleTag = isModal ? 'h2' : 'h1';
       flex: 1 1 auto;
       min-height: 0;
       overflow-y: auto;
-      max-height: 100px;
+      max-height: 120px;
     }
 
     .dialogue-prose {
@@ -589,6 +795,7 @@ const TitleTag = isModal ? 'h2' : 'h1';
     .dialogue-replies {
       flex: 1 1 auto;
       min-height: 0;
+      max-height: 160px;
       overflow-y: auto;
       gap: 6px;
     }
@@ -601,10 +808,11 @@ const TitleTag = isModal ? 'h2' : 'h1';
   }
 
   /* --------------------------------------------------------------------------
-     Mobile Landscape Dual-Pane Layout (<= 500px height in landscape)
-     Solves the vertical double-box clash by splitting speech & replies side-by-side
+     4. Short & Intermediate Landscape ((height <= 549px) OR (width < 1024px))
+     Split side-by-side dual-pane grid: speech left, inquiries right
      -------------------------------------------------------------------------- */
-  @media (max-height: 500px) and (orientation: landscape) {
+  @media (orientation: landscape) and (max-height: 549px),
+         (orientation: landscape) and (max-width: 1023px) {
     .npc-dialogue-portrait {
       display: none !important;
     }
@@ -612,28 +820,29 @@ const TitleTag = isModal ? 'h2' : 'h1';
     .dialogue-stack {
       position: fixed;
       left: 50%;
-      bottom: 4px;
+      bottom: max(6px, env(safe-area-inset-bottom));
       transform: translateX(-50%);
-      width: min(96vw, 860px);
-      height: calc(100dvh - var(--hud-height, 40px) - 8px);
-      max-height: calc(100dvh - var(--hud-height, 40px) - 8px);
+      width: min(96vw, 920px);
+      height: calc(100vh - var(--hud-height, 40px) - 12px);
+      height: calc(100dvh - var(--hud-height, 40px) - 12px);
+      max-height: calc(100vh - var(--hud-height, 40px) - 12px);
+      max-height: calc(100dvh - var(--hud-height, 40px) - 12px);
       display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
+      grid-template-columns: 1.1fr 0.9fr;
       gap: 10px;
       align-items: stretch;
       z-index: 50;
     }
 
     .page-dialogue .dialogue-stack {
-      left: 36%;
-      right: 2%;
-      width: auto;
-      transform: none;
+      left: 50%;
+      width: min(96vw, 920px);
+      transform: translateX(-50%);
       grid-template-columns: 1fr 1fr;
     }
 
     .dialogue-band {
-      padding: 8px 12px;
+      padding: 10px 14px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -677,7 +886,7 @@ const TitleTag = isModal ? 'h2' : 'h1';
     }
 
     .dialogue-replies-tray {
-      padding: 8px 10px;
+      padding: 8px 12px;
       display: flex;
       flex-direction: column;
       min-height: 0;
@@ -703,8 +912,8 @@ const TitleTag = isModal ? 'h2' : 'h1';
 
     .reply-btn {
       min-height: 38px !important;
-      padding: 5px 8px 5px 20px !important;
-      font-size: 0.8rem !important;
+      padding: 6px 10px 6px 22px !important;
+      font-size: 0.825rem !important;
       line-height: 1.25 !important;
     }
     .reply-btn::before {
