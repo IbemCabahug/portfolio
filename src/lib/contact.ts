@@ -19,6 +19,7 @@ export interface MissivePayload {
   message: string;
   botcheck?: string;
   turnstileToken?: string;
+  hcaptchaToken?: string;
 }
 
 export interface MissiveOptions {
@@ -206,6 +207,16 @@ export async function sendMissive(
       };
     }
 
+    // This proof belongs exclusively to Web3Forms; never verify it at our endpoint.
+    if (!payload.hcaptchaToken?.trim()) {
+      return {
+        success: false,
+        message: 'Complete delivery verification (hCaptcha) before sending, or use direct email.',
+        fallbackMailto,
+        fallbackGmailUrl,
+      };
+    }
+
     // 2. Browser-assisted submission to Web3Forms using server-sanitized fields (SEC-01 & SEC-07)
     const providerBound = createBoundedSignal(providerTimeoutMs, [overallBound.signal]);
     let upstreamRes: Response;
@@ -218,6 +229,7 @@ export async function sendMissive(
         },
         body: JSON.stringify({
           access_key: data.accessKey,
+          'h-captcha-response': payload.hcaptchaToken,
           name: data.sanitized.name,
           email: data.sanitized.email,
           subject: data.sanitized.subject,

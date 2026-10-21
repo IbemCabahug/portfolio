@@ -1483,7 +1483,7 @@ await test('PLAN-06 / Phase D: delivery matrix (both Resend settings, each alone
     }
   );
 
-  // Case 2: EMAIL_API_KEY alone without CONTACT_TO_ADDRESS + WEB3FORMS_KEY present -> Web3Forms fallback
+  // Partial server configuration must not downgrade to public provider delivery.
   await withIsolatedEnv(
     {
       EMAIL_API_KEY: 'resend_key',
@@ -1492,15 +1492,14 @@ await test('PLAN-06 / Phase D: delivery matrix (both Resend settings, each alone
     },
     async () => {
       const res = await makeReq('203.0.113.152', 'test-pass-matrix-2');
-      assert.equal(res.status, 200);
+      assert.equal(res.status, 503);
       const data = await res.json();
-      assert.equal(data.delivered, false);
-      assert.equal(data.authorized, true);
-      assert.equal(data.accessKey, 'web3_public_key');
+      assert.equal('accessKey' in data, false);
+      assert.match(data.message, /incomplete/i);
     }
   );
 
-  // Case 3: CONTACT_TO_ADDRESS alone without EMAIL_API_KEY + WEB3FORMS_KEY present -> Web3Forms fallback
+  // The other partial-server configuration also fails closed.
   await withIsolatedEnv(
     {
       EMAIL_API_KEY: undefined,
@@ -1509,11 +1508,10 @@ await test('PLAN-06 / Phase D: delivery matrix (both Resend settings, each alone
     },
     async () => {
       const res = await makeReq('203.0.113.153', 'test-pass-matrix-3');
-      assert.equal(res.status, 200);
+      assert.equal(res.status, 503);
       const data = await res.json();
-      assert.equal(data.delivered, false);
-      assert.equal(data.authorized, true);
-      assert.equal(data.accessKey, 'web3_public_key');
+      assert.equal('accessKey' in data, false);
+      assert.match(data.message, /incomplete/i);
     }
   );
 
@@ -1528,7 +1526,7 @@ await test('PLAN-06 / Phase D: delivery matrix (both Resend settings, each alone
       const res = await makeReq('203.0.113.154', 'test-pass-matrix-4');
       assert.equal(res.status, 503);
       const data = await res.json();
-      assert.match(data.message, /not yet configured/i);
+      assert.match(data.message, /incomplete/i);
     }
   );
 
@@ -1626,6 +1624,7 @@ await test('PLAN-06: client sendMissive integration tests (server-delivered vs b
   let web3FormsCalled = false;
   const mockFetchWeb3Path = async (url, init) => {
     if (url === '/api/missive') {
+      assert.equal(JSON.parse(init.body).hcaptchaToken, undefined, 'Provider proof must not reach first-party verification');
       return new Response(
         JSON.stringify({
           success: true,
@@ -1643,17 +1642,28 @@ await test('PLAN-06: client sendMissive integration tests (server-delivered vs b
       const bodyObj = JSON.parse(init?.body);
       assert.equal(bodyObj.access_key, 'synth_w3f_key');
       assert.equal(bodyObj.name, 'Alice Clean');
+      assert.equal(bodyObj['h-captcha-response'], 'synthetic-provider-proof');
+      assert.equal(bodyObj.turnstileToken, undefined);
       return new Response(JSON.stringify({ success: true, message: 'Delivered via Web3Forms' }), { status: 200 });
     }
     throw new Error(`Unexpected url: ${url}`);
   };
 
   const clientResWeb3 = await sendMissive(
-    { name: 'Alice Injected', email: 'alice@gmail.com', subject: 'Raw', message: 'Msg' },
+    { name: 'Alice Injected', email: 'alice@gmail.com', subject: 'Raw', message: 'Msg', hcaptchaToken: 'synthetic-provider-proof' },
     { fetchImpl: mockFetchWeb3Path }
   );
   assert.equal(clientResWeb3.success, true);
   assert.equal(web3FormsCalled, true);
+  web3FormsCalled = false;
+  const missingProof = await sendMissive(
+    { name: 'Alice', email: 'alice@gmail.com', subject: 'Raw', message: 'Msg' },
+    { fetchImpl: mockFetchWeb3Path }
+  );
+  assert.equal(missingProof.success, false);
+  assert.match(missingProof.message, /delivery verification/i);
+  assert.equal(web3FormsCalled, false, 'No provider request without proof');
+  assert.ok(missingProof.fallbackMailto);
 });
 
 // ── PLAN-07 / Phase E: Messenger Draft Lifecycle (Reviewer 8) ───────────────
@@ -2227,6 +2237,108 @@ await test('UX-09 & QA-02: BitsLiveDemo collapses empty frame-slot and BaseLayou
   const baseLayout = readRepoFile('src/layouts/BaseLayout.astro');
   assert.equal(baseLayout.includes('Client Security & Self-XSS Shield Active'), false);
   assert.match(baseLayout, /Developer Console Notice:/);
+});
+
+// ── October 2026 security audit regressions ─────────────────────────────────
+function auditRequest(ip, token, extra = {}) {
+  return POST({ request: new Request('https://portfolio-ibem.vercel.app/api/missive', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Origin: 'https://portfolio-ibem.vercel.app', 'x-vercel-forwarded-for': ip },
+    body: JSON.stringify({ name: 'Audit', email: 'audit@gmail.com', message: 'Synthetic audit fixture', turnstileToken: token, ...extra }),
+  }) });
+}
+
+const auditProductionEnv = {
+  NODE_ENV: 'production', VERCEL: '1', TURNSTILE_SECRET: 'synthetic-audit-secret',
+  EMAIL_API_KEY: 'synthetic-email-key', CONTACT_TO_ADDRESS: 'owner@example.test',
+};
+
+for (const [label, token] of [['missing', undefined], ['empty', ''], ['whitespace', '   '], ['overlong', 'x'.repeat(2049)]]) {
+  await test(`AUDIT: direct POST rejects ${label} token without outbound calls`, async () => {
+    await withIsolatedEnv(auditProductionEnv, async () => {
+      assert.equal((await auditRequest('203.0.113.1', token)).status, 400);
+      assert.equal(mockNetwork.recordedCalls.length, 0);
+    });
+  });
+}
+
+for (const [label, response] of [
+  ['invalid', { success: false, 'error-codes': ['invalid-input-response'] }],
+  ['expired', { success: false, 'error-codes': ['timeout-or-duplicate'] }],
+  ['already redeemed', { success: false, 'error-codes': ['timeout-or-duplicate'] }],
+  ['wrong action', { success: true, action: 'login', hostname: 'portfolio-ibem.vercel.app' }],
+  ['wrong hostname', { success: true, action: 'contact-missive', hostname: 'unrelated.vercel.app' }],
+  ['nonboolean success', { success: 'true', action: 'contact-missive', hostname: 'portfolio-ibem.vercel.app' }],
+  ['null response', null],
+]) {
+  await test(`AUDIT: ${label} Siteverify fixture cannot authorize delivery`, async () => {
+    mockNetwork.addRoute((url) => url === 'https://challenges.cloudflare.com/turnstile/v0/siteverify', () => Response.json(response));
+    await withIsolatedEnv(auditProductionEnv, async () => {
+      assert.equal((await auditRequest('203.0.113.1', 'synthetic-token')).status, 400);
+      assert.equal(mockNetwork.recordedCalls.length, 1);
+    });
+  });
+}
+
+for (const mode of ['network', 'http', 'malformed']) {
+  await test(`AUDIT: Siteverify ${mode} failure denies provider effects`, async () => {
+    mockNetwork.addRoute((url) => url === 'https://challenges.cloudflare.com/turnstile/v0/siteverify', () => {
+      if (mode === 'network') throw new Error('Synthetic outage');
+      return new Response(mode === 'malformed' ? '{invalid' : '', { status: mode === 'http' ? 503 : 200 });
+    });
+    await withIsolatedEnv(auditProductionEnv, async () => {
+      assert.equal((await auditRequest('203.0.113.1', 'synthetic-token')).status, mode === 'malformed' ? 400 : 503);
+      assert.equal(mockNetwork.recordedCalls.length, 1);
+    });
+  });
+}
+
+await test('AUD-03: 40 rejected tokens do not exhaust the verified delivery budget', async () => {
+  mockNetwork.addRoute((url) => url === 'https://challenges.cloudflare.com/turnstile/v0/siteverify', () =>
+    Response.json({ success: true, action: 'contact-missive', hostname: 'portfolio-ibem.vercel.app' }));
+  mockNetwork.addRoute((url) => url === 'https://api.resend.com/emails', () => Response.json({ id: 'synthetic' }));
+  await withIsolatedEnv(auditProductionEnv, async () => {
+    await captureLogs(async () => {
+      for (let i = 1; i <= 40; i++) assert.equal((await auditRequest(`198.51.100.${i}`, '')).status, 400);
+      assert.equal((await auditRequest('198.51.100.41', 'valid-fixture')).status, 200);
+    });
+    assert.deepEqual(mockNetwork.recordedCalls.map((call) => call.url), [
+      'https://challenges.cloudflare.com/turnstile/v0/siteverify', 'https://api.resend.com/emails',
+    ]);
+  });
+});
+
+await test('AUDIT: coarse verification work remains bounded independently of delivery capacity', async () => {
+  mockNetwork.addRoute((url) => url === 'https://challenges.cloudflare.com/turnstile/v0/siteverify', () => Response.json({ success: false }));
+  await withIsolatedEnv(auditProductionEnv, async () => {
+    await captureLogs(async () => {
+      for (let i = 1; i <= 120; i++) assert.equal((await auditRequest(`198.51.100.${i}`, `invalid-${i}`)).status, 400);
+      const res = await auditRequest('198.51.100.121', 'next-token');
+      assert.equal(res.status, 429);
+      assert.match((await res.json()).message, /verification is busy/i);
+      assert.ok(Number(res.headers.get('Retry-After')) > 0);
+    });
+    assert.equal(mockNetwork.recordedCalls.length, 120);
+  });
+});
+
+await test('AUD-06: production deployment takes precedence over test/development NODE_ENV', async () => {
+  for (const nodeEnv of ['test', 'development']) {
+    await withIsolatedEnv({ NODE_ENV: nodeEnv, VERCEL_ENV: 'production' }, async () => {
+      const result = await verifyTurnstile('test-pass-cannot-bypass-production', '203.0.113.1');
+      assert.equal(result.success, false);
+      assert.equal(result.isConfigError, true);
+    });
+  }
+  assert.equal(mockNetwork.recordedCalls.length, 0);
+});
+
+await test('AUDIT: development cannot use synthetic test-pass shortcut', async () => {
+  mockNetwork.addRoute((url) => url === 'https://challenges.cloudflare.com/turnstile/v0/siteverify', () => Response.json({ success: false }));
+  await withIsolatedEnv({ NODE_ENV: 'development' }, async () => {
+    assert.equal((await verifyTurnstile('test-pass-not-a-real-token', '203.0.113.1')).success, false);
+    assert.equal(mockNetwork.recordedCalls.length, 1);
+  });
 });
 
 if (!process.exitCode) {

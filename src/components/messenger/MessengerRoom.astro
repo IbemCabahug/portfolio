@@ -1246,6 +1246,7 @@ const turnstileSiteKey = import.meta.env.DEV
 <script>
   import { initPerformanceGovernor } from '../../lib/perf-governor';
   import { sendMissive } from '../../lib/contact';
+  import { setupProviderCaptcha } from '../../lib/provider-captcha';
   import { validateEmail } from '../../lib/email-validator';
   import {
     getFocusableElements,
@@ -2174,10 +2175,39 @@ const turnstileSiteKey = import.meta.env.DEV
 
     setupTransceiverSimulation();
 
+    const providerCaptcha = setupProviderCaptcha(signal);
+
     // Cloudflare Turnstile Management (SEC-04)
     const resolvedTurnstileSiteKey = pageWrapper.dataset.turnstileSitekey || '';
     let desktopTurnstileId: string | null = null;
     let mobileTurnstileId: string | null = null;
+
+    function setChallengeStatus(slotId: string, message: string) {
+      const slot = document.getElementById(slotId);
+      if (!slot) return;
+      let status = document.getElementById(`${slotId}-status`);
+      if (!status) {
+        status = document.createElement('p');
+        status.id = `${slotId}-status`;
+        status.className = 'text-xs text-center mt-2';
+        status.setAttribute('role', 'status');
+        status.setAttribute('aria-live', 'polite');
+        slot.after(status);
+      }
+      status.textContent = message;
+    }
+
+    function challengeCallbacks(slotId: string) {
+      return {
+        callback: () => setChallengeStatus(slotId, 'Security verification complete.'),
+        'expired-callback': () => setChallengeStatus(slotId, 'Verification expired. Please complete the refreshed challenge.'),
+        'timeout-callback': () => setChallengeStatus(slotId, 'Verification timed out. Please retry the challenge.'),
+        'error-callback': () => {
+          setChallengeStatus(slotId, 'Security verification is unavailable. Retry verification or use the direct email links.');
+          return true;
+        },
+      };
+    }
 
     function renderTurnstileUnavailableNotice(slot: HTMLElement | null) {
       if (!slot || slot.hasChildNodes()) return;
@@ -2207,6 +2237,7 @@ const turnstileSiteKey = import.meta.env.DEV
             theme: 'dark',
             size: 'normal',
             action: 'contact-missive',
+            ...challengeCallbacks('desktop-turnstile-slot'),
           });
         } catch (e) {
           console.warn('Desktop Turnstile render error:', e);
@@ -2220,6 +2251,7 @@ const turnstileSiteKey = import.meta.env.DEV
             theme: 'dark',
             size: 'normal',
             action: 'contact-missive',
+            ...challengeCallbacks('mobile-turnstile-slot'),
           });
         } catch (e) {
           console.warn('Mobile Turnstile render error:', e);
@@ -2227,7 +2259,43 @@ const turnstileSiteKey = import.meta.env.DEV
       }
     }
 
+    // A retry also recovers when the SDK arrives after the bounded readiness poll.
+    for (const slotId of ['desktop-turnstile-slot', 'mobile-turnstile-slot']) {
+      const slot = document.getElementById(slotId);
+      if (!slot || !resolvedTurnstileSiteKey) continue;
+      const retry = document.createElement('button');
+      retry.type = 'button';
+      retry.className = 'text-xs underline mt-2';
+      retry.textContent = 'Retry security verification';
+      slot.after(retry);
+      retry.addEventListener('click', () => {
+        renderTurnstile();
+        const id = slotId === 'desktop-turnstile-slot' ? desktopTurnstileId : mobileTurnstileId;
+        if ((window as any).turnstile && id !== null) {
+          try {
+            (window as any).turnstile.reset(id);
+            setChallengeStatus(slotId, 'Security verification restarted.');
+          } catch {
+            setChallengeStatus(slotId, 'Unable to restart verification. Reload this page or use direct email.');
+          }
+        } else {
+          setChallengeStatus(slotId, 'Security verification has not loaded. Check your connection or use direct email.');
+        }
+      }, { signal });
+      signal.addEventListener('abort', () => {
+        retry.remove();
+        document.getElementById(`${slotId}-status`)?.remove();
+      }, { once: true });
+    }
+
     if (typeof window !== 'undefined') {
+      const sdkScript = document.querySelector<HTMLScriptElement>('script[src^="https://challenges.cloudflare.com/turnstile/v0/api.js"]');
+      sdkScript?.addEventListener('load', renderTurnstile, { signal });
+      sdkScript?.addEventListener('error', () => {
+        for (const slotId of ['desktop-turnstile-slot', 'mobile-turnstile-slot']) {
+          setChallengeStatus(slotId, 'Security verification could not load. Reload this page or use direct email.');
+        }
+      }, { signal });
       if (!resolvedTurnstileSiteKey || (window as any).turnstile) {
         renderTurnstile();
       } else {
@@ -2237,12 +2305,26 @@ const turnstileSiteKey = import.meta.env.DEV
             renderTurnstile();
           }
         }, 200);
-        const pollerTimeout = setTimeout(() => clearInterval(turnstilePoller), 8000);
+        const pollerTimeout = setTimeout(() => {
+          clearInterval(turnstilePoller);
+          if (!(window as any).turnstile) {
+            for (const slotId of ['desktop-turnstile-slot', 'mobile-turnstile-slot']) {
+              setChallengeStatus(slotId, 'Security verification is taking longer than expected. Retry or use direct email.');
+            }
+          }
+        }, 8000);
         signal.addEventListener('abort', () => {
           clearInterval(turnstilePoller);
           clearTimeout(pollerTimeout);
         }, { once: true });
       }
+      signal.addEventListener('abort', () => {
+        for (const id of [desktopTurnstileId, mobileTurnstileId]) {
+          if (id !== null) {
+            try { (window as any).turnstile?.remove(id); } catch {}
+          }
+        }
+      }, { once: true });
     }
 
     // Form Handling and Missive Dispatching (UX-02, UX-03)
@@ -2409,17 +2491,25 @@ const turnstileSiteKey = import.meta.env.DEV
             if (tokenInput) turnstileToken = tokenInput.value;
           }
 
-          if (!turnstileToken && resolvedTurnstileSiteKey && typeof window !== 'undefined' && (window as any).turnstile) {
-            const widgetId = isDesktop ? desktopTurnstileId : mobileTurnstileId;
-            if (widgetId !== null) {
-              showFormError(errorContainerId, 'Security challenge is still verifying. Please complete the anti-bot check and try again.');
+          if (!turnstileToken) {
+              showFormError(errorContainerId, 'Complete security verification before sending. If it has not loaded, retry verification or use direct email.');
               setFormStatus(statusContainerId, '');
               if (submitBtn) {
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalBtnText;
               }
               return;
+          }
+
+          const hcaptchaToken = providerCaptcha.getToken(isDesktop);
+          if (!hcaptchaToken) {
+            showFormError(errorContainerId, 'Complete delivery verification (hCaptcha) before sending. Retry delivery verification or use direct email if it is unavailable.');
+            setFormStatus(statusContainerId, '');
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.textContent = originalBtnText;
             }
+            return;
           }
 
           const name = rawName || 'Traveler';
@@ -2438,7 +2528,10 @@ const turnstileSiteKey = import.meta.env.DEV
             message: body,
             botcheck: botcheckValue,
             turnstileToken,
+            hcaptchaToken,
           });
+
+          providerCaptcha.reset(isDesktop);
 
           // Reset Turnstile challenge token after submission attempt
           if (typeof window !== 'undefined' && (window as any).turnstile) {

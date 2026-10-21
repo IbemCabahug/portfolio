@@ -57,19 +57,23 @@ const DUMMY_TURNSTILE_SECRETS: ReadonlySet<string> = new Set([
 const RATE_WINDOW_MS = 3_600_000; // 1 hour
 const MAX_ATTEMPTS_PER_HOUR = 6;
 const COOLDOWN_MS = 30_000; // 30s between dispatch attempts
-const GLOBAL_MAX_PER_HOUR = 40; // hard cap on dispatches/hour per instance
+const GLOBAL_MAX_PER_HOUR = 40; // verified action reservations/hour per instance, NOT deployment-wide
+const VERIFICATION_WINDOW_MS = 300_000;
+const MAX_VERIFICATIONS_PER_WINDOW = 120; // coarse pre-verification work budget per instance
 const MAX_IP_BUCKETS = 5_000; // strict upper bound on tracked IP keys
 const MAX_REPLAY_TOKENS = 2_000;
 const TOKEN_REPLAY_TTL_MS = 600_000; // 10 minutes
 
 const ipBuckets = new Map<string, number[]>();
 let globalTimestamps: number[] = [];
+let verificationTimestamps: number[] = [];
 const usedTurnstileTokens = new Map<string, number>();
 const inFlightTurnstileTokens = new Set<string>();
 
 export function __resetRateLimitsForTests(): void {
   ipBuckets.clear();
   globalTimestamps = [];
+  verificationTimestamps = [];
   usedTurnstileTokens.clear();
   inFlightTurnstileTokens.clear();
 }
@@ -91,11 +95,12 @@ export function __getInFlightTokensCount(): number {
 }
 
 function isProductionEnv(): boolean {
-  if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') {
-    return false;
-  }
+  // A production deployment must not be weakened by a contradictory NODE_ENV.
   if (process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production') {
     return true;
+  }
+  if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') {
+    return false;
   }
   try {
     if (typeof import.meta !== 'undefined' && import.meta.env) {
@@ -258,6 +263,19 @@ function checkGlobalLimit(): { allowed: boolean; retryAfterSeconds: number } {
 
 function recordGlobalAttempt(): void {
   globalTimestamps.push(Date.now());
+}
+
+function reserveVerificationWork(): { allowed: boolean; retryAfterSeconds: number } {
+  const now = Date.now();
+  verificationTimestamps = verificationTimestamps.filter((t) => now - t < VERIFICATION_WINDOW_MS);
+  if (verificationTimestamps.length >= MAX_VERIFICATIONS_PER_WINDOW) {
+    return {
+      allowed: false,
+      retryAfterSeconds: Math.max(1, Math.ceil((verificationTimestamps[0] + VERIFICATION_WINDOW_MS - now) / 1000)),
+    };
+  }
+  verificationTimestamps.push(now);
+  return { allowed: true, retryAfterSeconds: 0 };
 }
 
 function rateLimitHeaders(limit: number, remaining: number, resetEpochSeconds: number): Record<string, string> {
@@ -425,8 +443,8 @@ export async function verifyTurnstile(
     };
   }
 
-  // Explicit non-production test shortcut when no real secret is provided
-  if (!isProd && (!configuredSecret || DUMMY_TURNSTILE_SECRETS.has(configuredSecret))) {
+  // Synthetic shortcuts belong to the isolated test runner, never development/deployments.
+  if (!isProd && process.env.NODE_ENV === 'test' && (!configuredSecret || DUMMY_TURNSTILE_SECRETS.has(configuredSecret))) {
     if (trimmedToken === 'TEST_INVALID_TOKEN') {
       return {
         success: false,
@@ -828,7 +846,7 @@ export const POST: APIRoute = async ({ request }) => {
     resetEpochSeconds
   );
 
-  // 3b. Global burst cap per instance.
+  // 3b. Reject a full verified-action budget early without spending network work.
   const global = checkGlobalLimit();
   if (!global.allowed) {
     logMissive(ip, 'abuse', 'rate_limited_global', payload.email || '');
@@ -841,7 +859,6 @@ export const POST: APIRoute = async ({ request }) => {
       { 'Retry-After': String(global.retryAfterSeconds), ...rlHeaders }
     );
   }
-  recordGlobalAttempt();
 
   // 4. Normalize and validate field boundaries BEFORE external network calls (SEC-03).
   // Strip CRLF sequences (\r, \n) from header-like fields (CWE-93) and reject oversized
@@ -922,6 +939,15 @@ export const POST: APIRoute = async ({ request }) => {
   const body = rawBody;
 
   // 5. Cloudflare Turnstile challenge verification (SEC-04).
+  const verificationWork = reserveVerificationWork();
+  if (!verificationWork.allowed) {
+    logMissive(ip, 'abuse', 'rate_limited_verification');
+    return json(
+      { success: false, message: 'Security verification is busy. Please retry shortly or use your email client.' },
+      429,
+      { 'Retry-After': String(verificationWork.retryAfterSeconds), ...rlHeaders }
+    );
+  }
   const turnstileCheck = await verifyTurnstile(payload.turnstileToken || '', ip);
   if (!turnstileCheck.success) {
     const category: LogCategory =
@@ -967,9 +993,30 @@ export const POST: APIRoute = async ({ request }) => {
     );
   }
 
+  // Reserve synchronously AFTER both awaited checks: concurrent valid requests
+  // cannot claim the same final slot. Rejected proof/DNS never spends this budget.
+  const deliveryLimit = checkGlobalLimit();
+  if (!deliveryLimit.allowed) {
+    logMissive(ip, 'abuse', 'rate_limited_global', email);
+    return json(
+      { success: false, message: 'The contact service is busy right now. Please try again later or email directly.' },
+      429,
+      { 'Retry-After': String(deliveryLimit.retryAfterSeconds), ...rlHeaders }
+    );
+  }
+  recordGlobalAttempt();
+
   // 7. Server-to-server delivery when EMAIL_API_KEY + CONTACT_TO_ADDRESS are configured (SEC-01 Option 1).
   const emailApiKey = (process.env.EMAIL_API_KEY || '').trim();
   const contactTo = (process.env.CONTACT_TO_ADDRESS || '').trim();
+  if (Boolean(emailApiKey) !== Boolean(contactTo)) {
+    logMissive(ip, 'service_error', 'incomplete_server_delivery_configuration');
+    return json(
+      { success: false, message: 'Email delivery configuration is incomplete. Please use Gmail Web or your email client.' },
+      503,
+      rlHeaders
+    );
+  }
   if (emailApiKey && contactTo) {
     try {
       const formattedBody = `Sender: ${name}\nReturn Address: ${email}\n\n--------------------------------------------------\n${body}\n--------------------------------------------------\n(Dispatched via Ibem's Tavern Messenger Roost)`;

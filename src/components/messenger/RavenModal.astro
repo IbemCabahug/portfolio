@@ -175,6 +175,12 @@ const { mailAddress } = Astro.props;
       <!-- Cloudflare Turnstile Anti-Spam Gate -->
       <div class="turnstile-container my-2 flex flex-col items-center justify-center min-h-[70px] w-full">
         <div id="desktop-turnstile-slot" class="cf-turnstile-wrapper flex justify-center items-center min-w-[300px] min-h-[65px]"></div>
+        <div class="my-3 text-center">
+          <p class="text-xs">Delivery verification (Web3Forms)</p>
+          <div id="desktop-hcaptcha-slot" class="flex justify-center min-h-[144px]"></div>
+          <p id="desktop-hcaptcha-slot-status" role="status" aria-live="polite" class="text-xs">Loading delivery verification…</p>
+          <button id="desktop-hcaptcha-slot-retry" type="button" class="text-xs underline">Retry delivery verification</button>
+        </div>
       </div>
 
       <div class="panel-actions pt-2 flex flex-wrap items-center justify-between gap-3">
