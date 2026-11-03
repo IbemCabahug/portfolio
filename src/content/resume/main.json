@@ -1,6 +1,6 @@
 {
   "contact": {
-    "phone": "+639943130249",
+    "phone": "+63 994 313 0249",
     "email": "cabahugnhovem@gmail.com",
     "location": "Mandaue City, Cebu, 6014",
     "portfolio": "portfolio-ibem.vercel.app",
@@ -8,41 +8,42 @@
     "github": "github.com/IbemCabahug",
     "githubUrl": "https://github.com/IbemCabahug"
   },
-  "summary": "Computer Technology graduate with 1,800 hours of hands-on IT and administrative support experience in the shipping and logistics industry. Experienced in manual QA testing of a production biometric attendance system, including test case preparation and execution, pre-release testing, and defect reporting in an Agile/Kanban workflow. Skilled in data entry, basic technical troubleshooting, and testing personal software projects developed with AI-assisted workflows, tracking defects and enhancements through GitHub Issues. Detail-oriented, adaptable, quick to learn new systems, and proficient in typing at 90+ WPM.",
+  "summary": "Computer Technology graduate with 1,800 hours of IT internship experience in shipping and logistics. Experienced in desktop troubleshooting, PC assembly using recovered functional components, Windows/software installation, computer maintenance, and end-user support. Contributed to development and testing of a company-directed biometric timekeeping system (BITS), including implementation of Manager and Employee dashboards. Seeking an entry-level IT Support or IT Staff role.",
   "coreSkills": [
     {
-      "category": "QA & Testing",
-      "items": "Manual, Functional & Regression Testing; Test Case Writing & Execution; Release/Pre-Release Testing; Bug Reporting & Tracking; Agile/Kanban Workflows"
+      "category": "IT Support & Troubleshooting",
+      "items": "Desktop hardware diagnostics; PC assembly and component replacement; hardware/software maintenance; installation and configuration; end-user technical support"
     },
     {
-      "category": "Technical Support",
-      "items": "Basic Hardware/Software Troubleshooting; Hardware & Software Installation & Configuration; End-User Technical Support; Data Entry & Record Verification"
+      "category": "Networking & Operating Systems",
+      "items": "Windows troubleshooting; basic network diagnostics"
     },
     {
-      "category": "Web & Development Tools",
-      "items": "HTML, CSS, JavaScript, SQL; Git & GitHub (incl. Issues, Kanban Boards); Visual Studio Code; AI-Assisted Development"
+      "category": "QA & System Testing",
+      "items": "Manual and functional testing; bug fixing; test case execution; defect documentation and tracking"
     },
     {
-      "category": "Productivity Tools",
-      "items": "Microsoft Excel & Word; Google Sheets & Docs"
+      "category": "Programming & Development",
+      "items": "Basic Java, HTML, CSS, JavaScript, and SQL; Git and GitHub; AI-assisted software development"
     },
     {
-      "category": "Typing Speed",
-      "items": "90+ WPM (Monkeytype)"
+      "category": "Productivity & Data Management",
+      "items": "Microsoft Office; Google Workspace; data and record management; typing speed 90+ WPM"
     }
   ],
   "experience": [
     {
-      "role": "IT and Administrative Support Intern",
+      "role": "IT Support Intern",
       "org": "Avega Bros. Integrated Shipping Corp.",
       "period": "July 2025 – July 2026",
-      "hours": "1,800 hrs",
+      "hours": "1,800 hours",
       "bullets": [
-        "Conducted manual QA testing of production updates for BITS, a biometric attendance system, by preparing and executing test cases, performing pre-release checks, and reporting and tracking defects across overtime, shift, punch-time, and reporting workflows.",
-        "Tracked sprint tasks using a GitHub Kanban board and workflow stages: To Do, In Progress, Testing, and Done.",
-        "Entered and maintained inventory, administrative, and biometric attendance records; checked data for errors and inconsistencies before finalization.",
-        "Organized physical and digital records for efficient retrieval and supported the real-time attendance dashboard and related system data.",
-        "Provided basic hardware/software troubleshooting, installation, configuration, and general office technical support."
+        "Provided day-to-day technical assistance to employees with desktop and laptop software issues.",
+        "Diagnosed desktop display, startup, and power issues; assembled usable PCs from working parts recovered from nonfunctional system units.",
+        "Performed hardware and software cleaning and maintenance, installed or configured Windows and software, and assisted with CCTV installation.",
+        "Collaborated on BITS, a company-directed ZKTeco K14 biometric timekeeping system; implemented the Manager and Employee dashboards.",
+        "Fixed bugs assigned through GitHub Kanban boards; manually tested attendance, shift, overtime, and reporting workflows and documented defects.",
+        "Reviewed inventory, administrative, and biometric attendance records for errors and inconsistencies."
       ]
     }
   ],
@@ -82,7 +83,7 @@
       "period": "August 2022 – May 2026",
       "honors": [
         "Academic Distinction Awardee",
-        "Dean's Lister"
+        "Dean's Lister (1st Year, 1st Semester)"
       ]
     }
   ],

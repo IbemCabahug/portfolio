@@ -1,0 +1,94 @@
+---
+import ThematicIcon from './icons/ThematicIcon.astro';
+import type { MimicReleaseConfig } from '../lib/mimic-release';
+
+interface Props {
+  config: MimicReleaseConfig;
+  sourceUrl?: string;
+}
+
+const { config, sourceUrl } = Astro.props;
+---
+
+<section
+  id="mimic-release-status"
+  data-release-status={config.status}
+  class="rounded-lg border-2 border-amber-600/70 bg-[#fff9ee] p-4 sm:p-6 shadow-sm text-[var(--ink)] my-2"
+  aria-labelledby="release-status-title"
+>
+  <div class="flex flex-col sm:flex-row items-start gap-4">
+    <!-- Visual Indicator: Clock / In-Progress Icon -->
+    <div
+      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-500/20 text-amber-800 border border-amber-600/40 mt-0.5"
+      aria-hidden="true"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+    </div>
+
+    <!-- Content Block -->
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-center gap-2.5 mb-2">
+        <h2
+          id="release-status-title"
+          class="font-serif font-bold text-base sm:text-lg text-[var(--ink)] tracking-tight"
+        >
+          {config.title}
+        </h2>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold tracking-wider uppercase bg-amber-200/90 text-amber-950 border border-amber-400">
+          <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse" aria-hidden="true"></span>
+          <span>{config.badgeLabel}</span>
+        </span>
+      </div>
+
+      <div class="text-xs sm:text-sm text-[var(--ink)]/90 space-y-2 leading-relaxed">
+        {config.paragraphs.map((paragraph, idx) => (
+          <p class={idx === config.paragraphs.length - 1 ? 'font-semibold text-[#7c531d]' : ''}>
+            {paragraph}
+          </p>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions Row -->
+  <div class="mt-5 pt-4 border-t border-amber-600/25 flex flex-wrap items-center gap-3">
+    <!-- Disabled Download Pill -->
+    <div
+      id="mimic-download-disabled"
+      class="inline-flex items-center gap-2 justify-center min-h-[44px] px-5 py-2 bg-stone-200 text-stone-500 font-bold text-xs sm:text-sm rounded border-2 border-stone-300 cursor-not-allowed select-none opacity-85"
+      aria-disabled="true"
+      role="status"
+      title="Public downloads are temporarily disabled while updates are in progress"
+    >
+      <ThematicIcon name="scroll" class="w-4 h-4 opacity-50" />
+      <span>Downloads Paused</span>
+    </div>
+
+    <!-- Public Source Code Link (Fully Maintained) -->
+    {sourceUrl && (
+      <a
+        href={sourceUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-2 justify-center min-h-[44px] px-5 py-2 border-2 border-[var(--wood-deep)] text-[var(--wood-deep)] font-bold text-xs sm:text-sm rounded hover:bg-[var(--wood-deep)] hover:text-[var(--parchment)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--brass)] focus-visible:outline-offset-2"
+        id="project-source-action"
+      >
+        <ThematicIcon name="code" class="w-4 h-4" />
+        <span>Inspect Source Code</span>
+      </a>
+    )}
+  </div>
+</section>

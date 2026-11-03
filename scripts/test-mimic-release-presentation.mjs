@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import puppeteer from 'puppeteer-core';
 import { EDGE } from './browser-path.mjs';
 import { createDistServer } from './serve-dist.mjs';
+import { mimicRelease } from '../src/lib/mimic-release.ts';
 
 const VERIFIED_DOWNLOAD_URL =
   'https://github.com/IbemCabahug/mimic-release/releases/latest/download/mimic-v1.1.0.apk';
@@ -115,170 +116,244 @@ try {
   assert.ok(mimicPageText.includes('Offline Local Vault Isolation'), 'Must accurately describe offline vault isolation');
   assert.ok(mimicPageText.includes('128-bit tamper detection'), 'Must describe AEAD tamper detection');
 
-  // Assert Real Download Anchor
-  const downloadAction = await page.evaluate(() => {
-    const el = document.querySelector('#project-download-action');
-    if (!el) return null;
-    const computed = window.getComputedStyle(el);
-    const rect = el.getBoundingClientRect();
-    return {
-      href: el.getAttribute('href'),
-      target: el.getAttribute('target'),
-      downloadAttr: el.hasAttribute('download'),
-      text: el.textContent.trim(),
-      minHeightPx: parseFloat(computed.minHeight),
-      rectHeight: rect.height,
-    };
-  });
-
-  assert.ok(downloadAction, 'Primary #project-download-action must be rendered on /quests/mimic');
-  assert.equal(downloadAction.href, VERIFIED_DOWNLOAD_URL, 'Download anchor must point to verified APK download URL');
-  assert.equal(downloadAction.text, 'Download Android APK', 'Download action label must match truthful copy');
-  assert.equal(downloadAction.target, null, 'Download action must navigate in same tab (no target="_blank" creating orphaned tabs)');
-  assert.equal(downloadAction.downloadAttr, false, 'Download action must not use HTML download attribute for external URL');
-  assert.ok(downloadAction.minHeightPx >= 44, `Download action minHeight must be >= 44px (got ${downloadAction.minHeightPx}px)`);
-  assert.ok(downloadAction.rectHeight >= 44, `Download action height must be >= 44px (got ${downloadAction.rectHeight}px)`);
-
-  // Assert Real Secondary Release Anchor
-  const releaseAction = await page.evaluate(() => {
-    const el = document.querySelector('#project-release-action');
-    if (!el) return null;
-    const computed = window.getComputedStyle(el);
-    const rect = el.getBoundingClientRect();
-    return {
-      href: el.getAttribute('href'),
-      target: el.getAttribute('target'),
-      rel: el.getAttribute('rel') || '',
-      text: el.textContent.trim(),
-      minHeightPx: parseFloat(computed.minHeight),
-      rectHeight: rect.height,
-    };
-  });
-
-  assert.ok(releaseAction, 'Secondary #project-release-action must be rendered on /quests/mimic');
-  assert.equal(releaseAction.href, CANONICAL_RELEASE_URL, 'Release anchor must point to candidate release page');
-  assert.equal(releaseAction.text, 'Release notes & installation', 'Secondary release label must be "Release notes & installation" when download is primary');
-  assert.equal(releaseAction.target, '_blank', 'Release anchor must open in new tab');
-  assert.ok(releaseAction.rel.includes('noopener') && releaseAction.rel.includes('noreferrer'), 'Release anchor must have safe rel');
-  assert.ok(releaseAction.minHeightPx >= 44, `Release action minHeight must be >= 44px (got ${releaseAction.minHeightPx}px)`);
-  assert.ok(releaseAction.rectHeight >= 44, `Release action rectHeight must be >= 44px (got ${releaseAction.rectHeight}px)`);
-
-  // Check URL Destinations: Release points to mimic-release, Source points to mimic; not reversed
-  assert.ok(releaseAction.href.includes('IbemCabahug/mimic-release'), 'Release action must point to mimic-release repository');
-  assert.equal(releaseAction.href.includes('IbemCabahug/mimic/'), false, 'Release action must not point to source repo');
-
-  const sourceAction = await page.evaluate(() => {
-    const links = Array.from(document.querySelectorAll('a'));
-    const link = links.find((l) => l.textContent.includes('Inspect Source Code'));
-    return link ? { href: link.getAttribute('href'), text: link.textContent.trim() } : null;
-  });
-  assert.ok(sourceAction, 'Inspect Source Code action must be present');
-  assert.equal(sourceAction.href, CANONICAL_SOURCE_URL, 'Source anchor must point to canonical mimic source repository');
-  assert.equal(sourceAction.href.includes('mimic-release'), false, 'Source action must not point to binary-only release repo');
-
-  // Assert Helper Text for Download State
-  const downloadHelperText = await page.$eval(
-    '#project-download-helper',
-    (el) => el.textContent.trim()
-  );
-  assert.equal(downloadHelperText, 'Android APK · Download hosted on GitHub', 'Helper text must match approved copy');
-
-  // 3. Deterministic Click & Keyboard Accessibility Test
-  assert.equal(interceptedRequests.length, 0, 'No download request should be made prior to user interaction');
-
-  // Verify semantic HTML anchor without JS dependency
-  const isPureSemanticAnchor = await page.evaluate(() => {
-    const el = document.querySelector('#project-download-action');
-    return el && el.tagName === 'A' && !el.hasAttribute('onclick') && el.href.startsWith('https://');
-  });
-  assert.equal(isPureSemanticAnchor, true, 'Download action must be a semantic HTML anchor without JS handlers');
-
-  // 3a. Keyboard focusability and visible focus outline
-  await page.focus('#project-download-action');
-  const focusedInfo = await page.evaluate(() => {
-    const el = document.activeElement;
-    if (!el || el.id !== 'project-download-action') return null;
-    const computed = window.getComputedStyle(el);
-    return {
-      id: el.id,
-      outlineStyle: computed.outlineStyle,
-      outlineWidth: parseFloat(computed.outlineWidth) || 0,
-    };
-  });
-  assert.ok(focusedInfo, 'Download action must be keyboard-focused');
-  assert.equal(focusedInfo.id, 'project-download-action');
-
-  // 3b. Deterministic Keyboard Enter activation
-  const countBeforeKey = interceptedRequests.length;
-  const keyReqUrl = await waitForDownloadRequest(async () => {
-    await page.keyboard.press('Enter');
-  });
-  assert.equal(keyReqUrl, VERIFIED_DOWNLOAD_URL, 'Pressing Enter must dispatch request to verified APK URL');
-  assert.equal(interceptedRequests.length, countBeforeKey + 1, 'Exactly one request dispatched on keyboard Enter');
-
-  // 3c. Deterministic Mouse click activation
-  const countBeforeClick = interceptedRequests.length;
-  const clickReqUrl = await waitForDownloadRequest(async () => {
-    await page.click('#project-download-action');
-  });
-  assert.equal(clickReqUrl, VERIFIED_DOWNLOAD_URL, 'Mouse click must dispatch request to verified APK URL');
-  assert.equal(interceptedRequests.length, countBeforeClick + 1, 'Exactly one additional request dispatched on click');
-
-  // 4. Viewport & Responsive Checks on Real /quests/mimic (Geometry, Gap, Dimensions, Overflow)
-  for (const width of [1280, 375, 320]) {
-    await page.setViewport({ width, height: 800 });
-    const layout = await page.evaluate(() => {
-      const download = document.querySelector('#project-download-action');
-      const release = document.querySelector('#project-release-action');
-      const container = download?.parentElement;
-      if (!download || !release || !container) return null;
-
-      const dRect = download.getBoundingClientRect();
-      const rRect = release.getBoundingClientRect();
-      const cStyle = window.getComputedStyle(container);
-
-      const rowGap = parseFloat(cStyle.rowGap || cStyle.gap) || 0;
-      const columnGap = parseFloat(cStyle.columnGap || cStyle.gap) || 0;
-
-      // Determine if side-by-side or wrapped
-      const isSideBySide = Math.abs(dRect.top - rRect.top) < 10;
-      const actualGap = isSideBySide
-        ? Math.abs(rRect.left - dRect.right)
-        : Math.abs(rRect.top - dRect.bottom);
-
-      const hasOverflow = document.documentElement.scrollWidth > document.documentElement.clientWidth;
-
+  if (mimicRelease.downloadsEnabled) {
+    // Assert Real Download Anchor
+    const downloadAction = await page.evaluate(() => {
+      const el = document.querySelector('#project-download-action');
+      if (!el) return null;
+      const computed = window.getComputedStyle(el);
+      const rect = el.getBoundingClientRect();
       return {
-        isSideBySide,
-        actualGap,
-        rowGap,
-        columnGap,
-        downloadWidth: dRect.width,
-        downloadHeight: dRect.height,
-        releaseWidth: rRect.width,
-        releaseHeight: rRect.height,
-        hasOverflow,
+        href: el.getAttribute('href'),
+        target: el.getAttribute('target'),
+        downloadAttr: el.hasAttribute('download'),
+        text: el.textContent.trim(),
+        minHeightPx: parseFloat(computed.minHeight),
+        rectHeight: rect.height,
       };
     });
 
-    assert.ok(layout, `Action buttons layout must exist at ${width}px`);
-    assert.equal(layout.hasOverflow, false, `Horizontal overflow detected at ${width}px on real /quests/mimic`);
-    assert.ok(
-      layout.rowGap >= 8 && layout.columnGap >= 8,
-      `Container CSS gap must be >= 8px at ${width}px (row: ${layout.rowGap}px, col: ${layout.columnGap}px)`
+    assert.ok(downloadAction, 'Primary #project-download-action must be rendered on /quests/mimic');
+    assert.equal(downloadAction.href, VERIFIED_DOWNLOAD_URL, 'Download anchor must point to verified APK download URL');
+    assert.equal(downloadAction.text, 'Download Android APK', 'Download action label must match truthful copy');
+    assert.equal(downloadAction.target, null, 'Download action must navigate in same tab (no target="_blank" creating orphaned tabs)');
+    assert.equal(downloadAction.downloadAttr, false, 'Download action must not use HTML download attribute for external URL');
+    assert.ok(downloadAction.minHeightPx >= 44, `Download action minHeight must be >= 44px (got ${downloadAction.minHeightPx}px)`);
+    assert.ok(downloadAction.rectHeight >= 44, `Download action height must be >= 44px (got ${downloadAction.rectHeight}px)`);
+
+    // Assert Real Secondary Release Anchor
+    const releaseAction = await page.evaluate(() => {
+      const el = document.querySelector('#project-release-action');
+      if (!el) return null;
+      const computed = window.getComputedStyle(el);
+      const rect = el.getBoundingClientRect();
+      return {
+        href: el.getAttribute('href'),
+        target: el.getAttribute('target'),
+        rel: el.getAttribute('rel') || '',
+        text: el.textContent.trim(),
+        minHeightPx: parseFloat(computed.minHeight),
+        rectHeight: rect.height,
+      };
+    });
+
+    assert.ok(releaseAction, 'Secondary #project-release-action must be rendered on /quests/mimic');
+    assert.equal(releaseAction.href, CANONICAL_RELEASE_URL, 'Release anchor must point to candidate release page');
+    assert.equal(releaseAction.text, 'Release notes & installation', 'Secondary release label must be "Release notes & installation" when download is primary');
+    assert.equal(releaseAction.target, '_blank', 'Release anchor must open in new tab');
+    assert.ok(releaseAction.rel.includes('noopener') && releaseAction.rel.includes('noreferrer'), 'Release anchor must have safe rel');
+    assert.ok(releaseAction.minHeightPx >= 44, `Release action minHeight must be >= 44px (got ${releaseAction.minHeightPx}px)`);
+    assert.ok(releaseAction.rectHeight >= 44, `Release action rectHeight must be >= 44px (got ${releaseAction.rectHeight}px)`);
+
+    // Check URL Destinations: Release points to mimic-release, Source points to mimic; not reversed
+    assert.ok(releaseAction.href.includes('IbemCabahug/mimic-release'), 'Release action must point to mimic-release repository');
+    assert.equal(releaseAction.href.includes('IbemCabahug/mimic/'), false, 'Release action must not point to source repo');
+
+    const sourceAction = await page.evaluate(() => {
+      const links = Array.from(document.querySelectorAll('a'));
+      const link = links.find((l) => l.textContent.includes('Inspect Source Code'));
+      return link ? { href: link.getAttribute('href'), text: link.textContent.trim() } : null;
+    });
+    assert.ok(sourceAction, 'Inspect Source Code action must be present');
+    assert.equal(sourceAction.href, CANONICAL_SOURCE_URL, 'Source anchor must point to canonical mimic source repository');
+    assert.equal(sourceAction.href.includes('mimic-release'), false, 'Source action must not point to binary-only release repo');
+
+    // Assert Helper Text for Download State
+    const downloadHelperText = await page.$eval(
+      '#project-download-helper',
+      (el) => el.textContent.trim()
     );
-    assert.ok(
-      layout.actualGap >= 8,
-      `Physical separation between action buttons must be >= 8px at ${width}px (got ${layout.actualGap}px)`
-    );
-    assert.ok(
-      layout.downloadHeight >= 44 && layout.downloadWidth >= 44,
-      `Download button must be >= 44x44px at ${width}px (got ${layout.downloadWidth}x${layout.downloadHeight}px)`
-    );
-    assert.ok(
-      layout.releaseHeight >= 44 && layout.releaseWidth >= 44,
-      `Release button must be >= 44x44px at ${width}px (got ${layout.releaseWidth}x${layout.releaseHeight}px)`
-    );
+    assert.equal(downloadHelperText, 'Android APK · Download hosted on GitHub', 'Helper text must match approved copy');
+
+    // 3. Deterministic Click & Keyboard Accessibility Test
+    assert.equal(interceptedRequests.length, 0, 'No download request should be made prior to user interaction');
+
+    // Verify semantic HTML anchor without JS dependency
+    const isPureSemanticAnchor = await page.evaluate(() => {
+      const el = document.querySelector('#project-download-action');
+      return el && el.tagName === 'A' && !el.hasAttribute('onclick') && el.href.startsWith('https://');
+    });
+    assert.equal(isPureSemanticAnchor, true, 'Download action must be a semantic HTML anchor without JS handlers');
+
+    // 3a. Keyboard focusability and visible focus outline
+    await page.focus('#project-download-action');
+    const focusedInfo = await page.evaluate(() => {
+      const el = document.activeElement;
+      if (!el || el.id !== 'project-download-action') return null;
+      const computed = window.getComputedStyle(el);
+      return {
+        id: el.id,
+        outlineStyle: computed.outlineStyle,
+        outlineWidth: parseFloat(computed.outlineWidth) || 0,
+      };
+    });
+    assert.ok(focusedInfo, 'Download action must be keyboard-focused');
+    assert.equal(focusedInfo.id, 'project-download-action');
+
+    // 3b. Deterministic Keyboard Enter activation
+    const countBeforeKey = interceptedRequests.length;
+    const keyReqUrl = await waitForDownloadRequest(async () => {
+      await page.keyboard.press('Enter');
+    });
+    assert.equal(keyReqUrl, VERIFIED_DOWNLOAD_URL, 'Pressing Enter must dispatch request to verified APK URL');
+    assert.equal(interceptedRequests.length, countBeforeKey + 1, 'Exactly one request dispatched on keyboard Enter');
+
+    // 3c. Deterministic Mouse click activation
+    const countBeforeClick = interceptedRequests.length;
+    const clickReqUrl = await waitForDownloadRequest(async () => {
+      await page.click('#project-download-action');
+    });
+    assert.equal(clickReqUrl, VERIFIED_DOWNLOAD_URL, 'Mouse click must dispatch request to verified APK URL');
+    assert.equal(interceptedRequests.length, countBeforeClick + 1, 'Exactly one additional request dispatched on click');
+
+    // 4. Viewport & Responsive Checks on Real /quests/mimic (Geometry, Gap, Dimensions, Overflow)
+    for (const width of [1280, 375, 320]) {
+      await page.setViewport({ width, height: 800 });
+      const layout = await page.evaluate(() => {
+        const download = document.querySelector('#project-download-action');
+        const release = document.querySelector('#project-release-action');
+        const container = download?.parentElement;
+        if (!download || !release || !container) return null;
+
+        const dRect = download.getBoundingClientRect();
+        const rRect = release.getBoundingClientRect();
+        const cStyle = window.getComputedStyle(container);
+
+        const rowGap = parseFloat(cStyle.rowGap || cStyle.gap) || 0;
+        const columnGap = parseFloat(cStyle.columnGap || cStyle.gap) || 0;
+
+        const isSideBySide = Math.abs(dRect.top - rRect.top) < 10;
+        const actualGap = isSideBySide
+          ? Math.abs(rRect.left - dRect.right)
+          : Math.abs(rRect.top - dRect.bottom);
+
+        const hasOverflow = document.documentElement.scrollWidth > document.documentElement.clientWidth;
+
+        return {
+          isSideBySide,
+          actualGap,
+          rowGap,
+          columnGap,
+          downloadWidth: dRect.width,
+          downloadHeight: dRect.height,
+          releaseWidth: rRect.width,
+          releaseHeight: rRect.height,
+          hasOverflow,
+        };
+      });
+
+      assert.ok(layout, `Action buttons layout must exist at ${width}px`);
+      assert.equal(layout.hasOverflow, false, `Horizontal overflow detected at ${width}px on real /quests/mimic`);
+      assert.ok(
+        layout.rowGap >= 8 && layout.columnGap >= 8,
+        `Container CSS gap must be >= 8px at ${width}px (row: ${layout.rowGap}px, col: ${layout.columnGap}px)`
+      );
+      assert.ok(
+        layout.actualGap >= 8,
+        `Physical separation between action buttons must be >= 8px at ${width}px (got ${layout.actualGap}px)`
+      );
+      assert.ok(
+        layout.downloadHeight >= 44 && layout.downloadWidth >= 44,
+        `Download button must be >= 44x44px at ${width}px (got ${layout.downloadWidth}x${layout.downloadHeight}px)`
+      );
+      assert.ok(
+        layout.releaseHeight >= 44 && layout.releaseWidth >= 44,
+        `Release button must be >= 44x44px at ${width}px (got ${layout.releaseWidth}x${layout.releaseHeight}px)`
+      );
+    }
+  } else {
+    // Verified Disabled State: Downloads are temporarily unavailable during update
+    const downloadAction = await page.$('#project-download-action');
+    assert.equal(downloadAction, null, 'Primary #project-download-action must NOT be rendered when downloads are disabled');
+    const releaseAction = await page.$('#project-release-action');
+    assert.equal(releaseAction, null, 'Secondary #project-release-action must NOT be rendered when downloads are disabled');
+    const downloadHelper = await page.$('#project-download-helper');
+    assert.equal(downloadHelper, null, 'Download helper must NOT be rendered when downloads are disabled');
+
+    // Assert Mimic Release Status Component is Rendered
+    const statusCard = await page.evaluate(() => {
+      const el = document.querySelector('#mimic-release-status');
+      if (!el) return null;
+      const title = el.querySelector('h2')?.textContent.trim() || '';
+      const badge = el.querySelector('span')?.textContent.trim() || '';
+      const text = el.textContent || '';
+      const disabledBtn = el.querySelector('#mimic-download-disabled');
+      const sourceBtn = el.querySelector('#project-source-action');
+      return {
+        title,
+        badge,
+        text,
+        hasDisabledBtn: !!disabledBtn,
+        disabledBtnText: disabledBtn?.textContent.trim() || '',
+        disabledAria: disabledBtn?.getAttribute('aria-disabled'),
+        sourceHref: sourceBtn?.getAttribute('href') || '',
+      };
+    });
+
+    assert.ok(statusCard, 'Release status component #mimic-release-status must be rendered on /quests/mimic');
+    assert.equal(statusCard.title, 'Downloads Temporarily Unavailable', 'Status card title must match expected title');
+    assert.ok(statusCard.text.includes('Mimic Release is currently undergoing improvements and updates'), 'Status message must contain update explanation');
+    assert.ok(statusCard.text.includes('Public downloads have been temporarily disabled'), 'Status message must state downloads are disabled');
+    assert.ok(statusCard.text.includes('The download feature will return once the updated release is ready'), 'Status message must give return expectation');
+    assert.ok(statusCard.text.includes('Thank you for your patience'), 'Status message must thank visitors');
+    assert.equal(statusCard.hasDisabledBtn, true, 'Disabled download indicator must be present');
+    assert.equal(statusCard.disabledAria, 'true', 'Disabled download indicator must have aria-disabled="true"');
+    assert.equal(statusCard.sourceHref, CANONICAL_SOURCE_URL, 'Source code link must remain intact');
+
+    // Source Code action verification
+    const sourceAction = await page.evaluate(() => {
+      const links = Array.from(document.querySelectorAll('a'));
+      const link = links.find((l) => l.textContent.includes('Inspect Source Code'));
+      return link ? { href: link.getAttribute('href'), text: link.textContent.trim() } : null;
+    });
+    assert.ok(sourceAction, 'Inspect Source Code action must be present');
+    assert.equal(sourceAction.href, CANONICAL_SOURCE_URL, 'Source anchor must point to canonical mimic source repository');
+    assert.equal(sourceAction.href.includes('mimic-release'), false, 'Source action must not point to binary-only release repo');
+
+    // Viewport & Responsive Checks on Real /quests/mimic for the Status Card
+    for (const width of [1280, 375, 320]) {
+      await page.setViewport({ width, height: 800 });
+      const layout = await page.evaluate(() => {
+        const el = document.querySelector('#mimic-release-status');
+        const sourceBtn = document.querySelector('#project-source-action');
+        const disabledBtn = document.querySelector('#mimic-download-disabled');
+        if (!el) return null;
+        const rect = el.getBoundingClientRect();
+        const sRect = sourceBtn?.getBoundingClientRect();
+        const dRect = disabledBtn?.getBoundingClientRect();
+        const hasOverflow = document.documentElement.scrollWidth > document.documentElement.clientWidth;
+        return {
+          hasOverflow,
+          width: rect.width,
+          sourceMinHeight: sRect?.height || 0,
+          disabledMinHeight: dRect?.height || 0,
+        };
+      });
+      assert.ok(layout, `Status card layout must exist at ${width}px`);
+      assert.equal(layout.hasOverflow, false, `Horizontal overflow detected at ${width}px on real /quests/mimic`);
+      assert.ok(layout.sourceMinHeight >= 44, `Source button height must be >= 44px at ${width}px (got ${layout.sourceMinHeight}px)`);
+      assert.ok(layout.disabledMinHeight >= 44, `Disabled button height must be >= 44px at ${width}px (got ${layout.disabledMinHeight}px)`);
+    }
   }
 
   // 5. Fresh Page: JavaScript-Disabled Verification
@@ -292,19 +367,27 @@ try {
     const noJsActions = await noJsPage.evaluate(() => {
       const dl = document.querySelector('#project-download-action');
       const rel = document.querySelector('#project-release-action');
+      const statusEl = document.querySelector('#mimic-release-status');
       const notice = document.querySelector('[data-mimic-simulation-notice]');
       return {
         hasDownload: !!dl,
         downloadHref: dl?.getAttribute('href'),
         hasRelease: !!rel,
         releaseHref: rel?.getAttribute('href'),
+        hasStatus: !!statusEl,
         noticeText: notice?.textContent?.trim() || '',
       };
     });
-    assert.ok(noJsActions.hasDownload, 'Download action must render with JavaScript disabled');
-    assert.equal(noJsActions.downloadHref, VERIFIED_DOWNLOAD_URL, 'Download href must match verified URL with JS disabled');
-    assert.ok(noJsActions.hasRelease, 'Release action must render with JavaScript disabled');
-    assert.equal(noJsActions.releaseHref, CANONICAL_RELEASE_URL, 'Release href must match canonical URL with JS disabled');
+    if (mimicRelease.downloadsEnabled) {
+      assert.ok(noJsActions.hasDownload, 'Download action must render with JavaScript disabled');
+      assert.equal(noJsActions.downloadHref, VERIFIED_DOWNLOAD_URL, 'Download href must match verified URL with JS disabled');
+      assert.ok(noJsActions.hasRelease, 'Release action must render with JavaScript disabled');
+      assert.equal(noJsActions.releaseHref, CANONICAL_RELEASE_URL, 'Release href must match canonical URL with JS disabled');
+    } else {
+      assert.equal(noJsActions.hasDownload, false, 'Download action must NOT render when downloads are disabled');
+      assert.equal(noJsActions.hasRelease, false, 'Release action must NOT render when downloads are disabled');
+      assert.ok(noJsActions.hasStatus, 'Release status notice must render with JavaScript disabled');
+    }
     assert.ok(noJsActions.noticeText.includes('Browser simulation'), 'Simulation notice must render with JS disabled');
     assert.ok(noJsActions.noticeText.includes('personal device files'), 'Simulation privacy boundary must render with JS disabled');
   } finally {
@@ -407,67 +490,78 @@ try {
 
   // 9. Separately Reported Live Release Smoke Check
   console.log('\n--- Live Release Smoke Probe ---');
-  let liveMetaStatus = null;
-  let liveAssetFound = false;
-  let liveDownloadStatus = null;
-  let liveContentType = null;
-  let liveContentLength = null;
-  let liveDisposition = null;
-  let liveProbeError = null;
-
-  try {
-    const metaRes = await fetch('https://api.github.com/repos/IbemCabahug/mimic-release/releases/latest', {
-      headers: { 'User-Agent': 'Mimic-Release-Probe/1.0' },
-      signal: AbortSignal.timeout(8000),
-    });
-    liveMetaStatus = metaRes.status;
-    if (metaRes.ok) {
-      const meta = await metaRes.json();
-      const asset = meta.assets?.find((a) => a.name === 'mimic-v1.1.0.apk');
-      if (asset) {
-        liveAssetFound = true;
-      }
-    }
-  } catch (err) {
-    liveProbeError = `Metadata fetch error: ${err.message}`;
-  }
-
-  try {
-    const headRes = await fetch(VERIFIED_DOWNLOAD_URL, {
-      method: 'HEAD',
-      redirect: 'follow',
-      headers: { 'User-Agent': 'Mimic-Release-Probe/1.0' },
-      signal: AbortSignal.timeout(8000),
-    });
-    liveDownloadStatus = headRes.status;
-    liveContentType = headRes.headers.get('content-type');
-    liveContentLength = headRes.headers.get('content-length');
-    liveDisposition = headRes.headers.get('content-disposition');
-  } catch (err) {
-    liveProbeError = (liveProbeError ? `${liveProbeError}; ` : '') + `HEAD download error: ${err.message}`;
-  }
-
-  console.log(`GitHub API latest release status: ${liveMetaStatus}`);
-  console.log(`Asset mimic-v1.1.0.apk present in release metadata: ${liveAssetFound}`);
-  console.log(`Download endpoint HTTP status: ${liveDownloadStatus}`);
-  console.log(`Download Content-Type: ${liveContentType}`);
-  console.log(`Download Content-Disposition: ${liveDisposition}`);
-  console.log(`Download Content-Length: ${liveContentLength}`);
-
-  if (liveDownloadStatus === 404 || (liveMetaStatus === 200 && !liveAssetFound)) {
-    throw new Error(
-      `LIVE RELEASE FAILURE: Asset mimic-v1.1.0.apk returned HTTP 404 or missing from latest release! (status: ${liveDownloadStatus})`
+  if (!mimicRelease.downloadsEnabled) {
+    console.log(
+      '[Live Smoke Probe] PASS: Mimic Release downloads are configured as disabled/updating in src/lib/mimic-release.ts.'
     );
-  } else if (liveDownloadStatus === 200 && liveAssetFound) {
-    console.log('[Live Smoke Probe] PASS: Live release metadata and APK download endpoint verified successfully.');
-  } else if (liveProbeError) {
-    console.log(`[Live Smoke Probe] INCONCLUSIVE: Network timeout or rate limit (${liveProbeError}).`);
+    console.log(
+      '[Live Smoke Probe] PASS: Public download controls and release links are safely hidden/disabled on the portfolio.'
+    );
+  } else {
+    let liveMetaStatus = null;
+    let liveAssetFound = false;
+    let liveDownloadStatus = null;
+    let liveContentType = null;
+    let liveContentLength = null;
+    let liveDisposition = null;
+    let liveProbeError = null;
+
+    try {
+      const metaRes = await fetch('https://api.github.com/repos/IbemCabahug/mimic-release/releases/latest', {
+        headers: { 'User-Agent': 'Mimic-Release-Probe/1.0' },
+        signal: AbortSignal.timeout(8000),
+      });
+      liveMetaStatus = metaRes.status;
+      if (metaRes.ok) {
+        const meta = await metaRes.json();
+        const asset = meta.assets?.find((a) => a.name === 'mimic-v1.1.0.apk');
+        if (asset) {
+          liveAssetFound = true;
+        }
+      }
+    } catch (err) {
+      liveProbeError = `Metadata fetch error: ${err.message}`;
+    }
+
+    try {
+      const headRes = await fetch(VERIFIED_DOWNLOAD_URL, {
+        method: 'HEAD',
+        redirect: 'follow',
+        headers: { 'User-Agent': 'Mimic-Release-Probe/1.0' },
+        signal: AbortSignal.timeout(8000),
+      });
+      liveDownloadStatus = headRes.status;
+      liveContentType = headRes.headers.get('content-type');
+      liveContentLength = headRes.headers.get('content-length');
+      liveDisposition = headRes.headers.get('content-disposition');
+    } catch (err) {
+      liveProbeError = (liveProbeError ? `${liveProbeError}; ` : '') + `HEAD download error: ${err.message}`;
+    }
+
+    console.log(`GitHub API latest release status: ${liveMetaStatus}`);
+    console.log(`Asset mimic-v1.1.0.apk present in release metadata: ${liveAssetFound}`);
+    console.log(`Download endpoint HTTP status: ${liveDownloadStatus}`);
+    console.log(`Download Content-Type: ${liveContentType}`);
+    console.log(`Download Content-Disposition: ${liveDisposition}`);
+    console.log(`Download Content-Length: ${liveContentLength}`);
+
+    if (liveDownloadStatus === 404 || (liveMetaStatus === 200 && !liveAssetFound)) {
+      throw new Error(
+        `LIVE RELEASE FAILURE: Asset mimic-v1.1.0.apk returned HTTP 404 or missing from latest release! (status: ${liveDownloadStatus})`
+      );
+    } else if (liveDownloadStatus === 200 && liveAssetFound) {
+      console.log('[Live Smoke Probe] PASS: Live release metadata and APK download endpoint verified successfully.');
+    } else if (liveProbeError) {
+      console.log(`[Live Smoke Probe] INCONCLUSIVE: Network timeout or rate limit (${liveProbeError}).`);
+    }
   }
 
   assert.deepEqual(pageErrors, [], `Unexpected page errors encountered: ${pageErrors.join(', ')}`);
 
   console.log(
-    '\nPASS: Verified Download Android APK, secondary Release notes & installation, source separation, deterministic keyboard Enter and mouse click activation, responsive geometry (>=44px, >=8px gap, no overflow), no-JS fallback, and live release smoke probe all succeeded.'
+    mimicRelease.downloadsEnabled
+      ? '\nPASS: Verified Download Android APK, secondary Release notes & installation, source separation, deterministic keyboard Enter and mouse click activation, responsive geometry (>=44px, >=8px gap, no overflow), no-JS fallback, and live release smoke probe all succeeded.'
+      : '\nPASS: Verified Mimic download availability configuration (disabled state), temporary-unavailability UI presentation, source code accessibility, responsive geometry (>=44px, no overflow), no-JS fallback, and unrelated project protection all succeeded.'
   );
 } finally {
   await browser?.close();
