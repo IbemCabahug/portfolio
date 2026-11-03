@@ -56,7 +56,8 @@
       "extraLinks": [
         {
           "url": "https://github.com/IbemCabahug/ArcaneTyper",
-          "label": "GitHub"
+          "label": "GitHub",
+          "urlLabel": "github.com/IbemCabahug/ArcaneTyper"
         }
       ],
       "bullets": [
@@ -69,6 +70,7 @@
       "note": "AI-Assisted Build",
       "url": "https://github.com/IbemCabahug/mimic",
       "urlLabel": "github.com/IbemCabahug/mimic",
+      "label": "GitHub",
       "bullets": [
         "Defined requirements and guided AI-assisted development of an Android social-deduction game featuring three game modes, five word packs, LAN multiplayer for up to eight players, and a private encrypted vault for photos, videos, and notes.",
         "Manually tested gameplay and vault-security features, including gesture unlock, PIN setup, failed-PIN lockout, auto-lock, and encrypted video playback. Performed additional testing on a physical device running the release build.",

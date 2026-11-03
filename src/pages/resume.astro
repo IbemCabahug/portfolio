@@ -297,7 +297,14 @@ const pdfPath = '/Cabahug-Nhovem-Resume.pdf';
                   rel="noopener noreferrer"
                   class="text-xs sm:text-sm font-semibold text-[#92400e] underline hover:text-[#78350f]"
                 >
-                  {project.urlLabel ?? project.url}
+                  {project.label ? (
+                    <>
+                      <span class="screen-only">{project.label}</span>
+                      <span class="print-only">{project.urlLabel ?? project.url}</span>
+                    </>
+                  ) : (
+                    project.urlLabel ?? project.url
+                  )}
                 </a>
                 {project.extraLinks?.map((link) => (
                   <>
@@ -309,7 +316,7 @@ const pdfPath = '/Cabahug-Nhovem-Resume.pdf';
                       class="text-xs sm:text-sm font-semibold text-[#92400e] underline hover:text-[#78350f]"
                     >
                       <span class="screen-only">{link.label}</span>
-                      <span class="print-only">{link.url}</span>
+                      <span class="print-only">{link.urlLabel ?? link.url}</span>
                     </a>
                   </>
                 ))}
