@@ -205,10 +205,7 @@ const pdfPath = '/Cabahug-Nhovem-Resume.pdf';
         </div>
 
         <div class="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-x-2 gap-y-1 text-xs sm:text-sm text-[#44403c] font-medium mt-1">
-          <span>
-            Portfolio: <a href={resume.contact.portfolioUrl} target="_blank" rel="noopener noreferrer" class="hover:text-[#78350f] text-[#92400e] underline">{resume.contact.portfolio}</a>
-          </span>
-          <span class="hidden sm:inline text-[#a8a29e]" aria-hidden="true">|</span>
+          <!-- Portfolio link intentionally omitted on-site (visitors are already here); it remains in the downloadable PDF and in main.json. -->
           <span>GitHub: <a href={resume.contact.githubUrl} target="_blank" rel="noopener noreferrer" class="hover:text-[#78350f] text-[#92400e] underline">{resume.contact.github}</a></span>
         </div>
       </header>

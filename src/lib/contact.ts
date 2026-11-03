@@ -3,13 +3,11 @@
  *
  * Architecture & Trust Boundary (SEC-01):
  * 1. Sends the contact payload to `/api/missive` for server-side request validation,
- *    rate limiting, Turnstile verification, and DNS email routing checks.
- * 2. If the server performed server-to-server delivery (`data.delivered === true`),
- *    returns immediately without any browser-to-provider call.
- * 3. Otherwise, when using Web3Forms (`data.accessKey` returned), submits the
- *    server-sanitized fields (`data.sanitized`) from the visitor's browser to
- *    `https://api.web3forms.com/submit` with bounded timeouts. Gmail Web and
- *    `mailto:` links are always returned as user-controlled fallbacks.
+ *    rate limiting, Turnstile verification, DNS email routing checks, and
+ *    server-to-server Resend delivery.
+ * 2. Returns immediately with the delivery outcome; no provider key or secondary
+ *    browser-to-provider call is ever used. Gmail Web and `mailto:` links are
+ *    always returned as user-controlled fallbacks.
  */
 
 export interface MissivePayload {
@@ -19,14 +17,12 @@ export interface MissivePayload {
   message: string;
   botcheck?: string;
   turnstileToken?: string;
-  hcaptchaToken?: string;
 }
 
 export interface MissiveOptions {
   signal?: AbortSignal;
   fetchImpl?: typeof fetch;
   preflightTimeoutMs?: number;
-  providerTimeoutMs?: number;
   overallTimeoutMs?: number;
 }
 
@@ -82,7 +78,6 @@ export async function sendMissive(
 ): Promise<MissiveResult> {
   const fetchFn = options.fetchImpl ?? fetch;
   const preflightTimeoutMs = options.preflightTimeoutMs ?? 8_000;
-  const providerTimeoutMs = options.providerTimeoutMs ?? 10_000;
   const overallTimeoutMs = options.overallTimeoutMs ?? 15_000;
 
   const initialName = (payload.name || '').replace(/[\r\n]+/g, ' ').trim() || 'Traveler';
@@ -133,9 +128,7 @@ export async function sendMissive(
 
     const data = (await response.json().catch(() => null)) as {
       success?: boolean;
-      authorized?: boolean;
       delivered?: boolean;
-      accessKey?: string;
       sanitized?: {
         name: string;
         email: string;
@@ -196,71 +189,11 @@ export async function sendMissive(
       };
     }
 
-    if (!response.ok || !data.success || !data.accessKey || !data.sanitized) {
-      return {
-        success: false,
-        message:
-          data.message ||
-          'Validation or delivery service is temporarily unavailable. You can send directly via Gmail Web or your email app.',
-        fallbackMailto,
-        fallbackGmailUrl,
-      };
-    }
-
-    // This proof belongs exclusively to Web3Forms; never verify it at our endpoint.
-    if (!payload.hcaptchaToken?.trim()) {
-      return {
-        success: false,
-        message: 'Complete delivery verification (hCaptcha) before sending, or use direct email.',
-        fallbackMailto,
-        fallbackGmailUrl,
-      };
-    }
-
-    // 2. Browser-assisted submission to Web3Forms using server-sanitized fields (SEC-01 & SEC-07)
-    const providerBound = createBoundedSignal(providerTimeoutMs, [overallBound.signal]);
-    let upstreamRes: Response;
-    try {
-      upstreamRes = await fetchFn('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: JSON.stringify({
-          access_key: data.accessKey,
-          'h-captcha-response': payload.hcaptchaToken,
-          name: data.sanitized.name,
-          email: data.sanitized.email,
-          subject: data.sanitized.subject,
-          message: formattedBody,
-          botcheck: '',
-        }),
-        signal: providerBound.signal,
-      });
-    } finally {
-      providerBound.cleanup();
-    }
-
-    const upstreamData = (await upstreamRes.json().catch(() => null)) as {
-      success?: boolean;
-      message?: string;
-    } | null;
-
-    if (upstreamRes.ok && upstreamData && upstreamData.success === true) {
-      return {
-        success: true,
-        message: 'Message submitted — your missive has been accepted for delivery.',
-        fallbackMailto,
-        fallbackGmailUrl,
-      };
-    }
-
     return {
       success: false,
       message:
-        upstreamData?.message ||
-        'Delivery encountered an upstream delay. Your draft is preserved—you can retry or send directly via Gmail Web.',
+        data.message ||
+        'Validation or delivery service is temporarily unavailable. You can send directly via Gmail Web or your email app.',
       fallbackMailto,
       fallbackGmailUrl,
     };

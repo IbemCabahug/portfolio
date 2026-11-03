@@ -1246,7 +1246,6 @@ const turnstileSiteKey = import.meta.env.DEV
 <script>
   import { initPerformanceGovernor } from '../../lib/perf-governor';
   import { sendMissive } from '../../lib/contact';
-  import { setupProviderCaptcha } from '../../lib/provider-captcha';
   import { validateEmail } from '../../lib/email-validator';
   import {
     getFocusableElements,
@@ -2175,8 +2174,6 @@ const turnstileSiteKey = import.meta.env.DEV
 
     setupTransceiverSimulation();
 
-    const providerCaptcha = setupProviderCaptcha(signal);
-
     // Cloudflare Turnstile Management (SEC-04)
     const resolvedTurnstileSiteKey = pageWrapper.dataset.turnstileSitekey || '';
     let desktopTurnstileId: string | null = null;
@@ -2501,17 +2498,6 @@ const turnstileSiteKey = import.meta.env.DEV
               return;
           }
 
-          const hcaptchaToken = providerCaptcha.getToken(isDesktop);
-          if (!hcaptchaToken) {
-            showFormError(errorContainerId, 'Complete delivery verification (hCaptcha) before sending. Retry delivery verification or use direct email if it is unavailable.');
-            setFormStatus(statusContainerId, '');
-            if (submitBtn) {
-              submitBtn.disabled = false;
-              submitBtn.textContent = originalBtnText;
-            }
-            return;
-          }
-
           const name = rawName || 'Traveler';
           const subject = rawSubject || 'Tavern Dispatch';
           const fullFormattedBody = `Sender: ${name}\nReturn Address: ${email}\n\n--------------------------------------------------\n${body}\n--------------------------------------------------\n(Dispatched via Ibem's Tavern Messenger Roost)`;
@@ -2528,10 +2514,7 @@ const turnstileSiteKey = import.meta.env.DEV
             message: body,
             botcheck: botcheckValue,
             turnstileToken,
-            hcaptchaToken,
           });
-
-          providerCaptcha.reset(isDesktop);
 
           // Reset Turnstile challenge token after submission attempt
           if (typeof window !== 'undefined' && (window as any).turnstile) {

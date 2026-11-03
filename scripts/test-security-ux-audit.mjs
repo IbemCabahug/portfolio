@@ -1596,7 +1596,7 @@ await test('PLAN-06: Resend upstream abort/timeout handling observes AbortSignal
   );
 });
 
-await test('PLAN-06: client sendMissive integration tests (server-delivered vs browser-assisted Web3Forms)', async () => {
+await test('PLAN-06: client sendMissive integration tests (server-delivered Resend and fail-closed responses)', async () => {
   // 1. Test server delivery path: /api/missive returns delivered: true
   const mockFetchServerDelivered = async (url) => {
     if (url === '/api/missive') {
@@ -1620,50 +1620,32 @@ await test('PLAN-06: client sendMissive integration tests (server-delivered vs b
   assert.equal(clientResServer.success, true);
   assert.match(clientResServer.message, /accepted for delivery/i);
 
-  // 2. Test browser-assisted Web3Forms path: /api/missive returns accessKey, client posts to Web3Forms
-  let web3FormsCalled = false;
-  const mockFetchWeb3Path = async (url, init) => {
+  // 2. Test fail-closed when delivered is not true (no browser-assisted fallback)
+  let externalProviderCalled = false;
+  const mockFetchNotDelivered = async (url) => {
     if (url === '/api/missive') {
-      assert.equal(JSON.parse(init.body).hcaptchaToken, undefined, 'Provider proof must not reach first-party verification');
       return new Response(
         JSON.stringify({
           success: true,
-          authorized: true,
           delivered: false,
-          accessKey: 'synth_w3f_key',
           sanitized: { name: 'Alice Clean', email: 'alice@gmail.com', subject: 'Clean', body: 'Msg' },
+          message: 'Email service not yet configured. Please use Gmail Web or your email client.',
         }),
-        { status: 200 }
+        { status: 503 }
       );
     }
-    if (url === 'https://api.web3forms.com/submit') {
-      web3FormsCalled = true;
-      assert.equal(init?.method, 'POST');
-      const bodyObj = JSON.parse(init?.body);
-      assert.equal(bodyObj.access_key, 'synth_w3f_key');
-      assert.equal(bodyObj.name, 'Alice Clean');
-      assert.equal(bodyObj['h-captcha-response'], 'synthetic-provider-proof');
-      assert.equal(bodyObj.turnstileToken, undefined);
-      return new Response(JSON.stringify({ success: true, message: 'Delivered via Web3Forms' }), { status: 200 });
-    }
-    throw new Error(`Unexpected url: ${url}`);
+    externalProviderCalled = true;
+    throw new Error(`Unexpected external provider call: ${url}`);
   };
 
-  const clientResWeb3 = await sendMissive(
-    { name: 'Alice Injected', email: 'alice@gmail.com', subject: 'Raw', message: 'Msg', hcaptchaToken: 'synthetic-provider-proof' },
-    { fetchImpl: mockFetchWeb3Path }
+  const clientResFailClosed = await sendMissive(
+    { name: 'Alice Injected', email: 'alice@gmail.com', subject: 'Raw', message: 'Msg' },
+    { fetchImpl: mockFetchNotDelivered }
   );
-  assert.equal(clientResWeb3.success, true);
-  assert.equal(web3FormsCalled, true);
-  web3FormsCalled = false;
-  const missingProof = await sendMissive(
-    { name: 'Alice', email: 'alice@gmail.com', subject: 'Raw', message: 'Msg' },
-    { fetchImpl: mockFetchWeb3Path }
-  );
-  assert.equal(missingProof.success, false);
-  assert.match(missingProof.message, /delivery verification/i);
-  assert.equal(web3FormsCalled, false, 'No provider request without proof');
-  assert.ok(missingProof.fallbackMailto);
+  assert.equal(clientResFailClosed.success, false);
+  assert.equal(externalProviderCalled, false, 'Client must never call an external delivery provider directly');
+  assert.ok(clientResFailClosed.fallbackMailto);
+  assert.ok(clientResFailClosed.fallbackGmailUrl);
 });
 
 // ── PLAN-07 / Phase E: Messenger Draft Lifecycle (Reviewer 8) ───────────────

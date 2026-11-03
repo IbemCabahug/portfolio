@@ -92,18 +92,12 @@ const { mailAddress, githubUrl, profile } = Astro.props;
         </div>
 
         <p class="text-[11px] text-[var(--ink)]/80 leading-snug bg-[var(--wood-deep)]/5 border border-[var(--brass)]/30 rounded px-2.5 py-1.5">
-          <strong>Privacy &amp; delivery notice:</strong> Submitting checks your email domain via DNS-over-HTTPS (Google/Cloudflare), verifies anti-bot status via Cloudflare Turnstile, and routes your message through Web3Forms to <span class="font-mono">{mailAddress}</span>. Prefer not to use the form? <a href={`mailto:${mailAddress}`} class="underline font-semibold text-[var(--wood-deep)]">Email directly</a>.
+          <strong>Privacy &amp; delivery notice:</strong> Submitting checks your email domain via DNS-over-HTTPS (Google/Cloudflare), verifies anti-bot status via Cloudflare Turnstile, and delivers your message server-side via Resend to <span class="font-mono">{mailAddress}</span>. Prefer not to use the form? <a href={`mailto:${mailAddress}`} class="underline font-semibold text-[var(--wood-deep)]">Email directly</a>.
         </p>
 
         <!-- Cloudflare Turnstile Anti-Spam Gate -->
         <div class="turnstile-container my-2 flex flex-col items-center justify-center min-h-[70px] w-full">
           <div id="mobile-turnstile-slot" class="cf-turnstile-wrapper flex justify-center items-center min-w-[300px] min-h-[65px]"></div>
-        <div class="my-3 text-center">
-          <p class="text-xs">Delivery verification (Web3Forms)</p>
-          <div id="mobile-hcaptcha-slot" class="flex justify-center min-h-[144px]"></div>
-          <p id="mobile-hcaptcha-slot-status" role="status" aria-live="polite" class="text-xs">Loading delivery verification…</p>
-          <button id="mobile-hcaptcha-slot-retry" type="button" class="text-xs underline">Retry delivery verification</button>
-        </div>
         </div>
 
         <div class="flex flex-col sm:flex-row gap-2.5 pt-1">

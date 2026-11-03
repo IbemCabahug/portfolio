@@ -20,9 +20,6 @@ try {
       return request.respond({ status: 500, body: 'Unexpected API request' });
     }
     if (url.startsWith(server.origin + '/') || url.startsWith('data:')) return request.continue();
-    if (url.startsWith('https://js.hcaptcha.com/1/api.js')) {
-      return request.respond({ contentType: 'application/javascript', body: '// Mock installed later.' });
-    }
     if (url.startsWith('https://challenges.cloudflare.com/turnstile/v0/api.js')) {
       return request.respond({ contentType: 'application/javascript', body: '// Deliberately unavailable until the test installs its mock.' });
     }
@@ -69,37 +66,7 @@ try {
       assert.equal(status.live, 'polite');
     }
   }
-  await page.evaluate(() => {
-    window.__hOptions = {};
-    window.__hResets = [];
-    window.__hRemoves = [];
-    window.hcaptcha = {
-      render(container, options) { window.__hOptions[container.id] = options; return container.id; },
-      getResponse() { return 'synthetic-provider-proof'; },
-      reset(id) { window.__hResets.push(id); },
-      remove(id) { window.__hRemoves.push(id); },
-    };
-    window.portfolioHCaptchaReady();
-  });
-  assert.equal(await page.evaluate(() => Object.keys(window.__hOptions).length), 2);
-  for (const slot of ['desktop-hcaptcha-slot', 'mobile-hcaptcha-slot']) {
-    for (const [callback, expected] of [
-      ['callback', 'complete'], ['expired-callback', 'expired'],
-      ['chalexpired-callback', 'timed out'], ['error-callback', 'unavailable'],
-    ]) {
-      const status = await page.evaluate(({ slot, callback }) => {
-        window.__hOptions[slot][callback]();
-        const node = document.getElementById(`${slot}-status`);
-        return { text: node.textContent, role: node.getAttribute('role') };
-      }, { slot, callback });
-      assert.ok(status.text.includes(expected));
-      assert.equal(status.role, 'status');
-    }
-    await page.evaluate((slot) => document.getElementById(`${slot}-retry`).click(), slot);
-  }
-  assert.equal(await page.evaluate(() => window.__hResets.length), 2);
   await page.evaluate(() => document.dispatchEvent(new Event('astro:before-swap')));
-  assert.equal(await page.evaluate(() => window.__hRemoves.length), 2);
   assert.equal(await page.evaluate(() => window.__widgetRemovals.length), 2);
   assert.equal(await page.evaluate(() => [...document.querySelectorAll('button')].filter((button) => button.textContent === 'Retry security verification').length), 0);
   assert.equal(apiCalls, 0);

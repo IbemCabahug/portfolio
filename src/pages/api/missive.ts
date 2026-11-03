@@ -2,17 +2,15 @@
  * Server-side missive preflight & dispatch endpoint (`/api/missive`).
  *
  * Architecture & Trust Boundary (SEC-01):
- * - When a server-to-server transactional email credential (`EMAIL_API_KEY` +
- *   `CONTACT_TO_ADDRESS`) is configured, this endpoint is the final delivery
- *   authority: it validates, rate-limits, verifies Turnstile, and delivers the
- *   message server-to-server without releasing any provider key to the browser.
- * - When operating with Web3Forms (`WEB3FORMS_KEY` only), final submission must
- *   originate from the visitor's browser because Web3Forms places Cloudflare Bot
- *   Management in front of `api.web3forms.com/submit` and blocks serverless
- *   datacenter IPs on the free plan. In that mode, this endpoint acts as the
- *   portfolio's preflight validation, rate-limit, and Turnstile gate and returns
- *   sanitized fields (`sanitized`) plus the Web3Forms public delivery key, while
- *   Web3Forms' own spam/botcheck/domain controls govern the final provider call.
+ * - This endpoint is the sole delivery authority. It validates, rate-limits,
+ *   verifies Cloudflare Turnstile, checks the sender's mail domain, and delivers
+ *   the message server-to-server via Resend (`EMAIL_API_KEY` +
+ *   `CONTACT_TO_ADDRESS`). No provider key is ever released to the browser, so
+ *   the Turnstile gate cannot be bypassed by posting to a provider directly.
+ * - If either delivery variable is missing the endpoint fails closed (HTTP 503)
+ *   and the UI keeps the draft and the direct-email alternatives available.
+ * - The former browser-assisted Web3Forms + hCaptcha path was removed because it
+ *   required a second CAPTCHA and exposed a public key that bypassed Turnstile.
  */
 
 import type { APIRoute } from 'astro';
@@ -1006,101 +1004,79 @@ export const POST: APIRoute = async ({ request }) => {
   }
   recordGlobalAttempt();
 
-  // 7. Server-to-server delivery when EMAIL_API_KEY + CONTACT_TO_ADDRESS are configured (SEC-01 Option 1).
+  // 7. Server-to-server delivery via Resend (EMAIL_API_KEY + CONTACT_TO_ADDRESS). Sole delivery path.
   const emailApiKey = (process.env.EMAIL_API_KEY || '').trim();
   const contactTo = (process.env.CONTACT_TO_ADDRESS || '').trim();
-  if (Boolean(emailApiKey) !== Boolean(contactTo)) {
-    logMissive(ip, 'service_error', 'incomplete_server_delivery_configuration');
-    return json(
-      { success: false, message: 'Email delivery configuration is incomplete. Please use Gmail Web or your email client.' },
-      503,
-      rlHeaders
+  if (!emailApiKey || !contactTo) {
+    const partial = Boolean(emailApiKey || contactTo);
+    logMissive(
+      ip,
+      'service_error',
+      partial ? 'incomplete_server_delivery_configuration' : 'missing_server_delivery_configuration'
     );
-  }
-  if (emailApiKey && contactTo) {
-    try {
-      const formattedBody = `Sender: ${name}\nReturn Address: ${email}\n\n--------------------------------------------------\n${body}\n--------------------------------------------------\n(Dispatched via Ibem's Tavern Messenger Roost)`;
-      const resendRes = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${emailApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: 'Portfolio Contact <onboarding@resend.dev>',
-          to: [contactTo],
-          reply_to: email,
-          subject,
-          text: formattedBody,
-        }),
-        signal: createTimeoutSignal(8_000),
-      });
-
-      if (resendRes.ok) {
-        logMissive(ip, 'authorized', 'delivered_server', email);
-        return json(
-          {
-            success: true,
-            delivered: true,
-            sanitized: { name, email, subject, body },
-            message: 'Message submitted — your missive has been accepted for delivery.',
-          },
-          200,
-          rlHeaders
-        );
-      }
-      logMissive(ip, 'service_error', 'server_delivery_failed', email, `HTTP ${resendRes.status}`);
-      return json(
-        {
-          success: false,
-          message: 'Email delivery service encountered an upstream error. Please use Gmail Web or your email client.',
-        },
-        502,
-        rlHeaders
-      );
-    } catch {
-      logMissive(ip, 'service_error', 'server_delivery_timeout', email);
-      return json(
-        {
-          success: false,
-          message: 'Email delivery service timed out. Please use Gmail Web or your email client.',
-        },
-        504,
-        rlHeaders
-      );
-    }
-  }
-
-  // 8. Browser-assisted Web3Forms delivery clearance (SEC-01 Option 2).
-  // Web3Forms free tier blocks serverless datacenter IPs via Cloudflare Bot Management
-  // and uses a public delivery key in the browser. We return the sanitized payload
-  // so `src/lib/contact.ts` submits the server-normalized values.
-  const accessKey = (process.env.WEB3FORMS_KEY || '').trim();
-  if (!accessKey) {
-    logMissive(ip, 'service_error', 'missing_provider_key', email);
     return json(
       {
         success: false,
-        message: 'Email service key not yet configured. Please use Gmail Web or your email client.',
+        message: partial
+          ? 'Email delivery configuration is incomplete. Please use Gmail Web or your email client.'
+          : 'Email service not yet configured. Please use Gmail Web or your email client.',
       },
       503,
       rlHeaders
     );
   }
 
-  logMissive(ip, 'authorized', 'validation_cleared', email);
-  return json(
-    {
-      success: true,
-      authorized: true,
-      delivered: false,
-      accessKey,
-      sanitized: { name, email, subject, body },
-      message: 'Validation cleared. Ready for provider submission.',
-    },
-    200,
-    rlHeaders
-  );
+  try {
+    const formattedBody = `Sender: ${name}\nReturn Address: ${email}\n\n--------------------------------------------------\n${body}\n--------------------------------------------------\n(Dispatched via Ibem's Tavern Messenger Roost)`;
+    const resendRes = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${emailApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'Portfolio Contact <onboarding@resend.dev>',
+        to: [contactTo],
+        reply_to: email,
+        subject,
+        text: formattedBody,
+      }),
+      signal: createTimeoutSignal(8_000),
+    });
+
+    if (resendRes.ok) {
+      logMissive(ip, 'authorized', 'delivered_server', email);
+      return json(
+        {
+          success: true,
+          delivered: true,
+          sanitized: { name, email, subject, body },
+          message: 'Message submitted — your missive has been accepted for delivery.',
+        },
+        200,
+        rlHeaders
+      );
+    }
+    logMissive(ip, 'service_error', 'server_delivery_failed', email, `HTTP ${resendRes.status}`);
+    return json(
+      {
+        success: false,
+        message: 'Email delivery service encountered an upstream error. Please use Gmail Web or your email client.',
+      },
+      502,
+      rlHeaders
+    );
+  } catch {
+    logMissive(ip, 'service_error', 'server_delivery_timeout', email);
+    return json(
+      {
+        success: false,
+        message: 'Email delivery service timed out. Please use Gmail Web or your email client.',
+      },
+      504,
+      rlHeaders
+    );
+  }
 };
 
 export const ALL: APIRoute = async () => {
