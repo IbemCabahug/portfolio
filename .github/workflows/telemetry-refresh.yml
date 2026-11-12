@@ -65,6 +65,13 @@ name: Telemetry Refresh
 #   - Star and fork counts are not tracked. A star alone changes no commit, so
 #     it will not by itself trigger a rebuild; it is picked up the next time
 #     some other change fires one.
+#   - Latest GitHub Release tags ARE tracked (key "<repo>@release", added
+#     2026-11-12), so publishing a release without a new commit still rebuilds.
+#   - Mimic APKs are published from IbemCabahug/mimic itself (since v1.4.4).
+#     The former IbemCabahug/mimic-release repo is private and no longer linked.
+#   - Observed reality: GitHub starts this 04:17 UTC cron 4-9 hours late. A
+#     quiet stretch of days with no snapshot commit is NORMAL when no tracked
+#     repo moved — check each run's job summary before assuming it is broken.
 
 on:
   schedule:
@@ -85,7 +92,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Compare tracked repos against the snapshot
         id: check
@@ -111,6 +118,7 @@ jobs:
           # is why it is used here. 2 calls total, so quota is not a concern.
 
           changed=0
+          SUMMARY_ROWS=$(mktemp)
           while read -r repo; do
             [ -z "$repo" ] && continue
 
@@ -150,13 +158,64 @@ jobs:
             short="${sha:0:7}"
             if [ "$prev" = "$sha" ]; then
               echo "  unchanged  $repo  $short"
+              echo "| \`$repo\` | commit | \`$short\` | unchanged |" >> "$SUMMARY_ROWS"
             else
               echo "  CHANGED    $repo  ${prev:-<none>} -> $short"
+              echo "| \`$repo\` | commit | \`${prev:0:7}\` → \`$short\` | **changed** |" >> "$SUMMARY_ROWS"
               changed=1
+            fi
+
+            # Latest published release (added 2026-11-12). A new GitHub Release
+            # can be published without a new commit (e.g. Mimic APK builds), and
+            # the Quest Board advertises downloads, so release tags are tracked
+            # under the "<repo>@release" key. 404 = repo has no releases; that
+            # and any probe failure yield "" and are treated as unchanged.
+            tag=$(curl -sSL \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "https://api.github.com/repos/$repo/releases/latest" \
+              | python3 -c 'import json,sys
+          try:
+              d = json.load(sys.stdin)
+              print(d.get("tag_name", "") if isinstance(d, dict) else "")
+          except Exception:
+              print("")')
+            if [ -n "$tag" ]; then
+              prev_tag=$(python3 -c 'import json,sys
+          try:
+              print(json.load(open(sys.argv[1])).get(sys.argv[2], ""))
+          except Exception:
+              print("")' "$SNAPSHOT" "$repo@release")
+              if [ "$prev_tag" = "$tag" ]; then
+                echo "  unchanged  $repo@release  $tag"
+                echo "| \`$repo\` | release | \`$tag\` | unchanged |" >> "$SUMMARY_ROWS"
+              else
+                echo "  CHANGED    $repo@release  ${prev_tag:-<none>} -> $tag"
+                echo "| \`$repo\` | release | \`${prev_tag:-none}\` → \`$tag\` | **changed** |" >> "$SUMMARY_ROWS"
+                changed=1
+              fi
             fi
           done <<< "$REPOS"
 
           echo "changed=$changed" >> "$GITHUB_OUTPUT"
+
+          # Job summary (added 2026-11-12): makes a healthy no-op run visibly
+          # distinguishable from a broken one in the Actions UI. A quiet run
+          # means "checked, nothing moved", not "sync is dead".
+          {
+            echo "### Telemetry Refresh — $(date -u '+%Y-%m-%d %H:%M UTC')"
+            echo
+            echo "| Repo | Kind | Value | Status |"
+            echo "|---|---|---|---|"
+            cat "$SUMMARY_ROWS"
+            echo
+            if [ "$changed" -eq 1 ]; then
+              echo "**Result:** a tracked repo moved — snapshot committed, Vercel rebuild triggered."
+            else
+              echo "**Result:** nothing moved — no commit, no deploy (healthy no-op)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
 
           if [ "$changed" -eq 1 ]; then
             echo "::notice::A tracked repo moved — recording it and rebuilding."
@@ -176,7 +235,7 @@ jobs:
           # a trailing newline so an unchanged run is byte-identical and git
           # has nothing to commit.
           python3 - <<'PY'
-          import json, os, urllib.request
+          import json, os, urllib.request, urllib.error
 
           REPOS = [
               "IbemCabahug/ArcaneTyper",
@@ -213,6 +272,30 @@ jobs:
                   # so a transient API failure cannot itself look like a change.
                   print(f"::warning::probe failed for {repo}: {exc}")
                   snapshot[repo] = previous.get(repo, "")
+
+              # Latest release tag, mirroring the check step. 404 (no releases)
+              # omits the key; other failures keep the previous value.
+              key = f"{repo}@release"
+              rel_req = urllib.request.Request(
+                  f"https://api.github.com/repos/{repo}/releases/latest",
+                  headers={
+                      "Accept": "application/vnd.github+json",
+                      "Authorization": f"Bearer {token}",
+                      "X-GitHub-Api-Version": "2022-11-28",
+                  },
+              )
+              try:
+                  with urllib.request.urlopen(rel_req, timeout=20) as response:
+                      tag = json.load(response).get("tag_name", "")
+                  if tag:
+                      snapshot[key] = tag
+              except urllib.error.HTTPError as exc:
+                  if exc.code != 404 and previous.get(key):
+                      snapshot[key] = previous[key]
+              except Exception as exc:
+                  print(f"::warning::release probe failed for {repo}: {exc}")
+                  if previous.get(key):
+                      snapshot[key] = previous[key]
 
           with open(PATH, "w") as f:
               json.dump(snapshot, f, indent=2, sort_keys=True)

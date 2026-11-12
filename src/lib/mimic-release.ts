@@ -14,16 +14,17 @@ export interface MimicReleaseConfig {
 }
 
 export const mimicRelease: MimicReleaseConfig = {
-  downloadsEnabled: false,
-  status: 'updating',
-  badgeLabel: 'Updates in Progress',
-  title: 'Downloads Temporarily Unavailable',
+  // Re-enabled 2026-11-12: v1.4.4 (build 3013) is published from the main
+  // repository at github.com/IbemCabahug/mimic (the old mimic-release repo is private).
+  downloadsEnabled: true,
+  status: 'available',
+  badgeLabel: 'v1.4.4 Available',
+  title: 'Free Download Available',
   statusMessage:
-    'Mimic Release is currently undergoing improvements and updates. Public downloads have been temporarily disabled while I prepare the next version. The download feature will return once the updated release is ready. Thank you for your patience.',
+    'Mimic v1.4.4 is free to download from the main GitHub repository. No activation code is needed.',
   paragraphs: [
-    'Mimic Release is currently undergoing improvements and updates. Public downloads have been temporarily disabled while I prepare the next version.',
-    'The download feature will return once the updated release is ready.',
-    'Thank you for your patience.',
+    'Mimic v1.4.4 is free to download from the main GitHub repository.',
+    'No activation code is needed to get started.',
   ],
 };
 

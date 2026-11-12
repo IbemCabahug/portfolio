@@ -8,9 +8,9 @@ import { createDistServer } from './serve-dist.mjs';
 import { mimicRelease } from '../src/lib/mimic-release.ts';
 
 const VERIFIED_DOWNLOAD_URL =
-  'https://github.com/IbemCabahug/mimic-release/releases/latest/download/mimic-v1.1.0.apk';
+  'https://github.com/IbemCabahug/mimic/releases/latest/download/app-release.apk';
 const CANONICAL_RELEASE_URL =
-  'https://github.com/IbemCabahug/mimic-release/releases/latest';
+  'https://github.com/IbemCabahug/mimic/releases/latest';
 const CANONICAL_SOURCE_URL =
   'https://github.com/IbemCabahug/mimic';
 
@@ -32,13 +32,13 @@ try {
       return void request.continue();
     }
     // Intercept external requests to verified GitHub release endpoints to prevent multi-megabyte binary downloads
-    if (url === VERIFIED_DOWNLOAD_URL || url.includes('/releases/latest/download/mimic-v1.1.0.apk')) {
+    if (url === VERIFIED_DOWNLOAD_URL || url.includes('/releases/latest/download/app-release.apk')) {
       interceptedRequests.push(url);
       return void request.respond({
         status: 200,
         contentType: 'application/vnd.android.package-archive',
         headers: {
-          'Content-Disposition': 'attachment; filename="mimic-v1.1.0.apk"',
+          'Content-Disposition': 'attachment; filename="app-release.apk"',
         },
         body: 'MOCK_APK_HEADER',
       });
@@ -54,7 +54,7 @@ try {
       }, 5000);
 
       const onReq = (req) => {
-        if (req.url() === VERIFIED_DOWNLOAD_URL || req.url().includes('mimic-v1.1.0.apk')) {
+        if (req.url() === VERIFIED_DOWNLOAD_URL || req.url().includes('app-release.apk')) {
           page.off('request', onReq);
           clearTimeout(timeout);
           resolve(req.url());
@@ -165,9 +165,9 @@ try {
     assert.ok(releaseAction.minHeightPx >= 44, `Release action minHeight must be >= 44px (got ${releaseAction.minHeightPx}px)`);
     assert.ok(releaseAction.rectHeight >= 44, `Release action rectHeight must be >= 44px (got ${releaseAction.rectHeight}px)`);
 
-    // Check URL Destinations: Release points to mimic-release, Source points to mimic; not reversed
-    assert.ok(releaseAction.href.includes('IbemCabahug/mimic-release'), 'Release action must point to mimic-release repository');
-    assert.equal(releaseAction.href.includes('IbemCabahug/mimic/'), false, 'Release action must not point to source repo');
+    // Check URL Destinations: releases now live in the main mimic repository; the retired private mimic-release repo must not be linked
+    assert.ok(releaseAction.href.startsWith('https://github.com/IbemCabahug/mimic/releases'), 'Release action must point to the mimic repository releases page');
+    assert.equal(releaseAction.href.includes('mimic-release'), false, 'Release action must not point to the retired mimic-release repository');
 
     const sourceAction = await page.evaluate(() => {
       const links = Array.from(document.querySelectorAll('a'));
@@ -176,7 +176,7 @@ try {
     });
     assert.ok(sourceAction, 'Inspect Source Code action must be present');
     assert.equal(sourceAction.href, CANONICAL_SOURCE_URL, 'Source anchor must point to canonical mimic source repository');
-    assert.equal(sourceAction.href.includes('mimic-release'), false, 'Source action must not point to binary-only release repo');
+    assert.equal(sourceAction.href.includes('mimic-release'), false, 'Source action must not point to the retired mimic-release repo');
 
     // Assert Helper Text for Download State
     const downloadHelperText = await page.$eval(
@@ -328,7 +328,7 @@ try {
     });
     assert.ok(sourceAction, 'Inspect Source Code action must be present');
     assert.equal(sourceAction.href, CANONICAL_SOURCE_URL, 'Source anchor must point to canonical mimic source repository');
-    assert.equal(sourceAction.href.includes('mimic-release'), false, 'Source action must not point to binary-only release repo');
+    assert.equal(sourceAction.href.includes('mimic-release'), false, 'Source action must not point to the retired mimic-release repo');
 
     // Viewport & Responsive Checks on Real /quests/mimic for the Status Card
     for (const width of [1280, 375, 320]) {
@@ -507,14 +507,14 @@ try {
     let liveProbeError = null;
 
     try {
-      const metaRes = await fetch('https://api.github.com/repos/IbemCabahug/mimic-release/releases/latest', {
+      const metaRes = await fetch('https://api.github.com/repos/IbemCabahug/mimic/releases/latest', {
         headers: { 'User-Agent': 'Mimic-Release-Probe/1.0' },
         signal: AbortSignal.timeout(8000),
       });
       liveMetaStatus = metaRes.status;
       if (metaRes.ok) {
         const meta = await metaRes.json();
-        const asset = meta.assets?.find((a) => a.name === 'mimic-v1.1.0.apk');
+        const asset = meta.assets?.find((a) => a.name === 'app-release.apk');
         if (asset) {
           liveAssetFound = true;
         }
@@ -539,7 +539,7 @@ try {
     }
 
     console.log(`GitHub API latest release status: ${liveMetaStatus}`);
-    console.log(`Asset mimic-v1.1.0.apk present in release metadata: ${liveAssetFound}`);
+    console.log(`Asset app-release.apk present in release metadata: ${liveAssetFound}`);
     console.log(`Download endpoint HTTP status: ${liveDownloadStatus}`);
     console.log(`Download Content-Type: ${liveContentType}`);
     console.log(`Download Content-Disposition: ${liveDisposition}`);
@@ -547,7 +547,7 @@ try {
 
     if (liveDownloadStatus === 404 || (liveMetaStatus === 200 && !liveAssetFound)) {
       throw new Error(
-        `LIVE RELEASE FAILURE: Asset mimic-v1.1.0.apk returned HTTP 404 or missing from latest release! (status: ${liveDownloadStatus})`
+        `LIVE RELEASE FAILURE: Asset app-release.apk returned HTTP 404 or missing from latest release! (status: ${liveDownloadStatus})`
       );
     } else if (liveDownloadStatus === 200 && liveAssetFound) {
       console.log('[Live Smoke Probe] PASS: Live release metadata and APK download endpoint verified successfully.');

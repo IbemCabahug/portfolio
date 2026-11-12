@@ -7,9 +7,9 @@ stack: ["Flutter", "Android", "AES-256", "Dart", "Cryptography"]
 featured: false
 thumbnail: "/art/projects/mimic-icon.webp"
 order: 3
-summary: "An Android social deduction party game that also contains an AES-256 encrypted personal vault for photos, videos, notes and documents. Vault contents remain strictly local on the device with zero cloud storage."
-downloadUrl: "https://github.com/IbemCabahug/mimic-release/releases/latest/download/mimic-v1.1.0.apk"
-releaseUrl: "https://github.com/IbemCabahug/mimic-release/releases/latest"
+summary: "A free Android social deduction word-guessing party game — play on one phone or over local Wi-Fi — that also contains an AES-256 encrypted personal vault for photos, videos, notes and documents. Vault contents remain strictly local on the device with zero cloud storage."
+downloadUrl: "https://github.com/IbemCabahug/mimic/releases/latest/download/app-release.apk"
+releaseUrl: "https://github.com/IbemCabahug/mimic/releases/latest"
 sourceUrl: "https://github.com/IbemCabahug/mimic"
 ---
 
@@ -23,6 +23,30 @@ Key design constraints:
 - **Hardware-Backed Security**: Cryptographic salts and key derivation leverage the Android Keystore system.
 
 > **Project Status — Shipped**: Completed and verified on Android. The social deduction game, local LAN multiplayer, and AES-256 encrypted local vault are fully implemented and verified on physical Android release hardware.
+
+---
+
+## Release & Download
+
+**Latest release: v1.4.4 (build 3013)** — a signed Android build with a simpler interface, published from the main [IbemCabahug/mimic](https://github.com/IbemCabahug/mimic) repository.
+
+- **Free to download and play.** No activation code is needed; Pro offers are currently paused.
+- **Requirements**: Android 7.0 or newer. Enable "Install from unknown sources" when prompted.
+- **Verify your download**: each release ships an `app-release.apk` alongside a `SHA256SUMS.txt` checksum file.
+- **Updating?** Install over your existing copy. Do **not** uninstall or clear app data to fix an installation error — vault keys are bound to the device and the app's signing identity, so doing so can permanently remove your vault data.
+
+### Game Modes
+- **Classic** — one Mimic, one shared word. Discuss and vote to find the impostor.
+- **Nightmare** — two Mimics with different fake words.
+- **Survival** — eliminated players become Watchers and still influence the game.
+
+Themed word packs (Dark Places, The Occult, Crime Scene, Survival Horror, Everyday Dread, Philippine Folklore) can be mixed up to three per game, for 2–8 players on one phone or over a host's hotspot — no internet required.
+
+### Version History
+- **v1.4.4 (build 3013)** — signed Android build with a simpler interface; free tier
+- **v1.4.3** — faster first playback for newly imported videos
+- **v1.1.0** — LAN multiplayer over hotspot, QR code room joining, rejoin flow
+- **v1.0.0** — initial release: solo gameplay and vault system
 
 ---
 
