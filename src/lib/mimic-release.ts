@@ -14,16 +14,16 @@ export interface MimicReleaseConfig {
 }
 
 export const mimicRelease: MimicReleaseConfig = {
-  // Re-enabled 2026-11-12: v1.4.4 (build 3013) is published from the main
+  // Updated 2026-11-18: v1.4.5 (build 3014) is published from the main
   // repository at github.com/IbemCabahug/mimic (the old mimic-release repo is private).
   downloadsEnabled: true,
   status: 'available',
-  badgeLabel: 'v1.4.4 Available',
+  badgeLabel: 'v1.4.5 Available',
   title: 'Free Download Available',
   statusMessage:
-    'Mimic v1.4.4 is free to download from the main GitHub repository. No activation code is needed.',
+    'Mimic v1.4.5 is free to download from the main GitHub repository. No activation code is needed.',
   paragraphs: [
-    'Mimic v1.4.4 is free to download from the main GitHub repository.',
+    'Mimic v1.4.5 is free to download from the main GitHub repository.',
     'No activation code is needed to get started.',
   ],
 };
