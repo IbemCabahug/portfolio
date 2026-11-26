@@ -146,7 +146,7 @@ const isDownloadsEnabled = isProjectDownloadEnabled(entry.data.slug);
             </div>
             {entry.data.downloadUrl ? (
               <p class="text-xs text-[var(--ink)]/80 font-serif italic" id="project-download-helper">
-                Android APK · Download hosted on GitHub
+                {entry.data.downloadHelper || 'Android APK · Download hosted on GitHub'}
               </p>
             ) : entry.data.releaseUrl ? (
               <p class="text-xs text-[var(--ink)]/80 font-serif italic" id="project-release-helper">
@@ -235,9 +235,9 @@ const isDownloadsEnabled = isProjectDownloadEnabled(entry.data.slug);
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
-              <span>Offline Device-Hardened Architecture</span>
+              <span>{entry.data.privateRepoNote || 'Private Repository · Architecture Overview'}</span>
             </span>
-            <span class="text-[11px] text-stone-700 italic">No network exfiltration permissions · Local keystore hardware-anchored</span>
+            <span class="text-[11px] text-stone-700 italic">{entry.data.privateRepoSubnote || 'Closed repository · Safe public architecture dossier'}</span>
           </div>
         ) : null}
       </header>

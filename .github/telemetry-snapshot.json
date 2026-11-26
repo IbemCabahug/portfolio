@@ -1,5 +1,7 @@
 {
   "IbemCabahug/ArcaneTyper": "fd1c5247a79e16f1a3143a37d328395b46e737b8",
   "IbemCabahug/mimic": "e2e918eb5ff8de5d017f908fd687dedb6a6edbdd",
-  "IbemCabahug/mimic@release": "v1.4.5-build.3014"
+  "IbemCabahug/mimic@release": "v1.4.5-build.3014",
+  "samananias/ta-duwa": "0421436cb6dacd8c5bdb55a9eaa80864a7b788fe",
+  "samananias/ta-duwa@release": "v0.5.0"
 }

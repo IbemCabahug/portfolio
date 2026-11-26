@@ -25,6 +25,7 @@
 //   reachability (reachable, overflowing, overflowY)
 
 import crypto from 'node:crypto';
+import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
 import { createDistServer } from './serve-dist.mjs';
 import { EDGE } from './browser-path.mjs';
@@ -35,7 +36,8 @@ const routeSource = rawRoute !== undefined ? 'argument' : 'default';
 let route = rawRoute || '/';
 if (!route.startsWith('/')) route = '/' + route;
 
-const srv = await createDistServer({ root: 'dist', port: 0, quiet: true });
+const distRoot = fs.existsSync('dist/client/index.html') ? 'dist/client' : 'dist';
+const srv = await createDistServer({ root: distRoot, port: 0, quiet: true });
 const resolvedUrl = `${srv.origin}${route}`;
 
 const res = await fetch(resolvedUrl);

@@ -4,6 +4,10 @@
     {
       "name": "PostgreSQL",
       "level": "working"
+    },
+    {
+      "name": "SQLite",
+      "level": "working"
     }
   ]
 }

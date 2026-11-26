@@ -1,5 +1,5 @@
 {
   "question": "What technologies does he use?",
-  "answer": "Day to day: TypeScript, React, Next.js, Astro, Express.js and PostgreSQL, with Git and Tailwind CSS. This tavern itself is built with Astro and hand-tuned for accessibility.",
+  "answer": "Day to day: TypeScript, React, React Native / Expo, Next.js, Astro, Fastify, Express.js, Prisma, and PostgreSQL for web and mobile systems — plus Java 17 (Android SDK, Shizuku AIDL) and Flutter for native Android apps, paired with Git and Tailwind CSS.",
   "order": 3
 }

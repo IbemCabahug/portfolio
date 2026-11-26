@@ -83,6 +83,22 @@ export const JOURNAL_MILESTONES: JournalMilestone[] = [
     tagline: 'Flutter party game and offline AES-256 encrypted hardware vault',
     iconName: 'swords',
   },
+  {
+    id: 'the-nest',
+    title: 'The Nest Architecture',
+    category: 'dossier',
+    path: '/quests/the-nest',
+    tagline: 'Private two-person Expo & Fastify companion with E2EE and native keystore custody',
+    iconName: 'candle',
+  },
+  {
+    id: 'ta-duwa',
+    title: 'TaDuwa Android Companion',
+    category: 'dossier',
+    path: '/quests/ta-duwa',
+    tagline: 'Native Java 17 Android game booster, recorder & optional Shizuku controls',
+    iconName: 'terminal',
+  },
 
   // ── Part 3: Guild Feats & Deeds (Interactive Trials) ─────────────────
   {
@@ -216,7 +232,7 @@ export function getAdventurerRank(count: number): AdventurerRank {
       colorClass: 'text-amber-500 font-extrabold',
     };
   }
-  if (count >= 10) {
+  if (count >= 11) {
     return {
       rank: 'Master Wayfarer',
       tier: 4,
@@ -225,7 +241,7 @@ export function getAdventurerRank(count: number): AdventurerRank {
       colorClass: 'text-amber-600 font-bold',
     };
   }
-  if (count >= 7) {
+  if (count >= 8) {
     return {
       rank: 'Veteran Adventurer',
       tier: 3,
@@ -261,6 +277,8 @@ export function detectMilestoneFromPath(pathname: string): string | null {
   if (clean === '/quests/arcanetyper') return 'arcanetyper';
   if (clean === '/quests/bits') return 'bits';
   if (clean === '/quests/mimic') return 'mimic';
+  if (clean === '/quests/the-nest') return 'the-nest';
+  if (clean === '/quests/ta-duwa') return 'ta-duwa';
   if (clean === '/quests') return 'quests';
   if (clean.startsWith('/messenger')) return 'messenger';
   if (clean.startsWith('/resume')) return 'resume';

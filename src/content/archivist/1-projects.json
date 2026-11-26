@@ -2,7 +2,7 @@
   "order": 1,
   "type": "branch",
   "question": "Which project should I inspect first?",
-  "lead": "That depends on the discipline you seek to evaluate. Nhovem engineers real-time interactive canvas engines, distributed enterprise systems, and client-side hardened vaults.",
+  "lead": "That depends on the discipline you seek to evaluate. Nhovem engineers real-time interactive canvas engines, distributed enterprise systems, client-side hardened vaults, native Android utilities, and private full-stack mobile apps.",
   "inquiries": [
     {
       "label": "Show me real-time interactive canvas gameplay",
@@ -21,6 +21,18 @@
       "response": "Inspect Mimic. An Android party game engineered around an isolated, client-side AES-256 encrypted personal vault.",
       "offerLabel": "Inspect Mimic Case Study",
       "offerHref": "/quests/mimic"
+    },
+    {
+      "label": "Show me private full-stack E2EE mobile architecture",
+      "response": "Inspect The Nest. A private two-person Expo/React Native and Fastify/PostgreSQL companion featuring passwordless native keystore custody, double-ratchet E2EE chat, and EXIF-stripped presigned uploads.",
+      "offerLabel": "Inspect The Nest Case Study",
+      "offerHref": "/quests/the-nest"
+    },
+    {
+      "label": "Show me native Android game booster & Shizuku tuning",
+      "response": "Inspect TaDuwa. A native Java 17 Android game booster, companion, and recorder starting with Mobile Legends and expanding to all apps—featuring MediaProjection game audio capture, a floating Pop Icon, and optional non-root Shizuku controls.",
+      "offerLabel": "Inspect TaDuwa Case Study",
+      "offerHref": "/quests/ta-duwa"
     }
   ]
 }

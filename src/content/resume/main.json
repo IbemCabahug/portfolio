@@ -8,7 +8,7 @@
     "github": "github.com/IbemCabahug",
     "githubUrl": "https://github.com/IbemCabahug"
   },
-  "summary": "Computer Technology graduate with 1,800 hours of IT internship experience in shipping and logistics. Experienced in desktop troubleshooting, PC assembly using recovered functional components, Windows/software installation, computer maintenance, and end-user support. Contributed to development and testing of a company-directed biometric timekeeping system (BITS), including implementation of Manager and Employee dashboards. Seeking an entry-level IT Support or IT Staff role.",
+  "summary": "Computer Technology graduate and AI-assisted developer with 1,800 hours of IT internship experience in shipping and logistics. Experienced in desktop troubleshooting, PC assembly, Windows/software configuration, and end-user support, alongside building web, cross-platform mobile, and native Android applications with AI coding tools while owning requirements, architecture, security boundaries, and testing. Contributed to production development and testing of BITS, a biometric timekeeping system.",
   "coreSkills": [
     {
       "category": "IT Support & Troubleshooting",
@@ -24,7 +24,7 @@
     },
     {
       "category": "Programming & Development",
-      "items": "Basic Java, HTML, CSS, JavaScript, and SQL; Git and GitHub; AI-assisted software development"
+      "items": "TypeScript, JavaScript, Java (Android), React Native / Expo, Fastify / Node.js, HTML, CSS, SQL / PostgreSQL; Git and GitHub; AI-assisted software development"
     },
     {
       "category": "Productivity & Data Management",
@@ -72,9 +72,37 @@
       "urlLabel": "github.com/IbemCabahug/mimic",
       "label": "GitHub",
       "bullets": [
-        "Defined requirements and guided AI-assisted development of an Android social-deduction game featuring three game modes, five word packs, LAN multiplayer for up to eight players, and a private encrypted vault for photos, videos, and notes.",
-        "Manually tested gameplay and vault-security features, including gesture unlock, PIN setup, failed-PIN lockout, auto-lock, and encrypted video playback. Performed additional testing on a physical device running the release build.",
-        "Identified release-specific defects, including a vault setup issue on clean installs, and incorporated clean-install testing on a wiped physical device into the release-testing process."
+        "Defined requirements and guided AI-assisted development of an Android social-deduction game featuring LAN multiplayer for up to eight players and an on-device AES-256 encrypted vault for photos, videos, and notes.",
+        "Manually tested gameplay and vault security (gesture/PIN unlock, lockout, auto-lock, encrypted video playback) including clean-install verification on physical Android devices."
+      ]
+    },
+    {
+      "name": "The Nest — Private Two-Person Mobile Companion",
+      "note": "AI-Assisted Build · Private Repo",
+      "url": "https://portfolio-ibem.vercel.app/quests/the-nest",
+      "urlLabel": "portfolio-ibem.vercel.app/quests/the-nest",
+      "label": "Case Study",
+      "bullets": [
+        "Architected a TypeScript monorepo (Expo React Native client, Fastify + Prisma + PostgreSQL API, shared contracts) for private two-person messaging, plans, notes, and shared memories.",
+        "Implemented passwordless enrollment with Android Keystore / iOS Keychain token custody, double-ratchet E2EE chat, EXIF-stripped presigned uploads, and 140 offline verification suites."
+      ]
+    },
+    {
+      "name": "TaDuwa — Android Game Booster, Companion & Recorder",
+      "note": "AI-Assisted Build · In Progress",
+      "url": "https://github.com/samananias/ta-duwa",
+      "urlLabel": "github.com/samananias/ta-duwa",
+      "label": "GitHub",
+      "extraLinks": [
+        {
+          "url": "https://github.com/samananias/ta-duwa/releases/tag/v0.5.0",
+          "label": "APK Release",
+          "urlLabel": "github.com/samananias/ta-duwa/releases/tag/v0.5.0"
+        }
+      ],
+      "bullets": [
+        "Built a native Java 17 Android game booster and recorder (initially targeting Mobile Legends with planned all-app support) featuring Play Hub, device checks, MediaProjection audio capture, Pop Icon overlay, and optional Shizuku AIDL controls.",
+        "Verified v0.5.0 testing preview with 29 JVM unit tests, R8 minified release build, Android release lint, and explicit local latency/jitter diagnostic honesty boundaries."
       ]
     }
   ],

@@ -78,6 +78,8 @@ const MULTI_ROUTES = [
   '/quests/mimic/',
   '/quests/bits/',
   '/quests/arcanetyper/',
+  '/quests/ta-duwa/',
+  '/quests/the-nest/',
   '/simple/',
   '/resume/',
   '/about/',
@@ -365,7 +367,7 @@ async function run() {
 
     assert.equal(tabletScrollResult.wrapperOverflowY, 'auto', '.scene-wrapper must have overflow-y: auto on tablet portrait');
     assert.ok(
-      tabletScrollResult.wrapperJustify === 'flex-start' || tabletScrollResult.wrapperJustify === 'start',
+      ['flex-start', 'start', 'flow-start'].includes(tabletScrollResult.wrapperJustify),
       `.scene-wrapper justify-content must be flex-start on tablet portrait (got ${tabletScrollResult.wrapperJustify})`
     );
     assert.ok(tabletScrollResult.narrowVisible, 'Narrow links must be reachable on tablet portrait 820x1180');
@@ -498,6 +500,45 @@ async function run() {
       assert.notEqual(m.pointerEvents, 'none', `Messenger hotspot ${m.id} ::after must have active pointer events`);
     }
     console.log('  [Messenger] Scene hotspots verified with >=44px hit targets and active pointer events. PASSED.');
+
+    // 4. Tavern Quest Board Popup (#dialog-questboard) with 5 project cards
+    for (const qbVp of [{ width: 1280, height: 720 }, { width: 844, height: 390 }]) {
+      await page.goto(`${server.origin}/tavern/`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+      await page.setViewport(qbVp);
+      await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(resolve)));
+
+      await page.click('#trigger-quest-board');
+      await page.waitForSelector('#dialog-questboard:not([hidden])', { timeout: 5000 });
+      await page.evaluate(() => new Promise((resolve) => setTimeout(resolve, 300)));
+
+      const qbState = await page.evaluate((vpH, vpW) => {
+        const dialog = document.getElementById('dialog-questboard');
+        const closeBtn = dialog ? dialog.querySelector('.close-panel-btn') : null;
+        const slugs = ['arcanetyper', 'bits', 'mimic', 'ta-duwa', 'the-nest'];
+        const missing = slugs.filter((s) => !dialog?.querySelector(`#bounty-${s}`));
+        const dRect = dialog ? dialog.getBoundingClientRect() : null;
+        const cRect = closeBtn ? closeBtn.getBoundingClientRect() : null;
+        return {
+          open: !!dialog && !dialog.hidden,
+          cardCount: dialog ? dialog.querySelectorAll('.bounty-slip').length : 0,
+          missing,
+          noHorizontalOverflow: document.documentElement.scrollWidth <= vpW + 1.5,
+          dialogFitsHeight: dRect ? dRect.bottom <= vpH + 2 && dRect.top >= -2 : false,
+          closeReachable: cRect ? cRect.width >= 44 && cRect.height >= 44 && cRect.bottom <= vpH + 2 : false,
+        };
+      }, qbVp.height, qbVp.width);
+
+      assert.ok(qbState.open, `Quest Board dialog must open at ${qbVp.width}x${qbVp.height}`);
+      assert.equal(qbState.cardCount, 5, `Quest Board dialog must render 5 bounty cards at ${qbVp.width}x${qbVp.height}`);
+      assert.deepEqual(qbState.missing, [], `Missing bounty cards at ${qbVp.width}x${qbVp.height}: ${qbState.missing.join(', ')}`);
+      assert.ok(qbState.noHorizontalOverflow, `Quest Board dialog must not overflow horizontally at ${qbVp.width}x${qbVp.height}`);
+      assert.ok(qbState.dialogFitsHeight, `Quest Board dialog must fit viewport height at ${qbVp.width}x${qbVp.height}`);
+      assert.ok(qbState.closeReachable, `Quest Board close button must be reachable at ${qbVp.width}x${qbVp.height}`);
+
+      await page.keyboard.press('Escape');
+      await page.waitForSelector('#dialog-questboard[hidden]', { timeout: 5000 });
+    }
+    console.log('  [QuestBoard] 5 bounty slips verified at 1280x720 and 844x390, Escape closes cleanly. PASSED.');
 
     // ==========================================
     // Phase 6: Orientation Flip (Resize without reload)

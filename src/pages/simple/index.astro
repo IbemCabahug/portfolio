@@ -46,6 +46,26 @@ const technicalHighlights: Record<string, { problem: string; decisions: string[]
     ],
     verification: 'Zero network telemetry · Tested local storage encryption on physical Android devices.',
   },
+  'ta-duwa': {
+    problem:
+      'Mobile gamers often face noisy "game booster" tools that make unverifiable ping claims or require root access to tune device settings.',
+    decisions: [
+      'Built natively in Java 17 with Android Framework XML Views as an all-app game booster and recorder roadmap (targeting MLBB first), keeping Play Hub, device readiness checks, MediaProjection/AudioPlaybackCapture recording, and the floating Pop Icon functional without root or Shizuku.',
+      'Isolated optional non-root Shizuku controls (Game Mode, render scale, background app quieting, Data Saver whitelisting, Private DNS) behind an explicit AIDL UserService with a one-tap Reset All Tweaks action.',
+      'Enforced strict diagnostic honesty: TCP handshake and 12-probe jitter tests measure local connection stability and explicitly disclaim in-game server ping.',
+    ],
+    verification: '29 JVM unit tests, R8 minified release build, Android release lint, and public v0.5.0 testing preview APK.',
+  },
+  'the-nest': {
+    problem:
+      'Generic cloud chat and photo apps mix personal life with noisy feeds, third-party analytics, and server-readable media.',
+    decisions: [
+      'Architected a TypeScript monorepo (Expo React Native client, Fastify + Prisma + PostgreSQL API, shared pure contracts) with passwordless private onboarding and hardware-backed token custody.',
+      'Implemented direct-to-storage presigned uploads with EXIF GPS sanitization alongside double-ratchet E2EE messaging and streaming AES-256-GCM encrypted media.',
+      'Combined daily collaboration (plans, revision-checked notes, live Android presence widget) with an SSE-synced Music Room, multi-species aquarium, and accessible mini-games.',
+    ],
+    verification: '140 offline verification suites running with zero external DB/network services + full workspace typechecking.',
+  },
 };
 
 const title = profile ? `${profile.name} — Technical Portfolio & Proof of Work` : "Technical Portfolio & Proof of Work";
@@ -73,7 +93,7 @@ const description = "The Field Ledger: Technical proof-of-work showcase, archite
           </p>
 
           <p class="text-base max-w-[75ch] leading-relaxed mb-6 text-[var(--ink)]/90">
-            {profile.tagline} Focused on accessible web architecture, strict quality budgets, systems performance, and AI-assisted software development where all architectural trade-offs, schema decisions, and test validations remain strictly human-driven.
+            {profile.tagline} Focused on accessible architecture, strict quality budgets, security boundaries, and verifiable software delivery.
           </p>
 
           <div class="flex flex-wrap items-center gap-x-8 gap-y-2 text-sm font-semibold text-[var(--ink)]/80">
@@ -211,26 +231,26 @@ const description = "The Field Ledger: Technical proof-of-work showcase, archite
             <div class="bg-[#fcf7ee] border border-[var(--brass)]/80 p-5 rounded">
               <h3 class="text-base font-bold text-[var(--ink)] mb-2 font-serif flex items-center gap-2">
                 <ThematicIcon name="play" class="w-4 h-4 text-[#7c531d]" />
-                <span>Frontend & Web Architecture</span>
+                <span>Frontend, Mobile & Android UI</span>
               </h3>
               <p class="text-xs text-[var(--ink)]/80 mb-3 leading-relaxed">
-                Astro, TypeScript, Tailwind CSS, HTML5 Canvas, Web Audio API, WCAG 2.1 AA Compliance, Responsive Layouts.
+                Astro, React Native / Expo, TypeScript, Tailwind CSS, Java 17 / Android SDK XML Views, HTML5 Canvas, WCAG 2.1 AA.
               </p>
               <div class="text-xs font-semibold text-[#7c531d] border-t border-[var(--brass)]/30 pt-2">
-                <strong>Proof:</strong> Arcane Typer (Canvas 60fps loop) & Portfolio (Lighthouse 100/100, 0-byte JS mode).
+                <strong>Proof:</strong> Arcane Typer (Canvas 60fps), The Nest (Expo), TaDuwa (Android), & Portfolio (100/100 A11y).
               </div>
             </div>
 
             <div class="bg-[#fcf7ee] border border-[var(--brass)]/80 p-5 rounded">
               <h3 class="text-base font-bold text-[var(--ink)] mb-2 font-serif flex items-center gap-2">
                 <ThematicIcon name="terminal" class="w-4 h-4 text-[#7c531d]" />
-                <span>Backend & Real-Time Systems</span>
+                <span>Backend, Native & Real-Time Systems</span>
               </h3>
               <p class="text-xs text-[var(--ink)]/80 mb-3 leading-relaxed">
-                Node.js, Express.js, Supabase, WebSockets, REST APIs, Biometric scan ingestion, Multi-shift business logic.
+                Node.js, Fastify, Express.js, Shizuku AIDL, E2EE / AES-256-GCM, WebSockets, SSE, Biometric scan ingestion.
               </p>
               <div class="text-xs font-semibold text-[#7c531d] border-t border-[var(--brass)]/30 pt-2">
-                <strong>Proof:</strong> BITS (Overtime routing layer) & Supabase 1v1 duels in Arcane Typer.
+                <strong>Proof:</strong> BITS (Overtime routing), The Nest (Fastify + E2EE), & TaDuwa (MediaProjection + AIDL).
               </div>
             </div>
 
@@ -240,10 +260,10 @@ const description = "The Field Ledger: Technical proof-of-work showcase, archite
                 <span>Databases & Data Integrity</span>
               </h3>
               <p class="text-xs text-[var(--ink)]/80 mb-3 leading-relaxed">
-                PostgreSQL, SQLite, Schema Migrations, ZKTeco hardware punch-time normalisation, Relational model design.
+                PostgreSQL, Prisma, SQLite, Schema Migrations, Optimistic Concurrency, Presigned Media Sanitization.
               </p>
               <div class="text-xs font-semibold text-[#7c531d] border-t border-[var(--brass)]/30 pt-2">
-                <strong>Proof:</strong> BITS attendance tracking (25 models) & Arcane Typer leaderboard schema.
+                <strong>Proof:</strong> BITS attendance tracking (25 models) & The Nest (Prisma + EXIF GPS stripping).
               </div>
             </div>
 
@@ -253,10 +273,10 @@ const description = "The Field Ledger: Technical proof-of-work showcase, archite
                 <span>Engineering Rigor & Quality Gates</span>
               </h3>
               <p class="text-xs text-[var(--ink)]/80 mb-3 leading-relaxed">
-                Automated regression testing, Puppeteer, Lighthouse audits, 12 Quality Budgets (contrast, layout shifts, no-JS fallbacks).
+                Automated test suites, JUnit, Puppeteer, Lighthouse audits, 12 Quality Budgets (contrast, layout shifts, no-JS fallbacks).
               </p>
               <div class="text-xs font-semibold text-[#7c531d] border-t border-[var(--brass)]/30 pt-2">
-                <strong>Proof:</strong> 99/99 passing contrast tests, zero-runtime-JS enforcement script, Astro check clean.
+                <strong>Proof:</strong> The Nest (140 offline suites), TaDuwa (29 JUnit tests), & Portfolio (contrast + no-JS gates).
               </div>
             </div>
           </div>

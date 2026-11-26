@@ -25,12 +25,10 @@ name: Telemetry Refresh
 # repo on every push to main, that commit triggers a production build, which
 # re-runs the GitHub fetch and re-freezes the telemetry with real values.
 #
-# TRACKED: IbemCabahug/ArcaneTyper, IbemCabahug/mimic.
-# NOT TRACKED: IbemCabahug/bits. That name is a permanent 301 redirect to
-# samananias/bits, a repository belonging to someone else. Following it would
-# attribute a third party's commits, stars and push dates to this portfolio and
-# would rebuild the site whenever they commit. Re-add it here once our own
-# BITS repository is published under a name we control.
+# TRACKED: IbemCabahug/ArcaneTyper, IbemCabahug/mimic, samananias/ta-duwa.
+# NOT TRACKED: IbemCabahug/bits (permanent 301 redirect to samananias/bits) and
+# private projects without a public sourceUrl (such as The Nest).
+# Re-add BITS here once our own BITS repository is published under a name we control.
 #
 # WHY A COMMIT INSTEAD OF A VERCEL DEPLOY HOOK
 # A deploy hook needs PORTFOLIO_DEPLOY_HOOK stored as a secret here. Pushing a
@@ -102,16 +100,14 @@ jobs:
           set -euo pipefail
           SNAPSHOT=".github/telemetry-snapshot.json"
 
-          # Keep in sync with the sourceUrl in each src/content/projects/*.mdx.
+          # Keep in sync with public projects in src/content/projects/*.mdx.
           #
-          # IbemCabahug/bits is deliberately NOT tracked. That name is a
-          # permanent 301 redirect to samananias/bits, which belongs to someone
-          # else — following it would attribute a third party's commits, stars
-          # and push dates to this portfolio, and would rebuild the site
-          # whenever they commit. It is re-added here once our own BITS repo is
-          # published under a name we control.
+          # IbemCabahug/bits is deliberately NOT tracked (permanent 301 redirect to
+          # samananias/bits). Private projects without a public sourceUrl are
+          # intentionally omitted from telemetry tracking.
           REPOS="IbemCabahug/ArcaneTyper
-          IbemCabahug/mimic"
+          IbemCabahug/mimic
+          samananias/ta-duwa"
 
           # Unauthenticated calls from a runner share an IP pool and 60 req/hr is
           # the ceiling; the default GITHUB_TOKEN raises this to 5000/hr, which
@@ -166,10 +162,10 @@ jobs:
             fi
 
             # Latest published release (added 2026-11-12). A new GitHub Release
-            # can be published without a new commit (e.g. Mimic APK builds), and
-            # the Quest Board advertises downloads, so release tags are tracked
-            # under the "<repo>@release" key. 404 = repo has no releases; that
-            # and any probe failure yield "" and are treated as unchanged.
+            # can be published without a new commit (e.g. Mimic / TaDuwa APK builds),
+            # and the Quest Board advertises downloads, so release tags are tracked
+            # under the "<repo>@release" key. Falls back to the newest non-draft
+            # release (including prereleases) when /releases/latest returns 404.
             tag=$(curl -sSL \
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: Bearer $GH_TOKEN" \
@@ -181,6 +177,19 @@ jobs:
               print(d.get("tag_name", "") if isinstance(d, dict) else "")
           except Exception:
               print("")')
+            if [ -z "$tag" ]; then
+              tag=$(curl -sSL \
+                -H "Accept: application/vnd.github+json" \
+                -H "Authorization: Bearer $GH_TOKEN" \
+                -H "X-GitHub-Api-Version: 2022-11-28" \
+                "https://api.github.com/repos/$repo/releases?per_page=10" \
+                | python3 -c 'import json,sys
+          try:
+              d = json.load(sys.stdin)
+              print(next((r.get("tag_name", "") for r in d if isinstance(r, dict) and not r.get("draft") and r.get("tag_name")), "") if isinstance(d, list) else "")
+          except Exception:
+              print("")')
+            fi
             if [ -n "$tag" ]; then
               prev_tag=$(python3 -c 'import json,sys
           try:
@@ -240,6 +249,7 @@ jobs:
           REPOS = [
               "IbemCabahug/ArcaneTyper",
               "IbemCabahug/mimic",
+              "samananias/ta-duwa",
           ]
           PATH = ".github/telemetry-snapshot.json"
 
@@ -273,8 +283,10 @@ jobs:
                   print(f"::warning::probe failed for {repo}: {exc}")
                   snapshot[repo] = previous.get(repo, "")
 
-              # Latest release tag, mirroring the check step. 404 (no releases)
-              # omits the key; other failures keep the previous value.
+              # Latest release tag, mirroring the check step. If /releases/latest
+              # returns 404 (e.g. only prereleases exist), fall back to the newest
+              # non-draft release from /releases?per_page=10; non-404 failures keep
+              # the previous value.
               key = f"{repo}@release"
               rel_req = urllib.request.Request(
                   f"https://api.github.com/repos/{repo}/releases/latest",
@@ -290,7 +302,34 @@ jobs:
                   if tag:
                       snapshot[key] = tag
               except urllib.error.HTTPError as exc:
-                  if exc.code != 404 and previous.get(key):
+                  if exc.code == 404:
+                      list_req = urllib.request.Request(
+                          f"https://api.github.com/repos/{repo}/releases?per_page=10",
+                          headers={
+                              "Accept": "application/vnd.github+json",
+                              "Authorization": f"Bearer {token}",
+                              "X-GitHub-Api-Version": "2022-11-28",
+                          },
+                      )
+                      try:
+                          with urllib.request.urlopen(list_req, timeout=20) as list_res:
+                              releases = json.load(list_res)
+                          if isinstance(releases, list):
+                              tag = next(
+                                  (
+                                      r.get("tag_name", "")
+                                      for r in releases
+                                      if isinstance(r, dict) and not r.get("draft") and r.get("tag_name")
+                                  ),
+                                  "",
+                              )
+                              if tag:
+                                  snapshot[key] = tag
+                      except Exception as list_exc:
+                          print(f"::warning::release fallback probe failed for {repo}: {list_exc}")
+                          if previous.get(key):
+                              snapshot[key] = previous[key]
+                  elif previous.get(key):
                       snapshot[key] = previous[key]
               except Exception as exc:
                   print(f"::warning::release probe failed for {repo}: {exc}")

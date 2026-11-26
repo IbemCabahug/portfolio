@@ -2,17 +2,17 @@
   "order": 3,
   "type": "branch",
   "question": "What kind of developer is Nhovem?",
-  "lead": "A disciplined AI-Assisted Developer based in the Philippines who treats software engineering as an exacting, verifiable craft. Nhovem pairs with advanced AI under strict human verification.",
+  "lead": "An AI-Assisted Developer based in the Philippines building web applications, cross-platform mobile apps, and native Android tools. He uses AI coding tools to move quickly while owning requirements, architecture, security boundaries, and testing himself.",
   "inquiries": [
     {
       "label": "How does the human-AI workflow operate?",
-      "response": "Under the project's engineering protocol, AI serves as an implementation worker, while the human operator acts as lead architect. Every line, budget, and test is reviewed and verified by hand.",
+      "response": "Under the project's engineering protocol, AI serves as an implementation worker, while the human operator acts as lead architect. Every requirement, security boundary, budget, and test is reviewed and verified by hand.",
       "offerLabel": "Read Engineering Workflow",
       "offerHref": "/about"
     },
     {
       "label": "What are Nhovem's primary technologies?",
-      "response": "Core stack includes TypeScript, Astro, Node.js, and Tailwind CSS for web systems; Flutter and Dart for cross-platform applications; with PostgreSQL and SQLite for data stores.",
+      "response": "Core stack includes TypeScript, Astro, React Native / Expo, Fastify, Prisma, Node.js, and Tailwind CSS for web and cross-platform apps; Java 17 / Android SDK and Flutter for Android apps; with PostgreSQL and SQLite for data stores.",
       "offerLabel": "Inspect Full Resume",
       "offerHref": "/resume"
     }

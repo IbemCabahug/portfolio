@@ -17,7 +17,7 @@ const featuredTales = allTales.sort((a, b) => a.data.order - b.data.order);
 
 <BaseLayout
   title={`${profile?.name || 'Nhovem Cabahug'} — ${profile?.title || 'AI-Assisted Developer'}`}
-  description={profile?.tagline || "I build accessible, fast web applications with TypeScript. I develop with AI assistance, and I review, test and make the architectural decisions myself."}
+  description={profile?.tagline || "I am an AI-assisted developer building web applications, cross-platform mobile apps, and native Android tools. I use AI coding tools to move quickly from idea to working software, while owning the product requirements, system architecture, security boundaries, and hands-on testing myself."}
   hideDefaultNav={true}
 >
   <div class="min-h-screen bg-[var(--wood-deep)] text-[var(--parchment)]">
@@ -48,7 +48,7 @@ const featuredTales = allTales.sort((a, b) => a.data.order - b.data.order);
             </p>
 
             <p class="text-base sm:text-lg text-[var(--parchment)]/90 leading-relaxed mb-8 max-w-2xl">
-              I build accessible, fast web applications with TypeScript. I develop with AI assistance, and I review, test and make the architectural decisions myself. Recently shipped features and bug fixes for a biometric tracking system in production.
+              {profile?.tagline || "I am an AI-assisted developer building web applications, cross-platform mobile apps, and native Android tools. I use AI coding tools to move quickly from idea to working software, while owning the product requirements, system architecture, security boundaries, and hands-on testing myself."}
             </p>
 
             {/* Quick Action Links & Direct Contact */}
@@ -182,7 +182,7 @@ const featuredTales = allTales.sort((a, b) => a.data.order - b.data.order);
               </h3>
               <span class="text-xs uppercase tracking-wider text-[var(--brass)] font-semibold block mb-2">Projects & Case Studies</span>
               <p class="text-sm text-[var(--parchment)]/90 leading-relaxed mb-4">
-                Deep architectural case studies for Arcane Typer, BITS biometric production OJT, and Mimic Android party game and encrypted vault.
+                Deep architectural case studies for Arcane Typer, BITS biometric tracking, Mimic encrypted vault, The Nest private mobile home, and TaDuwa Android companion.
               </p>
             </div>
             <a
@@ -203,7 +203,7 @@ const featuredTales = allTales.sort((a, b) => a.data.order - b.data.order);
               Flagship Quests & Systems
             </h2>
             <p class="text-sm text-[var(--parchment)]/80 mt-1">
-              Curated evidence of production contributions and independently architected web applications.
+              Curated evidence of production contributions and independently architected web and mobile applications.
             </p>
           </div>
           <a
@@ -214,7 +214,7 @@ const featuredTales = allTales.sort((a, b) => a.data.order - b.data.order);
           </a>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {featuredProjects.map((project) => (
             <article class="bg-[var(--parchment)] text-[var(--ink)] p-6 rounded border-2 border-[var(--brass)] shadow-xl flex flex-col justify-between">
               <div>
