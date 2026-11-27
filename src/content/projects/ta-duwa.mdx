@@ -29,7 +29,7 @@ To avoid any misleading "game booster" claims, TaDuwa enforces strict architectu
 - **Honest Network Diagnostics**: The `Run TCP Check` (`1.1.1.1:443`, 3 attempts) and 12-probe stability/jitter test measure *local connection latency and jitter* — explicitly **not** in-game server ping.
 - **Realistic Network Boost Scope**: Network stability controls reduce *local device interference* (background Wi-Fi/BLE scanning, competing background app traffic via Data Saver while keeping the target game whitelisted, and holding `WifiManager.WIFI_MODE_FULL_LOW_LATENCY` during active recording). They cannot override weak Wi-Fi signal, `2.4 GHz` router congestion, or ISP routing.
 
-> **Project Status — In Progress (`v0.5.0` Experimental Prerelease)**: Current builds target *Mobile Legends: Bang Bang* while broader all-app support is on the roadmap. The minified release build, all 29 JVM unit tests, Android release lint, and APK signature verification passed; Shizuku and real-device gameplay behavior are still undergoing testing—use a spare device or practice match rather than a ranked match.
+> **Project Status — In Progress (`v0.5.0` Experimental Prerelease)**: Current builds target *Mobile Legends: Bang Bang* while broader all-app support is on the roadmap. The minified release build, all 29 JVM unit tests, Android release lint, and APK signature verification passed; Shizuku and real-device gameplay behavior are still undergoing testing—use a spare device or practice match rather than a ranked match. *(The interactive **TaDuwa Companion** preview above runs purely in your browser with 100% dummy placeholder metrics and never runs Shizuku or touches your device settings.)*
 
 ---
 

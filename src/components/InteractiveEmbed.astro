@@ -6,6 +6,7 @@ interface Props {
   liveUrl: string;
   title: string;
   slug?: string;
+  thumbnail?: string;
   instanceId?: string;
   scalingMode?: 'fit-canvas' | 'responsive';
   description?: string;
@@ -17,6 +18,7 @@ const {
   liveUrl,
   title,
   slug = 'arcanetyper',
+  thumbnail = slug === 'arcanetyper' ? '/art/projects/arcanetyper-icon.webp' : undefined,
   instanceId = slug,
   scalingMode = 'fit-canvas',
   description = 'Launch an interactive typing trial directly inside this project dossier, or open the standalone application in a new browser tab.',
@@ -54,6 +56,7 @@ const views: QuestDemoViewConfig[] = [
   projectName={projectName}
   ariaLabel={`${projectName} interactive live demo`}
   icon={slug === 'bits' ? 'code' : 'swords'}
+  iconSrc={thumbnail}
   intro={description}
   hint={hint}
   launchLabel={launchLabel}

@@ -1,0 +1,688 @@
+---
+---
+
+<style>
+  .nest-preview-card {
+    --nest-canvas: #F8F7FC;
+    --nest-surface: #FFFFFF;
+    --nest-soft: #EDE9FE;
+    --nest-text: #1F2937;
+    --nest-muted: #5A536D;
+    --nest-border: #8B7FA8;
+    --nest-action: #3B2A66;
+    --nest-on-action: #FFFFFF;
+    --nest-info-soft: #E0E7FF;
+    --nest-on-info-soft: #312E81;
+    --nest-green-soft: #DCFCE7;
+    --nest-green-ink: #14532D;
+    --nest-violet-soft: #EDE9FE;
+    --nest-violet-ink: #4C1D95;
+    --nest-warning-soft: #FEF3C7;
+    --nest-on-warning-soft: #78350F;
+    --nest-accent-soft: #DCFCE7;
+    --nest-accent-ink: #14532D;
+    --nest-accent-border: #15803D;
+  }
+
+  .nest-preview-card[data-nest-theme="dark"] {
+    --nest-canvas: #171321;
+    --nest-surface: #241D33;
+    --nest-soft: #322944;
+    --nest-text: #F2EEF9;
+    --nest-muted: #C4BCD6;
+    --nest-border: #8B7FA8;
+    --nest-action: #F2EEF9;
+    --nest-on-action: #171321;
+    --nest-info-soft: #1E1B4B;
+    --nest-on-info-soft: #C7D2FE;
+    --nest-green-soft: #064E3B;
+    --nest-green-ink: #A7F3D0;
+    --nest-violet-soft: #2E1065;
+    --nest-violet-ink: #DDD6FE;
+    --nest-warning-soft: #451A03;
+    --nest-on-warning-soft: #FDE68A;
+    --nest-accent-soft: #064E3B;
+    --nest-accent-ink: #A7F3D0;
+    --nest-accent-border: #86EFAC;
+  }
+
+  .nest-preview-card[data-nest-perspective="sprout"] {
+    --nest-accent-soft: var(--nest-violet-soft);
+    --nest-accent-ink: var(--nest-violet-ink);
+    --nest-accent-border: #7C3AED;
+  }
+
+  .nest-preview-card[data-nest-theme="dark"][data-nest-perspective="sprout"] {
+    --nest-accent-border: #C4B5FD;
+  }
+
+  .nest-phone-screen {
+    background-color: var(--nest-canvas);
+    color: var(--nest-text);
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .nest-app-card {
+    background-color: var(--nest-surface);
+    border: 1.5px solid var(--nest-border);
+    border-radius: 16px;
+    padding: 12px;
+    box-shadow: 0 2px 0 rgba(42, 33, 64, 0.12);
+  }
+
+  .nest-app-muted {
+    color: var(--nest-muted);
+  }
+
+  .nest-pill-info {
+    background-color: var(--nest-info-soft);
+    color: var(--nest-on-info-soft);
+    border: 1px solid var(--nest-on-info-soft);
+  }
+
+  .nest-pill-accent {
+    background-color: var(--nest-accent-soft);
+    color: var(--nest-accent-ink);
+    border: 1px solid var(--nest-accent-border);
+  }
+
+  .nest-pill-warning {
+    background-color: var(--nest-warning-soft);
+    color: var(--nest-on-warning-soft);
+    border: 1px solid var(--nest-on-warning-soft);
+  }
+
+  .nest-btn-secondary {
+    background-color: var(--nest-soft);
+    color: var(--nest-text);
+    border: 1.5px solid var(--nest-border);
+  }
+
+  .nest-btn-secondary:hover {
+    filter: brightness(0.97);
+  }
+
+  .nest-btn-primary {
+    background-color: var(--nest-action);
+    color: var(--nest-on-action);
+    border: 1.5px solid var(--nest-action);
+  }
+
+  .nest-tab-bar {
+    background-color: var(--nest-surface);
+    border-top: 1.5px solid var(--nest-border);
+  }
+
+  .nest-ctrl-btn[aria-pressed="true"] {
+    background-color: #6d28d9;
+    border-color: #c4b5fd;
+    color: #ffffff;
+    font-weight: 700;
+  }
+
+  .nest-ctrl-btn[aria-pressed="false"] {
+    background-color: #211b2e;
+    border-color: #4c3d6b;
+    color: #e4ddf3;
+  }
+
+  .nest-ctrl-btn[aria-pressed="false"]:hover {
+    background-color: #2c243d;
+    color: #ffffff;
+  }
+</style>
+
+<section
+  class="nest-preview-card my-8 p-3 sm:p-7 rounded-2xl border-2 border-purple-500/50 bg-[#14101d] text-stone-100 shadow-2xl"
+  data-nest-preview
+  data-nest-theme="light"
+  data-nest-state="populated"
+  data-nest-perspective="pebble"
+  aria-labelledby="nest-preview-heading"
+>
+  {/* Header */}
+  <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-5 border-b border-purple-500/30">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="w-11 h-11 rounded-xl bg-[#241d33] border border-purple-400/50 p-1 flex items-center justify-center shrink-0 shadow-md overflow-hidden">
+        <img
+          src="/art/projects/the-nest-icon.webp"
+          alt=""
+          width="44"
+          height="44"
+          class="w-full h-full object-contain rounded-lg"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+      <div class="min-w-0">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-purple-300">
+            Private App UI Preview
+          </span>
+          <span class="px-2 py-0.5 rounded-full bg-purple-950 border border-purple-600/70 text-[10px] font-mono text-purple-200">
+            Expo / React Native
+          </span>
+        </div>
+        <h3 id="nest-preview-heading" class="text-lg sm:text-2xl font-bold font-serif text-amber-100 leading-tight">
+          Our Nest Home — Interactive Preview
+        </h3>
+      </div>
+    </div>
+
+    <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-950/70 border border-emerald-500/50 text-xs font-mono text-emerald-200">
+      <span class="w-2 h-2 rounded-full bg-emerald-400" aria-hidden="true"></span>
+      <span>Dummy Data Only · 0 Backend Calls</span>
+    </div>
+  </div>
+
+  {/* Static Browser Simulation Clarification Notice */}
+  <div
+    data-nest-simulation-notice
+    class="mb-5 p-3.5 sm:p-4 rounded-xl bg-[#1c1629] border border-amber-400/40 text-sm text-stone-200 flex items-start gap-3 shadow-sm"
+  >
+    <div aria-hidden="true" class="w-7 h-7 rounded-full bg-amber-500/15 text-[var(--candle)] flex items-center justify-center shrink-0 mt-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 11v6" />
+        <path d="M12 7h.01" />
+      </svg>
+    </div>
+    <div class="min-w-0 space-y-1">
+      <strong class="block text-amber-200 text-sm font-semibold">Browser simulation — dummy data only</strong>
+      <p class="leading-relaxed text-xs sm:text-sm text-stone-300">
+        All names, highlights, notes, plans, and photos shown inside this simulator are 100% dummy placeholder data using the Pebble &amp; Sprout mascots. This preview runs strictly in your browser and never connects to the private app, backend API, or any real personal information.
+      </p>
+    </div>
+  </div>
+
+  {/* Interactive Controls Bar */}
+  <div class="mb-6 p-3 rounded-xl bg-[#0e0b16] border border-purple-500/30 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="flex flex-col gap-1.5">
+      <span class="text-[11px] font-mono uppercase tracking-wider text-purple-300 font-bold">Theme</span>
+      <div class="flex flex-wrap gap-2" role="group" aria-label="Preview theme">
+        <button
+          type="button"
+          class="nest-ctrl-btn inline-flex items-center gap-1.5 min-h-[44px] px-3.5 py-2 rounded-lg border text-xs font-mono cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-amber-300 focus-visible:outline-offset-2"
+          data-nest-set-theme="light"
+          aria-pressed="true"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+          </svg>
+          <span>Light</span>
+        </button>
+        <button
+          type="button"
+          class="nest-ctrl-btn inline-flex items-center gap-1.5 min-h-[44px] px-3.5 py-2 rounded-lg border text-xs font-mono cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-amber-300 focus-visible:outline-offset-2"
+          data-nest-set-theme="dark"
+          aria-pressed="false"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+          </svg>
+          <span>Dark</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <span class="text-[11px] font-mono uppercase tracking-wider text-purple-300 font-bold">Home State</span>
+      <div class="flex flex-wrap gap-2" role="group" aria-label="Home screen state">
+        <button
+          type="button"
+          class="nest-ctrl-btn min-h-[44px] px-3.5 py-2 rounded-lg border text-xs font-mono cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-amber-300 focus-visible:outline-offset-2"
+          data-nest-set-state="populated"
+          aria-pressed="true"
+        >
+          Populated Nest
+        </button>
+        <button
+          type="button"
+          class="nest-ctrl-btn min-h-[44px] px-3.5 py-2 rounded-lg border text-xs font-mono cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-amber-300 focus-visible:outline-offset-2"
+          data-nest-set-state="empty"
+          aria-pressed="false"
+        >
+          First Visit
+        </button>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <span class="text-[11px] font-mono uppercase tracking-wider text-purple-300 font-bold">Perspective</span>
+      <div class="flex flex-wrap gap-2" role="group" aria-label="Dummy mascot perspective">
+        <button
+          type="button"
+          class="nest-ctrl-btn min-h-[44px] px-3 py-2 rounded-lg border text-xs font-mono cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-amber-300 focus-visible:outline-offset-2"
+          data-nest-set-perspective="pebble"
+          aria-pressed="true"
+        >
+          Pebble (Green)
+        </button>
+        <button
+          type="button"
+          class="nest-ctrl-btn min-h-[44px] px-3 py-2 rounded-lg border text-xs font-mono cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-amber-300 focus-visible:outline-offset-2"
+          data-nest-set-perspective="sprout"
+          aria-pressed="false"
+        >
+          Sprout (Violet)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {/* Smartphone Chassis */}
+  <div class="flex justify-center my-2">
+    <div class="nest-phone-chassis relative w-full max-w-[390px] rounded-[36px] sm:rounded-[42px] p-2.5 sm:p-3.5 bg-gradient-to-b from-stone-800 via-stone-900 to-black border-4 border-stone-700/80 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)]">
+      {/* Screen Glass */}
+      <div class="nest-phone-screen relative rounded-[28px] sm:rounded-[32px] overflow-hidden flex flex-col border border-purple-950/40">
+        {/* Mobile Status Bar */}
+        <div class="h-7 px-4 sm:px-5 flex items-center justify-between text-[11px] font-mono shrink-0 border-b border-current/10">
+          <span class="font-bold">9:41</span>
+          <div class="w-12 sm:w-14 h-3.5 rounded-full bg-stone-950 border border-stone-700/70" aria-hidden="true"></div>
+          <div class="flex items-center gap-1.5 text-[10px]">
+            <span class="px-1.5 py-0.5 rounded font-bold nest-pill-accent">Dummy</span>
+            <span>Wi-Fi</span>
+          </div>
+        </div>
+
+        {/* In-Simulator Dummy Data Banner */}
+        <div
+          data-nest-dummy-banner
+          class="px-3 py-1.5 text-[11px] leading-snug flex items-center justify-center gap-1.5 text-center border-b border-current/15 nest-pill-warning"
+        >
+          <span class="font-extrabold uppercase tracking-wider shrink-0">Dummy Preview</span>
+          <span aria-hidden="true">·</span>
+          <span>All info shown inside this simulator is dummy placeholder data.</span>
+        </div>
+
+        {/* Scrollable Screen Body */}
+        <div class="p-3.5 sm:p-4 space-y-3.5">
+          {/* App Top Bar */}
+          <div class="flex items-center justify-between gap-2">
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="text-lg font-extrabold tracking-tight">Our Nest</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full nest-pill-accent">
+                  Quiet Nest
+                </span>
+              </div>
+              <p class="text-xs nest-app-muted font-medium">Pebble &amp; Sprout · Dummy Preview Data</p>
+            </div>
+
+            <div class="flex items-center gap-1 shrink-0" aria-hidden="true">
+              <img
+                src="/art/projects/the-nest/pebble-hero.webp"
+                alt=""
+                width="28"
+                height="28"
+                class="w-7 h-7 rounded-full object-contain bg-[#DCFCE7] border border-[#15803D]"
+                loading="lazy"
+                decoding="async"
+              />
+              <img
+                src="/art/projects/the-nest/sprout-hero.webp"
+                alt=""
+                width="28"
+                height="28"
+                class="w-7 h-7 rounded-full object-contain bg-[#EDE9FE] border border-[#7C3AED]"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+          </div>
+
+          {/* POPULATED NEST STATE */}
+          <div data-nest-view="populated" class="space-y-3.5">
+            {/* Mascot Greeting Row */}
+            <div class="flex items-center gap-3 pt-1">
+              <img
+                src="/art/projects/the-nest/cuddle-hero.webp"
+                alt="Pebble and Sprout cuddling dinosaur mascots"
+                width="104"
+                height="69"
+                class="w-24 sm:w-26 h-auto shrink-0 object-contain"
+                loading="lazy"
+                decoding="async"
+              />
+              <div class="min-w-0">
+                <p data-nest-greeting class="text-lg font-extrabold leading-tight">
+                  Good evening, Pebble
+                </p>
+                <p class="text-xs nest-app-muted mt-0.5 leading-snug">
+                  Welcome back to your nest.
+                </p>
+              </div>
+            </div>
+
+            {/* Shared Nest Highlights Card */}
+            <div class="nest-app-card space-y-2.5">
+              <div class="flex items-center justify-between gap-2">
+                <strong class="text-sm font-bold">Shared Nest Highlights</strong>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full nest-pill-info shrink-0">
+                  Calm Summary
+                </span>
+              </div>
+
+              <p class="text-xs nest-app-muted leading-relaxed">
+                Quiet nest updates: 1 pinned note: &ldquo;Weekend picnic list&rdquo; · next plan: &ldquo;Sunset coastal walk&rdquo; · 2 open tasks.
+              </p>
+
+              <div class="grid grid-cols-2 gap-2 pt-0.5">
+                <button
+                  type="button"
+                  data-nest-peek="note"
+                  aria-expanded="false"
+                  class="nest-btn-secondary min-h-[40px] px-2.5 py-1.5 rounded-xl text-xs font-bold cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-amber-400"
+                >
+                  Preview Note
+                </button>
+                <button
+                  type="button"
+                  data-nest-peek="plan"
+                  aria-expanded="false"
+                  class="nest-btn-secondary min-h-[40px] px-2.5 py-1.5 rounded-xl text-xs font-bold cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-amber-400"
+                >
+                  Preview Plan
+                </button>
+              </div>
+
+              {/* Inline Detail Peek Drawer */}
+              <div
+                data-nest-peek-panel
+                hidden
+                class="mt-1 p-2.5 rounded-xl text-xs leading-relaxed nest-pill-info"
+              ></div>
+            </div>
+
+            {/* Recent in Nest — Dummy Memory Card */}
+            <div class="nest-app-card space-y-2.5">
+              <div class="flex items-center justify-between gap-2">
+                <strong class="text-xs font-bold uppercase tracking-wider nest-app-muted">
+                  Recent in Nest
+                </strong>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full nest-pill-accent">
+                  EXIF GPS Stripped
+                </span>
+              </div>
+
+              <div class="relative rounded-xl overflow-hidden border border-current/15">
+                <img
+                  src="/art/projects/the-nest/coastal-sample.webp"
+                  alt="Dummy coastal sunset landscape illustration"
+                  width="640"
+                  height="384"
+                  class="w-full h-36 sm:h-40 object-cover block"
+                  loading="lazy"
+                  decoding="async"
+                />
+
+                {/* Spoiler Boundary Overlay (toggled interactively) */}
+                <div
+                  data-nest-spoiler-overlay
+                  hidden
+                  class="absolute inset-0 flex flex-col items-center justify-center p-3 text-center nest-pill-warning"
+                >
+                  <strong class="text-xs font-extrabold uppercase tracking-wider">
+                    Spoiler Boundary Active
+                  </strong>
+                  <p class="text-[11px] mt-1 leading-snug max-w-[26ch]">
+                    Moment stays unmounted until you choose to reveal it.
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="min-w-0">
+                  <p class="text-sm font-bold leading-snug">Sunset Trail at Point Reyes</p>
+                  <p data-nest-memory-meta class="text-[11px] nest-app-muted">
+                    Dummy Memory · Captured by Sprout
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  data-nest-spoiler-toggle
+                  aria-pressed="false"
+                  class="nest-btn-secondary min-h-[38px] px-2.5 py-1 rounded-lg text-[11px] font-bold cursor-pointer shrink-0 focus-visible:outline-2 focus-visible:outline-amber-400"
+                >
+                  Test Spoiler Shield
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* FIRST VISIT (EMPTY) STATE */}
+          <div data-nest-view="empty" hidden class="py-5 space-y-4 text-center">
+            <img
+              src="/art/projects/the-nest/cuddle-hero.webp"
+              alt="Pebble and Sprout welcoming you to an empty nest"
+              width="140"
+              height="93"
+              class="w-32 h-auto mx-auto object-contain"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="space-y-1.5 px-2">
+              <p class="text-xl font-extrabold">Your nest is ready.</p>
+              <p class="text-xs nest-app-muted leading-relaxed">
+                This is your little place for the two of you — preserve memories, share calm plans, and stay close without social feeds or algorithms.
+              </p>
+            </div>
+            <div class="flex flex-col gap-2 max-w-[260px] mx-auto pt-1">
+              <button
+                type="button"
+                data-nest-return-populated
+                class="nest-btn-primary min-h-[44px] px-4 py-2 rounded-xl text-xs font-bold cursor-pointer focus-visible:outline-2 focus-visible:outline-amber-400"
+              >
+                + Preview Populated Nest
+              </button>
+              <button
+                type="button"
+                data-nest-return-populated
+                class="nest-btn-secondary min-h-[44px] px-4 py-2 rounded-xl text-xs font-bold cursor-pointer focus-visible:outline-2 focus-visible:outline-amber-400"
+              >
+                Browse Dummy Highlights
+              </button>
+            </div>
+          </div>
+
+          {/* Focused Preview Notice when tapping non-Home bottom tabs */}
+          <p
+            data-nest-tab-note
+            hidden
+            class="text-[11px] text-center font-medium px-2.5 py-1.5 rounded-lg nest-pill-info"
+          ></p>
+        </div>
+
+        {/* Bottom Navigation Bar — crisp monochrome SVGs matching The Nest Icon.tsx */}
+        <nav class="nest-tab-bar px-2 py-1.5 grid grid-cols-5 gap-1 text-[10px] font-semibold" aria-label="Dummy app tabs">
+          <button
+            type="button"
+            data-nest-tab="home"
+            class="min-h-[42px] rounded-xl flex flex-col items-center justify-center gap-0.5 nest-pill-accent font-bold cursor-pointer"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <path d="M3 10.5 12 3l9 7.5" />
+              <path d="M5.5 9.5V20a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V9.5" />
+            </svg>
+            <span>Nest</span>
+          </button>
+          <button
+            type="button"
+            data-nest-tab="plans"
+            class="min-h-[42px] rounded-xl flex flex-col items-center justify-center gap-0.5 nest-app-muted hover:opacity-80 cursor-pointer"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <rect x="3" y="4" width="18" height="17" rx="3" />
+              <path d="M3 9h18" />
+              <circle cx="8.5" cy="14.5" r="1.2" fill="currentColor" stroke="none" />
+              <circle cx="15.5" cy="14.5" r="1.2" fill="currentColor" stroke="none" />
+            </svg>
+            <span>Plans</span>
+          </button>
+          <button
+            type="button"
+            data-nest-tab="notes"
+            class="min-h-[42px] rounded-xl flex flex-col items-center justify-center gap-0.5 nest-app-muted hover:opacity-80 cursor-pointer"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <rect x="4" y="3" width="16" height="18" rx="3" />
+              <path d="M8 9h8M8 14h5" />
+            </svg>
+            <span>Notes</span>
+          </button>
+          <button
+            type="button"
+            data-nest-tab="memories"
+            class="min-h-[42px] rounded-xl flex flex-col items-center justify-center gap-0.5 nest-app-muted hover:opacity-80 cursor-pointer"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <rect x="3" y="4" width="18" height="16" rx="3" />
+              <circle cx="8.5" cy="9" r="1.4" fill="currentColor" stroke="none" />
+              <path d="m5 18 5-5 3.5 3.5L16 14l3 4" />
+            </svg>
+            <span>Memories</span>
+          </button>
+          <button
+            type="button"
+            data-nest-tab="chat"
+            class="min-h-[42px] rounded-xl flex flex-col items-center justify-center gap-0.5 nest-app-muted hover:opacity-80 cursor-pointer"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <path d="M4 6a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H9l-5 4V6Z" />
+              <path d="M8.5 8.5h7M8.5 12h4.5" />
+            </svg>
+            <span>Chat</span>
+          </button>
+        </nav>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  let nestPreviewAbort: AbortController | null = null;
+
+  function initNestPreview() {
+    nestPreviewAbort?.abort();
+    nestPreviewAbort = new AbortController();
+    const { signal } = nestPreviewAbort;
+
+    const roots = document.querySelectorAll<HTMLElement>('[data-nest-preview]');
+    roots.forEach((root) => {
+      const populatedView = root.querySelector<HTMLElement>('[data-nest-view="populated"]');
+      const emptyView = root.querySelector<HTMLElement>('[data-nest-view="empty"]');
+      const greetingEl = root.querySelector<HTMLElement>('[data-nest-greeting]');
+      const memoryMetaEl = root.querySelector<HTMLElement>('[data-nest-memory-meta]');
+      const peekPanel = root.querySelector<HTMLElement>('[data-nest-peek-panel]');
+      const spoilerOverlay = root.querySelector<HTMLElement>('[data-nest-spoiler-overlay]');
+      const spoilerToggle = root.querySelector<HTMLButtonElement>('[data-nest-spoiler-toggle]');
+      const tabNote = root.querySelector<HTMLElement>('[data-nest-tab-note]');
+
+      let activePeek: 'note' | 'plan' | null = null;
+      let spoilerActive = false;
+
+      const setPressedGroup = (selector: string, activeAttr: string, activeValue: string) => {
+        root.querySelectorAll<HTMLButtonElement>(selector).forEach((btn) => {
+          btn.setAttribute('aria-pressed', btn.getAttribute(activeAttr) === activeValue ? 'true' : 'false');
+        });
+      };
+
+      const applyState = (state: 'populated' | 'empty') => {
+        root.dataset.nestState = state;
+        if (populatedView) populatedView.hidden = state !== 'populated';
+        if (emptyView) emptyView.hidden = state !== 'empty';
+        setPressedGroup('[data-nest-set-state]', 'data-nest-set-state', state);
+      };
+
+      root.querySelectorAll<HTMLButtonElement>('[data-nest-set-theme]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const theme = btn.getAttribute('data-nest-set-theme') === 'dark' ? 'dark' : 'light';
+          root.dataset.nestTheme = theme;
+          setPressedGroup('[data-nest-set-theme]', 'data-nest-set-theme', theme);
+        }, { signal });
+      });
+
+      root.querySelectorAll<HTMLButtonElement>('[data-nest-set-state]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const state = btn.getAttribute('data-nest-set-state') === 'empty' ? 'empty' : 'populated';
+          applyState(state);
+        }, { signal });
+      });
+
+      root.querySelectorAll<HTMLButtonElement>('[data-nest-return-populated]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          applyState('populated');
+          if (tabNote) tabNote.hidden = true;
+        }, { signal });
+      });
+
+      root.querySelectorAll<HTMLButtonElement>('[data-nest-set-perspective]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const perspective = btn.getAttribute('data-nest-set-perspective') === 'sprout' ? 'sprout' : 'pebble';
+          root.dataset.nestPerspective = perspective;
+          setPressedGroup('[data-nest-set-perspective]', 'data-nest-set-perspective', perspective);
+          if (greetingEl) {
+            greetingEl.textContent = perspective === 'sprout' ? 'Good evening, Sprout' : 'Good evening, Pebble';
+          }
+          if (memoryMetaEl) {
+            memoryMetaEl.textContent =
+              perspective === 'sprout'
+                ? 'Dummy Memory · Captured by Pebble'
+                : 'Dummy Memory · Captured by Sprout';
+          }
+        }, { signal });
+      });
+
+      const peekCopy: Record<'note' | 'plan', string> = {
+        note: 'Dummy Pinned Note (Rev #4 · Optimistic Concurrency): "Weekend picnic list — Sourdough & fruit, warm blanket, thermos of ginger tea."',
+        plan: 'Dummy Shared Plan: "Sunset coastal walk · Saturday 5:30 PM" — synced calmly without countdown pressure.',
+      };
+
+      root.querySelectorAll<HTMLButtonElement>('[data-nest-peek]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const kind = btn.getAttribute('data-nest-peek') === 'plan' ? 'plan' : 'note';
+          activePeek = activePeek === kind ? null : kind;
+          root.querySelectorAll<HTMLButtonElement>('[data-nest-peek]').forEach((b) => {
+            b.setAttribute('aria-expanded', b.getAttribute('data-nest-peek') === activePeek ? 'true' : 'false');
+          });
+          if (peekPanel) {
+            if (activePeek) {
+              peekPanel.textContent = peekCopy[activePeek];
+              peekPanel.hidden = false;
+            } else {
+              peekPanel.hidden = true;
+            }
+          }
+        }, { signal });
+      });
+
+      spoilerToggle?.addEventListener('click', () => {
+        spoilerActive = !spoilerActive;
+        spoilerToggle.setAttribute('aria-pressed', spoilerActive ? 'true' : 'false');
+        spoilerToggle.textContent = spoilerActive ? 'Reveal Sample Photo' : 'Test Spoiler Shield';
+        if (spoilerOverlay) spoilerOverlay.hidden = !spoilerActive;
+      }, { signal });
+
+      root.querySelectorAll<HTMLButtonElement>('[data-nest-tab]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const tab = btn.getAttribute('data-nest-tab');
+          if (!tabNote) return;
+          if (tab === 'home') {
+            tabNote.hidden = true;
+          } else {
+            tabNote.textContent =
+              'Focused Our Nest Home preview (dummy data) — other modules stay private in this public dossier.';
+            tabNote.hidden = false;
+          }
+        }, { signal });
+      });
+    });
+  }
+
+  document.addEventListener('astro:page-load', initNestPreview);
+  document.addEventListener('astro:before-swap', () => {
+    nestPreviewAbort?.abort();
+    nestPreviewAbort = null;
+  });
+</script>

@@ -5,10 +5,11 @@ import { demoUrl } from '../lib/bits-demo-url';
 interface Props {
   liveUrl: string;
   title: string;
+  thumbnail?: string;
   instanceId?: string;
 }
 
-const { liveUrl, title, instanceId = 'bits' } = Astro.props;
+const { liveUrl, title, thumbnail = '/art/projects/bits-icon.webp', instanceId = 'bits' } = Astro.props;
 const projectName = title.split('—')[0].trim() || 'BITS';
 const dashboardUrl = demoUrl(liveUrl, import.meta.env.DEV);
 const terminalUrl = demoUrl(import.meta.env.PUBLIC_ZK_SIMULATOR_URL, import.meta.env.DEV);
@@ -54,6 +55,7 @@ const views: QuestDemoViewConfig[] = [
   projectName={projectName}
   ariaLabel="BITS interactive live demo"
   icon="code"
+  iconSrc={thumbnail}
   intro="Explore the external BITS attendance dashboard and virtual ZKTeco terminal without leaving this project dossier."
   hint="Launch loads the BITS dashboard first; the terminal loads only when selected. Use sample identities only and verify scan results in BITS Attendance."
   secondaryNote="Use the Simulator tab above the dashboard to stay in this demo. Buttons inside BITS retain their original behavior and may open another browser tab."

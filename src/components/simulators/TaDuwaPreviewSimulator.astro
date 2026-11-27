@@ -1,0 +1,1439 @@
+---
+---
+
+<style>
+  .taduwa-preview-card {
+    --fiesta-bg: #FFF2D9;
+    --fiesta-panel: #FFF8EA;
+    --fiesta-soft: #E8DEFF;
+    --fiesta-ink: #211B26;
+    --fiesta-muted: #554A59;
+    --fiesta-accent: #D7FA62;
+    --fiesta-warning: #FFD477;
+    --fiesta-record: #FF979A;
+    --fiesta-dot: #FF6B70;
+  }
+
+  .taduwa-phone-screen {
+    background-color: var(--fiesta-bg);
+    color: var(--fiesta-ink);
+  }
+
+  .taduwa-card {
+    background-color: var(--fiesta-panel);
+    border: 2px solid var(--fiesta-ink);
+    border-radius: 14px;
+    padding: 12px;
+    box-shadow: 0 3px 0 var(--fiesta-ink);
+  }
+
+  .taduwa-tile {
+    background-color: var(--fiesta-bg);
+    border: 2px solid var(--fiesta-ink);
+    border-radius: 10px;
+    padding: 8px 10px;
+  }
+
+  .taduwa-muted {
+    color: var(--fiesta-muted);
+  }
+
+  .taduwa-btn {
+    border: 2px solid var(--fiesta-ink);
+    box-shadow: 0 2px 0 var(--fiesta-ink);
+    color: var(--fiesta-ink);
+    font-weight: 700;
+    transition: transform 0.1s ease, filter 0.12s ease;
+  }
+
+  .taduwa-btn:hover {
+    filter: brightness(0.97);
+  }
+
+  .taduwa-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 0 var(--fiesta-ink);
+  }
+
+  .taduwa-btn-primary {
+    background-color: var(--fiesta-accent);
+  }
+
+  .taduwa-btn-secondary {
+    background-color: var(--fiesta-soft);
+  }
+
+  .taduwa-btn-warning {
+    background-color: var(--fiesta-warning);
+  }
+
+  .taduwa-btn-stop {
+    background-color: var(--fiesta-record);
+  }
+
+  .taduwa-mode-btn {
+    border: 2px solid var(--fiesta-ink);
+    font-weight: 700;
+    transition: background-color 0.12s ease, color 0.12s ease;
+  }
+
+  .taduwa-mode-btn[aria-pressed="true"] {
+    background-color: var(--fiesta-ink);
+    color: var(--fiesta-panel);
+  }
+
+  .taduwa-mode-btn[aria-pressed="false"] {
+    background-color: var(--fiesta-panel);
+    color: var(--fiesta-ink);
+  }
+
+  .taduwa-mode-btn[aria-pressed="false"]:hover {
+    background-color: var(--fiesta-soft);
+  }
+
+  .taduwa-pill {
+    border: 2px solid var(--fiesta-ink);
+    color: var(--fiesta-ink);
+    font-weight: 800;
+  }
+
+  .taduwa-pill-ready {
+    background-color: var(--fiesta-accent);
+  }
+
+  .taduwa-pill-warn {
+    background-color: var(--fiesta-warning);
+  }
+
+  .taduwa-pill-rec {
+    background-color: var(--fiesta-record);
+  }
+
+  .taduwa-pill-soft {
+    background-color: var(--fiesta-soft);
+  }
+
+  .taduwa-tab-bar {
+    background-color: var(--fiesta-panel);
+    border-top: 2px solid var(--fiesta-ink);
+  }
+
+  .taduwa-nav-tab {
+    border: 2px solid transparent;
+    color: var(--fiesta-muted);
+    transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+  }
+
+  .taduwa-nav-tab[aria-selected="true"] {
+    background-color: var(--fiesta-accent);
+    border-color: var(--fiesta-ink);
+    color: var(--fiesta-ink);
+    font-weight: 800;
+  }
+
+  .taduwa-nav-tab[aria-selected="false"]:hover {
+    background-color: var(--fiesta-soft);
+    color: var(--fiesta-ink);
+  }
+
+  .taduwa-ctrl-btn[aria-pressed="true"] {
+    background-color: #D7FA62;
+    border-color: #D7FA62;
+    color: #211B26;
+    font-weight: 800;
+  }
+
+  .taduwa-ctrl-btn[aria-pressed="false"] {
+    background-color: #1f1a26;
+    border-color: #4a3f57;
+    color: #e8e1f0;
+  }
+
+  .taduwa-ctrl-btn[aria-pressed="false"]:hover {
+    background-color: #2c2536;
+    color: #ffffff;
+  }
+</style>
+
+<section
+  class="taduwa-preview-card my-8 p-3 sm:p-7 rounded-2xl border-2 border-lime-400/45 bg-[#15121a] text-stone-100 shadow-2xl"
+  data-taduwa-preview
+  data-taduwa-view="hub"
+  data-taduwa-preset="cool"
+  aria-labelledby="taduwa-preview-heading"
+>
+  {/* Header */}
+  <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-5 border-b border-lime-400/25">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="w-11 h-11 rounded-xl bg-[#211B26] border border-lime-300/60 p-1 flex items-center justify-center shrink-0 shadow-md overflow-hidden">
+        <img
+          src="/art/projects/taduwa-icon.webp"
+          alt=""
+          width="44"
+          height="44"
+          class="w-full h-full object-contain rounded-lg"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+      <div class="min-w-0">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-lime-300">
+            Android App UI Preview
+          </span>
+          <span class="px-2 py-0.5 rounded-full bg-[#241e2e] border border-lime-300/40 text-[10px] font-mono text-lime-200">
+            Java 17 / XML Views
+          </span>
+        </div>
+        <h3 id="taduwa-preview-heading" class="text-lg sm:text-2xl font-bold font-serif text-amber-100 leading-tight">
+          TaDuwa Companion — Interactive Preview
+        </h3>
+      </div>
+    </div>
+
+    <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-950/75 border border-emerald-500/50 text-xs font-mono text-emerald-200">
+      <span class="w-2 h-2 rounded-full bg-emerald-400" aria-hidden="true"></span>
+      <span>Dummy Data Only · 0 Device Access</span>
+    </div>
+  </div>
+
+  {/* Static Browser Simulation Clarification Notice */}
+  <div
+    data-taduwa-simulation-notice
+    class="mb-5 p-3.5 sm:p-4 rounded-xl bg-[#1e1926] border border-amber-400/45 text-sm text-stone-200 flex items-start gap-3 shadow-sm"
+  >
+    <div aria-hidden="true" class="w-7 h-7 rounded-full bg-amber-500/15 text-[var(--candle)] flex items-center justify-center shrink-0 mt-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 11v6" />
+        <path d="M12 7h.01" />
+      </svg>
+    </div>
+    <div class="min-w-0 space-y-1">
+      <strong class="block text-amber-200 text-sm font-semibold">Browser simulation — dummy data only</strong>
+      <p class="leading-relaxed text-xs sm:text-sm text-stone-300">
+        All memory readings, thermal states, TCP latency values, recording timers, and Shizuku outputs shown inside this simulator are 100% dummy placeholder data. It runs strictly in your browser with zero Shizuku execution, screen capture, or Android settings access — download the Android APK above to test the real app on a device.
+      </p>
+    </div>
+  </div>
+
+  {/* Outer Interactive Controls Bar */}
+  <div class="mb-6 p-3 rounded-xl bg-[#0e0b13] border border-lime-400/25 grid grid-cols-1 md:grid-cols-2 gap-3">
+    <div class="flex flex-col gap-1.5">
+      <span class="text-[11px] font-mono uppercase tracking-wider text-lime-300 font-bold">Screen View</span>
+      <div class="flex flex-wrap gap-2" role="group" aria-label="Preview screen">
+        <button
+          type="button"
+          class="taduwa-ctrl-btn inline-flex items-center gap-1.5 min-h-[44px] px-3 py-2 rounded-lg border text-xs font-mono cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-lime-300 focus-visible:outline-offset-2"
+          data-taduwa-set-view="hub"
+          aria-pressed="true"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <rect x="3" y="3" width="8" height="8" rx="1.5" />
+            <rect x="13" y="3" width="8" height="8" rx="1.5" />
+            <rect x="3" y="13" width="8" height="8" rx="1.5" />
+            <rect x="13" y="13" width="8" height="8" rx="1.5" />
+          </svg>
+          <span>Play Hub &amp; Check</span>
+        </button>
+        <button
+          type="button"
+          class="taduwa-ctrl-btn inline-flex items-center gap-1.5 min-h-[44px] px-3 py-2 rounded-lg border text-xs font-mono cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-lime-300 focus-visible:outline-offset-2"
+          data-taduwa-set-view="studio"
+          aria-pressed="false"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <rect x="2" y="6" width="14" height="12" rx="2" />
+            <path d="m16 10 6-3v10l-6-3Z" />
+          </svg>
+          <span>Recording Studio</span>
+        </button>
+        <button
+          type="button"
+          class="taduwa-ctrl-btn inline-flex items-center gap-1.5 min-h-[44px] px-3 py-2 rounded-lg border text-xs font-mono cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-lime-300 focus-visible:outline-offset-2"
+          data-taduwa-set-view="boost"
+          aria-pressed="false"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <path d="M13 2 4 14h7l-1 8 10-12h-7l0-8Z" />
+          </svg>
+          <span>Shizuku Boost</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <span class="text-[11px] font-mono uppercase tracking-wider text-lime-300 font-bold">Device Condition (Dummy)</span>
+      <div class="flex flex-wrap gap-2" role="group" aria-label="Dummy device condition">
+        <button
+          type="button"
+          class="taduwa-ctrl-btn inline-flex items-center gap-1.5 min-h-[44px] px-3 py-2 rounded-lg border text-xs font-mono cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-lime-300 focus-visible:outline-offset-2"
+          data-taduwa-set-preset="cool"
+          aria-pressed="true"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <path d="M12 2v20M4.93 7l14.14 10M19.07 7 4.93 17" />
+          </svg>
+          <span>Cool / Ready</span>
+        </button>
+        <button
+          type="button"
+          class="taduwa-ctrl-btn inline-flex items-center gap-1.5 min-h-[44px] px-3 py-2 rounded-lg border text-xs font-mono cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-lime-300 focus-visible:outline-offset-2"
+          data-taduwa-set-preset="warm"
+          aria-pressed="false"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 1 1 4 0Z" />
+          </svg>
+          <span>Warm / Battery Saver</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {/* Smartphone Chassis */}
+  <div class="flex justify-center my-2">
+    <div class="taduwa-phone-chassis relative w-full max-w-[390px] rounded-[36px] sm:rounded-[42px] p-2.5 sm:p-3.5 bg-gradient-to-b from-stone-800 via-stone-900 to-black border-4 border-stone-700/80 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)]">
+      {/* Screen Glass */}
+      <div class="taduwa-phone-screen relative rounded-[28px] sm:rounded-[32px] overflow-hidden flex flex-col border-2 border-[#211B26]">
+        {/* Mobile Status Bar */}
+        <div class="h-7 px-4 sm:px-5 flex items-center justify-between text-[11px] font-mono shrink-0 border-b border-[#211B26]/20 bg-[#FFF8EA]">
+          <span class="font-bold">9:41</span>
+          <div class="w-12 sm:w-14 h-3.5 rounded-full bg-[#211B26]" aria-hidden="true"></div>
+          <div class="flex items-center gap-1.5 text-[10px]">
+            <span class="px-1.5 py-0.5 rounded font-extrabold bg-[#D7FA62] text-[#211B26] border border-[#211B26]">Dummy</span>
+            <span class="font-semibold">Wi-Fi</span>
+          </div>
+        </div>
+
+        {/* In-Simulator Dummy Data Banner */}
+        <div
+          data-taduwa-dummy-banner
+          class="px-3 py-1.5 text-[11px] leading-snug flex items-center justify-center gap-1.5 text-center border-b-2 border-[#211B26] bg-[#FFD477] text-[#211B26]"
+        >
+          <span class="font-extrabold uppercase tracking-wider shrink-0">Dummy Preview</span>
+          <span aria-hidden="true">·</span>
+          <span class="font-semibold">All metrics, timers, and Shizuku outputs inside this simulator are dummy placeholder data.</span>
+        </div>
+
+        {/* App Top Header */}
+        <div class="px-3.5 pt-3.5 pb-2.5 flex items-center justify-between gap-2 border-b-2 border-[#211B26]/15 bg-[#FFF2D9]">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <img
+              src="/art/projects/taduwa-icon.webp"
+              alt=""
+              width="32"
+              height="32"
+              class="w-8 h-8 rounded-lg border-2 border-[#211B26] object-contain bg-[#FFF8EA] shrink-0"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="min-w-0">
+              <p class="text-base font-extrabold tracking-tight leading-none text-[#211B26]">TaDuwa</p>
+              <p class="text-[11px] taduwa-muted font-medium truncate mt-0.5">Duwa ta. Play smart.</p>
+            </div>
+          </div>
+
+          <span
+            data-taduwa-status-pill
+            class="taduwa-pill taduwa-pill-ready px-2.5 py-1 rounded-full text-[11px] font-mono tracking-wider shrink-0"
+          >
+            READY
+          </span>
+        </div>
+
+        {/* Simulated Floating Pop Icon Overlay Strip (Shown when recording + Pop Icon ON) */}
+        <div
+          data-taduwa-pop-bar
+          hidden
+          class="px-3.5 py-2 bg-[#211B26] text-[#FFF8EA] flex flex-wrap items-center justify-between gap-2 border-b-2 border-[#211B26]"
+        >
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#FFF8EA] border border-[#211B26] shrink-0" aria-hidden="true">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#FF6B70]"></span>
+            </span>
+            <span data-taduwa-pop-label class="text-[11px] font-mono font-bold truncate">
+              Pop Icon [+] · Collapsed over game
+            </span>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button
+              type="button"
+              data-taduwa-pop-expand
+              aria-expanded="false"
+              class="px-2 py-1 rounded bg-[#D7FA62] text-[#211B26] text-[10px] font-extrabold cursor-pointer"
+            >
+              Expand
+            </button>
+            <button
+              type="button"
+              data-taduwa-pop-stop
+              hidden
+              class="px-2 py-1 rounded bg-[#FF979A] text-[#211B26] text-[10px] font-extrabold cursor-pointer"
+            >
+              Stop
+            </button>
+          </div>
+        </div>
+
+        {/* Screen Body */}
+        <div class="p-3.5 space-y-3.5">
+          {/* PANEL 1: PLAY HUB & DEVICE CHECK (Visible by default even without JS) */}
+          <div data-taduwa-panel="hub" class="space-y-3.5">
+            {/* 01 / LAUNCH DECK */}
+            <div class="taduwa-card space-y-2.5">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[10px] font-mono font-extrabold tracking-widest uppercase taduwa-muted">
+                  01 / Launch Deck
+                </span>
+                <span class="taduwa-pill taduwa-pill-soft px-2 py-0.5 rounded-full text-[10px] font-mono">
+                  MLBB · All-App Roadmap
+                </span>
+              </div>
+
+              <div>
+                <h4 class="text-base font-extrabold leading-tight">Play Hub</h4>
+                <p class="text-[11px] taduwa-muted mt-1 leading-snug">
+                  Launches Mobile Legends: Bang Bang normally without modifying the game. Broader all-app game boost support is planned.
+                </p>
+              </div>
+
+              {/* Warm / Battery Saver Override Banner */}
+              <div
+                data-taduwa-safety-note
+                hidden
+                class="p-2 rounded-lg bg-[#FFD477] border-2 border-[#211B26] text-[11px] font-semibold leading-snug text-[#211B26]"
+              >
+                Warm thermal / Battery Saver detected (dummy): recording target capped at Lightweight (480p / 24 FPS). Play only stays unaffected.
+              </div>
+
+              {/* Idle Launch Buttons */}
+              <div data-taduwa-rec-idle-controls class="grid grid-cols-2 gap-2 pt-0.5">
+                <button
+                  type="button"
+                  data-taduwa-start-rec
+                  class="taduwa-btn taduwa-btn-primary min-h-[44px] px-2.5 py-2 rounded-xl text-xs cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true" focusable="false">
+                    <circle cx="12" cy="12" r="7" />
+                  </svg>
+                  <span>Record &amp; Play</span>
+                </button>
+                <button
+                  type="button"
+                  data-taduwa-play-only
+                  class="taduwa-btn taduwa-btn-secondary min-h-[44px] px-2.5 py-2 rounded-xl text-xs cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true" focusable="false">
+                    <path d="m7 4 13 8-13 8V4Z" />
+                  </svg>
+                  <span>Play only</span>
+                </button>
+              </div>
+
+              {/* Active Recording Controls */}
+              <div data-taduwa-rec-active-controls hidden class="space-y-2 pt-0.5">
+                <div
+                  data-taduwa-rec-status
+                  class="px-2.5 py-1.5 rounded-lg bg-[#FF979A]/35 border-2 border-[#211B26] text-[11px] font-mono font-bold text-[#211B26]"
+                >
+                  Dummy Recording active (1280x720 @ 30 FPS) · 00:00
+                </div>
+                <div class="grid grid-cols-3 gap-1.5">
+                  <button
+                    type="button"
+                    data-taduwa-stop-rec
+                    class="taduwa-btn taduwa-btn-stop min-h-[42px] px-2 py-1.5 rounded-xl text-[11px] cursor-pointer"
+                  >
+                    Stop
+                  </button>
+                  <button
+                    type="button"
+                    data-taduwa-pause-rec
+                    class="taduwa-btn taduwa-btn-warning min-h-[42px] px-2 py-1.5 rounded-xl text-[11px] cursor-pointer"
+                  >
+                    Pause
+                  </button>
+                  <button
+                    type="button"
+                    data-taduwa-screenshot
+                    class="taduwa-btn taduwa-btn-secondary min-h-[42px] px-2 py-1.5 rounded-xl text-[11px] cursor-pointer"
+                  >
+                    Shot
+                  </button>
+                </div>
+              </div>
+
+              {/* Play Hub Feedback Pill */}
+              <p
+                data-taduwa-hub-feedback
+                hidden
+                class="p-2 rounded-lg bg-[#E8DEFF] border border-[#211B26] text-[11px] font-semibold leading-snug text-[#211B26]"
+              ></p>
+            </div>
+
+            {/* Shizuku Quick Entry Card Button */}
+            <button
+              type="button"
+              data-taduwa-open-boost
+              class="taduwa-card taduwa-btn taduwa-btn-secondary w-full text-left flex items-center justify-between gap-2 min-h-[46px] px-3 py-2.5 rounded-xl text-xs cursor-pointer"
+            >
+              <span data-taduwa-home-boost-label class="font-extrabold">
+                Shizuku Game Boost · Tap to inspect (Dummy)
+              </span>
+              <span aria-hidden="true" class="font-mono font-extrabold text-sm">&gt;</span>
+            </button>
+
+            {/* 02 / SNAPSHOT — Device Check */}
+            <div class="taduwa-card space-y-2.5">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[10px] font-mono font-extrabold tracking-widest uppercase taduwa-muted">
+                  02 / Snapshot
+                </span>
+                <span class="text-[10px] font-mono font-bold taduwa-muted">Dummy Telemetry</span>
+              </div>
+
+              <h4 class="text-base font-extrabold leading-tight">Device check</h4>
+
+              <div class="grid grid-cols-2 gap-2 text-[11px]">
+                <div class="taduwa-tile">
+                  <span class="block text-[9px] font-mono font-extrabold tracking-wider uppercase taduwa-muted">
+                    Memory
+                  </span>
+                  <strong data-taduwa-metric-ram class="block text-xs font-extrabold mt-0.5">
+                    4.8 / 8.0 GiB
+                  </strong>
+                  <span data-taduwa-metric-ram-sub class="block text-[10px] taduwa-muted">
+                    Healthy headroom
+                  </span>
+                </div>
+                <div class="taduwa-tile">
+                  <span class="block text-[9px] font-mono font-extrabold tracking-wider uppercase taduwa-muted">
+                    Thermal
+                  </span>
+                  <strong data-taduwa-metric-heat class="block text-xs font-extrabold mt-0.5">
+                    Cool (NONE)
+                  </strong>
+                  <span data-taduwa-metric-heat-sub class="block text-[10px] taduwa-muted">
+                    No throttling
+                  </span>
+                </div>
+                <div class="taduwa-tile">
+                  <span class="block text-[9px] font-mono font-extrabold tracking-wider uppercase taduwa-muted">
+                    Display &amp; Power
+                  </span>
+                  <strong data-taduwa-metric-display class="block text-xs font-extrabold mt-0.5">
+                    1080x2400 @ 120Hz
+                  </strong>
+                  <span data-taduwa-metric-power class="block text-[10px] taduwa-muted">
+                    Battery Saver: OFF
+                  </span>
+                </div>
+                <div class="taduwa-tile">
+                  <span class="block text-[9px] font-mono font-extrabold tracking-wider uppercase taduwa-muted">
+                    Network
+                  </span>
+                  <strong data-taduwa-metric-net class="block text-xs font-extrabold mt-0.5">
+                    Wi-Fi · 5 GHz
+                  </strong>
+                  <span class="block text-[10px] taduwa-muted">Dummy reading</span>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 pt-0.5">
+                <button
+                  type="button"
+                  data-taduwa-run-tcp
+                  class="taduwa-btn taduwa-btn-primary min-h-[42px] px-2.5 py-1.5 rounded-xl text-[11px] cursor-pointer"
+                >
+                  Run TCP Check
+                </button>
+                <button
+                  type="button"
+                  data-taduwa-refresh-check
+                  class="taduwa-btn taduwa-btn-secondary min-h-[42px] px-2.5 py-1.5 rounded-xl text-[11px] cursor-pointer"
+                >
+                  Refresh Dummy
+                </button>
+              </div>
+
+              <div class="p-2 rounded-lg bg-[#FFF2D9] border border-[#211B26] space-y-1">
+                <p class="text-[10px] font-semibold taduwa-muted leading-snug">
+                  3-connection public TCP handshake check (1.1.1.1:443) — NOT Mobile Legends in-game ping.
+                </p>
+                <p
+                  data-taduwa-tcp-output
+                  class="text-[11px] font-mono font-bold text-[#211B26] leading-snug"
+                >
+                  Tap Run TCP Check for a simulated 3-attempt public TCP handshake readout.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* PANEL 2: RECORDING STUDIO */}
+          <div data-taduwa-panel="studio" hidden class="space-y-3.5">
+            <div class="taduwa-card space-y-3">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[10px] font-mono font-extrabold tracking-widest uppercase taduwa-muted">
+                  03 / Recording Setup
+                </span>
+                <span class="text-[10px] font-mono font-bold taduwa-muted">MediaProjection (Dummy)</span>
+              </div>
+
+              <h4 class="text-base font-extrabold leading-tight">Recording setup</h4>
+
+              <div class="space-y-1.5">
+                <span class="block text-[10px] font-mono font-extrabold uppercase tracking-wider taduwa-muted">
+                  Quality mode
+                </span>
+                <div class="grid grid-cols-2 gap-1.5" role="group" aria-label="Dummy recording quality mode">
+                  <button
+                    type="button"
+                    data-taduwa-rec-mode="smooth30"
+                    aria-pressed="true"
+                    class="taduwa-mode-btn min-h-[42px] px-2 py-1.5 rounded-lg text-[11px] cursor-pointer"
+                  >
+                    Smooth 30
+                  </button>
+                  <button
+                    type="button"
+                    data-taduwa-rec-mode="auto60"
+                    aria-pressed="false"
+                    class="taduwa-mode-btn min-h-[42px] px-2 py-1.5 rounded-lg text-[11px] cursor-pointer"
+                  >
+                    Auto (60)
+                  </button>
+                  <button
+                    type="button"
+                    data-taduwa-rec-mode="lightweight"
+                    aria-pressed="false"
+                    class="taduwa-mode-btn min-h-[42px] px-2 py-1.5 rounded-lg text-[11px] cursor-pointer"
+                  >
+                    Lightweight
+                  </button>
+                  <button
+                    type="button"
+                    data-taduwa-rec-mode="highfps"
+                    aria-pressed="false"
+                    class="taduwa-mode-btn min-h-[42px] px-2 py-1.5 rounded-lg text-[11px] cursor-pointer"
+                  >
+                    High FPS
+                  </button>
+                </div>
+              </div>
+
+              <div class="p-2.5 rounded-lg bg-[#FFF2D9] border-2 border-[#211B26] space-y-1">
+                <p data-taduwa-target-readout class="text-[11px] font-mono font-extrabold text-[#211B26]">
+                  Target (not measured output): 720p @ 30 FPS · Landscape [Game Audio]
+                </p>
+                <p data-taduwa-mode-note class="text-[11px] taduwa-muted leading-snug">
+                  Gameplay-first default: locks recording target to 720p/30 FPS (halving GPU &amp; encoder load vs. 60 FPS) to reduce game frame drops.
+                </p>
+              </div>
+
+              <div class="space-y-1.5">
+                <span class="block text-[10px] font-mono font-extrabold uppercase tracking-wider taduwa-muted">
+                  Target orientation
+                </span>
+                <div class="grid grid-cols-2 gap-1.5" role="group" aria-label="Target recording orientation">
+                  <button
+                    type="button"
+                    data-taduwa-orient="Landscape"
+                    aria-pressed="true"
+                    class="taduwa-mode-btn min-h-[40px] px-2 py-1 rounded-lg text-[11px] cursor-pointer"
+                  >
+                    Landscape
+                  </button>
+                  <button
+                    type="button"
+                    data-taduwa-orient="Portrait"
+                    aria-pressed="false"
+                    class="taduwa-mode-btn min-h-[40px] px-2 py-1 rounded-lg text-[11px] cursor-pointer"
+                  >
+                    Portrait
+                  </button>
+                </div>
+              </div>
+
+              <div class="space-y-1.5">
+                <span class="block text-[10px] font-mono font-extrabold uppercase tracking-wider taduwa-muted">
+                  Audio preference
+                </span>
+                <div class="grid grid-cols-3 gap-1.5" role="group" aria-label="Audio source preference">
+                  <button
+                    type="button"
+                    data-taduwa-audio="Game Audio"
+                    aria-pressed="true"
+                    class="taduwa-mode-btn min-h-[40px] px-1.5 py-1 rounded-lg text-[11px] cursor-pointer"
+                  >
+                    Game Audio
+                  </button>
+                  <button
+                    type="button"
+                    data-taduwa-audio="Mic / Speaker"
+                    aria-pressed="false"
+                    class="taduwa-mode-btn min-h-[40px] px-1.5 py-1 rounded-lg text-[11px] cursor-pointer"
+                  >
+                    Mic
+                  </button>
+                  <button
+                    type="button"
+                    data-taduwa-audio="Mute"
+                    aria-pressed="false"
+                    class="taduwa-mode-btn min-h-[40px] px-1.5 py-1 rounded-lg text-[11px] cursor-pointer"
+                  >
+                    Mute
+                  </button>
+                </div>
+                <p class="text-[10px] taduwa-muted leading-snug">
+                  Preference only — Android or the target game may restrict internal audio capture by app policy.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                data-taduwa-pop-toggle
+                aria-pressed="true"
+                class="taduwa-btn taduwa-btn-secondary w-full min-h-[42px] px-3 py-1.5 rounded-xl text-[11px] cursor-pointer"
+              >
+                Floating Pop Icon: ON (Tap to toggle)
+              </button>
+            </div>
+          </div>
+
+          {/* PANEL 3: OPTIONAL SHIZUKU GAME BOOST */}
+          <div data-taduwa-panel="boost" hidden class="space-y-3">
+            {/* Boost Top Subheader */}
+            <div class="flex items-center justify-between gap-2">
+              <button
+                type="button"
+                data-taduwa-boost-back
+                class="taduwa-btn taduwa-btn-secondary min-h-[40px] px-2.5 py-1 rounded-lg text-[11px] cursor-pointer"
+              >
+                &lt; Back
+              </button>
+              <strong class="text-sm font-extrabold">Game Boost (Optional)</strong>
+              <span
+                data-taduwa-boost-pill
+                class="taduwa-pill taduwa-pill-warn px-2 py-0.5 rounded-full text-[10px] font-mono"
+              >
+                SETUP
+              </span>
+            </div>
+
+            {/* Card 1: Shizuku Bridge */}
+            <div class="taduwa-card space-y-2">
+              <span class="block text-[10px] font-mono font-extrabold tracking-widest uppercase taduwa-muted">
+                Shizuku Bridge (No Root · Simulated)
+              </span>
+              <p data-taduwa-shizuku-status class="text-[11px] font-bold leading-snug">
+                Demo bridge is idle. Tap below to simulate granting Shizuku UID 2000 permission.
+              </p>
+              <button
+                type="button"
+                data-taduwa-shizuku-connect
+                class="taduwa-btn taduwa-btn-primary w-full min-h-[42px] px-3 py-1.5 rounded-xl text-xs cursor-pointer"
+              >
+                Simulate Grant Permission
+              </button>
+            </div>
+
+            {/* Card 2: Performance Profile & Network Stability */}
+            <div class="taduwa-card space-y-2.5">
+              <span class="block text-[10px] font-mono font-extrabold tracking-widest uppercase taduwa-muted">
+                Target Performance Profile
+              </span>
+
+              <div class="grid grid-cols-2 gap-1.5" role="group" aria-label="Dummy Shizuku performance profile">
+                <button
+                  type="button"
+                  data-taduwa-boost-profile="Off"
+                  aria-pressed="true"
+                  class="taduwa-mode-btn min-h-[40px] px-2 py-1 rounded-lg text-[11px] cursor-pointer"
+                >
+                  Off
+                </button>
+                <button
+                  type="button"
+                  data-taduwa-boost-profile="Performance"
+                  aria-pressed="false"
+                  class="taduwa-mode-btn min-h-[40px] px-2 py-1 rounded-lg text-[11px] cursor-pointer"
+                >
+                  Performance
+                </button>
+                <button
+                  type="button"
+                  data-taduwa-boost-profile="Smooth GPU (85%)"
+                  aria-pressed="false"
+                  class="taduwa-mode-btn min-h-[40px] px-2 py-1 rounded-lg text-[11px] cursor-pointer"
+                >
+                  Smooth GPU (85%)
+                </button>
+                <button
+                  type="button"
+                  data-taduwa-boost-profile="Cooling GPU (75%)"
+                  aria-pressed="false"
+                  class="taduwa-mode-btn min-h-[40px] px-2 py-1 rounded-lg text-[11px] cursor-pointer"
+                >
+                  Cooling GPU (75%)
+                </button>
+              </div>
+
+              <p data-taduwa-boost-note class="text-[11px] taduwa-muted leading-snug">
+                Off: leaves the target game and Android resolution at default system behavior.
+              </p>
+
+              <div class="space-y-1.5">
+                <button
+                  type="button"
+                  data-taduwa-toggle-quiet
+                  aria-pressed="true"
+                  class="taduwa-mode-btn w-full min-h-[40px] px-2.5 py-1.5 rounded-lg text-[11px] text-left cursor-pointer"
+                >
+                  Quiet heavy background apps: ON
+                </button>
+                <button
+                  type="button"
+                  data-taduwa-toggle-net
+                  aria-pressed="true"
+                  class="taduwa-mode-btn w-full min-h-[40px] px-2.5 py-1.5 rounded-lg text-[11px] text-left cursor-pointer"
+                >
+                  Network stability (scan lock + bg data): ON
+                </button>
+              </div>
+
+              <div class="space-y-1">
+                <span class="block text-[10px] font-mono font-extrabold uppercase tracking-wider taduwa-muted">
+                  Private DNS (Optional)
+                </span>
+                <div class="grid grid-cols-3 gap-1.5" role="group" aria-label="Optional Private DNS">
+                  <button
+                    type="button"
+                    data-taduwa-dns="System"
+                    aria-pressed="true"
+                    class="taduwa-mode-btn min-h-[38px] px-1.5 py-1 rounded-lg text-[11px] cursor-pointer"
+                  >
+                    System
+                  </button>
+                  <button
+                    type="button"
+                    data-taduwa-dns="1.1.1.1"
+                    aria-pressed="false"
+                    class="taduwa-mode-btn min-h-[38px] px-1.5 py-1 rounded-lg text-[11px] cursor-pointer"
+                  >
+                    1.1.1.1
+                  </button>
+                  <button
+                    type="button"
+                    data-taduwa-dns="Google"
+                    aria-pressed="false"
+                    class="taduwa-mode-btn min-h-[38px] px-1.5 py-1 rounded-lg text-[11px] cursor-pointer"
+                  >
+                    Google
+                  </button>
+                </div>
+                <p class="text-[10px] taduwa-muted leading-snug">
+                  Cuts local scan/bg contention (target app stays whitelisted) — never fixes weak signal or 2.4 GHz congestion.
+                </p>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 pt-0.5">
+                <button
+                  type="button"
+                  data-taduwa-apply-boost
+                  class="taduwa-btn taduwa-btn-primary min-h-[42px] px-2 py-1.5 rounded-xl text-[11px] cursor-pointer"
+                >
+                  Apply Boost Now
+                </button>
+                <button
+                  type="button"
+                  data-taduwa-reset-boost
+                  class="taduwa-btn taduwa-btn-stop min-h-[42px] px-2 py-1.5 rounded-xl text-[11px] cursor-pointer"
+                >
+                  Reset All Tweaks
+                </button>
+              </div>
+            </div>
+
+            {/* Card 3: Maintenance & Dummy Log */}
+            <div class="taduwa-card space-y-2">
+              <span class="block text-[10px] font-mono font-extrabold tracking-widest uppercase taduwa-muted">
+                Maintenance &amp; Dummy Shell Log
+              </span>
+              <button
+                type="button"
+                data-taduwa-jitter-demo
+                class="taduwa-btn taduwa-btn-secondary w-full min-h-[40px] px-2.5 py-1.5 rounded-xl text-[11px] cursor-pointer"
+              >
+                Run 12-Probe Jitter Demo
+              </button>
+              <pre
+                data-taduwa-boost-log
+                class="p-2.5 rounded-lg bg-[#FFF2D9] border-2 border-[#211B26] font-mono text-[10px] leading-relaxed text-[#211B26] whitespace-pre-wrap break-words"
+              >Dummy log idle — no real Android shell commands run in this browser preview.</pre>
+            </div>
+          </div>
+        </div>
+
+        {/* In-Phone Bottom Navigation Bar — crisp monochrome SVGs */}
+        <nav class="taduwa-tab-bar px-2 py-1.5 grid grid-cols-3 gap-1.5 text-[10px]" aria-label="TaDuwa preview tabs">
+          <button
+            type="button"
+            data-taduwa-tab="hub"
+            aria-selected="true"
+            class="taduwa-nav-tab min-h-[42px] rounded-xl flex flex-col items-center justify-center gap-0.5 cursor-pointer"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <rect x="3" y="3" width="8" height="8" rx="1.5" />
+              <rect x="13" y="3" width="8" height="8" rx="1.5" />
+              <rect x="3" y="13" width="8" height="8" rx="1.5" />
+              <rect x="13" y="13" width="8" height="8" rx="1.5" />
+            </svg>
+            <span>Play Hub</span>
+          </button>
+          <button
+            type="button"
+            data-taduwa-tab="studio"
+            aria-selected="false"
+            class="taduwa-nav-tab min-h-[42px] rounded-xl flex flex-col items-center justify-center gap-0.5 cursor-pointer"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <rect x="2" y="6" width="14" height="12" rx="2" />
+              <path d="m16 10 6-3v10l-6-3Z" />
+            </svg>
+            <span>Studio</span>
+          </button>
+          <button
+            type="button"
+            data-taduwa-tab="boost"
+            aria-selected="false"
+            class="taduwa-nav-tab min-h-[42px] rounded-xl flex flex-col items-center justify-center gap-0.5 cursor-pointer"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <path d="M13 2 4 14h7l-1 8 10-12h-7l0-8Z" />
+            </svg>
+            <span>Shizuku</span>
+          </button>
+        </nav>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  let taduwaPreviewAbort: AbortController | null = null;
+  const activeTimers = new Set<number>();
+
+  function clearTaduwaTimers() {
+    activeTimers.forEach((id) => window.clearInterval(id));
+    activeTimers.clear();
+  }
+
+  function formatDuration(totalSec: number): string {
+    const mins = Math.floor(totalSec / 60);
+    const secs = totalSec % 60;
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  }
+
+  function initTaDuwaPreview() {
+    taduwaPreviewAbort?.abort();
+    clearTaduwaTimers();
+    taduwaPreviewAbort = new AbortController();
+    const { signal } = taduwaPreviewAbort;
+
+    const roots = document.querySelectorAll<HTMLElement>('[data-taduwa-preview]');
+    roots.forEach((root) => {
+      type ViewName = 'hub' | 'studio' | 'boost';
+      type PresetName = 'cool' | 'warm';
+      type RecMode = 'smooth30' | 'auto60' | 'lightweight' | 'highfps';
+
+      let view: ViewName = 'hub';
+      let preset: PresetName = 'cool';
+      let recording: 'idle' | 'active' | 'paused' = 'idle';
+      let recSeconds = 0;
+      let recTimerId: number | null = null;
+      let recMode: RecMode = 'smooth30';
+      let orient: 'Landscape' | 'Portrait' = 'Landscape';
+      let audio: 'Game Audio' | 'Mic / Speaker' | 'Mute' = 'Game Audio';
+      let popEnabled = true;
+      let popExpanded = false;
+      let tcpRunCount = 0;
+      let shizukuGranted = false;
+      let boostProfile = 'Off';
+      let quietBg = true;
+      let netStable = true;
+      let dnsChoice = 'System';
+
+      const statusPill = root.querySelector<HTMLElement>('[data-taduwa-status-pill]');
+      const popBar = root.querySelector<HTMLElement>('[data-taduwa-pop-bar]');
+      const popLabel = root.querySelector<HTMLElement>('[data-taduwa-pop-label]');
+      const popExpandBtn = root.querySelector<HTMLButtonElement>('[data-taduwa-pop-expand]');
+      const popStopBtn = root.querySelector<HTMLButtonElement>('[data-taduwa-pop-stop]');
+
+      const safetyNote = root.querySelector<HTMLElement>('[data-taduwa-safety-note]');
+      const recIdleControls = root.querySelector<HTMLElement>('[data-taduwa-rec-idle-controls]');
+      const recActiveControls = root.querySelector<HTMLElement>('[data-taduwa-rec-active-controls]');
+      const recStatusEl = root.querySelector<HTMLElement>('[data-taduwa-rec-status]');
+      const pauseRecBtn = root.querySelector<HTMLButtonElement>('[data-taduwa-pause-rec]');
+      const hubFeedback = root.querySelector<HTMLElement>('[data-taduwa-hub-feedback]');
+      const homeBoostLabel = root.querySelector<HTMLElement>('[data-taduwa-home-boost-label]');
+
+      const metricRam = root.querySelector<HTMLElement>('[data-taduwa-metric-ram]');
+      const metricRamSub = root.querySelector<HTMLElement>('[data-taduwa-metric-ram-sub]');
+      const metricHeat = root.querySelector<HTMLElement>('[data-taduwa-metric-heat]');
+      const metricHeatSub = root.querySelector<HTMLElement>('[data-taduwa-metric-heat-sub]');
+      const metricDisplay = root.querySelector<HTMLElement>('[data-taduwa-metric-display]');
+      const metricPower = root.querySelector<HTMLElement>('[data-taduwa-metric-power]');
+      const metricNet = root.querySelector<HTMLElement>('[data-taduwa-metric-net]');
+      const tcpOutput = root.querySelector<HTMLElement>('[data-taduwa-tcp-output]');
+
+      const targetReadout = root.querySelector<HTMLElement>('[data-taduwa-target-readout]');
+      const modeNoteEl = root.querySelector<HTMLElement>('[data-taduwa-mode-note]');
+      const popToggleBtn = root.querySelector<HTMLButtonElement>('[data-taduwa-pop-toggle]');
+
+      const boostPill = root.querySelector<HTMLElement>('[data-taduwa-boost-pill]');
+      const shizukuStatusEl = root.querySelector<HTMLElement>('[data-taduwa-shizuku-status]');
+      const shizukuConnectBtn = root.querySelector<HTMLButtonElement>('[data-taduwa-shizuku-connect]');
+      const boostNoteEl = root.querySelector<HTMLElement>('[data-taduwa-boost-note]');
+      const quietToggleBtn = root.querySelector<HTMLButtonElement>('[data-taduwa-toggle-quiet]');
+      const netToggleBtn = root.querySelector<HTMLButtonElement>('[data-taduwa-toggle-net]');
+      const boostLogEl = root.querySelector<HTMLElement>('[data-taduwa-boost-log]');
+
+      const modeCopy: Record<RecMode, { res: string; fps: string; note: string }> = {
+        smooth30: {
+          res: '720p',
+          fps: '30 FPS',
+          note: 'Gameplay-first default: locks recording target to 720p/30 FPS (halving GPU & encoder load vs. 60 FPS) to reduce game frame drops.',
+        },
+        auto60: {
+          res: '720p',
+          fps: '60 FPS',
+          note: 'Auto (60): prefers 720p/60 FPS on >=6 GiB phones with healthy memory and heat; uses more GPU/encoder headroom than Smooth 30.',
+        },
+        lightweight: {
+          res: '480p',
+          fps: '24 FPS',
+          note: 'Lightweight: targets 480p/24 FPS (480p/30 fallback) to keep thermal and memory pressure minimal.',
+        },
+        highfps: {
+          res: '720p',
+          fps: '120 FPS (Exp)',
+          note: 'Experimental opt-in: tries 720p/120 (then 90/60) only with >=120 Hz display, >=8 GiB RAM, healthy heat, and hardware H.264.',
+        },
+      };
+
+      const profileNotes: Record<string, string> = {
+        Off: 'Off: leaves the target game and Android resolution at default system behavior.',
+        Performance: 'Performance: switches Android Game Mode to Performance for the target game at full 100% render scale.',
+        'Smooth GPU (85%)': 'Smooth GPU (85%): Performance mode + 85% render scale (~28% less GPU work in dummy benchmark model). Restart game after changing.',
+        'Cooling GPU (75%)': 'Cooling GPU (75%): Performance mode + 75% render scale (~44% less GPU work) for warm sessions.',
+      };
+
+      const setPressedGroup = (selector: string, attr: string, value: string) => {
+        root.querySelectorAll<HTMLButtonElement>(selector).forEach((btn) => {
+          btn.setAttribute('aria-pressed', btn.getAttribute(attr) === value ? 'true' : 'false');
+        });
+      };
+
+      const effectiveRecTarget = () => {
+        if (preset === 'warm') {
+          return { res: '480p', fps: '24 FPS (Safety Cap)' };
+        }
+        const info = modeCopy[recMode];
+        return { res: info.res, fps: info.fps };
+      };
+
+      const syncStatusPill = () => {
+        if (!statusPill) return;
+        statusPill.className = 'taduwa-pill px-2.5 py-1 rounded-full text-[11px] font-mono tracking-wider shrink-0';
+        if (recording === 'active') {
+          statusPill.classList.add('taduwa-pill-rec');
+          statusPill.textContent = 'REC';
+        } else if (recording === 'paused') {
+          statusPill.classList.add('taduwa-pill-warn');
+          statusPill.textContent = 'PAUSED';
+        } else if (preset === 'warm') {
+          statusPill.classList.add('taduwa-pill-warn');
+          statusPill.textContent = 'WARM';
+        } else {
+          statusPill.classList.add('taduwa-pill-ready');
+          statusPill.textContent = 'READY';
+        }
+      };
+
+      const syncPopBar = () => {
+        if (!popBar) return;
+        const showPop = recording !== 'idle' && popEnabled;
+        popBar.hidden = !showPop;
+        if (!showPop) return;
+
+        if (popLabel) {
+          popLabel.textContent = popExpanded
+            ? `Pop Icon [+] · ${formatDuration(recSeconds)} · ${recording === 'paused' ? 'Paused' : 'Live Dummy Rec'}`
+            : 'Pop Icon [+] · Collapsed over game';
+        }
+        if (popExpandBtn) {
+          popExpandBtn.setAttribute('aria-expanded', popExpanded ? 'true' : 'false');
+          popExpandBtn.textContent = popExpanded ? 'Collapse' : 'Expand';
+        }
+        if (popStopBtn) {
+          popStopBtn.hidden = !popExpanded;
+        }
+      };
+
+      const syncRecordingControls = () => {
+        const isIdle = recording === 'idle';
+        if (recIdleControls) recIdleControls.hidden = !isIdle;
+        if (recActiveControls) recActiveControls.hidden = isIdle;
+        if (!isIdle && recStatusEl) {
+          const target = effectiveRecTarget();
+          const stateLabel = recording === 'paused' ? 'Dummy Recording paused' : 'Dummy Recording active';
+          recStatusEl.textContent = `${stateLabel} (${target.res} @ ${target.fps}) · ${formatDuration(recSeconds)}`;
+        }
+        if (pauseRecBtn) {
+          pauseRecBtn.textContent = recording === 'paused' ? 'Resume' : 'Pause';
+        }
+        syncStatusPill();
+        syncPopBar();
+      };
+
+      const syncPresetMetrics = () => {
+        const isWarm = preset === 'warm';
+        if (safetyNote) safetyNote.hidden = !isWarm;
+        if (metricRam) metricRam.textContent = isWarm ? '1.4 / 6.0 GiB' : '4.8 / 8.0 GiB';
+        if (metricRamSub) metricRamSub.textContent = isWarm ? 'Tight memory (dummy)' : 'Healthy headroom';
+        if (metricHeat) metricHeat.textContent = isWarm ? 'Warm (MODERATE)' : 'Cool (NONE)';
+        if (metricHeatSub) metricHeatSub.textContent = isWarm ? 'Safety cap active' : 'No throttling';
+        if (metricDisplay) metricDisplay.textContent = isWarm ? '1080x2400 @ 60Hz' : '1080x2400 @ 120Hz';
+        if (metricPower) metricPower.textContent = isWarm ? 'Battery Saver: ON' : 'Battery Saver: OFF';
+        if (metricNet) metricNet.textContent = isWarm ? 'Wi-Fi · 2.4 GHz' : 'Wi-Fi · 5 GHz';
+
+        const target = effectiveRecTarget();
+        if (targetReadout) {
+          targetReadout.textContent = `Target (not measured output): ${target.res} @ ${target.fps} · ${orient} [${audio}]`;
+        }
+        if (modeNoteEl) {
+          modeNoteEl.textContent = modeCopy[recMode].note;
+        }
+        syncRecordingControls();
+      };
+
+      const syncShizukuUI = () => {
+        if (boostPill) {
+          boostPill.className = 'taduwa-pill px-2 py-0.5 rounded-full text-[10px] font-mono';
+          boostPill.classList.add(shizukuGranted ? 'taduwa-pill-ready' : 'taduwa-pill-warn');
+          boostPill.textContent = shizukuGranted ? 'READY' : 'SETUP';
+        }
+        if (shizukuStatusEl) {
+          shizukuStatusEl.textContent = shizukuGranted
+            ? 'Demo Shizuku connected (UID 2000 Mock). Controls update simulated logs only.'
+            : 'Demo bridge is idle. Tap below to simulate granting Shizuku UID 2000 permission.';
+        }
+        if (shizukuConnectBtn) {
+          shizukuConnectBtn.textContent = shizukuGranted
+            ? 'Disconnect Demo Bridge'
+            : 'Simulate Grant Permission';
+        }
+        if (homeBoostLabel) {
+          homeBoostLabel.textContent = shizukuGranted
+            ? `Shizuku Game Boost · READY (${boostProfile} · Dummy)`
+            : 'Shizuku Game Boost · Tap to inspect (Dummy)';
+        }
+      };
+
+      const applyView = (nextView: ViewName) => {
+        view = nextView;
+        root.dataset.taduwaView = nextView;
+        root.querySelectorAll<HTMLElement>('[data-taduwa-panel]').forEach((panel) => {
+          panel.hidden = panel.getAttribute('data-taduwa-panel') !== nextView;
+        });
+        setPressedGroup('[data-taduwa-set-view]', 'data-taduwa-set-view', nextView);
+        root.querySelectorAll<HTMLButtonElement>('[data-taduwa-tab]').forEach((tab) => {
+          tab.setAttribute('aria-selected', tab.getAttribute('data-taduwa-tab') === nextView ? 'true' : 'false');
+        });
+      };
+
+      const stopRecordingTimer = () => {
+        if (recTimerId !== null) {
+          window.clearInterval(recTimerId);
+          activeTimers.delete(recTimerId);
+          recTimerId = null;
+        }
+      };
+
+      const startRecordingTimer = () => {
+        stopRecordingTimer();
+        recTimerId = window.setInterval(() => {
+          if (recording === 'active') {
+            recSeconds += 1;
+            syncRecordingControls();
+          }
+        }, 1000);
+        activeTimers.add(recTimerId);
+      };
+
+      const stopDemoRecording = (feedbackText: string) => {
+        stopRecordingTimer();
+        recording = 'idle';
+        popExpanded = false;
+        syncRecordingControls();
+        if (hubFeedback) {
+          hubFeedback.textContent = feedbackText;
+          hubFeedback.hidden = false;
+        }
+      };
+
+      // Outer view controls
+      root.querySelectorAll<HTMLButtonElement>('[data-taduwa-set-view]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const val = btn.getAttribute('data-taduwa-set-view');
+          const nextView: ViewName = val === 'studio' || val === 'boost' ? val : 'hub';
+          applyView(nextView);
+        }, { signal });
+      });
+
+      // Bottom tabs inside phone
+      root.querySelectorAll<HTMLButtonElement>('[data-taduwa-tab]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const val = btn.getAttribute('data-taduwa-tab');
+          const nextView: ViewName = val === 'studio' || val === 'boost' ? val : 'hub';
+          applyView(nextView);
+        }, { signal });
+      });
+
+      // Device condition preset
+      root.querySelectorAll<HTMLButtonElement>('[data-taduwa-set-preset]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          preset = btn.getAttribute('data-taduwa-set-preset') === 'warm' ? 'warm' : 'cool';
+          root.dataset.taduwaPreset = preset;
+          setPressedGroup('[data-taduwa-set-preset]', 'data-taduwa-set-preset', preset);
+          syncPresetMetrics();
+        }, { signal });
+      });
+
+      // Play Hub actions
+      root.querySelector<HTMLButtonElement>('[data-taduwa-start-rec]')?.addEventListener('click', () => {
+        recording = 'active';
+        recSeconds = 0;
+        popExpanded = false;
+        startRecordingTimer();
+        syncRecordingControls();
+        if (hubFeedback) {
+          hubFeedback.textContent =
+            'Dummy simulation: launched recorder preview (no real screen capture or game intent sent).';
+          hubFeedback.hidden = false;
+        }
+      }, { signal });
+
+      root.querySelector<HTMLButtonElement>('[data-taduwa-play-only]')?.addEventListener('click', () => {
+        if (hubFeedback) {
+          hubFeedback.textContent =
+            'Dummy simulation: Play only launches the target game normally via standard Android intent without recording or modifying binaries.';
+          hubFeedback.hidden = false;
+        }
+      }, { signal });
+
+      root.querySelector<HTMLButtonElement>('[data-taduwa-stop-rec]')?.addEventListener('click', () => {
+        stopDemoRecording(
+          `Dummy simulation stopped after ${formatDuration(recSeconds)} — real app saves MP4 locally under Movies/TaDuwa.`,
+        );
+      }, { signal });
+
+      pauseRecBtn?.addEventListener('click', () => {
+        recording = recording === 'paused' ? 'active' : 'paused';
+        syncRecordingControls();
+      }, { signal });
+
+      root.querySelector<HTMLButtonElement>('[data-taduwa-screenshot]')?.addEventListener('click', () => {
+        if (hubFeedback) {
+          hubFeedback.textContent =
+            'Dummy simulation: screenshot captured (real app saves PNG locally under Pictures/TaDuwa).';
+          hubFeedback.hidden = false;
+        }
+      }, { signal });
+
+      // Pop Icon overlay strip controls
+      popExpandBtn?.addEventListener('click', () => {
+        popExpanded = !popExpanded;
+        syncPopBar();
+      }, { signal });
+
+      popStopBtn?.addEventListener('click', () => {
+        stopDemoRecording(
+          `Stopped via Floating Pop Icon preview (${formatDuration(recSeconds)}) — dummy simulation only.`,
+        );
+      }, { signal });
+
+      root.querySelector<HTMLButtonElement>('[data-taduwa-open-boost]')?.addEventListener('click', () => {
+        applyView('boost');
+      }, { signal });
+
+      root.querySelector<HTMLButtonElement>('[data-taduwa-boost-back]')?.addEventListener('click', () => {
+        applyView('hub');
+      }, { signal });
+
+      // Device Check TCP & Refresh
+      root.querySelector<HTMLButtonElement>('[data-taduwa-run-tcp]')?.addEventListener('click', () => {
+        tcpRunCount += 1;
+        if (tcpOutput) {
+          tcpOutput.textContent =
+            preset === 'warm'
+              ? `Dummy Check #${tcpRunCount}: 1.1.1.1:443 avg 38 ms (attempts: 31, 44, 39 ms) · 13 ms spread — NOT in-game ping.`
+              : `Dummy Check #${tcpRunCount}: 1.1.1.1:443 avg 18 ms (attempts: 17, 19, 18 ms) · 2 ms spread — NOT in-game ping.`;
+        }
+      }, { signal });
+
+      root.querySelector<HTMLButtonElement>('[data-taduwa-refresh-check]')?.addEventListener('click', () => {
+        syncPresetMetrics();
+        if (tcpOutput) {
+          tcpOutput.textContent =
+            preset === 'warm'
+              ? 'Refreshed dummy snapshot: Warm thermal & Battery Saver active.'
+              : 'Refreshed dummy snapshot: Cool thermal & 120Hz display ready.';
+        }
+      }, { signal });
+
+      // Recording Studio controls
+      root.querySelectorAll<HTMLButtonElement>('[data-taduwa-rec-mode]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const mode = btn.getAttribute('data-taduwa-rec-mode') as RecMode | null;
+          if (!mode || !modeCopy[mode]) return;
+          recMode = mode;
+          setPressedGroup('[data-taduwa-rec-mode]', 'data-taduwa-rec-mode', mode);
+          syncPresetMetrics();
+        }, { signal });
+      });
+
+      root.querySelectorAll<HTMLButtonElement>('[data-taduwa-orient]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          orient = btn.getAttribute('data-taduwa-orient') === 'Portrait' ? 'Portrait' : 'Landscape';
+          setPressedGroup('[data-taduwa-orient]', 'data-taduwa-orient', orient);
+          syncPresetMetrics();
+        }, { signal });
+      });
+
+      root.querySelectorAll<HTMLButtonElement>('[data-taduwa-audio]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const val = btn.getAttribute('data-taduwa-audio');
+          audio = val === 'Mic / Speaker' || val === 'Mute' ? val : 'Game Audio';
+          setPressedGroup('[data-taduwa-audio]', 'data-taduwa-audio', audio);
+          syncPresetMetrics();
+        }, { signal });
+      });
+
+      popToggleBtn?.addEventListener('click', () => {
+        popEnabled = !popEnabled;
+        popToggleBtn.setAttribute('aria-pressed', popEnabled ? 'true' : 'false');
+        popToggleBtn.textContent = popEnabled
+          ? 'Floating Pop Icon: ON (Tap to toggle)'
+          : 'Floating Pop Icon: OFF (Tap to enable)';
+        syncPopBar();
+      }, { signal });
+
+      // Shizuku Game Boost controls
+      shizukuConnectBtn?.addEventListener('click', () => {
+        shizukuGranted = !shizukuGranted;
+        syncShizukuUI();
+        if (boostLogEl) {
+          boostLogEl.textContent = shizukuGranted
+            ? '[DUMMY] Shizuku UserService bound (UID 2000 Mock) · Ready for preview commands.'
+            : '[DUMMY] Shizuku demo bridge disconnected. All settings remain untouched.';
+        }
+      }, { signal });
+
+      root.querySelectorAll<HTMLButtonElement>('[data-taduwa-boost-profile]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const profile = btn.getAttribute('data-taduwa-boost-profile') || 'Off';
+          boostProfile = profile;
+          setPressedGroup('[data-taduwa-boost-profile]', 'data-taduwa-boost-profile', profile);
+          if (boostNoteEl && profileNotes[profile]) {
+            boostNoteEl.textContent = profileNotes[profile];
+          }
+          syncShizukuUI();
+        }, { signal });
+      });
+
+      quietToggleBtn?.addEventListener('click', () => {
+        quietBg = !quietBg;
+        quietToggleBtn.setAttribute('aria-pressed', quietBg ? 'true' : 'false');
+        quietToggleBtn.textContent = `Quiet heavy background apps: ${quietBg ? 'ON' : 'OFF'}`;
+      }, { signal });
+
+      netToggleBtn?.addEventListener('click', () => {
+        netStable = !netStable;
+        netToggleBtn.setAttribute('aria-pressed', netStable ? 'true' : 'false');
+        netToggleBtn.textContent = `Network stability (scan lock + bg data): ${netStable ? 'ON' : 'OFF'}`;
+      }, { signal });
+
+      root.querySelectorAll<HTMLButtonElement>('[data-taduwa-dns]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const val = btn.getAttribute('data-taduwa-dns') || 'System';
+          dnsChoice = val;
+          setPressedGroup('[data-taduwa-dns]', 'data-taduwa-dns', val);
+        }, { signal });
+      });
+
+      root.querySelector<HTMLButtonElement>('[data-taduwa-apply-boost]')?.addEventListener('click', () => {
+        if (!shizukuGranted) {
+          if (boostLogEl) {
+            boostLogEl.textContent =
+              '[DUMMY] Permission needed first: tap "Simulate Grant Permission" above to preview Shizuku output.';
+          }
+          return;
+        }
+        if (boostLogEl) {
+          boostLogEl.textContent = [
+            `[DUMMY] Game Mode profile: ${boostProfile}`,
+            `[DUMMY] Quiet heavy third-party apps: ${quietBg ? 'applied (whitelisted system/target app)' : 'skipped'}`,
+            `[DUMMY] Network stability (scan lock + Data Saver): ${netStable ? 'enabled' : 'off'} · DNS: ${dnsChoice}`,
+            '[DUMMY] Note: simulated output only — zero real Android commands executed.',
+          ].join('\n');
+        }
+      }, { signal });
+
+      root.querySelector<HTMLButtonElement>('[data-taduwa-reset-boost]')?.addEventListener('click', () => {
+        boostProfile = 'Off';
+        quietBg = false;
+        netStable = false;
+        dnsChoice = 'System';
+        setPressedGroup('[data-taduwa-boost-profile]', 'data-taduwa-boost-profile', 'Off');
+        setPressedGroup('[data-taduwa-dns]', 'data-taduwa-dns', 'System');
+        if (boostNoteEl) boostNoteEl.textContent = profileNotes.Off;
+        if (quietToggleBtn) {
+          quietToggleBtn.setAttribute('aria-pressed', 'false');
+          quietToggleBtn.textContent = 'Quiet heavy background apps: OFF';
+        }
+        if (netToggleBtn) {
+          netToggleBtn.setAttribute('aria-pressed', 'false');
+          netToggleBtn.textContent = 'Network stability (scan lock + bg data): OFF';
+        }
+        syncShizukuUI();
+        if (boostLogEl) {
+          boostLogEl.textContent =
+            '[DUMMY] Reset All Tweaks requested: Game Mode=Off, Downscale=100%, Scans=Restored, Private DNS=System, EXIT=0 (mock).';
+        }
+      }, { signal });
+
+      root.querySelector<HTMLButtonElement>('[data-taduwa-jitter-demo]')?.addEventListener('click', () => {
+        if (boostLogEl) {
+          boostLogEl.textContent = [
+            '[DUMMY] Wi-Fi Link (mock): RSSI -54 dBm · 433 Mbps (5 GHz)',
+            '[DUMMY] 12-Probe TCP Jitter to 1.1.1.1:443 — avg 19 ms, min 15 ms, max 24 ms (NOT in-game server ping).',
+          ].join('\n');
+        }
+      }, { signal });
+
+      // Initial sync
+      syncPresetMetrics();
+      syncShizukuUI();
+    });
+  }
+
+  document.addEventListener('astro:page-load', initTaDuwaPreview);
+  document.addEventListener('astro:before-swap', () => {
+    taduwaPreviewAbort?.abort();
+    taduwaPreviewAbort = null;
+    clearTaduwaTimers();
+  });
+</script>

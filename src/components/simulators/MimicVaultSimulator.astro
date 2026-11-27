@@ -94,8 +94,16 @@ const { compact = false } = Astro.props;
       {/* Header & Journey Stepper Hub */}
       <div class="flex flex-wrap items-center justify-between gap-4 pb-4 mb-5 border-b border-purple-900/40">
         <div class="flex items-center gap-3">
-          <div class="w-11 h-11 rounded-xl bg-[#161a26] border border-purple-600/50 flex items-center justify-center shrink-0 shadow-md">
-            <ThematicIcon name="swords" class="w-6 h-6 text-purple-400" />
+          <div class="w-11 h-11 rounded-xl bg-[#161a26] border border-purple-600/50 p-1 flex items-center justify-center shrink-0 shadow-md overflow-hidden">
+            <img
+              src="/art/projects/mimic-icon.webp"
+              alt=""
+              width="44"
+              height="44"
+              class="w-full h-full object-contain rounded-lg"
+              loading="lazy"
+              decoding="async"
+            />
           </div>
           <div>
             <div class="flex items-center gap-2">
